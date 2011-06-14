@@ -1,0 +1,197 @@
+unit uSelectCompilerVersion;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ImgList, ComCtrls;
+
+type
+  TCompilerType = (Ct_Delphi, Ct_Lazarus_FPC, Ct_Oxygene);
+
+  TFrmSelCompilerVer = class(TForm)
+    LabelText:    TLabel;
+    ButtonOk:     TButton;
+    ButtonCancel: TButton;
+    ImageList1:   TImageList;
+    ListViewIDEs: TListView;
+    procedure FormActivate(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure ListViewIDEsDblClick(Sender: TObject);
+  private
+    FCompilerType: TCompilerType;
+    FShowCompiler: boolean;
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure LoadInstalledVersions;
+    property CompilerType: TCompilerType Read FCompilerType Write FCompilerType;
+    property ShowCompiler: boolean Read FShowCompiler Write FShowCompiler;
+  end;
+
+const
+  ListCompilerType: array[TCompilerType] of string = ('Delphi', 'Lazarus', 'Oxygene');
+
+implementation
+
+{$R *.dfm}
+
+uses
+  uRegistry,
+  uLazarusIDE,
+  uDelphiIDE,
+  CommCtrl,
+  ShellAPI,
+  uDelphiPrismIDE;
+
+procedure ExtractIconFileToImageList(ImageList: TImageList; const Filename: string);
+var
+  FileInfo: TShFileInfo;
+begin
+  if FileExists(Filename) then
+  begin
+    FillChar(FileInfo, SizeOf(FileInfo), 0);
+    SHGetFileInfo(PChar(Filename), 0, FileInfo, SizeOf(FileInfo),
+      SHGFI_ICON or SHGFI_SMALLICON);
+    if FileInfo.hIcon <> 0 then
+    begin
+      ImageList_AddIcon(ImageList.Handle, FileInfo.hIcon);
+      DestroyIcon(FileInfo.hIcon);
+    end;
+  end;
+end;
+
+{ TFrmSelDelphiVer }
+procedure TFrmSelCompilerVer.FormActivate(Sender: TObject);
+begin
+  LabelText.Caption := Format('%s compilers installed', [ListCompilerType[FCompilerType]]);
+end;
+
+procedure TFrmSelCompilerVer.FormCreate(Sender: TObject);
+begin
+  FShowCompiler := False;
+end;
+
+procedure TFrmSelCompilerVer.ListViewIDEsDblClick(Sender: TObject);
+begin
+  ButtonOk.Click;
+end;
+
+procedure TFrmSelCompilerVer.LoadInstalledVersions;
+var
+  item:     TListItem;
+  DelphiComp: TDelphiVersions;
+  FileName: string;
+  ImageIndex: integer;
+begin
+  case FCompilerType of
+    Ct_Delphi:
+    begin
+      for DelphiComp :=
+        Low(TDelphiVersions) to High(TDelphiVersions) do
+        if RegKeyExists(DelphiRegPaths[DelphiComp],
+          HKEY_CURRENT_USER) then
+          if RegReadStr(DelphiRegPaths[DelphiComp],
+            'App', FileName, HKEY_CURRENT_USER) and FileExists(FileName) then
+          begin
+            item := ListViewIDEs.Items.Add;
+            item.Caption := DelphiVersionsNames[DelphiComp];
+            item.SubItems.Add(FileName);
+            item.SubItems.Add(ExtractFilePath(FileName) + 'Dcc32.exe');
+            ExtractIconFileToImageList(ImageList1, Filename);
+            ImageIndex := ImageList1.Count - 1;
+            item.ImageIndex := ImageIndex;
+            item.Data := Pointer(Ord(Ct_Delphi));
+          end;
+
+    end;
+    Ct_Lazarus_FPC:
+    begin
+      if IsLazarusInstalled then
+      begin
+        FileName := GetLazarusIDEFileName;
+        item     := ListViewIDEs.Items.Add;
+        item.Caption := 'Lazarus';
+        item.SubItems.Add(FileName);
+        item.SubItems.Add(GetLazarusCompilerFileName);
+        ExtractIconFileToImageList(ImageList1, Filename);
+        ImageIndex := ImageList1.Count - 1;
+        item.ImageIndex := ImageIndex;
+        item.Data := Pointer(Ord(Ct_Lazarus_FPC));
+      end;
+    end;
+
+    Ct_Oxygene:
+    begin
+
+      if IsDelphiPrismInstalled then
+      begin
+        if FShowCompiler then
+        begin
+          FileName := GetDelphiPrismCompilerFileName;
+          item     := ListViewIDEs.Items.Add;
+          item.Caption := 'Oxygene';
+          item.SubItems.Add(FileName);
+          item.SubItems.Add(FileName);
+          ExtractIconFileToImageList(ImageList1, Filename);
+          //ExtractIconFileToImageList(ImageList1,ExtractFilePath(ParamStr(0))+'Extras\MonoDevelop.ico');
+          ImageIndex := ImageList1.Count - 1;
+          item.ImageIndex := ImageIndex;
+          item.Data := Pointer(Ord(Ct_Oxygene));
+        end
+        else
+        begin
+          if IsMonoDevelopInstalled and
+            IsDelphiPrismAttachedtoMonoDevelop then
+          begin
+            FileName := GetMonoDevelopIDEFileName;
+            item     := ListViewIDEs.Items.Add;
+            item.Caption := 'MonoDevelop';
+            item.SubItems.Add(FileName);
+            item.SubItems.Add(GetDelphiPrismCompilerFileName);
+            //ExtractIconFileToImageList(ImageList1,Filename);
+            ExtractIconFileToImageList(
+              ImageList1, ExtractFilePath(ParamStr(0)) + 'Extras\MonoDevelop.ico');
+            ImageIndex := ImageList1.Count - 1;
+            item.ImageIndex := ImageIndex;
+            item.Data := Pointer(Ord(Ct_Oxygene));
+          end;
+
+          if IsVS2008Installed and
+            IsDelphiPrismAttachedtoVS2008 then
+          begin
+            FileName := GetVS2008IDEFileName;
+            item     := ListViewIDEs.Items.Add;
+            item.Caption := 'Visual Studio 2008';
+            item.SubItems.Add(FileName);
+            item.SubItems.Add(GetDelphiPrismCompilerFileName);
+            ExtractIconFileToImageList(ImageList1, Filename);
+            ImageIndex := ImageList1.Count - 1;
+            item.ImageIndex := ImageIndex;
+            item.Data := Pointer(Ord(Ct_Oxygene));
+          end;
+
+          if IsVS2010Installed and
+            IsDelphiPrismAttachedtoVS2010 then
+          begin
+            FileName := GetVS2010IDEFileName;
+            item     := ListViewIDEs.Items.Add;
+            item.Caption := 'Visual Studio 2010';
+            item.SubItems.Add(FileName);
+            item.SubItems.Add(GetDelphiPrismCompilerFileName);
+            ExtractIconFileToImageList(ImageList1, Filename);
+            ImageIndex := ImageList1.Count - 1;
+            item.ImageIndex := ImageIndex;
+            item.Data := Pointer(Ord(Ct_Oxygene));
+          end;
+
+        end;
+
+      end;
+
+    end;
+  end;
+
+end;
+
+end.
