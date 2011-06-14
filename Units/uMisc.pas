@@ -1,0 +1,118 @@
+unit uMisc;
+
+interface
+
+uses
+ SysUtils,
+ Forms,
+ Windows,
+ Classes;
+
+procedure CaptureConsoleOutput(const lpCommandLine: string; OutPutList: TStrings);
+procedure MsgWarning(const Msg: string);
+procedure MsgInformation(const Msg: string);
+function  MsgQuestion(const Msg: string):Boolean;
+
+implementation
+
+
+procedure MsgWarning(const Msg: string);
+begin
+  Application.MessageBox(PChar(Msg), 'Warning', MB_OK + MB_ICONWARNING);
+end;
+
+procedure MsgInformation(const Msg: string);
+begin
+  Application.MessageBox(PChar(Msg), 'Information', MB_OK + MB_ICONINFORMATION);
+end;
+
+function  MsgQuestion(const Msg: string):Boolean;
+begin
+  Result:= Application.MessageBox(PChar(Msg), 'Information', MB_YESNO + MB_ICONINFORMATION)=IDYES;
+end;
+
+
+procedure CaptureConsoleOutput(const lpCommandLine: string; OutPutList: TStrings);
+const
+  ReadBuffer = 1048576;  // 1 MB Buffer
+var
+  lpPipeAttributes      : TSecurityAttributes;
+  ReadPipe              : THandle;
+  WritePipe             : THandle;
+  lpStartupInfo         : TStartUpInfo;
+  lpProcessInformation  : TProcessInformation;
+  Buffer                : PAnsiChar;
+  TotalBytesRead        : DWORD;
+  BytesRead             : DWORD;
+  Apprunning            : integer;
+  n                     : integer;
+  BytesLeftThisMessage  : integer;
+  TotalBytesAvail       : integer;
+begin
+  with lpPipeAttributes do
+  begin
+    nlength := SizeOf(TSecurityAttributes);
+    binherithandle := True;
+    lpsecuritydescriptor := nil;
+  end;
+
+  if not CreatePipe(ReadPipe, WritePipe, @lpPipeAttributes, 0) then
+    exit;
+  try
+    Buffer := AllocMem(ReadBuffer + 1);
+    try
+      ZeroMemory(@lpStartupInfo, Sizeof(lpStartupInfo));
+      lpStartupInfo.cb      := SizeOf(lpStartupInfo);
+      lpStartupInfo.hStdOutput := WritePipe;
+      lpStartupInfo.hStdInput := ReadPipe;
+      lpStartupInfo.dwFlags := STARTF_USESTDHANDLES + STARTF_USESHOWWINDOW;
+      lpStartupInfo.wShowWindow := SW_HIDE;
+
+{
+function CreateProcess(lpApplicationName: PWideChar; lpCommandLine: PWideChar;
+  lpProcessAttributes, lpThreadAttributes: PSecurityAttributes;
+  bInheritHandles: BOOL; dwCreationFlags: DWORD; lpEnvironment: Pointer;
+  lpCurrentDirectory: PWideChar; const lpStartupInfo: TStartupInfo;
+  var lpProcessInformation: TProcessInformation): BOOL; stdcall;
+
+}
+
+      OutPutList.Add(lpCommandLine);
+      if CreateProcess(nil, PChar(lpCommandLine), @lpPipeAttributes,
+        @lpPipeAttributes, True, CREATE_NO_WINDOW or NORMAL_PRIORITY_CLASS, nil,
+        nil, lpStartupInfo, lpProcessInformation) then
+      begin
+        try
+          n := 0;
+          TotalBytesRead := 0;
+          repeat
+            Inc(n);
+            Apprunning := WaitForSingleObject(lpProcessInformation.hProcess, 100);
+            Application.ProcessMessages;
+            if not PeekNamedPipe(ReadPipe, @Buffer[TotalBytesRead],
+              ReadBuffer, @BytesRead, @TotalBytesAvail, @BytesLeftThisMessage) then
+              break
+            else
+            if BytesRead > 0 then
+              ReadFile(ReadPipe, Buffer[TotalBytesRead], BytesRead, BytesRead, nil);
+            Inc(TotalBytesRead, BytesRead);
+          until (Apprunning <> WAIT_TIMEOUT) or (n > 150);
+
+          Buffer[TotalBytesRead] := #0;
+          OemToCharA(Buffer, Buffer);
+          OutPutList.Text := OutPutList.Text + AnsiString(Buffer);
+        finally
+          CloseHandle(lpProcessInformation.hProcess);
+          CloseHandle(lpProcessInformation.hThread);
+        end;
+      end;
+    finally
+      FreeMem(Buffer);
+    end;
+  finally
+    CloseHandle(ReadPipe);
+    CloseHandle(WritePipe);
+  end;
+end;
+
+end.

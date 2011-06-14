@@ -1,0 +1,182 @@
+unit uLazarusIDE;
+
+interface
+
+uses
+  ShlObj,
+  ComObj,
+  ActiveX,
+  Classes,
+  Windows,
+  Variants,
+  SysUtils;
+
+function GetLazarusLocalFolder: string;
+function GetLazarusIDEFolder: string;
+function GetLazarusIDEFileName: string;
+function GetLazarusCompilerFileName: string;
+function IsLazarusInstalled: boolean;
+
+function  CreateLazarusProject(const FileName, Path, ProjectTemplate: string): boolean;
+procedure CompileAndRunFPCCode(Console:TStrings;const CompilerName, ProjectFile: string; Run: boolean);
+
+implementation
+
+uses
+  ShellAPI,
+  uMisc;
+
+const
+  LazarusConfigFile = 'environmentoptions.xml';
+  LazarusIDEName    = 'lazarus.exe';
+
+procedure CompileAndRunFPCCode(Console:TStrings;const CompilerName, ProjectFile: string; Run: boolean);
+var
+  ExeFile: string;
+begin
+  Console.Add('');
+  CaptureConsoleOutput(CompilerName + ' ' + Format('"%s"', [ProjectFile]), Console);
+  if Run then
+  begin
+    ExeFile := ChangeFileExt(ProjectFile, '.exe');
+    if FileExists(ExeFile) then
+      ShellExecute(0, nil, PChar(ExeFile), nil, nil, SW_SHOWNORMAL)
+    else
+      MsgWarning(Format('Could not find %s', [ExeFile]));
+  end;
+
+end;
+
+
+function CreateLazarusProject(const FileName, Path, ProjectTemplate: string): boolean;
+var
+  XmlDoc: olevariant;
+  Node:   olevariant;
+
+  LpiFileName: string;
+begin
+  Result := False;
+
+  LpiFileName := IncludeTrailingPathDelimiter(Path) + ChangeFileExt(FileName, '.lpi');
+  CopyFile(PChar(ProjectTemplate), PChar(LpiFileName), False);
+
+  XmlDoc := CreateOleObject('Msxml2.DOMDocument.6.0');
+  try
+    XmlDoc.Async := False;
+    XmlDoc.Load(LpiFileName);
+    XmlDoc.SetProperty('SelectionLanguage', 'XPath');
+
+    if (XmlDoc.parseError.errorCode <> 0) then
+      raise Exception.CreateFmt('Error in Xml Data %s', [XmlDoc.parseError]);
+
+    Node := XmlDoc.selectSingleNode(
+      '//CONFIG/ProjectOptions/Units/Unit0/Filename/@Value');
+    if not VarIsClear(Node) then
+      Node.Text := FileName;
+
+    Node := XmlDoc.selectSingleNode(
+      '//CONFIG/ProjectOptions/JumpHistory/Position1/Filename/@Value');
+    if not VarIsClear(Node) then
+      Node.Text := FileName;
+       {
+       Node  :=XmlDoc.selectSingleNode('//CONFIG/CompilerOptions/Target/Filename/@Value');
+       if not VarIsClear(Node) then
+       Node.Text:=ChangeFileExt(FileName,'');
+       }
+    XmlDoc.Save(LpiFileName);
+    Result := True;
+  finally
+    XmlDoc := Unassigned;
+  end;
+end;
+
+function GetLocalAppDataFolder: string;
+const
+  CSIDL_LOCAL_APPDATA = $001C;
+var
+  ppMalloc: IMalloc;
+  ppidl:    PItemIdList;
+begin
+  ppidl := nil;
+  try
+    if SHGetMalloc(ppMalloc) = S_OK then
+    begin
+      SHGetSpecialFolderLocation(0, CSIDL_LOCAL_APPDATA, ppidl);
+      SetLength(Result, MAX_PATH);
+      if not SHGetPathFromIDList(ppidl, PChar(Result)) then
+        RaiseLastOSError;
+      SetLength(Result, lStrLen(PChar(Result)));
+    end;
+  finally
+    if ppidl <> nil then
+      ppMalloc.Free(ppidl);
+  end;
+end;
+
+
+function GetLazarusLocalFolder: string;
+begin
+  Result := Format('%slazarus', [IncludeTrailingPathDelimiter(GetLocalAppDataFolder)]);
+  if not DirectoryExists(Result) then
+    Result := '';
+end;
+
+
+function GetConfigLazarusValue(const AValue: string): string;
+var
+  LocalFolder: TFileName;
+  FileName: TFileName;
+  XmlDoc: olevariant;
+  Node: olevariant;
+begin
+  Result      := '';
+  LocalFolder := GetLazarusLocalFolder;
+  if LocalFolder <> '' then
+  begin
+    FileName := Format('%s%s', [IncludeTrailingPathDelimiter(LocalFolder),
+      LazarusConfigFile]);
+    if FileExists(FileName) then
+    begin
+      XmlDoc := CreateOleObject('Msxml2.DOMDocument.6.0');
+      try
+        XmlDoc.Async := False;
+        XmlDoc.Load(FileName);
+        XmlDoc.SetProperty('SelectionLanguage', 'XPath');
+
+        if (XmlDoc.parseError.errorCode <> 0) then
+          raise Exception.CreateFmt('Error in Xml Data %s', [XmlDoc.parseError]);
+
+        Node := XmlDoc.selectSingleNode(AValue);
+        if not VarIsClear(Node) then
+          Result := Node.Text;
+      finally
+        XmlDoc := Unassigned;
+      end;
+    end;
+  end;
+end;
+
+
+function GetLazarusIDEFolder: string;
+begin
+  Result := GetConfigLazarusValue('//CONFIG/EnvironmentOptions/LazarusDirectory/@Value');
+end;
+
+function GetLazarusIDEFileName: string;
+begin
+  Result := Format('%s%s', [IncludeTrailingPathDelimiter(GetLazarusIDEFolder),
+    LazarusIDEName]);
+end;
+
+function GetLazarusCompilerFileName: string;
+begin
+  Result := GetConfigLazarusValue('//CONFIG/EnvironmentOptions/CompilerFilename/@Value');
+end;
+
+function IsLazarusInstalled: boolean;
+begin
+  Result := FileExists(GetLazarusIDEFileName);
+end;
+
+
+end.

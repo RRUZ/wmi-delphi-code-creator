@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "GetWMI_Info", "GetWMI_Info.oxygene", "{F3043BF1-BB6F-42F2-82ED-54D0969AABB4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F3043BF1-BB6F-42F2-82ED-54D0969AABB4}.Debug|x86.ActiveCfg = Debug|x86
+		{F3043BF1-BB6F-42F2-82ED-54D0969AABB4}.Debug|x86.Build.0 = Debug|x86
+		{F3043BF1-BB6F-42F2-82ED-54D0969AABB4}.Release|x86.ActiveCfg = Release|x86
+		{F3043BF1-BB6F-42F2-82ED-54D0969AABB4}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = GetWMI_Info.oxygene
+	EndGlobalSection
+EndGlobal
