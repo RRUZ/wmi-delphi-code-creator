@@ -4,7 +4,6 @@ uses
   Forms,
   Main in 'Main.pas' {FrmMain},
   uWmiTree in 'Units\uWmiTree.pas' {FrmWMITree},
-  uWmi_Metadata in '..\..\2007\WmiMetadata\uWmi_Metadata.pas',
   uDelphiSyntax in 'Units\uDelphiSyntax.pas',
   uListView_Helper in 'Units\uListView_Helper.pas',
   uWmi_About in 'Units\uWmi_About.pas' {FrmAbout},
@@ -26,7 +25,8 @@ uses
   uWmiGenCode in 'Units\uWmiGenCode.pas',
   uWmiOxygenCode in 'Units\uWmiOxygenCode.pas',
   uWmiFPCCode in 'Units\uWmiFPCCode.pas',
-  AsyncCalls in 'Units\AsyncCalls.pas';
+  AsyncCalls in 'Units\AsyncCalls.pas',
+  uWmi_Metadata in 'Units\uWmi_Metadata.pas';
 
 {$R *.res}
 
