@@ -56,7 +56,7 @@ end;
 
 procedure CaptureConsoleOutput(const lpCommandLine: string; OutPutList: TStrings);
 const
-  ReadBuffer = 1048576;  // 1 MB Buffer
+  ReadBuffer = 1048576;
 var
   lpPipeAttributes      : TSecurityAttributes;
   ReadPipe              : THandle;
