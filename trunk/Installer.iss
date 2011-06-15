@@ -130,6 +130,7 @@ DisableProgramGroupPage=false
 AppID=WmiDelphiCodeCreator
 SetupIconFile=Images\Icon.ico
 DefaultGroupName=WmiDelphiCodeCreator
+MinVersion=,5.01.2600
 [Code]
 procedure LoadSkin(lpszPath: String; lpszIniFileName: String); external 'LoadSkin@files:isskin.dll stdcall';
 procedure UnloadSkin(); external 'UnloadSkin@files:isskin.dll stdcall';
