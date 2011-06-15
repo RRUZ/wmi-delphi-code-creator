@@ -45,7 +45,7 @@
 			<DelphiCompile Include="WmiDelphiCodeCreator.dpr">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="MainWmiDelphiC.pas">
+			<DCCReference Include="Main.pas">
 				<Form>FrmMain</Form>
 			</DCCReference>
 			<DCCReference Include="Units\uWmiTree.pas">
@@ -54,11 +54,10 @@
 			<DCCReference Include="..\..\2007\WmiMetadata\uWmi_Metadata.pas"/>
 			<DCCReference Include="Units\uDelphiSyntax.pas"/>
 			<DCCReference Include="Units\uListView_Helper.pas"/>
-			<DCCReference Include="Units\Wmi_About.pas">
+			<DCCReference Include="Units\uWmi_About.pas">
 				<Form>FrmAbout</Form>
 			</DCCReference>
 			<DCCReference Include="Units\uWmiDelphiCode.pas"/>
-			<DCCReference Include="C:\Delphi\Librerias\AsyncCalls\AsyncCalls.pas"/>
 			<DCCReference Include="Units\uDelphiIDE.pas"/>
 			<DCCReference Include="Units\uDelphiPrismHelper.pas"/>
 			<DCCReference Include="Units\uDelphiPrismIDE.pas"/>
@@ -66,7 +65,7 @@
 			<DCCReference Include="Units\uSelectCompilerVersion.pas">
 				<Form>FrmSelCompilerVer</Form>
 			</DCCReference>
-			<DCCReference Include="Units\Wmi_ViewPropsValues.pas">
+			<DCCReference Include="Units\uWmi_ViewPropsValues.pas">
 				<Form>FrmWmiVwProps</Form>
 			</DCCReference>
 			<DCCReference Include="Units\uRegistry.pas"/>
@@ -84,6 +83,7 @@
 			<DCCReference Include="Units\uWmiGenCode.pas"/>
 			<DCCReference Include="Units\uWmiOxygenCode.pas"/>
 			<DCCReference Include="Units\uWmiFPCCode.pas"/>
+			<DCCReference Include="Units\AsyncCalls.pas"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
@@ -109,7 +109,7 @@
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>
 						<VersionInfo Name="Release">1</VersionInfo>
-						<VersionInfo Name="Build">80</VersionInfo>
+						<VersionInfo Name="Build">83</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -121,7 +121,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription"/>
-						<VersionInfoKeys Name="FileVersion">1.0.1.80</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.0.1.83</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright"/>
 						<VersionInfoKeys Name="LegalTrademarks"/>

@@ -1,3 +1,25 @@
+{**************************************************************************************************}
+{                                                                                                  }
+{ Unit uComboBox                                                                                   }
+{ Unit for the WMI Delphi Code Creator                                                             }
+{                                                                                                  }
+{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
+{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
+{ License at http://www.mozilla.org/MPL/                                                           }
+{                                                                                                  }
+{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
+{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
+{ and limitations under the License.                                                               }
+{                                                                                                  }
+{ The Original Code is uComboBox.pas.                                                              }
+{                                                                                                  }
+{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011 Rodrigo Ruz V.                         }
+{ All Rights Reserved.                                                                             }
+{                                                                                                  }
+{**************************************************************************************************}
+
+
 unit uComboBox;
 
 interface
@@ -40,7 +62,7 @@ end;
 
 procedure TComboBox.DropDown;
 var
-  I: integer;
+  Index: integer;
 begin
   inherited DropDown;
   ItemWidth := 0;
@@ -48,9 +70,9 @@ begin
     Self.Perform(CB_SETDROPPEDWIDTH, FDropDownFixedWidth, 0)
   else
   begin
-    for I := 0 to Items.Count - 1 do
-      if (GetTextWidth(Items[I]) > ItemWidth) then
-        ItemWidth := GetTextWidth(Items[I]) + 8;
+    for Index := 0 to Items.Count - 1 do
+      if (GetTextWidth(Items[Index]) > ItemWidth) then
+        ItemWidth := GetTextWidth(Items[Index]) + 8;
     Self.Perform(CB_SETDROPPEDWIDTH, ItemWidth, 0);
   end;
 end;
