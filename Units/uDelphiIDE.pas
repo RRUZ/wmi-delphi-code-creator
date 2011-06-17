@@ -29,9 +29,11 @@ Uses
 type
   TDelphiVersions =
     (
+{
     Delphi4,
     Delphi5,
     Delphi6,
+}
     Delphi7,
     Delphi8,
     Delphi2005,
@@ -44,9 +46,11 @@ type
 
 const
   DelphiVersionsNames: array[TDelphiVersions] of string = (
+{
     'Delphi 4',
     'Delphi 5',
     'Delphi 6',
+}
     'Delphi 7',
     'Delphi 8',
     'BDS 2005',
@@ -58,9 +62,11 @@ const
     );
 
   DelphiRegPaths: array[TDelphiVersions] of string = (
+{
     '\Software\Borland\Delphi\4.0',
     '\Software\Borland\Delphi\5.0',
     '\Software\Borland\Delphi\6.0',
+}
     '\Software\Borland\Delphi\7.0',
     '\Software\Borland\BDS\2.0',
     '\Software\Borland\BDS\3.0',

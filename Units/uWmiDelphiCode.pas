@@ -27,8 +27,6 @@ uses
   uWmiGenCode,
   Classes;
 
-
-
 const
   sTagDelphiCodeParamsIn  = '[DELPHICODEINPARAMS]';
   sTagDelphiCodeParamsOut = '[DELPHICODEOUTPARAMS]';
@@ -36,15 +34,20 @@ const
   sTagDelphiEventsWql     = '[DELPHIEVENTSWQL]';
   sTagDelphiEventsOut     = '[DELPHIEVENTSOUT]';
 
+  DelphiMaxTypesClassCodeGen   =3;
 
-procedure GenerateDelphiWmiConsoleCode(const DestList, Props: TStrings;
-  const Namespace, WmiClass: string; UseHelperFunct: boolean);
+  DelphiWmiClassCodeSupported  : Array [0..DelphiMaxTypesClassCodeGen-1] of TWmiCode = (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
+
+  ListDelphiWmiClassTemplates           : Array [0..DelphiMaxTypesClassCodeGen-1] of  string = ('TemplateConsoleAppDelphi_TLB.pas', 'TemplateConsoleAppDelphi.pas', 'TemplateConsoleAppDelphi_COM.pas');
+  ListDelphiWmiClassSingletonTemplates  : Array [0..DelphiMaxTypesClassCodeGen-1] of  string = ('TemplateConsoleAppDelphiSingleton_TLB.pas', 'TemplateConsoleAppDelphiSingleton.pas', 'TemplateConsoleAppDelphi_COM.pas');
+
+
+procedure GenerateDelphiWmiConsoleCode(const DestList, Props: TStrings; const Namespace, WmiClass: string; UseHelperFunct: boolean;Mode:TWmiCode);
 
 procedure GenerateDelphiWmiEventCode(
   const DestList, ParamsIn, Values, Conds, PropsOut: TStrings;
   const Namespace, WmiEvent, WmiTargetInstance: string; PollSeconds: integer;
   UseHelperFunct, Intrinsic: boolean);
-
 
 procedure GenerateDelphiWmiInvokerCode(const DestList, ParamsIn, Values: TStrings;
   const Namespace, WmiClass, WmiMethod, WmiPath: string; UseHelperFunct: boolean);
@@ -89,7 +92,7 @@ end;
 
 //Delphi console Code
 procedure GenerateDelphiWmiConsoleCode(const DestList, Props: TStrings;
-  const Namespace, WmiClass: string; UseHelperFunct: boolean);
+  const Namespace, WmiClass: string; UseHelperFunct: boolean;Mode:TWmiCode);
 var
   StrCode: string;
   Descr: string;
@@ -99,6 +102,8 @@ var
   Len: integer;
   Singleton: boolean;
   Padding: string;
+
+  TemplateCode : string;
 begin
   Singleton := WmiClassIsSingleton(Namespace, WmiClass);
 
@@ -121,38 +126,85 @@ begin
     if Singleton then
     begin
       Padding := '';
+
       if UseHelperFunct then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesSingletonHelper[Lng_Delphi]))
+        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
-        StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesSingleton[Lng_Delphi]));
+        TemplateCode:='';
+
+        StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiClassSingletonTemplates[Integer(Mode)]));
     end
     else
     begin
       Padding := '  ';
       if UseHelperFunct then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesHelper[Lng_Delphi]))
+        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
-        StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplates[Lng_Delphi]));
+        TemplateCode:='';
+
+        StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiClassTemplates[Integer(Mode)]));
     end;
 
 
+    StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
 
     Len := GetMaxLengthItemName(Props) + 3;
 
-    if Props.Count > 0 then
-      for i := 0 to Props.Count - 1 do
-        if UseHelperFunct then
-          DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
-            Len) + 's %%s'',[VarStrNull(FWbemObject.%s)]));// %s',
-            [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]))
-        else
-          DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
-            Len) + 's %%s'',[FWbemObject.%s]));// %s', [Props.Names[i], Props.Names[i],
-            Props.ValueFromIndex[i]]));
+    case Mode of
+      WmiCode_Scripting:
+                          begin
+                            if Props.Count > 0 then
+                              for i := 0 to Props.Count - 1 do
+                                if UseHelperFunct then
+                                  DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
+                                    Len) + 's %%s'',[VarStrNull(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]))
+                                else
+                                  DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
+                                    Len) + 's %%s'',[FWbemPropertySet.Item(%s, 0).Get_Value]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+                          end;
+
+      WmiCode_LateBinding:
+                          begin
+                            if Props.Count > 0 then
+                              for i := 0 to Props.Count - 1 do
+                                if UseHelperFunct then
+                                  DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
+                                    Len) + 's %%s'',[VarStrNull(FWbemObject.%s)]));// %s',
+                                    [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]))
+                                else
+                                  DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
+                                    Len) + 's %%s'',[FWbemObject.%s]));// %s', [Props.Names[i], Props.Names[i],
+                                    Props.ValueFromIndex[i]]));
+                          end;
+
+
+
+      WmiCode_COM:
+                          begin
+
+                                 {
+                                 apObjects.Get('Caption', 0, pVal, pType, plFlavor);
+                                       Writeln(pVal);
+                                       VarClear(pVal);
+                                 }
+                            Padding:= Padding + StringOfChar(' ',11);
+                            if Props.Count > 0 then
+                              for i := 0 to Props.Count - 1 do
+                              begin
+                                  DynCode.Add(Padding + Format('apObjects.Get(%s, 0, pVal, pType, plFlavor);// %s',[QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+                                if UseHelperFunct then
+                                  DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[VarStrNull(pVal)]));', [Props.Names[i]]))
+                                else
+                                  DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[pVal]));', [Props.Names[i]]));
+                                  DynCode.Add(Padding + 'VarClear(pVal);');
+                                  DynCode.Add('');
+                              end;
+                          end;
+    end;
+
 
 
     StrCode := StringReplace(StrCode, sTagDelphiCode, DynCode.Text, [rfReplaceAll]);
@@ -196,6 +248,8 @@ var
 
   IsStatic:  boolean;
   ParamsStr: string;
+
+  TemplateCode : string;
 begin
 
   try
@@ -229,23 +283,27 @@ begin
     if IsStatic then
     begin
       if UseHelperFunct then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesStaticInvokerHelper[Lng_Delphi]))
+        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
+        TemplateCode:='';
+
+
         StrCode := TFile.ReadAllText(GetTemplateLocation(
           ListSourceTemplatesStaticInvoker[Lng_Delphi]));
     end
     else
     begin
       if UseHelperFunct then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesNonStaticInvokerHelper[Lng_Delphi]))
+        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
+        TemplateCode:='';
+
         StrCode := TFile.ReadAllText(GetTemplateLocation(
           ListSourceTemplatesNonStaticInvoker[Lng_Delphi]));
     end;
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiMethodName, WmiMethod, [rfReplaceAll]);

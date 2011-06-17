@@ -3,7 +3,7 @@ object FrmSettings: TFrmSettings
   Top = 302
   BorderStyle = bsDialog
   Caption = 'Settings'
-  ClientHeight = 187
+  ClientHeight = 201
   ClientWidth = 398
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,7 +21,7 @@ object FrmSettings: TFrmSettings
     Left = 0
     Top = 0
     Width = 398
-    Height = 152
+    Height = 166
     Align = alClient
     BorderWidth = 5
     TabOrder = 0
@@ -33,14 +33,54 @@ object FrmSettings: TFrmSettings
       Left = 6
       Top = 6
       Width = 386
-      Height = 140
-      ActivePage = TabSheet1
+      Height = 154
+      ActivePage = TabSheet2
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 615
-      ExplicitHeight = 276
+      ExplicitHeight = 140
+      object TabSheet2: TTabSheet
+        Caption = 'Delphi Code generation'
+        ImageIndex = 1
+        ExplicitLeft = 0
+        ExplicitTop = 28
+        ExplicitHeight = 112
+        object Label4: TLabel
+          Left = 3
+          Top = 35
+          Width = 108
+          Height = 13
+          Caption = 'Delphi WMI Class code'
+        end
+        object LabelDescr: TLabel
+          Left = 128
+          Top = 59
+          Width = 225
+          Height = 49
+          AutoSize = False
+          Caption = 'LabelDescr'
+          WordWrap = True
+        end
+        object CbDelphiCodewmiClass: TComboBox
+          Left = 128
+          Top = 32
+          Width = 225
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 0
+          OnChange = CbDelphiCodewmiClassChange
+        end
+        object CheckBoxHelper: TCheckBox
+          Left = 3
+          Top = 12
+          Width = 350
+          Height = 17
+          Caption = 'Create Helper functions in generated code to handle null values'
+          TabOrder = 1
+        end
+      end
       object TabSheet1: TTabSheet
         Caption = 'Theme Settings'
+        ExplicitHeight = 112
         object Label1: TLabel
           Left = 11
           Top = 8
@@ -115,11 +155,12 @@ object FrmSettings: TFrmSettings
   end
   object Panel2: TPanel
     Left = 0
-    Top = 152
+    Top = 166
     Width = 398
     Height = 35
     Align = alBottom
     TabOrder = 1
+    ExplicitTop = 152
     object ButtonApply: TButton
       Left = 6
       Top = 6

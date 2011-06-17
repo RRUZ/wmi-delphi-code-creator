@@ -70,6 +70,7 @@ var
   Len: integer;
   Singleton: boolean;
   Padding: string;
+  TemplateCode : string;
 begin
   Singleton := WmiClassIsSingleton(Namespace, WmiClass);
 
@@ -94,24 +95,29 @@ begin
     begin
       Padding := '';
       if UseHelperFunct then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesSingletonHelper[Lng_FPC]))
+        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
+        TemplateCode:='';
+
         StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesSingleton[Lng_FPC]));
     end
     else
     begin
       Padding := '  ';
       if UseHelperFunct then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesHelper[Lng_FPC]))
+        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
-        StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplates[Lng_FPC]));
+        TemplateCode:='';
+
+      StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplates[Lng_FPC]));
     end;
 
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
+
 
     Len := GetMaxLengthItemName(Props) + 3;
 
@@ -171,6 +177,7 @@ var
 
   IsStatic:  boolean;
   ParamsStr: string;
+  TemplateCode : string;
 begin
 
   try
@@ -204,18 +211,20 @@ begin
     if IsStatic then
     begin
       if UseHelperFunct then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesStaticInvokerHelper[Lng_FPC]))
+        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
+        TemplateCode:='';
+
         StrCode := TFile.ReadAllText(GetTemplateLocation(
           ListSourceTemplatesStaticInvoker[Lng_FPC]));
     end
     else
     begin
       if UseHelperFunct then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesNonStaticInvokerHelper[Lng_FPC]))
+        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
+        TemplateCode:='';
+
         StrCode := TFile.ReadAllText(GetTemplateLocation(
           ListSourceTemplatesNonStaticInvoker[Lng_FPC]));
     end;
@@ -225,6 +234,7 @@ begin
     StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiMethodName, WmiMethod, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiPath, WmiPath, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
 
 
     if IsStatic then
@@ -333,7 +343,7 @@ var
   StrCode: string;
   sValue:  string;
   Wql:     string;
-  i, Len:  integer;
+  i :  integer;
   Props:   TStrings;
 begin
   StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_FPC]));
@@ -363,8 +373,6 @@ begin
 
 
   //not wbemTargetInstance
-  Len   := GetMaxLengthItem(PropsOut) + 3;
-
   Props := TStringList.Create;
   try
     for i := 0 to PropsOut.Count - 1 do
