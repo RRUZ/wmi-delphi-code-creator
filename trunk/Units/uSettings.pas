@@ -25,7 +25,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit;
+  Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox;
 
 type
   TSettings = class
@@ -33,10 +33,14 @@ type
     FCurrentTheme: string;
     FFontSize: Word;
     FFontName: string;
+    FDelphiWmiClassCodeGenMode: Integer;
+    FDelphiWmiClassHelperFuncts: Boolean;
   published
     property CurrentTheme : string Read FCurrentTheme Write FCurrentTheme;
     property FontName     : string Read FFontName Write FFontName;
     property FontSize     : Word Read FFontSize Write FFontSize;
+    property DelphiWmiClassCodeGenMode : Integer Read FDelphiWmiClassCodeGenMode Write FDelphiWmiClassCodeGenMode;
+    property DelphiWmiClassHelperFuncts: Boolean Read FDelphiWmiClassHelperFuncts Write FDelphiWmiClassHelperFuncts;
   end;
 
 
@@ -55,6 +59,11 @@ type
     Label2: TLabel;
     Label3: TLabel;
     ButtonGetMore: TButton;
+    TabSheet2: TTabSheet;
+    Label4: TLabel;
+    CbDelphiCodewmiClass: TComboBox;
+    LabelDescr: TLabel;
+    CheckBoxHelper: TCheckBox;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -62,12 +71,15 @@ type
     procedure ComboBoxThemeChange(Sender: TObject);
     procedure ButtonGetMoreClick(Sender: TObject);
     procedure ComboBoxFontChange(Sender: TObject);
+    procedure CbDelphiCodewmiClassChange(Sender: TObject);
   private
     FSettings: TSettings;
     FCurrentTheme:  TIDETheme;
     FForm: TForm;
     procedure LoadFixedWidthFonts;
     procedure LoadThemes;
+    procedure LoadCodeGenData;
+
   public
     property Settings: TSettings Read FSettings Write FSettings;
     property Form: TForm Read FForm Write FForm;
@@ -90,7 +102,7 @@ uses
   SynEditHighlighter,
   StrUtils,
   IOUtils,
-  IniFiles;
+  IniFiles, uWmiDelphiCode, uWmiGenCode;
 
 const
   sThemesExt  ='.theme.xml';
@@ -188,6 +200,8 @@ begin
     Settings.CurrentTheme := iniFile.ReadString('Global', 'CurrentTheme', '');
     Settings.FontName     := iniFile.ReadString('Global', 'FontName', 'Consolas');
     Settings.FontSize     := iniFile.ReadInteger('Global', 'FontSize', 10);
+    Settings.DelphiWmiClassCodeGenMode     := iniFile.ReadInteger('Global', 'DelphiWmiClassCodeGenMode', integer(WmiCode_LateBinding));
+    Settings.DelphiWmiClassHelperFuncts    := iniFile.ReadBool('Global', 'DelphiWmiClassHelperFuncts', False);
   finally
     iniFile.Free;
   end;
@@ -202,9 +216,25 @@ begin
     iniFile.WriteString('Global', 'CurrentTheme', Settings.CurrentTheme);
     iniFile.WriteString('Global', 'FontName', Settings.FontName);
     iniFile.WriteInteger('Global', 'FontSize', Settings.FontSize);
+    iniFile.WriteInteger('Global', 'DelphiWmiClassCodeGenMode', Settings.DelphiWmiClassCodeGenMode);
+    iniFile.WriteBool('Global', 'DelphiWmiClassHelperFuncts', Settings.DelphiWmiClassHelperFuncts);
   finally
     iniFile.Free;
   end;
+end;
+
+procedure TFrmSettings.LoadCodeGenData;
+var
+  i : integer;
+begin
+ CbDelphiCodewmiClass.Items.Clear;
+ CbDelphiCodewmiClass.Items.BeginUpdate;
+ try
+   for i := 0 to DelphiMaxTypesClassCodeGen-1 do
+     CbDelphiCodewmiClass.Items.Add(ListWmiCodeName[DelphiWmiClassCodeSupported[i]])
+ finally
+    CbDelphiCodewmiClass.Items.EndUpdate;
+ end;
 end;
 
 procedure TFrmSettings.LoadFixedWidthFonts;
@@ -237,6 +267,8 @@ begin
     FSettings.CurrentTheme := ComboBoxTheme.Text;
     FSettings.FontName     := ComboBoxFont.Text;
     FSettings.FontSize     := StrToInt(EditFontSize.Text);
+    FSettings.DelphiWmiClassCodeGenMode     := CbDelphiCodewmiClass.ItemIndex;
+    FSettings.DelphiWmiClassHelperFuncts    := CheckBoxHelper.Checked;
     WriteSettings(FSettings);
     Close();
   end;
@@ -275,6 +307,11 @@ begin
 end;
 
 
+procedure TFrmSettings.CbDelphiCodewmiClassChange(Sender: TObject);
+begin
+   LabelDescr.Caption:=ListWmiCodeDescr[TWmiCode(CbDelphiCodewmiClass.ItemIndex)];
+end;
+
 procedure TFrmSettings.ComboBoxFontChange(Sender: TObject);
 begin
   LoadCurrentThemeFont(FForm,ComboBoxFont.Text,StrToInt(EditFontSize.Text));
@@ -292,6 +329,7 @@ begin
   DummyFrm:=Self;
   LoadFixedWidthFonts;
   LoadThemes;
+  LoadCodeGenData;
 end;
 
 procedure TFrmSettings.FormDestroy(Sender: TObject);
@@ -305,6 +343,9 @@ begin
   ComboBoxTheme.ItemIndex := ComboBoxTheme.Items.IndexOf(FSettings.CurrentTheme);
   ComboBoxFont.ItemIndex  := ComboBoxFont.Items.IndexOf(FSettings.FontName);
   UpDown1.Position        := FSettings.FontSize;
+  CbDelphiCodewmiClass.ItemIndex  := FSettings.DelphiWmiClassCodeGenMode;
+  LabelDescr.Caption:=ListWmiCodeDescr[TWmiCode(CbDelphiCodewmiClass.ItemIndex)];
+  CheckBoxHelper.Checked    := FSettings.FDelphiWmiClassHelperFuncts;
 end;
 
 function GetThemeNameFromFile(const FileName:string): string;

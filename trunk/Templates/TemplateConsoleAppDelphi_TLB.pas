@@ -19,6 +19,7 @@ uses
   SysUtils,
   ActiveX,
   ComObj,
+  WbemScripting_TLB,
   Variants;
   
 [HELPER_FUNCTIONS]
@@ -31,22 +32,27 @@ const
   WbemComputer        ='localhost';
   wbemFlagForwardOnly = $00000020;
 var
-  FSWbemLocator : OLEVariant;
-  FWMIService   : OLEVariant;
-  FWbemObjectSet: OLEVariant;
-  FWbemObject   : OLEVariant;
+  FSWbemLocator : ISWbemLocator;
+  FWMIService   : ISWbemServices;
+  FWbemObjectSet: ISWbemObjectSet;
+  FWbemObject   : ISWbemObject;
+  FWbemPropertySet: ISWbemPropertySet; 
+  TempObj         : OleVariant;  
   oEnum         : IEnumvariant;
-  iValue        : LongWord;
-begin;
-  FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
-  FWMIService   := FSWbemLocator.ConnectServer(WbemComputer, '[WMINAMESPACE]', WbemUser, WbemPassword);
-  FWbemObjectSet:= FWMIService.ExecQuery('SELECT * FROM [WMICLASSNAME]','WQL',wbemFlagForwardOnly);
+  iValue        : Cardinal;
+begin                
+  FSWbemLocator := CoSWbemLocator.Create;
+  FWMIService   := FSWbemLocator.ConnectServer(WbemComputer, '[WMINAMESPACE]', WbemUser, WbemPassword, '', '', 0, nil);
+  FWbemObjectSet:= FWMIService.ExecQuery('SELECT * FROM [WMICLASSNAME]','WQL', wbemFlagForwardOnly, nil);
   oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, FWbemObject, iValue) = 0 do
+  while oEnum.Next(1, TempObj, iValue) = 0 do
   begin
+    FWbemObject     := IUnknown(TempObj) as ISWBemObject;
+    FWbemPropertySet:= FWbemObject.Properties_;
+  
 [DELPHICODE]	    
     Writeln('');
-    FWbemObject:=Unassigned;
+    TempObj:=Unassigned;
   end;
 end;
 

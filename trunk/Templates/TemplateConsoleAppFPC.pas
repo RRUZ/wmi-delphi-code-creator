@@ -21,6 +21,8 @@ uses
   ComObj,
   Variants;
                 
+[HELPER_FUNCTIONS]
+				
 [WMICLASSDESC]
 procedure  Get[WMICLASSNAME]Info;
 const

@@ -28,10 +28,12 @@ uses
 
 type
   TSourceLanguages = (Lng_Delphi, Lng_FPC, Lng_Oxygen);
+  TWmiCode        =  (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
 
 const
   WbemEmptyParam     = 'VarEmpty';
   sTagVersionApp     = '[VERSIONAPP]';
+  sTagHelperTemplate = '[HELPER_FUNCTIONS]';
   sTagWmiClassName   = '[WMICLASSNAME]';
   sTagWmiNameSpace   = '[WMINAMESPACE]';
   sTagWmiClassDescr  = '[WMICLASSDESC]';
@@ -39,40 +41,34 @@ const
   sTagWmiMethodDescr = '[WMIMETHODDESC]';
   sTagWmiPath        = '[WMIPATH]';
 
+  sTemplateTemplateFuncts = 'TemplateHelperFunctions.pas';
+
   ListSourceLanguages: array[TSourceLanguages] of
     string = ('Delphi', 'Free Pascal', 'Delphi Prism');
+
   ListSourceTemplates: array[TSourceLanguages] of
     string = ('TemplateConsoleAppDelphi.pas', 'TemplateConsoleAppFPC.pas',
-    'TemplateConsoleAppOxygen.pas');
-  ListSourceTemplatesHelper: array[TSourceLanguages] of
-    string = ('TemplateConsoleAppDelphiHelper.pas', 'TemplateConsoleAppFPCHelper.pas',
     'TemplateConsoleAppOxygen.pas');
 
   ListSourceTemplatesSingleton: array[TSourceLanguages] of
     string = ('TemplateConsoleAppDelphiSingleton.pas', 'TemplateConsoleAppFPCSingleton.pas',
     'TemplateConsoleAppOxygen.pas');
-  ListSourceTemplatesSingletonHelper: array[TSourceLanguages] of
-    string = ('TemplateConsoleAppDelphiHelperSingleton.pas',
-    'TemplateConsoleAppFPCHelperSingleton.pas', 'TemplateConsoleAppOxygen.pas');
-
 
   ListSourceTemplatesStaticInvoker: array[TSourceLanguages] of
     string = ('TemplateStaticMethodInvokerDelphi.pas', 'TemplateStaticMethodInvokerFPC.pas',
     'TemplateStaticMethodInvokerOxygen.pas');
-  ListSourceTemplatesStaticInvokerHelper: array[TSourceLanguages] of
-    string = ('TemplateStaticMethodInvokerDelphi.pas', 'TemplateStaticMethodInvokerFPC.pas',
-    'TemplateStaticMethodInvokerOxygen.pas');    //no helper  for now
 
   ListSourceTemplatesNonStaticInvoker: array[TSourceLanguages] of
     string = ('TemplateNonStaticMethodInvokerDelphi.pas',
     'TemplateNonStaticMethodInvokerFPC.pas', 'TemplateNonStaticMethodInvokerOxygen.pas');
-  ListSourceTemplatesNonStaticInvokerHelper: array[TSourceLanguages] of
-    string = ('TemplateNonStaticMethodInvokerDelphi.pas',
-    'TemplateNonStaticMethodInvokerFPC.pas', 'TemplateNonStaticMethodInvokerOxygen.pas');
 
-  //no helper  for now
   ListSourceTemplatesEvents: array[TSourceLanguages] of
     string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas');
+
+  ListWmiCodeName  : array [TWmiCode] of string = ('Microsoft WMI Scripting Library - WbemScripting_TLB','Microsoft WMI Scripting Library - Late Binding', 'WMI COM API');
+  ListWmiCodeDescr : array [TWmiCode] of string = ('Generate code using the Microsoft WMI Scripting Library using the WbemScripting_TLB unit',
+                                                   'Generate code using the Microsoft WMI Scripting Library using late binding',
+                                                   'Generate code using the COM API for WMI uisng the JwaWbemCli (part of the JEDI API Library)');
 
 
   function GetMaxLengthItemName(List: TStrings): integer;

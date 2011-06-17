@@ -66,6 +66,7 @@ var
   ClassDescr: TStrings;
   DynCode: TStrings;
   i: integer;
+  TemplateCode : string;
 begin
 
   try
@@ -83,14 +84,20 @@ begin
   ClassDescr := TStringList.Create;
   try
     DestList.Clear;
+
     if UseHelperFunct then
-      StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesHelper[Lng_Oxygen]))
+      TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
     else
-      StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplates[Lng_Oxygen]));
+      TemplateCode:='';
+
+    StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplates[Lng_Oxygen]));
+
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
+
 
     if Props.Count > 0 then
       for i := 0 to Props.Count - 1 do
@@ -142,6 +149,7 @@ var
   InParamsDescr: TStringList;
 
   IsStatic: boolean;
+  TemplateCode : string;
 begin
 
   try
@@ -175,18 +183,21 @@ begin
     if IsStatic then
     begin
       if UseHelperFunct then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesStaticInvokerHelper[Lng_Oxygen]))
+        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
+        TemplateCode:='';
+
         StrCode := TFile.ReadAllText(GetTemplateLocation(
           ListSourceTemplatesStaticInvoker[Lng_Oxygen]));
     end
     else
     begin
+
       if UseHelperFunct then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesNonStaticInvokerHelper[Lng_Oxygen]))
+        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
+        TemplateCode:='';
+
         StrCode := TFile.ReadAllText(GetTemplateLocation(
           ListSourceTemplatesNonStaticInvoker[Lng_Oxygen]));
     end;
@@ -196,6 +207,7 @@ begin
     StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiMethodName, WmiMethod, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiPath, WmiPath, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
 
 
     if IsStatic then

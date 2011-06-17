@@ -19,6 +19,8 @@ uses
   SysUtils,
   ActiveX,
   ComObj;
+  
+[HELPER_FUNCTIONS]
 
 [WMIMETHODDESC]
 procedure  Invoke_[WMICLASSNAME]_[WMIMETHOD];

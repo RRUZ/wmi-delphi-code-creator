@@ -20,6 +20,8 @@ uses
   ActiveX,
   ComObj,
   Variants;
+  
+[HELPER_FUNCTIONS]  
 
 [WMICLASSDESC]
 procedure  Get[WMICLASSNAME]Info;

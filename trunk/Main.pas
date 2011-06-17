@@ -1,7 +1,7 @@
 {**************************************************************************************************}
 {                                                                                                  }
 { Unit Main                                                                                        }
-{ Main Form  for the WMI Delphi Code Creator                                                       }
+{ Main Form for the WMI Delphi Code Creator                                                        }
 {                                                                                                  }
 { The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
 { you may not use this file except in compliance with the License. You may obtain a copy of the    }
@@ -32,12 +32,14 @@ interface
   improve source code
   automated tests
   store cache x machine
+
+  Select different templates for delphi code generation (COM, Late binding, TLB)
 }
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, SynEditHighlighter, SynHighlighterPas,
-  SynEdit, ImgList, ToolWin, uWmiTree,
+  SynEdit, ImgList, ToolWin, uWmiTree, uSettings,
   Menus, Buttons, uComboBox;
 
 const
@@ -134,7 +136,6 @@ type
     SynEditDelphiCodeInvoke: TSynEdit;
     SynEditEventCode: TSynEdit;
     PanelLanguageSet: TPanel;
-    CheckBoxHelperFunct: TCheckBox;
     ComboBoxLanguageSel: TComboBox;
     Label8:    TLabel;
     ComboBoxPaths: TComboBox;
@@ -170,7 +171,6 @@ type
     procedure ListViewMethodsParamsClick(Sender: TObject);
     procedure EditValueMethodParamExit(Sender: TObject);
     procedure OpeninDelphi1Click(Sender: TObject);
-    procedure CheckBoxHelperFunctClick(Sender: TObject);
     procedure ButtonGenerateCodeInvokerClick(Sender: TObject);
     procedure PageControlMainChange(Sender: TObject);
     procedure EditValueEventExit(Sender: TObject);
@@ -189,6 +189,8 @@ type
     FDataLoaded: boolean;
     FItem:      TListitem;
     FrmWMITree: TFrmWMITree;
+    Settings : TSettings;
+
     procedure UMEditValueParam(var msg: TMessage); message UM_EDITPARAMVALUE;
     procedure UMEditEventValue(var msg: TMessage); message UM_EDITEVENTVALUE;
     procedure UMEditEventCond(var msg: TMessage); message UM_EDITEVENTCOND;
@@ -250,8 +252,7 @@ uses
   uWmiOxygenCode,
   uWmiFPCCode,
   uWmiDatabase,
-  uMisc,
-  uSettings;
+  uMisc;
 
 const
   VALUE_METHODPARAM_COLUMN = 2;
@@ -292,20 +293,6 @@ end;
 procedure TFrmMain.ButtonGetValuesClick(Sender: TObject);
 begin
   GetValuesWmiProperties(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
-end;
-
-procedure TFrmMain.CheckBoxHelperFunctClick(Sender: TObject);
-begin
-   CheckBoxHelperFunct.Visible:=TSourceLanguages(ComboBoxLanguageSel.ItemIndex)<>Lng_Oxygen;
-
-  if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
-    GenerateObjectPascalConsoleCode
-  else
-  if PageControlCodeGen.ActivePage = TabSheetMethods then
-    GenerateObjectPascalMethodInvoker
-  else
-  if PageControlCodeGen.ActivePage = TabSheetEvents then
-    GenerateObjectPascalEventCode;
 end;
 
 procedure TFrmMain.CheckBoxPathClick(Sender: TObject);
@@ -494,18 +481,13 @@ var
   i:   TSourceLanguages;
   ProgressBarStyle: integer;
   Frm: TFrmWmiDatabase;
-  Settings : TSettings;
 begin
+  Settings :=TSettings.Create;
   SetToolBar;
 
-  Settings :=TSettings.Create;
-  try
-    ReadSettings(Settings);
-    LoadCurrentTheme(Self,Settings.CurrentTheme);
-    LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
-  finally
-    Settings.Free;
-  end;
+  ReadSettings(Settings);
+  LoadCurrentTheme(Self,Settings.CurrentTheme);
+  LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
 
   FDataLoaded := False;
   StatusBar1.Panels[2].Text := Format('WMI installed version %s      ', [GetWmiVersion]);
@@ -539,6 +521,7 @@ end;
 procedure TFrmMain.FormDestroy(Sender: TObject);
 begin
   FrmWMITree.Free;
+  Settings.Free;
 end;
 
 procedure TFrmMain.GenerateObjectPascalConsoleCode;
@@ -565,11 +548,11 @@ begin
 
     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
       Lng_Delphi: GenerateDelphiWmiConsoleCode(
-          SynEditDelphiCode.Lines, Props, Namespace, WmiClass, CheckBoxHelperFunct.Checked);
+          SynEditDelphiCode.Lines, Props, Namespace, WmiClass, Settings.DelphiWmiClassHelperFuncts,TWmiCode(Settings.DelphiWmiClassCodeGenMode));
       Lng_FPC: GenerateFPCWmiConsoleCode(
-          SynEditDelphiCode.Lines, Props, Namespace, WmiClass, CheckBoxHelperFunct.Checked);
+          SynEditDelphiCode.Lines, Props, Namespace, WmiClass, Settings.DelphiWmiClassHelperFuncts);
       Lng_Oxygen: GenerateOxygenWmiConsoleCode(
-          SynEditDelphiCode.Lines, Props, Namespace, WmiClass, CheckBoxHelperFunct.Checked);
+          SynEditDelphiCode.Lines, Props, Namespace, WmiClass, Settings.DelphiWmiClassHelperFuncts);
     end;
 
     SynEditDelphiCode.SelStart  := SynEditDelphiCode.GetTextLen;
@@ -617,13 +600,13 @@ begin
     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
       Lng_Delphi: GenerateDelphiWmiInvokerCode(
           SynEditDelphiCodeInvoke.Lines, Params, Values, Namespace, WmiClass, WmiMethod,
-          ComboBoxPaths.Text, CheckBoxHelperFunct.Checked);
+          ComboBoxPaths.Text, Settings.DelphiWmiClassHelperFuncts);
       Lng_FPC: GenerateFPCWmiInvokerCode(
           SynEditDelphiCodeInvoke.Lines, Params, Values, Namespace, WmiClass, WmiMethod,
-          ComboBoxPaths.Text, CheckBoxHelperFunct.Checked);
+          ComboBoxPaths.Text, Settings.DelphiWmiClassHelperFuncts);
       Lng_Oxygen: GenerateOxygenWmiInvokerCode(
           SynEditDelphiCodeInvoke.Lines, Params, Values, Namespace, WmiClass, WmiMethod,
-          ComboBoxPaths.Text, CheckBoxHelperFunct.Checked);
+          ComboBoxPaths.Text, Settings.DelphiWmiClassHelperFuncts);
     end;
 
 
@@ -686,15 +669,15 @@ begin
     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
       Lng_Delphi: GenerateDelphiWmiEventCode(
           SynEditEventCode.Lines, Params, Values, Conds, PropsOut, Namespace, WmiEvent,
-          WmiTargetInstance, PollSeconds, CheckBoxHelperFunct.Checked, RadioButtonIntrinsic.Checked);
+          WmiTargetInstance, PollSeconds, Settings.DelphiWmiClassHelperFuncts, RadioButtonIntrinsic.Checked);
 
       Lng_FPC: GenerateFPCWmiEventCode(
           SynEditEventCode.Lines, Params, Values, Conds, PropsOut, Namespace, WmiEvent,
-          WmiTargetInstance, PollSeconds, CheckBoxHelperFunct.Checked, RadioButtonIntrinsic.Checked);
+          WmiTargetInstance, PollSeconds, Settings.DelphiWmiClassHelperFuncts, RadioButtonIntrinsic.Checked);
 
       Lng_Oxygen:  GenerateOxygenWmiEventCode(
           SynEditEventCode.Lines, Params, Values, Conds, PropsOut, Namespace, WmiEvent,
-          WmiTargetInstance, PollSeconds, CheckBoxHelperFunct.Checked, RadioButtonIntrinsic.Checked);
+          WmiTargetInstance, PollSeconds, Settings.DelphiWmiClassHelperFuncts, RadioButtonIntrinsic.Checked);
     end;
 
     SynEditEventCode.SelStart  := SynEditEventCode.GetTextLen;
@@ -1655,6 +1638,7 @@ begin
     Frm.ShowModal();
   finally
     Frm.Free;
+    ReadSettings(Settings);
   end;
 end;
 

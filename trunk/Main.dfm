@@ -28,8 +28,7 @@ object FrmMain: TFrmMain
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
-    ExplicitTop = 24
-    ExplicitHeight = 513
+    ExplicitTop = 36
     object PageControlMain: TPageControl
       Left = 5
       Top = 5
@@ -103,6 +102,7 @@ object FrmMain: TFrmMain
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
+                ExplicitHeight = 406
                 DesignSize = (
                   308
                   404)
@@ -179,7 +179,7 @@ object FrmMain: TFrmMain
                   Left = 9
                   Top = 192
                   Width = 295
-                  Height = 180
+                  Height = 176
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -200,6 +200,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
+                  ExplicitHeight = 178
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -234,6 +235,7 @@ object FrmMain: TFrmMain
                   ExplicitHeight = 402
                   object TabSheetDelphiCode: TTabSheet
                     Caption = 'Code'
+                    ExplicitHeight = 368
                     object SynEditDelphiCode: TSynEdit
                       Left = 0
                       Top = 0
@@ -260,6 +262,7 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
+                      ExplicitHeight = 368
                     end
                   end
                 end
@@ -358,7 +361,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 124
+                  Height = 120
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -404,7 +407,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 346
+                  Top = 342
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -564,7 +567,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 169
+                  Height = 165
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -588,7 +591,6 @@ object FrmMain: TFrmMain
                   TabOrder = 4
                   ViewStyle = vsReport
                   OnClick = ListViewEventsCondsClick
-                  ExplicitHeight = 171
                 end
                 object EditValueEvent: TEdit
                   Left = 88
@@ -662,14 +664,13 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 351
+                  Top = 347
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 7
                   OnClick = ButtonGenerateEventCodeClick
-                  ExplicitTop = 353
                 end
                 object RadioButtonIntrinsic: TRadioButton
                   Left = 5
@@ -713,7 +714,6 @@ object FrmMain: TFrmMain
                   ExplicitHeight = 402
                   object TabSheet1: TTabSheet
                     Caption = 'Delphi Code'
-                    ExplicitHeight = 368
                     object SynEditEventCode: TSynEdit
                       Left = 0
                       Top = 0
@@ -740,7 +740,6 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
-                      ExplicitHeight = 368
                     end
                   end
                 end
@@ -806,15 +805,6 @@ object FrmMain: TFrmMain
               Height = 13
               Caption = 'Language'
             end
-            object CheckBoxHelperFunct: TCheckBox
-              Left = 290
-              Top = 14
-              Width = 232
-              Height = 17
-              Caption = 'Create helper functions in generated code'
-              TabOrder = 1
-              OnClick = CheckBoxHelperFunctClick
-            end
             object ComboBoxLanguageSel: TComboBox
               Left = 64
               Top = 14
@@ -822,7 +812,6 @@ object FrmMain: TFrmMain
               Height = 21
               Style = csDropDownList
               TabOrder = 0
-              OnChange = CheckBoxHelperFunctClick
             end
           end
         end
@@ -1022,7 +1011,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800D40010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800DC0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
