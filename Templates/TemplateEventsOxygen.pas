@@ -35,6 +35,8 @@ end;
 
 
 class method ConsoleApp.Main(args: array of string);
+const
+  sComputerName = 'localhost';
 var
   WmiQuery: String;
   Conn    : ConnectionOptions;
@@ -43,11 +45,19 @@ var
 begin
   Console.WriteLine('Listening Wmi Event - Press enter to exit');
   try
-      Conn  := new ConnectionOptions();
-      Conn.Username := '';
-      Conn.Password := '';
-      Scope := new System.Management.ManagementScope('\\localhost\[WMINAMESPACE]');
-      Scope.Connect();
+      
+	Conn  := new ConnectionOptions();
+    if sComputerName<>'localhost' then
+    begin
+      Conn.Username  := '';
+      Conn.Password  := '';
+      Conn.Authority := 'ntlmdomain:DOMAIN';
+      Scope := New ManagementScope(String.Format('\\{0}\[WMINAMESPACE]',sComputerName), Conn);
+    end
+    else
+    Scope := New ManagementScope(String.Format('\\{0}\[WMINAMESPACE]',sComputerName), nil);
+    Scope.Connect();
+	
     [OXYGENEVENTSWQL]
       Watcher := new ManagementEventWatcher(Scope, new EventQuery(WmiQuery));
       Watcher.EventArrived += new EventArrivedEventHandler(WmiEventHandler);
