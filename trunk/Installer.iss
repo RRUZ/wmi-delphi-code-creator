@@ -59,7 +59,6 @@ Source: Themes\wekeroad-ink.theme.xml; DestDir: {app}\Themes\
 Source: Themes\zenburn-2010.theme.xml; DestDir: {app}\Themes\
 Source: Themes\Zenburn.theme.xml; DestDir: {app}\Themes\
 Source: WmiDelphiCodeCreator.exe; DestDir: {app}
-Source: Delphi\WbemScripting_TLB.pas; DestDir: {app}\Delphi\
 Source: Extras\MonoDevelop.ico; DestDir: {app}\Extras\
 Source: Lazarus\TemplateConsole.lpi; DestDir: {app}\Lazarus\
 Source: Oxygene\MonoDevelop\Properties\App.ico; DestDir: {app}\Oxygene\MonoDevelop\Properties
@@ -87,23 +86,30 @@ Source: Oxygene\VS2010\Properties\Settings.Designer.pas; DestDir: {app}\Oxygene\
 Source: Oxygene\VS2010\Properties\Settings.settings; DestDir: {app}\Oxygene\VS2010\Properties
 Source: Oxygene\VS2010\GetWMI_Info.oxygene; DestDir: {app}\Oxygene\VS2010
 Source: Oxygene\VS2010\GetWMI_Info.sln; DestDir: {app}\Oxygene\VS2010
+Source: Delphi\Jedi.inc; DestDir: {app}\Delphi\
+Source: Delphi\JediAPILib.inc; DestDir: {app}\Delphi\
+Source: Delphi\JwaActiveX.pas; DestDir: {app}\Delphi\
+Source: Delphi\JwaWbemCli.pas; DestDir: {app}\Delphi\
+Source: Delphi\JwaWinDLLNames.pas; DestDir: {app}\Delphi\
+Source: Delphi\JwaWinNT.pas; DestDir: {app}\Delphi\
+Source: Delphi\JwaWinType.pas; DestDir: {app}\Delphi\
+Source: Delphi\WbemScripting_TLB.pas; DestDir: {app}\Delphi\
 Source: Templates\TemplateConsoleAppDelphi.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppDelphiHelper.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppDelphiHelperSingleton.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppDelphiSingleton.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppDelphiSingleton_TLB.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppDelphi_COM.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppDelphi_TLB.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppFPC.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppFPCHelper.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppFPCHelperSingleton.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppFPCSingleton.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppOxygen.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsDelphi.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsOxygen.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateHelperFunctions.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateStaticMethodInvokerDelphiHelper.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
 [Setup]
@@ -152,7 +158,6 @@ end;
 [Dirs]
 Name: {app}\Themes
 Name: {app}\Cache
-Name: {app}\Delphi
 Name: {app}\Extras
 Name: {app}\Lazarus
 Name: {app}\Oxygene
@@ -162,6 +167,7 @@ Name: {app}\Oxygene\VS2008
 Name: {app}\Oxygene\VS2008\Properties
 Name: {app}\Oxygene\VS2010
 Name: {app}\Oxygene\VS2010\Properties
+Name: {app}\Delphi
 Name: {app}\Templates
 [Icons]
 Name: {group}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}

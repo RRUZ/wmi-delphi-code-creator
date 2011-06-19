@@ -30,12 +30,32 @@ implementation
 
 [WMIMETHODDESC]
 class method ConsoleApp.Invoke_[WMICLASSNAME]_[WMIMETHOD](const WmiPath :string);
+const
+  sComputerName = 'localhost';
 var
-  classInstance  : ManagementObject;
+  ClassInstance  : ManagementObject;
   inParams       : ManagementBaseObject; 
   outParams      : ManagementBaseObject; 
+  Scope          : ManagementScope;
+  Conn           : ConnectionOptions;   
+  Path           : ManagementPath;
+  Options        : ObjectGetOptions;
 begin
-  classInstance  := new ManagementObject('[WMINAMESPACE]',WmiPath,nil);
+  Conn := new ConnectionOptions();
+  if sComputerName<>'localhost' then
+  begin
+    Conn.Username  := '';
+    Conn.Password  := '';
+    Conn.Authority := 'ntlmdomain:DOMAIN';
+    Scope := New ManagementScope(String.Format('\\{0}\[WMINAMESPACE]',sComputerName), Conn);
+  end
+  else
+  Scope := New ManagementScope(String.Format('\\{0}\[WMINAMESPACE]',sComputerName), nil);
+  scope.Connect();
+  
+  Options := New ObjectGetOptions();
+  Path    := New ManagementPath(WmiPath);  
+  ClassInstance  := new ManagementObject(scope, Path, Options);
   inParams       := classInstance.GetMethodParameters('[WMIMETHOD]');
 [DELPHICODEINPARAMS]  
   outParams      := classInstance.InvokeMethod('[WMIMETHOD]', inParams ,nil);

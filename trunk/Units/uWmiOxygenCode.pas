@@ -218,10 +218,10 @@ begin
           if Values[i] <> WbemEmptyParam then
             if ParamsIn.ValueFromIndex[i] = wbemtypeString then
               DynCodeInParams.Add(
-                Format('  inParams[%s]:=%s;', [ParamsIn.Names[i], QuotedStr(Values[i])]))
+                Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), QuotedStr(Values[i])]))
             else
               DynCodeInParams.Add(
-                Format('  inParams[%s]:=%s;', [ParamsIn.Names[i], Values[i]]));
+                Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), Values[i]]));
     end
     else
     begin
@@ -235,8 +235,7 @@ begin
               DynCodeInParams.Add(
                 Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), Values[i]]));
     end;
-    StrCode := StringReplace(StrCode, sTagOxygenCodeParamsIn, DynCodeInParams.Text,
-      [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagOxygenCodeParamsIn, DynCodeInParams.Text, [rfReplaceAll]);
 
 
     //Out Params
@@ -245,7 +244,7 @@ begin
       for i := 0 to OutParamsList.Count - 1 do
         DynCodeOutParams.Add(
           Format('  Console.WriteLine(''{0,-35} {1,-40}'',%s,outParams[%s]);',
-          [OutParamsList[i], QuotedStr(OutParamsList[i])]));
+          [QuotedStr(OutParamsList[i]), QuotedStr(OutParamsList[i])]));
     end
     else
     if OutParamsList.Count = 1 then

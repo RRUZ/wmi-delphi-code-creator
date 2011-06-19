@@ -40,10 +40,28 @@ begin
 end;
 
 class method ConsoleApp.Get[WMICLASSNAME]Info;
+const
+  sComputerName = 'localhost';
 var
   Searcher : ManagementObjectSearcher;
+  Scope    : ManagementScope;
+  Conn     : ConnectionOptions;  
+  Query    : ObjectQuery; 
 begin
-  Searcher := new ManagementObjectSearcher('[WMINAMESPACE]','select * from [WMICLASSNAME]');
+  Conn := new ConnectionOptions();
+  if sComputerName<>'localhost' then
+  begin
+    Conn.Username  := '';
+    Conn.Password  := '';
+    Conn.Authority := 'ntlmdomain:DOMAIN';
+    Scope := New ManagementScope(String.Format('\\{0}\[WMINAMESPACE]',sComputerName), Conn);
+  end
+  else
+  Scope := New ManagementScope(String.Format('\\{0}\[WMINAMESPACE]',sComputerName), nil);
+  
+  Scope.Connect();
+  Query := New ObjectQuery('SELECT * FROM [WMICLASSNAME]'); 				
+  Searcher := new ManagementObjectSearcher(Scope, Query);
     for WmiObject : ManagementObject  in Searcher.Get() do
     begin
 [OXYGENECODE]	

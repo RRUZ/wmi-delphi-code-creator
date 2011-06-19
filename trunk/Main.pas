@@ -34,6 +34,7 @@ interface
   store cache x machine
 
   Select different templates for delphi code generation (COM, Late binding, TLB)
+  Add remote support for wmi methods in delphi prism
 }
 
 uses
