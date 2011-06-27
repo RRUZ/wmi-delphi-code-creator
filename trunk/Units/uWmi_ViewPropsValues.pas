@@ -259,6 +259,7 @@ begin
   FWQL.Free;
   if FThread <> nil then
   begin
+   if not FThread.Terminated then
     FThread.Terminate;
     //FThread.Free;
   end;

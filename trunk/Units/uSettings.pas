@@ -35,12 +35,14 @@ type
     FFontName: string;
     FDelphiWmiClassCodeGenMode: Integer;
     FDelphiWmiClassHelperFuncts: Boolean;
+    FShowImplementedMethods: Boolean;
   published
     property CurrentTheme : string Read FCurrentTheme Write FCurrentTheme;
     property FontName     : string Read FFontName Write FFontName;
     property FontSize     : Word Read FFontSize Write FFontSize;
     property DelphiWmiClassCodeGenMode : Integer Read FDelphiWmiClassCodeGenMode Write FDelphiWmiClassCodeGenMode;
     property DelphiWmiClassHelperFuncts: Boolean Read FDelphiWmiClassHelperFuncts Write FDelphiWmiClassHelperFuncts;
+    property ShowImplementedMethods : Boolean read FShowImplementedMethods write FShowImplementedMethods;
   end;
 
 
@@ -64,6 +66,8 @@ type
     CbDelphiCodewmiClass: TComboBox;
     LabelDescr: TLabel;
     CheckBoxHelper: TCheckBox;
+    TabSheet3: TTabSheet;
+    CheckBoxShowImplMethods: TCheckBox;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -202,6 +206,7 @@ begin
     Settings.FontSize     := iniFile.ReadInteger('Global', 'FontSize', 10);
     Settings.DelphiWmiClassCodeGenMode     := iniFile.ReadInteger('Global', 'DelphiWmiClassCodeGenMode', integer(WmiCode_LateBinding));
     Settings.DelphiWmiClassHelperFuncts    := iniFile.ReadBool('Global', 'DelphiWmiClassHelperFuncts', False);
+    Settings.ShowImplementedMethods        := iniFile.ReadBool('Global', 'ShowImplementedMethods', True);
   finally
     iniFile.Free;
   end;
@@ -218,7 +223,8 @@ begin
     iniFile.WriteInteger('Global', 'FontSize', Settings.FontSize);
     iniFile.WriteInteger('Global', 'DelphiWmiClassCodeGenMode', Settings.DelphiWmiClassCodeGenMode);
     iniFile.WriteBool('Global', 'DelphiWmiClassHelperFuncts', Settings.DelphiWmiClassHelperFuncts);
-  finally
+    iniFile.WriteBool('Global', 'ShowImplementedMethods', Settings.ShowImplementedMethods);
+    finally
     iniFile.Free;
   end;
 end;
@@ -269,6 +275,7 @@ begin
     FSettings.FontSize     := StrToInt(EditFontSize.Text);
     FSettings.DelphiWmiClassCodeGenMode     := CbDelphiCodewmiClass.ItemIndex;
     FSettings.DelphiWmiClassHelperFuncts    := CheckBoxHelper.Checked;
+    FSettings.ShowImplementedMethods        := CheckBoxShowImplMethods.Checked;
     WriteSettings(FSettings);
     Close();
   end;
@@ -346,6 +353,7 @@ begin
   CbDelphiCodewmiClass.ItemIndex  := FSettings.DelphiWmiClassCodeGenMode;
   LabelDescr.Caption:=ListWmiCodeDescr[TWmiCode(CbDelphiCodewmiClass.ItemIndex)];
   CheckBoxHelper.Checked    := FSettings.FDelphiWmiClassHelperFuncts;
+  CheckBoxShowImplMethods.Checked    := FSettings.FShowImplementedMethods;
 end;
 
 function GetThemeNameFromFile(const FileName:string): string;
