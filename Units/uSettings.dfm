@@ -37,13 +37,9 @@ object FrmSettings: TFrmSettings
       ActivePage = TabSheet2
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 140
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 28
-        ExplicitHeight = 112
         object Label4: TLabel
           Left = 3
           Top = 35
@@ -80,7 +76,6 @@ object FrmSettings: TFrmSettings
       end
       object TabSheet1: TTabSheet
         Caption = 'Theme Settings'
-        ExplicitHeight = 112
         object Label1: TLabel
           Left = 11
           Top = 8
@@ -118,7 +113,7 @@ object FrmSettings: TFrmSettings
           Height = 21
           ReadOnly = True
           TabOrder = 1
-          Text = '8'
+          Text = '10'
           OnChange = ComboBoxFontChange
         end
         object UpDown1: TUpDown
@@ -129,7 +124,7 @@ object FrmSettings: TFrmSettings
           Associate = EditFontSize
           Min = 8
           Max = 48
-          Position = 8
+          Position = 10
           TabOrder = 2
         end
         object ComboBoxFont: TComboBox
@@ -151,6 +146,18 @@ object FrmSettings: TFrmSettings
           OnClick = ButtonGetMoreClick
         end
       end
+      object TabSheet3: TTabSheet
+        Caption = 'Wmi Methods settings '
+        ImageIndex = 2
+        object CheckBoxShowImplMethods: TCheckBox
+          Left = 3
+          Top = 7
+          Width = 182
+          Height = 17
+          Caption = 'Only show implemented methods'
+          TabOrder = 0
+        end
+      end
     end
   end
   object Panel2: TPanel
@@ -160,7 +167,6 @@ object FrmSettings: TFrmSettings
     Height = 35
     Align = alBottom
     TabOrder = 1
-    ExplicitTop = 152
     object ButtonApply: TButton
       Left = 6
       Top = 6

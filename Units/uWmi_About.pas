@@ -36,9 +36,9 @@ type
     LabelVersion: TLabel;
     LabelWMIVersion: TLabel;
     Button2:   TButton;
-    ImageLogo: TImage;
     MemoCopyRights: TMemo;
     Button3: TButton;
+    Image2: TImage;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);

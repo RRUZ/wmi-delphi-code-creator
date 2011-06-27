@@ -190,7 +190,7 @@ begin
                                        Writeln(pVal);
                                        VarClear(pVal);
                                  }
-                            Padding:= Padding + StringOfChar(' ',11);
+                            Padding:= Padding + StringOfChar(' ',15);
                             if Props.Count > 0 then
                               for i := 0 to Props.Count - 1 do
                               begin

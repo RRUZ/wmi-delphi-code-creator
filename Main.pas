@@ -697,13 +697,7 @@ procedure TFrmMain.GetValuesWmiProperties(const Namespace, WmiClass: string);
 var
   Frm: TFrmWmiVwProps;
   i:   integer;
-  //GWmiLoadValues : IAsyncCall;
- {
- procedure Dummy;
- begin
-   Frm.LoadValues;
- end;
-  }
+
 begin
   if (ListViewProperties.Items.Count > 0) and (WmiClass <> '') and (Namespace <> '') then
   begin
@@ -722,32 +716,14 @@ begin
         if ListViewProperties.Items[i].Checked then
           Frm.Wmiproperties.Add(ListViewProperties.Items[i].Caption);
 
-         {
-           GWmiLoadValues:=LocalAsyncCall(@Dummy);
-           while AsyncMultiSync([GWmiLoadValues], True, 100) = WAIT_TIMEOUT do
-             Application.ProcessMessages;
-          }
       Frm.LoadValues;
       Frm.Show();
-           {
-         if Frm.ContainValues then
-         begin
-           SetMsg('');
-           //ProgressBarWmi.Visible:=False;
-           //ButtonGetValues.Enabled:=True;
-           //Frm.ShowModal();
-           Frm.Show();
-         end
-         else
-           MsgAdvertencia('Does not exist values for this class');
-           }
 
 
     finally
       SetMsg('');
       ProgressBarWmi.Visible := False;
       ButtonGetValues.Enabled := True;
-      //Frm.Free;
       Self.Enabled := True;
     end;
   end;
@@ -883,8 +859,13 @@ begin
     ComboBoxMethods.Items.Clear;
     if ComboBoxClassesMethods.Text <> '' then
     begin
-      GetListWmiClassImplementedMethods(ComboBoxNamespaceMethods.Text,
-        ComboBoxClassesMethods.Text, ComboBoxMethods.Items);
+      if Settings.ShowImplementedMethods then
+        GetListWmiClassImplementedMethods(ComboBoxNamespaceMethods.Text,
+          ComboBoxClassesMethods.Text, ComboBoxMethods.Items)
+      else
+        GetListWmiClassMethods(ComboBoxNamespaceMethods.Text,
+          ComboBoxClassesMethods.Text, ComboBoxMethods.Items);
+
       ComboBoxPaths.Items.Clear;
     end;
 
