@@ -34,7 +34,6 @@ interface
   store cache x machine
 
   Select different templates for delphi code generation (COM, Late binding, TLB)
-  Add remote support for wmi methods in delphi prism
 }
 
 uses
@@ -670,7 +669,7 @@ begin
     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
       Lng_Delphi: GenerateDelphiWmiEventCode(
           SynEditEventCode.Lines, Params, Values, Conds, PropsOut, Namespace, WmiEvent,
-          WmiTargetInstance, PollSeconds, Settings.DelphiWmiClassHelperFuncts, RadioButtonIntrinsic.Checked);
+          WmiTargetInstance, PollSeconds, Settings.DelphiWmiClassHelperFuncts, RadioButtonIntrinsic.Checked,TWmiCode(Settings.DelphiWmiEventCodeGenMode));
 
       Lng_FPC: GenerateFPCWmiEventCode(
           SynEditEventCode.Lines, Params, Values, Conds, PropsOut, Namespace, WmiEvent,

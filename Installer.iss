@@ -112,11 +112,14 @@ Source: Templates\TemplateNonStaticMethodInvokerOxygen.pas; DestDir: {app}\Templ
 Source: Templates\TemplateStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
+#define MyAppName 'Wmi Delphi Code Creator'
+#define MyAppVersion GetFileVersion('WmiDelphiCodeCreator.exe')
 [Setup]
 UsePreviousLanguage=no
-AppName=Wmi Delphi Code Creator
+AppName={#MyAppName}
 AppPublisher=The Road To Delphi
-AppVerName=Wmi Delphi Code Creator - The Road To Delphi
+AppVerName={#MyAppName} {#MyAppVersion}
+VersionInfoVersion={#MyAppVersion}
 AppPublisherURL=http://theroadtodelphi.wordpress.com/
 AppSupportURL=http://theroadtodelphi.wordpress.com/
 AppUpdatesURL=http://theroadtodelphi.wordpress.com/
@@ -142,6 +145,43 @@ procedure LoadSkin(lpszPath: String; lpszIniFileName: String); external 'LoadSki
 procedure UnloadSkin(); external 'UnloadSkin@files:isskin.dll stdcall';
 function  ShowWindow(hWnd: Integer; uType: Integer): Integer; external 'ShowWindow@user32.dll stdcall';
 
+
+
+function GetUninstallString(): String;
+var
+  sUnInstPath: String;
+  sUnInstallString: String;
+begin
+  sUnInstPath := ExpandConstant('Software\Microsoft\Windows\CurrentVersion\Uninstall\{#emit SetupSetting("AppId")}_is1');
+  sUnInstallString := '';
+  if not RegQueryStringValue(HKLM, sUnInstPath, 'UninstallString', sUnInstallString) then
+    RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString);
+  Result := sUnInstallString;
+end;
+
+function IsUpgrade(): Boolean;
+begin
+  Result := (GetUninstallString() <> '');
+end;
+
+function UnInstallOldVersion(): Integer;
+var
+  sUnInstallString: String;
+  iResultCode: Integer;
+begin
+  Result := 0;
+  sUnInstallString := GetUninstallString();
+  if sUnInstallString <> '' then begin
+    sUnInstallString := RemoveQuotes(sUnInstallString);
+    if Exec(sUnInstallString, '/SILENT /NORESTART /SUPPRESSMSGBOXES','', SW_HIDE, ewWaitUntilTerminated, iResultCode) then
+      Result := 3
+    else
+      Result := 2;
+  end else
+    Result := 1;
+end;
+
+
 function InitializeSetup(): Boolean;
 begin
    ExtractTemporaryFile('Office2007.cjstyles');
@@ -153,6 +193,20 @@ procedure DeinitializeSetup();
 begin
 	ShowWindow(StrToInt(ExpandConstant('{wizardhwnd}')), 0);
 	UnloadSkin();
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+ Filename: String;
+ Version : string;
+begin
+  if (CurStep=ssInstall) then
+  begin
+    if (IsUpgrade()) then
+    begin
+      UnInstallOldVersion();
+    end;
+  end;
 end;
 
 [Dirs]

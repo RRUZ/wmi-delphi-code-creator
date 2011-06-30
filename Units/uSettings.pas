@@ -36,12 +36,14 @@ type
     FDelphiWmiClassCodeGenMode: Integer;
     FDelphiWmiClassHelperFuncts: Boolean;
     FShowImplementedMethods: Boolean;
+    FDelphiWmiEventCodeGenMode: Integer;
   published
     property CurrentTheme : string Read FCurrentTheme Write FCurrentTheme;
     property FontName     : string Read FFontName Write FFontName;
     property FontSize     : Word Read FFontSize Write FFontSize;
     property DelphiWmiClassCodeGenMode : Integer Read FDelphiWmiClassCodeGenMode Write FDelphiWmiClassCodeGenMode;
     property DelphiWmiClassHelperFuncts: Boolean Read FDelphiWmiClassHelperFuncts Write FDelphiWmiClassHelperFuncts;
+    property DelphiWmiEventCodeGenMode : Integer Read FDelphiWmiEventCodeGenMode Write FDelphiWmiEventCodeGenMode;
     property ShowImplementedMethods : Boolean read FShowImplementedMethods write FShowImplementedMethods;
   end;
 
@@ -63,11 +65,14 @@ type
     ButtonGetMore: TButton;
     TabSheet2: TTabSheet;
     Label4: TLabel;
-    CbDelphiCodewmiClass: TComboBox;
+    CbDelphiCodeWmiClass: TComboBox;
     LabelDescr: TLabel;
     CheckBoxHelper: TCheckBox;
     TabSheet3: TTabSheet;
     CheckBoxShowImplMethods: TCheckBox;
+    Label5: TLabel;
+    CbDelphiCodeWmiEvent: TComboBox;
+    LabelDescrEvent: TLabel;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -75,7 +80,8 @@ type
     procedure ComboBoxThemeChange(Sender: TObject);
     procedure ButtonGetMoreClick(Sender: TObject);
     procedure ComboBoxFontChange(Sender: TObject);
-    procedure CbDelphiCodewmiClassChange(Sender: TObject);
+    procedure CbDelphiCodeWmiClassChange(Sender: TObject);
+    procedure CbDelphiCodeWmiEventChange(Sender: TObject);
   private
     FSettings: TSettings;
     FCurrentTheme:  TIDETheme;
@@ -207,6 +213,7 @@ begin
     Settings.DelphiWmiClassCodeGenMode     := iniFile.ReadInteger('Global', 'DelphiWmiClassCodeGenMode', integer(WmiCode_LateBinding));
     Settings.DelphiWmiClassHelperFuncts    := iniFile.ReadBool('Global', 'DelphiWmiClassHelperFuncts', False);
     Settings.ShowImplementedMethods        := iniFile.ReadBool('Global', 'ShowImplementedMethods', True);
+    Settings.DelphiWmiEventCodeGenMode     := iniFile.ReadInteger('Global', 'DelphiWmiEventCodeGenMode', integer(WmiCode_Scripting));
   finally
     iniFile.Free;
   end;
@@ -224,7 +231,8 @@ begin
     iniFile.WriteInteger('Global', 'DelphiWmiClassCodeGenMode', Settings.DelphiWmiClassCodeGenMode);
     iniFile.WriteBool('Global', 'DelphiWmiClassHelperFuncts', Settings.DelphiWmiClassHelperFuncts);
     iniFile.WriteBool('Global', 'ShowImplementedMethods', Settings.ShowImplementedMethods);
-    finally
+    iniFile.WriteInteger('Global', 'DelphiWmiEventCodeGenMode', Settings.DelphiWmiEventCodeGenMode);
+  finally
     iniFile.Free;
   end;
 end;
@@ -237,9 +245,19 @@ begin
  CbDelphiCodewmiClass.Items.BeginUpdate;
  try
    for i := 0 to DelphiMaxTypesClassCodeGen-1 do
-     CbDelphiCodewmiClass.Items.Add(ListWmiCodeName[DelphiWmiClassCodeSupported[i]])
+     //CbDelphiCodewmiClass.Items.Add(ListWmiCodeName[DelphiWmiClassCodeSupported[i]])
+     CbDelphiCodewmiClass.Items.AddObject(ListWmiCodeName[DelphiWmiClassCodeSupported[i]],TObject(DelphiWmiClassCodeSupported[i]));
  finally
     CbDelphiCodewmiClass.Items.EndUpdate;
+ end;
+
+ CbDelphiCodeWmiEvent.Items.Clear;
+ CbDelphiCodeWmiEvent.Items.BeginUpdate;
+ try
+   for i := 0 to DelphiMaxTypesEventsCodeGen-1 do
+     CbDelphiCodeWmiEvent.Items.AddObject(ListWmiCodeName[DelphiWmiEventCodeSupported[i]],TObject(DelphiWmiEventCodeSupported[i]));
+ finally
+    CbDelphiCodeWmiEvent.Items.EndUpdate;
  end;
 end;
 
@@ -273,13 +291,13 @@ begin
     FSettings.CurrentTheme := ComboBoxTheme.Text;
     FSettings.FontName     := ComboBoxFont.Text;
     FSettings.FontSize     := StrToInt(EditFontSize.Text);
-    FSettings.DelphiWmiClassCodeGenMode     := CbDelphiCodewmiClass.ItemIndex;
+    FSettings.DelphiWmiClassCodeGenMode     := Integer(CbDelphiCodewmiClass.Items.Objects[CbDelphiCodewmiClass.ItemIndex]);//CbDelphiCodewmiClass.ItemIndex;
     FSettings.DelphiWmiClassHelperFuncts    := CheckBoxHelper.Checked;
     FSettings.ShowImplementedMethods        := CheckBoxShowImplMethods.Checked;
+    FSettings.DelphiWmiEventCodeGenMode     := Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]);
     WriteSettings(FSettings);
     Close();
   end;
-
 end;
 
 procedure TFrmSettings.ButtonCancelClick(Sender: TObject);
@@ -314,9 +332,14 @@ begin
 end;
 
 
-procedure TFrmSettings.CbDelphiCodewmiClassChange(Sender: TObject);
+procedure TFrmSettings.CbDelphiCodeWmiClassChange(Sender: TObject);
 begin
-   LabelDescr.Caption:=ListWmiCodeDescr[TWmiCode(CbDelphiCodewmiClass.ItemIndex)];
+   LabelDescr.Caption:=ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodewmiClass.Items.Objects[CbDelphiCodewmiClass.ItemIndex]))];//ListWmiCodeDescr[TWmiCode(CbDelphiCodewmiClass.ItemIndex)];
+end;
+
+procedure TFrmSettings.CbDelphiCodeWmiEventChange(Sender: TObject);
+begin
+   LabelDescrEvent.Caption:=ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]))];
 end;
 
 procedure TFrmSettings.ComboBoxFontChange(Sender: TObject);
@@ -345,13 +368,33 @@ begin
 end;
 
 procedure TFrmSettings.LoadSettings;
+var
+  i  : integer;
 begin
   ReadSettings(FSettings);
   ComboBoxTheme.ItemIndex := ComboBoxTheme.Items.IndexOf(FSettings.CurrentTheme);
   ComboBoxFont.ItemIndex  := ComboBoxFont.Items.IndexOf(FSettings.FontName);
   UpDown1.Position        := FSettings.FontSize;
-  CbDelphiCodewmiClass.ItemIndex  := FSettings.DelphiWmiClassCodeGenMode;
-  LabelDescr.Caption:=ListWmiCodeDescr[TWmiCode(CbDelphiCodewmiClass.ItemIndex)];
+
+  for i := 0 to DelphiMaxTypesClassCodeGen-1 do
+    if FSettings.DelphiWmiClassCodeGenMode=Integer(CbDelphiCodewmiClass.Items.Objects[i]) then
+    begin
+      CbDelphiCodewmiClass.ItemIndex  := i;
+      Break;
+    end;
+    //CbDelphiCodewmiClass.ItemIndex  := FSettings.DelphiWmiClassCodeGenMode;
+
+  for i := 0 to DelphiMaxTypesEventsCodeGen-1 do
+    if FSettings.DelphiWmiEventCodeGenMode=Integer(CbDelphiCodeWmiEvent.Items.Objects[i]) then
+    begin
+      CbDelphiCodeWmiEvent.ItemIndex  := i;
+      Break;
+    end;
+
+
+  LabelDescr.Caption:=ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodewmiClass.Items.Objects[CbDelphiCodewmiClass.ItemIndex]))];
+  LabelDescrEvent.Caption:=ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]))];
+
   CheckBoxHelper.Checked    := FSettings.FDelphiWmiClassHelperFuncts;
   CheckBoxShowImplMethods.Checked    := FSettings.FShowImplementedMethods;
 end;

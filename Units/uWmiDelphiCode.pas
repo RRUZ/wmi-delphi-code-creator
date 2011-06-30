@@ -33,21 +33,25 @@ const
   sTagDelphiCode          = '[DELPHICODE]';
   sTagDelphiEventsWql     = '[DELPHIEVENTSWQL]';
   sTagDelphiEventsOut     = '[DELPHIEVENTSOUT]';
+  sTagDelphiEventsOut2    = '[DELPHIEVENTSOUT2]';
 
   DelphiMaxTypesClassCodeGen   =3;
-
   DelphiWmiClassCodeSupported  : Array [0..DelphiMaxTypesClassCodeGen-1] of TWmiCode = (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
 
   ListDelphiWmiClassTemplates           : Array [0..DelphiMaxTypesClassCodeGen-1] of  string = ('TemplateConsoleAppDelphi_TLB.pas', 'TemplateConsoleAppDelphi.pas', 'TemplateConsoleAppDelphi_COM.pas');
   ListDelphiWmiClassSingletonTemplates  : Array [0..DelphiMaxTypesClassCodeGen-1] of  string = ('TemplateConsoleAppDelphiSingleton_TLB.pas', 'TemplateConsoleAppDelphiSingleton.pas', 'TemplateConsoleAppDelphi_COM.pas');
 
+  DelphiMaxTypesEventsCodeGen   =2;
+  DelphiWmiEventCodeSupported  : Array [0..DelphiMaxTypesEventsCodeGen-1] of TWmiCode = (WmiCode_Scripting, WmiCode_COM);
+
+  ListDelphiWmiEventsTemplates : Array [0..DelphiMaxTypesEventsCodeGen-1] of  string = ('TemplateEventsDelphi.pas', 'TemplateEventsDelphi_COM.pas');
 
 procedure GenerateDelphiWmiConsoleCode(const DestList, Props: TStrings; const Namespace, WmiClass: string; UseHelperFunct: boolean;Mode:TWmiCode);
 
 procedure GenerateDelphiWmiEventCode(
   const DestList, ParamsIn, Values, Conds, PropsOut: TStrings;
   const Namespace, WmiEvent, WmiTargetInstance: string; PollSeconds: integer;
-  UseHelperFunct, Intrinsic: boolean);
+  UseHelperFunct, Intrinsic: boolean;Mode:TWmiCode);
 
 procedure GenerateDelphiWmiInvokerCode(const DestList, ParamsIn, Values: TStrings;
   const Namespace, WmiClass, WmiMethod, WmiPath: string; UseHelperFunct: boolean);
@@ -65,28 +69,12 @@ uses
   uWmi_Metadata;
 
 
-function GetFileVersion(const exeName: string): string;
-const
-  c_StringInfo = 'StringFileInfo\040904E4\FileVersion';
+function GetFileVersion(const FileName: string): string;
 var
-  n, Len:     cardinal;
-  Buf, Value: PChar;
+  FSO  : OleVariant;
 begin
-  Result := '';
-  n      := GetFileVersionInfoSize(PChar(exeName), n);
-  if n > 0 then
-  begin
-    Buf := AllocMem(n);
-    try
-      GetFileVersionInfo(PChar(exeName), 0, n, Buf);
-      if VerQueryValue(Buf, PChar(c_StringInfo), Pointer(Value), Len) then
-      begin
-        Result := Trim(Value);
-      end;
-    finally
-      FreeMem(Buf, n);
-    end;
-  end;
+  FSO    := CreateOleObject('Scripting.FileSystemObject');
+  Result := FSO.GetFileVersion(FileName);
 end;
 
 
@@ -226,6 +214,169 @@ begin
   end;
 end;
 
+procedure GenerateDelphiWmiEventCode(
+  const DestList, ParamsIn, Values, Conds, PropsOut: TStrings;
+  const Namespace, WmiEvent, WmiTargetInstance: string; PollSeconds: integer;
+  UseHelperFunct, Intrinsic: boolean;Mode:TWmiCode);
+var
+  StrCode: string;
+  sValue:  string;
+  Wql:     string;
+  i, Len:  integer;
+  Props:   TStrings;
+  TemplateCode : string;
+begin
+
+  if UseHelperFunct then
+    TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
+  else
+    TemplateCode:='';
+
+   for i:=0  to DelphiMaxTypesEventsCodeGen-1 do
+    if DelphiWmiEventCodeSupported[i]=Mode then
+      break;
+
+    StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiEventsTemplates[i]));
+
+    case Mode of
+     WmiCode_Scripting :
+                         begin
+                              WQL := Format('Select * From %s Within %d ', [WmiEvent, PollSeconds,
+                                WmiTargetInstance]);
+                              WQL := Format('  FWQL:=%s+%s', [QuotedStr(WQL), sLineBreak]);
+
+                              if WmiTargetInstance <> '' then
+                              begin
+                                sValue := Format('Where TargetInstance ISA "%s" ', [WmiTargetInstance]);
+                                WQL    := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
+                              end;
+
+                              for i := 0 to Conds.Count - 1 do
+                              begin
+                                sValue := '';
+                                if (i > 0) or ((i = 0) and (WmiTargetInstance <> '')) then
+                                  sValue := 'AND ';
+                                sValue := sValue + ' ' + ParamsIn.Names[i] + Conds[i] + Values[i] + ' ';
+                                WQL := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
+                              end;
+
+                              i := LastDelimiter('+', Wql);
+                              if i > 0 then
+                                Wql[i] := ';';
+
+
+                              Len   := GetMaxLengthItem(PropsOut) + 3;
+                              Props := TStringList.Create;
+                              try
+                                for i := 0 to PropsOut.Count - 1 do
+                                  Props.Add(Format('  Writeln(Format(''%-' + IntToStr(Len) +
+                                    's : %%s '',[PropVal.%s]));', [PropsOut[i], PropsOut[i]]));
+
+                                StrCode := StringReplace(StrCode, sTagDelphiEventsOut, Props.Text, [rfReplaceAll]);
+                              finally
+                                props.Free;
+                              end;
+
+
+                              StrCode := StringReplace(StrCode, sTagDelphiEventsWql, WQL, [rfReplaceAll]);
+                              StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
+                              StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
+                         end;
+     WmiCode_LateBinding:;
+     WmiCode_COM:        begin
+
+                            WQL := Format('Select * From %s Within %d ', [WmiEvent, PollSeconds,
+                              WmiTargetInstance]);
+                            WQL := Format('  WQL =%s+%s', [QuotedStr(WQL), sLineBreak]);
+
+                            if WmiTargetInstance <> '' then
+                            begin
+                              sValue := Format('Where TargetInstance ISA "%s" ', [WmiTargetInstance]);
+                              WQL    := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
+                            end;
+
+                            for i := 0 to Conds.Count - 1 do
+                            begin
+                              sValue := '';
+                              if (i > 0) or ((i = 0) and (WmiTargetInstance <> '')) then
+                                sValue := 'AND ';
+                              sValue := sValue + ' ' + ParamsIn.Names[i] + Conds[i] + Values[i] + ' ';
+                              WQL := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
+                            end;
+
+                            i := LastDelimiter('+', Wql);
+                            if i > 0 then
+                              Wql[i] := ';';
+
+
+                            //not wbemTargetInstance
+                            Props := TStringList.Create;
+                            try
+                              for i := 0 to PropsOut.Count - 1 do
+                               if not StartsText(wbemTargetInstance,PropsOut[i]) then
+                               begin
+                                {
+                                if Succeeded(apObjArray.Get('TIME_CREATED', lFlags, pVal, pType, plFlavor)) then
+                                  begin
+                                    sValue:=pVal;
+                                    VarClear(pVal);
+                                    Writeln(Format('TIME_CREATED %s',[sValue]));
+                                  end;
+                                }
+                                Props.Add('    //You must convert to string the next types manually -> CIM_OBJECT, CIM_EMPTY, CIM_DATETIME, CIM_REFERENCE');
+                                Props.Add(Format('    if Succeeded(apObjArray.Get(%s, lFlags, pVal, pType, plFlavor)) and ((pType<>CIM_OBJECT) and (pType<>CIM_EMPTY) and (pType<>CIM_DATETIME) and (pType<>CIM_REFERENCE) )  then',[QuotedStr(PropsOut[i])]));
+                                Props.Add('    begin');
+                                Props.Add('      sValue:=pVal;');
+                                Props.Add('      VarClear(pVal);');
+                                Props.Add(Format('      Writeln(Format(''%s %%s'',[sValue]));',[PropsOut[i]]));
+                                Props.Add('    end;');
+                                Props.Add('');
+                               end;
+                              StrCode := StringReplace(StrCode, sTagDelphiEventsOut, Props.Text, [rfReplaceAll]);
+                            finally
+                              props.Free;
+                            end;
+
+                            Props := TStringList.Create;
+                            try
+                              for i := 0 to PropsOut.Count - 1 do
+                               if StartsText(wbemTargetInstance,PropsOut[i]) then
+                               begin
+                                {
+                                  Instance.Get('Caption', 0, pVal, pType, plFlavor);
+                                  sValue:=pVal;
+                                  VarClear(pVal);
+                                  Writeln(Format('Caption %s',[sValue]));
+                                }
+                                sValue:= StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]);
+
+                                Props.Add('        //You must convert to string the next types manually -> CIM_OBJECT, CIM_EMPTY, CIM_DATETIME, CIM_REFERENCE');
+                                Props.Add(Format('        if Succeeded(Instance.Get(%s, 0, pVal, pType, plFlavor)) and ((pType<>CIM_OBJECT) and (pType<>CIM_EMPTY) and (pType<>CIM_DATETIME) and (pType<>CIM_REFERENCE) ) then ',[QuotedStr(sValue)]));
+                                Props.Add('        begin');
+                                Props.Add('          sValue:=pVal;');
+                                Props.Add('          VarClear(pVal);');
+                                Props.Add(Format('          Writeln(Format(''%s %%s'',[sValue]));',[sValue]));
+                                Props.Add('        end;');
+                                Props.Add('');
+                               end;
+                              StrCode := StringReplace(StrCode, sTagDelphiEventsOut2, Props.Text, [rfReplaceAll]);
+                            finally
+                              props.Free;
+                            end;
+
+
+                            StrCode := StringReplace(StrCode, sTagDelphiEventsWql, WQL, [rfReplaceAll]);
+                            StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
+                            StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
+                         end;
+
+    end;
+
+  StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
+
+
+  DestList.Text := StrCode;
+end;
 
 
 procedure GenerateDelphiWmiInvokerCode(const DestList, ParamsIn, Values: TStrings;
@@ -394,67 +545,6 @@ begin
     InParamsTypes.Free;
     InParamsDescr.Free;
   end;
-end;
-
-
-
-
-
-procedure GenerateDelphiWmiEventCode(
-  const DestList, ParamsIn, Values, Conds, PropsOut: TStrings;
-  const Namespace, WmiEvent, WmiTargetInstance: string; PollSeconds: integer;
-  UseHelperFunct, Intrinsic: boolean);
-var
-  StrCode: string;
-  sValue:  string;
-  Wql:     string;
-  i, Len:  integer;
-  Props:   TStrings;
-begin
-  StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_Delphi]));
-
-  WQL := Format('Select * From %s Within %d ', [WmiEvent, PollSeconds,
-    WmiTargetInstance]);
-  WQL := Format('  FWQL:=%s+%s', [QuotedStr(WQL), sLineBreak]);
-
-  if WmiTargetInstance <> '' then
-  begin
-    sValue := Format('Where TargetInstance ISA "%s" ', [WmiTargetInstance]);
-    WQL    := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
-  end;
-
-  for i := 0 to Conds.Count - 1 do
-  begin
-    sValue := '';
-    if (i > 0) or ((i = 0) and (WmiTargetInstance <> '')) then
-      sValue := 'AND ';
-    sValue := sValue + ' ' + ParamsIn.Names[i] + Conds[i] + Values[i] + ' ';
-    WQL := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
-  end;
-
-  i := LastDelimiter('+', Wql);
-  if i > 0 then
-    Wql[i] := ';';
-
-
-  Len   := GetMaxLengthItem(PropsOut) + 3;
-  Props := TStringList.Create;
-  try
-    for i := 0 to PropsOut.Count - 1 do
-      Props.Add(Format('  Writeln(Format(''%-' + IntToStr(Len) +
-        's : %%s '',[PropVal.%s]));', [PropsOut[i], PropsOut[i]]));
-
-    StrCode := StringReplace(StrCode, sTagDelphiEventsOut, Props.Text, [rfReplaceAll]);
-  finally
-    props.Free;
-  end;
-
-
-  StrCode := StringReplace(StrCode, sTagDelphiEventsWql, WQL, [rfReplaceAll]);
-  StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
-  StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
-
-  DestList.Text := StrCode;
 end;
 
 
