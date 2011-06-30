@@ -3,8 +3,8 @@ object FrmSettings: TFrmSettings
   Top = 302
   BorderStyle = bsDialog
   Caption = 'Settings'
-  ClientHeight = 201
-  ClientWidth = 398
+  ClientHeight = 342
+  ClientWidth = 445
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,8 +20,8 @@ object FrmSettings: TFrmSettings
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 398
-    Height = 166
+    Width = 445
+    Height = 307
     Align = alClient
     BorderWidth = 5
     TabOrder = 0
@@ -32,20 +32,21 @@ object FrmSettings: TFrmSettings
     object PageControl1: TPageControl
       Left = 6
       Top = 6
-      Width = 386
-      Height = 154
+      Width = 433
+      Height = 295
       ActivePage = TabSheet2
       Align = alClient
       TabOrder = 0
+      ExplicitHeight = 154
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
         object Label4: TLabel
           Left = 3
           Top = 35
-          Width = 108
+          Width = 106
           Height = 13
-          Caption = 'Delphi WMI Class code'
+          Caption = 'Delphi WMI class code'
         end
         object LabelDescr: TLabel
           Left = 128
@@ -56,14 +57,30 @@ object FrmSettings: TFrmSettings
           Caption = 'LabelDescr'
           WordWrap = True
         end
-        object CbDelphiCodewmiClass: TComboBox
+        object Label5: TLabel
+          Left = 3
+          Top = 131
+          Width = 116
+          Height = 13
+          Caption = 'Delphi WMI events code'
+        end
+        object LabelDescrEvent: TLabel
           Left = 128
-          Top = 32
+          Top = 163
+          Width = 225
+          Height = 49
+          AutoSize = False
+          Caption = 'LabelDescr'
+          WordWrap = True
+        end
+        object CbDelphiCodeWmiClass: TComboBox
+          Left = 128
+          Top = 35
           Width = 225
           Height = 21
           Style = csDropDownList
           TabOrder = 0
-          OnChange = CbDelphiCodewmiClassChange
+          OnChange = CbDelphiCodeWmiClassChange
         end
         object CheckBoxHelper: TCheckBox
           Left = 3
@@ -72,6 +89,15 @@ object FrmSettings: TFrmSettings
           Height = 17
           Caption = 'Create Helper functions in generated code to handle null values'
           TabOrder = 1
+        end
+        object CbDelphiCodeWmiEvent: TComboBox
+          Left = 128
+          Top = 128
+          Width = 225
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 2
+          OnChange = CbDelphiCodeWmiEventChange
         end
       end
       object TabSheet1: TTabSheet
@@ -162,8 +188,8 @@ object FrmSettings: TFrmSettings
   end
   object Panel2: TPanel
     Left = 0
-    Top = 166
-    Width = 398
+    Top = 307
+    Width = 445
     Height = 35
     Align = alBottom
     TabOrder = 1
