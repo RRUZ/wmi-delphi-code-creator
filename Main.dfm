@@ -179,7 +179,7 @@ object FrmMain: TFrmMain
                   Left = 9
                   Top = 192
                   Width = 295
-                  Height = 170
+                  Height = 164
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -200,7 +200,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 172
+                  ExplicitHeight = 166
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -363,7 +363,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 114
+                  Height = 108
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -387,7 +387,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListViewMethodsParamsClick
-                  ExplicitHeight = 116
+                  ExplicitHeight = 110
                 end
                 object MemoMethodDescr: TMemo
                   Left = 11
@@ -410,14 +410,14 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 336
+                  Top = 330
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 7
                   OnClick = ButtonGenerateCodeInvokerClick
-                  ExplicitTop = 338
+                  ExplicitTop = 332
                 end
                 object ComboBoxPaths: TComboBox
                   Left = 103
@@ -575,7 +575,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 159
+                  Height = 153
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -599,7 +599,7 @@ object FrmMain: TFrmMain
                   TabOrder = 4
                   ViewStyle = vsReport
                   OnClick = ListViewEventsCondsClick
-                  ExplicitHeight = 161
+                  ExplicitHeight = 155
                 end
                 object EditValueEvent: TEdit
                   Left = 88
@@ -673,14 +673,14 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 341
+                  Top = 335
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 7
                   OnClick = ButtonGenerateEventCodeClick
-                  ExplicitTop = 343
+                  ExplicitTop = 337
                 end
                 object RadioButtonIntrinsic: TRadioButton
                   Left = 5
@@ -826,6 +826,7 @@ object FrmMain: TFrmMain
               Height = 21
               Style = csDropDownList
               TabOrder = 0
+              OnChange = ComboBoxLanguageSelChange
             end
           end
         end
@@ -1037,7 +1038,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800E80010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800F40010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000

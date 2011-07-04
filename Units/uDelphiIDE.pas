@@ -92,7 +92,7 @@ var
   ExeFile: string;
 begin
   Console.Add('');
-  CaptureConsoleOutput(CompilerName + ' ' + Format(' -B -CC %s', [ProjectFile]), Console);
+  CaptureConsoleOutput(CompilerName + ' ' + Format(' -B -CC "%s"', [ProjectFile]), Console);
   if Run then
   begin
     ExeFile := ChangeFileExt(ProjectFile, '.exe');

@@ -34,13 +34,43 @@ object FrmSettings: TFrmSettings
       Top = 6
       Width = 433
       Height = 295
-      ActivePage = TabSheet2
+      ActivePage = TabSheet4
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 154
+      object TabSheet4: TTabSheet
+        Caption = 'General'
+        ImageIndex = 3
+        object Label6: TLabel
+          Left = 16
+          Top = 13
+          Width = 194
+          Height = 13
+          Caption = 'Output folder used for compiled projects'
+        end
+        object EditOutputFolder: TEdit
+          Left = 16
+          Top = 32
+          Width = 281
+          Height = 21
+          TabOrder = 0
+        end
+        object BtnSelFolderThemes: TButton
+          Left = 303
+          Top = 30
+          Width = 26
+          Height = 25
+          Caption = '...'
+          TabOrder = 1
+          OnClick = BtnSelFolderThemesClick
+        end
+      end
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 35
@@ -102,6 +132,10 @@ object FrmSettings: TFrmSettings
       end
       object TabSheet1: TTabSheet
         Caption = 'Theme Settings'
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label1: TLabel
           Left = 11
           Top = 8
@@ -175,6 +209,10 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -211,5 +249,9 @@ object FrmSettings: TFrmSettings
       TabOrder = 1
       OnClick = ButtonCancelClick
     end
+  end
+  object JvBrowseForFolderDialog1: TJvBrowseForFolderDialog
+    Left = 256
+    Top = 112
   end
 end

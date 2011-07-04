@@ -25,7 +25,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox;
+  Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
+  JvBaseDlg, JvBrowseFolder;
 
 type
   TSettings = class
@@ -37,6 +38,8 @@ type
     FDelphiWmiClassHelperFuncts: Boolean;
     FShowImplementedMethods: Boolean;
     FDelphiWmiEventCodeGenMode: Integer;
+    FOutputFolder: string;
+    function GetOutputFolder: string;
   published
     property CurrentTheme : string Read FCurrentTheme Write FCurrentTheme;
     property FontName     : string Read FFontName Write FFontName;
@@ -45,6 +48,7 @@ type
     property DelphiWmiClassHelperFuncts: Boolean Read FDelphiWmiClassHelperFuncts Write FDelphiWmiClassHelperFuncts;
     property DelphiWmiEventCodeGenMode : Integer Read FDelphiWmiEventCodeGenMode Write FDelphiWmiEventCodeGenMode;
     property ShowImplementedMethods : Boolean read FShowImplementedMethods write FShowImplementedMethods;
+    property OutputFolder : string read GetOutputFolder write FOutputFolder;
   end;
 
 
@@ -73,6 +77,11 @@ type
     Label5: TLabel;
     CbDelphiCodeWmiEvent: TComboBox;
     LabelDescrEvent: TLabel;
+    TabSheet4: TTabSheet;
+    EditOutputFolder: TEdit;
+    Label6: TLabel;
+    BtnSelFolderThemes: TButton;
+    JvBrowseForFolderDialog1: TJvBrowseForFolderDialog;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -82,9 +91,10 @@ type
     procedure ComboBoxFontChange(Sender: TObject);
     procedure CbDelphiCodeWmiClassChange(Sender: TObject);
     procedure CbDelphiCodeWmiEventChange(Sender: TObject);
+    procedure BtnSelFolderThemesClick(Sender: TObject);
   private
     FSettings: TSettings;
-    FCurrentTheme:  TIDETheme;
+    //FCurrentTheme:  TIDETheme;
     FForm: TForm;
     procedure LoadFixedWidthFonts;
     procedure LoadThemes;
@@ -119,6 +129,26 @@ const
 
 Var
   DummyFrm : TFrmSettings;
+
+
+function GetTempDirectory: string;
+var
+  tempFolder: array[0..MAX_PATH] of char;
+begin
+  GetTempPath(MAX_PATH, @tempFolder);
+  Result := StrPas(tempFolder);
+end;
+
+{ TSettings }
+
+function TSettings.GetOutputFolder: string;
+begin
+  if (FOutputFolder='') or not DirectoryExists(FOutputFolder) then
+    Result:=GetTempDirectory
+  else
+    Result := FOutputFolder;
+end;
+
 
 function EnumFontsProc(var LogFont: TLogFont; var TextMetric: TTextMetric;
   FontType: integer; Data: Pointer): integer; stdcall;
@@ -207,13 +237,14 @@ var
 begin
   iniFile := TIniFile.Create(ExtractFilePath(ParamStr(0)) + 'Settings.ini');
   try
-    Settings.CurrentTheme := iniFile.ReadString('Global', 'CurrentTheme', '');
+    Settings.CurrentTheme := iniFile.ReadString('Global', 'CurrentTheme', 'deep-blue');
     Settings.FontName     := iniFile.ReadString('Global', 'FontName', 'Consolas');
     Settings.FontSize     := iniFile.ReadInteger('Global', 'FontSize', 10);
     Settings.DelphiWmiClassCodeGenMode     := iniFile.ReadInteger('Global', 'DelphiWmiClassCodeGenMode', integer(WmiCode_LateBinding));
     Settings.DelphiWmiClassHelperFuncts    := iniFile.ReadBool('Global', 'DelphiWmiClassHelperFuncts', False);
     Settings.ShowImplementedMethods        := iniFile.ReadBool('Global', 'ShowImplementedMethods', True);
     Settings.DelphiWmiEventCodeGenMode     := iniFile.ReadInteger('Global', 'DelphiWmiEventCodeGenMode', integer(WmiCode_Scripting));
+    Settings.OutputFolder                  := iniFile.ReadString('Global', 'OutputFolder', GetTempDirectory);
   finally
     iniFile.Free;
   end;
@@ -232,6 +263,7 @@ begin
     iniFile.WriteBool('Global', 'DelphiWmiClassHelperFuncts', Settings.DelphiWmiClassHelperFuncts);
     iniFile.WriteBool('Global', 'ShowImplementedMethods', Settings.ShowImplementedMethods);
     iniFile.WriteInteger('Global', 'DelphiWmiEventCodeGenMode', Settings.DelphiWmiEventCodeGenMode);
+    iniFile.WriteString('Global', 'OutputFolder', Settings.OutputFolder);
   finally
     iniFile.Free;
   end;
@@ -284,6 +316,16 @@ begin
   ShellExecute(self.WindowHandle,'open','http://theroadtodelphi.wordpress.com/delphi-ide-theme-editor/',nil,nil, SW_SHOWNORMAL);
 end;
 
+procedure TFrmSettings.BtnSelFolderThemesClick(Sender: TObject);
+begin
+  if DirectoryExists(EditOutputFolder.Text) then
+    JvBrowseForFolderDialog1.Directory := EditOutputFolder.Text;
+
+  if JvBrowseForFolderDialog1.Execute then
+    EditOutputFolder.Text := JvBrowseForFolderDialog1.Directory;
+
+end;
+
 procedure TFrmSettings.ButtonApplyClick(Sender: TObject);
 begin
   if Application.MessageBox(PChar(Format('Do you want save the changes ?%s', [''])), 'Confirmation', MB_YESNO + MB_ICONQUESTION) = idYes then
@@ -295,6 +337,7 @@ begin
     FSettings.DelphiWmiClassHelperFuncts    := CheckBoxHelper.Checked;
     FSettings.ShowImplementedMethods        := CheckBoxShowImplMethods.Checked;
     FSettings.DelphiWmiEventCodeGenMode     := Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]);
+    FSettings.OutputFolder                  := EditOutputFolder.Text;
     WriteSettings(FSettings);
     Close();
   end;
@@ -397,6 +440,7 @@ begin
 
   CheckBoxHelper.Checked    := FSettings.FDelphiWmiClassHelperFuncts;
   CheckBoxShowImplMethods.Checked    := FSettings.FShowImplementedMethods;
+  EditOutputFolder.Text              := FSettings.OutputFolder;
 end;
 
 function GetThemeNameFromFile(const FileName:string): string;
@@ -418,5 +462,6 @@ begin
     ComboBoxTheme.Items.EndUpdate;
   end;
 end;
+
 
 end.
