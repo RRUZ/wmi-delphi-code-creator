@@ -90,15 +90,6 @@ begin
       lpStartupInfo.dwFlags := STARTF_USESTDHANDLES + STARTF_USESHOWWINDOW;
       lpStartupInfo.wShowWindow := SW_HIDE;
 
-{
-function CreateProcess(lpApplicationName: PWideChar; lpCommandLine: PWideChar;
-  lpProcessAttributes, lpThreadAttributes: PSecurityAttributes;
-  bInheritHandles: BOOL; dwCreationFlags: DWORD; lpEnvironment: Pointer;
-  lpCurrentDirectory: PWideChar; const lpStartupInfo: TStartupInfo;
-  var lpProcessInformation: TProcessInformation): BOOL; stdcall;
-
-}
-
       OutPutList.Add(lpCommandLine);
       if CreateProcess(nil, PChar(lpCommandLine), @lpPipeAttributes,
         @lpPipeAttributes, True, CREATE_NO_WINDOW or NORMAL_PRIORITY_CLASS, nil,
@@ -121,7 +112,8 @@ function CreateProcess(lpApplicationName: PWideChar; lpCommandLine: PWideChar;
           until (Apprunning <> WAIT_TIMEOUT) or (n > 150);
 
           Buffer[TotalBytesRead] := #0;
-          OemToCharA(Buffer, Buffer);
+          //OemToCharA(Buffer, Buffer);
+          OemToAnsi(Buffer, Buffer);
           OutPutList.Text := OutPutList.Text + AnsiString(Buffer);
         finally
           CloseHandle(lpProcessInformation.hProcess);

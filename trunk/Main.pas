@@ -34,6 +34,8 @@ interface
   store cache x machine
 
   Select different templates for delphi code generation (COM, Late binding, TLB)
+
+
 }
 
 uses
@@ -327,6 +329,8 @@ end;
 procedure TFrmMain.ComboBoxLanguageSelChange(Sender: TObject);
 begin
   GenerateObjectPascalConsoleCode;
+  GenerateObjectPascalMethodInvoker;
+  GenerateObjectPascalEventCode;
 end;
 
 procedure TFrmMain.ComboBoxMethodsChange(Sender: TObject);
@@ -1329,13 +1333,6 @@ begin
   GetValuesWmiProperties(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
 end;
 
-function GetTempDirectory: string;
-var
-  tempFolder: array[0..MAX_PATH] of char;
-begin
-  GetTempPath(MAX_PATH, @tempFolder);
-  Result := StrPas(tempFolder);
-end;
 
 procedure TFrmMain.ToolButtonRunClick(Sender: TObject);
 var
@@ -1366,7 +1363,7 @@ begin
           Ct_Delphi:
           begin
             CompilerName := item.SubItems[1];
-            FileName     := GetTempDirectory;
+            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
             FileName     :=
               FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.dpr';
 
@@ -1390,7 +1387,7 @@ begin
           Ct_Lazarus_FPC:
           begin
             CompilerName := item.SubItems[1];
-            FileName     := GetTempDirectory;
+            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
             FileName     :=
               FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.lpr';
 
@@ -1415,7 +1412,7 @@ begin
           Ct_Oxygene:
           begin
             CompilerName := item.SubItems[1];
-            FileName     := GetTempDirectory;
+            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
             FileName     := FileName + 'Program.pas';
 
             if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
@@ -1468,7 +1465,7 @@ begin
       begin
         Ct      := TCompilerType(integer(item.Data));
         IdeName := item.SubItems[0];
-        FileName := GetTempDirectory;
+        FileName := IncludeTrailingPathDelimiter(Settings.OutputFolder);
 
 
         case ct of
