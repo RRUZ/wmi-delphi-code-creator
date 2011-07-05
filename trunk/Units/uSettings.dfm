@@ -3,7 +3,7 @@ object FrmSettings: TFrmSettings
   Top = 302
   BorderStyle = bsDialog
   Caption = 'Settings'
-  ClientHeight = 342
+  ClientHeight = 434
   ClientWidth = 445
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,7 +21,7 @@ object FrmSettings: TFrmSettings
     Left = 0
     Top = 0
     Width = 445
-    Height = 307
+    Height = 399
     Align = alClient
     BorderWidth = 5
     TabOrder = 0
@@ -33,10 +33,11 @@ object FrmSettings: TFrmSettings
       Left = 6
       Top = 6
       Width = 433
-      Height = 295
+      Height = 387
       ActivePage = TabSheet4
       Align = alClient
       TabOrder = 0
+      ExplicitHeight = 295
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
@@ -52,7 +53,7 @@ object FrmSettings: TFrmSettings
           Top = 32
           Width = 281
           Height = 21
-          TabOrder = 0
+          TabOrder = 1
         end
         object BtnSelFolderThemes: TButton
           Left = 303
@@ -60,17 +61,13 @@ object FrmSettings: TFrmSettings
           Width = 26
           Height = 25
           Caption = '...'
-          TabOrder = 1
+          TabOrder = 0
           OnClick = BtnSelFolderThemesClick
         end
       end
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 35
@@ -79,7 +76,7 @@ object FrmSettings: TFrmSettings
           Caption = 'Delphi WMI class code'
         end
         object LabelDescr: TLabel
-          Left = 128
+          Left = 152
           Top = 59
           Width = 225
           Height = 49
@@ -89,27 +86,43 @@ object FrmSettings: TFrmSettings
         end
         object Label5: TLabel
           Left = 3
-          Top = 131
+          Top = 275
           Width = 116
           Height = 13
           Caption = 'Delphi WMI events code'
         end
         object LabelDescrEvent: TLabel
-          Left = 128
-          Top = 163
+          Left = 152
+          Top = 307
           Width = 225
           Height = 49
           AutoSize = False
           Caption = 'LabelDescr'
           WordWrap = True
         end
+        object LabelDescrMethod: TLabel
+          Left = 152
+          Top = 177
+          Width = 225
+          Height = 49
+          AutoSize = False
+          Caption = 'LabelDescr'
+          WordWrap = True
+        end
+        object Label8: TLabel
+          Left = 3
+          Top = 145
+          Width = 124
+          Height = 13
+          Caption = 'Delphi WMI methods code'
+        end
         object CbDelphiCodeWmiClass: TComboBox
-          Left = 128
+          Left = 152
           Top = 35
           Width = 225
           Height = 21
           Style = csDropDownList
-          TabOrder = 0
+          TabOrder = 1
           OnChange = CbDelphiCodeWmiClassChange
         end
         object CheckBoxHelper: TCheckBox
@@ -118,24 +131,29 @@ object FrmSettings: TFrmSettings
           Width = 350
           Height = 17
           Caption = 'Create Helper functions in generated code to handle null values'
-          TabOrder = 1
+          TabOrder = 0
         end
         object CbDelphiCodeWmiEvent: TComboBox
-          Left = 128
-          Top = 128
+          Left = 152
+          Top = 272
+          Width = 225
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 3
+          OnChange = CbDelphiCodeWmiEventChange
+        end
+        object CbDelphiCodeWmiMethod: TComboBox
+          Left = 152
+          Top = 142
           Width = 225
           Height = 21
           Style = csDropDownList
           TabOrder = 2
-          OnChange = CbDelphiCodeWmiEventChange
+          OnChange = CbDelphiCodeWmiMethodChange
         end
       end
       object TabSheet1: TTabSheet
         Caption = 'Theme Settings'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label1: TLabel
           Left = 11
           Top = 8
@@ -163,7 +181,7 @@ object FrmSettings: TFrmSettings
           Width = 254
           Height = 21
           Style = csDropDownList
-          TabOrder = 0
+          TabOrder = 1
           OnChange = ComboBoxThemeChange
         end
         object EditFontSize: TEdit
@@ -172,7 +190,7 @@ object FrmSettings: TFrmSettings
           Width = 32
           Height = 21
           ReadOnly = True
-          TabOrder = 1
+          TabOrder = 3
           Text = '10'
           OnChange = ComboBoxFontChange
         end
@@ -185,7 +203,7 @@ object FrmSettings: TFrmSettings
           Min = 8
           Max = 48
           Position = 10
-          TabOrder = 2
+          TabOrder = 4
         end
         object ComboBoxFont: TComboBox
           Left = 11
@@ -193,7 +211,7 @@ object FrmSettings: TFrmSettings
           Width = 202
           Height = 21
           Style = csDropDownList
-          TabOrder = 3
+          TabOrder = 2
           OnChange = ComboBoxFontChange
         end
         object ButtonGetMore: TButton
@@ -202,17 +220,13 @@ object FrmSettings: TFrmSettings
           Width = 98
           Height = 25
           Caption = 'Get more themes'
-          TabOrder = 4
+          TabOrder = 0
           OnClick = ButtonGetMoreClick
         end
       end
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -226,7 +240,7 @@ object FrmSettings: TFrmSettings
   end
   object Panel2: TPanel
     Left = 0
-    Top = 307
+    Top = 399
     Width = 445
     Height = 35
     Align = alBottom

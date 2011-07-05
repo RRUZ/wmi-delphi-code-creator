@@ -179,7 +179,7 @@ object FrmMain: TFrmMain
                   Left = 9
                   Top = 192
                   Width = 295
-                  Height = 164
+                  Height = 162
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -200,7 +200,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 166
+                  ExplicitHeight = 164
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -363,7 +363,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 108
+                  Height = 106
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -384,10 +384,9 @@ object FrmMain: TFrmMain
                       Width = 150
                     end>
                   ReadOnly = True
-                  TabOrder = 5
+                  TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewMethodsParamsClick
-                  ExplicitHeight = 110
                 end
                 object MemoMethodDescr: TMemo
                   Left = 11
@@ -397,27 +396,26 @@ object FrmMain: TFrmMain
                   Anchors = [akLeft, akTop, akRight]
                   ReadOnly = True
                   ScrollBars = ssVertical
-                  TabOrder = 4
+                  TabOrder = 5
                 end
                 object EditValueMethodParam: TEdit
                   Left = 37
                   Top = 239
                   Width = 121
                   Height = 21
-                  TabOrder = 6
+                  TabOrder = 7
                   Visible = False
                   OnExit = EditValueMethodParamExit
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 330
+                  Top = 328
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
-                  TabOrder = 7
+                  TabOrder = 8
                   OnClick = ButtonGenerateCodeInvokerClick
-                  ExplicitTop = 332
                 end
                 object ComboBoxPaths: TComboBox
                   Left = 103
@@ -426,7 +424,7 @@ object FrmMain: TFrmMain
                   Height = 21
                   Style = csDropDownList
                   Anchors = [akLeft, akTop, akRight]
-                  TabOrder = 3
+                  TabOrder = 4
                   OnChange = ComboBoxPathsChange
                 end
                 object CheckBoxPath: TCheckBox
@@ -435,7 +433,7 @@ object FrmMain: TFrmMain
                   Width = 69
                   Height = 17
                   Caption = 'Instances'
-                  TabOrder = 8
+                  TabOrder = 3
                   OnClick = CheckBoxPathClick
                 end
               end
@@ -460,10 +458,6 @@ object FrmMain: TFrmMain
                   ExplicitHeight = 402
                   object TabSheet2: TTabSheet
                     Caption = 'Delphi Code'
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object SynEditDelphiCodeInvoke: TSynEdit
                       Left = 0
                       Top = 0
@@ -575,7 +569,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 153
+                  Height = 151
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -596,17 +590,16 @@ object FrmMain: TFrmMain
                       Width = 60
                     end>
                   ReadOnly = True
-                  TabOrder = 4
+                  TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewEventsCondsClick
-                  ExplicitHeight = 155
                 end
                 object EditValueEvent: TEdit
                   Left = 88
                   Top = 235
                   Width = 145
                   Height = 21
-                  TabOrder = 6
+                  TabOrder = 8
                   Visible = False
                   OnExit = EditValueEventExit
                 end
@@ -617,7 +610,7 @@ object FrmMain: TFrmMain
                   Height = 21
                   Style = csDropDownList
                   ItemIndex = 0
-                  TabOrder = 5
+                  TabOrder = 7
                   Text = '='
                   Visible = False
                   OnExit = ComboBoxCondExit
@@ -648,7 +641,7 @@ object FrmMain: TFrmMain
                   Anchors = [akLeft, akTop, akRight]
                   DropDownCount = 20
                   Sorted = True
-                  TabOrder = 1
+                  TabOrder = 3
                   OnChange = ComboBoxEventsChange
                 end
                 object ComboBoxTargetInstance: TComboBox
@@ -660,7 +653,7 @@ object FrmMain: TFrmMain
                   Anchors = [akLeft, akTop, akRight]
                   DropDownCount = 20
                   Sorted = True
-                  TabOrder = 2
+                  TabOrder = 4
                   OnChange = ComboBoxTargetInstanceChange
                 end
                 object EditEventWait: TEdit
@@ -668,19 +661,18 @@ object FrmMain: TFrmMain
                   Top = 130
                   Width = 48
                   Height = 21
-                  TabOrder = 3
+                  TabOrder = 5
                   Text = '1'
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 335
+                  Top = 333
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
-                  TabOrder = 7
+                  TabOrder = 9
                   OnClick = ButtonGenerateEventCodeClick
-                  ExplicitTop = 337
                 end
                 object RadioButtonIntrinsic: TRadioButton
                   Left = 5
@@ -689,7 +681,7 @@ object FrmMain: TFrmMain
                   Height = 17
                   Caption = 'Intrinsic'
                   Checked = True
-                  TabOrder = 8
+                  TabOrder = 1
                   TabStop = True
                   OnClick = RadioButtonIntrinsicClick
                 end
@@ -699,7 +691,7 @@ object FrmMain: TFrmMain
                   Width = 113
                   Height = 17
                   Caption = 'Extrinsic'
-                  TabOrder = 9
+                  TabOrder = 2
                   OnClick = RadioButtonIntrinsicClick
                 end
               end
@@ -724,10 +716,6 @@ object FrmMain: TFrmMain
                   ExplicitHeight = 402
                   object TabSheet1: TTabSheet
                     Caption = 'Delphi Code'
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object SynEditEventCode: TSynEdit
                       Left = 0
                       Top = 0
@@ -834,26 +822,14 @@ object FrmMain: TFrmMain
       object TabSheetTreeClasses: TTabSheet
         Caption = 'Wmi Explorer'
         ImageIndex = 29
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object TabSheetWmiDatabase: TTabSheet
         Caption = 'WMI Database'
         ImageIndex = 31
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object TabSheet6: TTabSheet
         Caption = 'Log'
         ImageIndex = 28
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object MemoLog: TMemo
           Left = 0
           Top = 0
@@ -1038,7 +1014,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800F40010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800F80010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000

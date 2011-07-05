@@ -25,6 +25,7 @@ unit uMisc;
 interface
 
 uses
+ ComObj,
  SysUtils,
  Forms,
  Windows,
@@ -34,8 +35,28 @@ procedure CaptureConsoleOutput(const lpCommandLine: string; OutPutList: TStrings
 procedure MsgWarning(const Msg: string);
 procedure MsgInformation(const Msg: string);
 function  MsgQuestion(const Msg: string):Boolean;
+function  GetFileVersion(const FileName: string): string;
+function  GetTempDirectory: string;
 
 implementation
+
+function GetTempDirectory: string;
+var
+  lpBuffer: array[0..MAX_PATH] of Char;
+begin
+  GetTempPath(MAX_PATH, @lpBuffer);
+  Result := StrPas(lpBuffer);
+end;
+
+
+function GetFileVersion(const FileName: string): string;
+var
+  FSO  : OleVariant;
+begin
+  FSO    := CreateOleObject('Scripting.FileSystemObject');
+  Result := FSO.GetFileVersion(FileName);
+end;
+
 
 
 procedure MsgWarning(const Msg: string);

@@ -143,7 +143,6 @@ Color15=$FFFFFF
 
 procedure FillListViewDelphiVersions(ListView: TListView);
 function IsDelphiIDERunning(const DelphiIDEPath: TFileName): boolean;
-function GetFileVersion(const exeName: string): string;
 {$IFDEF OLDEVERSIONS_SUPPORT}
 function DelphiIsOldVersion(DelphiVersion:TDelphiVersions) : Boolean;
 function GetIndexClosestColor(AColor:TColor) : Integer;
@@ -229,29 +228,6 @@ begin
 {$ENDIF}
 end;
 
-function GetFileVersion(const exeName: string): string;
-const
-  c_StringInfo = 'StringFileInfo\040904E4\FileVersion';
-var
-  n, Len:     cardinal;
-  Buf, Value: PChar;
-begin
-  Result := '';
-  n      := GetFileVersionInfoSize(PChar(exeName), n);
-  if n > 0 then
-  begin
-    Buf := AllocMem(n);
-    try
-      GetFileVersionInfo(PChar(exeName), 0, n, Buf);
-      if VerQueryValue(Buf, PChar(c_StringInfo), Pointer(Value), Len) then
-      begin
-        Result := Trim(Value);
-      end;
-    finally
-      FreeMem(Buf, n);
-    end;
-  end;
-end;
 
 function ProcessFileName(PID: DWORD): string;
 var
