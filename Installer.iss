@@ -112,6 +112,8 @@ Source: Templates\TemplateNonStaticMethodInvokerOxygen.pas; DestDir: {app}\Templ
 Source: Templates\TemplateStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
 #define MyAppName 'Wmi Delphi Code Creator'
 #define MyAppVersion GetFileVersion('WmiDelphiCodeCreator.exe')
 [Setup]

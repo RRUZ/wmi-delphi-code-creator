@@ -604,7 +604,7 @@ begin
     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
       Lng_Delphi: GenerateDelphiWmiInvokerCode(
           SynEditDelphiCodeInvoke.Lines, Params, Values, Namespace, WmiClass, WmiMethod,
-          ComboBoxPaths.Text, Settings.DelphiWmiClassHelperFuncts);
+          ComboBoxPaths.Text, Settings.DelphiWmiClassHelperFuncts,TWmiCode(Settings.DelphiWmiMethodCodeGenMode));
       Lng_FPC: GenerateFPCWmiInvokerCode(
           SynEditDelphiCodeInvoke.Lines, Params, Values, Namespace, WmiClass, WmiMethod,
           ComboBoxPaths.Text, Settings.DelphiWmiClassHelperFuncts);
