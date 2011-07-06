@@ -419,6 +419,15 @@ object FrmAbout: TFrmAbout
       TabOrder = 2
       OnClick = Button3Click
     end
+    object btnCheckUpdates: TButton
+      Left = 170
+      Top = 16
+      Width = 127
+      Height = 25
+      Caption = 'Check for updates'
+      TabOrder = 3
+      OnClick = btnCheckUpdatesClick
+    end
   end
   object MemoCopyRights: TMemo
     Left = 8
