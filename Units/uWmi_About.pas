@@ -39,10 +39,12 @@ type
     MemoCopyRights: TMemo;
     Button3: TButton;
     Image2: TImage;
+    btnCheckUpdates: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure btnCheckUpdatesClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -54,6 +56,7 @@ type
 implementation
 
 uses
+  uCheckUpdate,
   uWmiGenCode,
   uWmi_Metadata,
   ShellApi;
@@ -61,6 +64,18 @@ uses
 {$R *.dfm}
 
 
+
+procedure TFrmAbout.btnCheckUpdatesClick(Sender: TObject);
+var
+  Frm: TFrmCheckUpdate;
+begin
+  Frm := TFrmCheckUpdate.Create(nil);
+  try
+    Frm.ShowModal();
+  finally
+    Frm.Free;
+  end;
+end;
 
 procedure TFrmAbout.Button1Click(Sender: TObject);
 begin

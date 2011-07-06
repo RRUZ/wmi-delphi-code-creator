@@ -94,6 +94,8 @@ Source: Delphi\JwaWinDLLNames.pas; DestDir: {app}\Delphi\
 Source: Delphi\JwaWinNT.pas; DestDir: {app}\Delphi\
 Source: Delphi\JwaWinType.pas; DestDir: {app}\Delphi\
 Source: Delphi\WbemScripting_TLB.pas; DestDir: {app}\Delphi\
+#define MyAppName 'Wmi Delphi Code Creator'
+#define MyAppVersion GetFileVersion('WmiDelphiCodeCreator.exe')
 Source: Templates\TemplateConsoleAppDelphi.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppDelphiSingleton.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppDelphiSingleton_TLB.pas; DestDir: {app}\Templates\
@@ -103,19 +105,18 @@ Source: Templates\TemplateConsoleAppFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppFPCSingleton.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppOxygen.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsDelphi.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateEventsDelphi_COM.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsOxygen.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateHelperFunctions.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateNonStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
-#define MyAppName 'Wmi Delphi Code Creator'
-#define MyAppVersion GetFileVersion('WmiDelphiCodeCreator.exe')
 [Setup]
 UsePreviousLanguage=no
 AppName={#MyAppName}
@@ -126,7 +127,7 @@ AppPublisherURL=http://theroadtodelphi.wordpress.com/
 AppSupportURL=http://theroadtodelphi.wordpress.com/
 AppUpdatesURL=http://theroadtodelphi.wordpress.com/
 DefaultDirName={pf}\TheRoadToDelphi\Wmi Delphi Code Creator
-OutputBaseFileName=Setup
+OutputBaseFileName=Setup_WmiDelphiCodeCreator
 DisableDirPage=true
 Compression=lzma
 SolidCompression=true
