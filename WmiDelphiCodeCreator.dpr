@@ -27,7 +27,8 @@ uses
   uWmiFPCCode in 'Units\uWmiFPCCode.pas',
   AsyncCalls in 'Units\AsyncCalls.pas',
   uWmi_Metadata in 'Units\uWmi_Metadata.pas',
-  uCheckUpdate in 'Units\uCheckUpdate.pas' {FrmCheckUpdate};
+  uCheckUpdate in 'Units\uCheckUpdate.pas' {FrmCheckUpdate},
+  uWinInet in 'Units\uWinInet.pas';
 
 {$R *.res}
 
