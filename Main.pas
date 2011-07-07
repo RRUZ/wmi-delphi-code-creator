@@ -1377,10 +1377,8 @@ begin
               SynEditEventCode.Lines.SaveToFile(FileName);
 
             if CreateDelphiProject(
-              ExtractFilePath(FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
-              'Delphi') then
-              CompileAndRunDelphiCode(MemoConsole.Lines,CompilerName, FileName,
-                TComponent(Sender).Tag = 1);
+              ExtractFilePath(FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +'Delphi') then
+              CompileAndRunDelphiCode(MemoConsole.Lines,CompilerName, FileName, TComponent(Sender).Tag = 1);
 
             ScrollMemoConsole;
           end;
@@ -1481,8 +1479,7 @@ begin
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
               SynEditEventCode.Lines.SaveToFile(FileName);
-            ShellExecute(Handle, nil, PChar(IdeName),
-              PChar(FileName), nil, SW_SHOWNORMAL);
+              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
 
           Ct_Lazarus_FPC:
@@ -1501,8 +1498,7 @@ begin
             if CreateLazarusProject(
               ExtractFileName(FileName), ExtractFilePath(FileName), IncludeTrailingPathDelimiter(
               ExtractFilePath(ParamStr(0))) + 'Lazarus\TemplateConsole.lpi') then
-              ShellExecute(Handle, nil, PChar(IdeName),
-                PChar(FileName), nil, SW_SHOWNORMAL);
+              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
           Ct_Oxygene:
           begin
@@ -1524,8 +1520,7 @@ begin
               'Oxygene\Monodevelop\GetWMI_Info.oxygene', FileName) then
             begin
               FileName := ChangeFileExt(FileName, '.sln');
-              ShellExecute(Handle, nil,
-                PChar(IdeName), PChar(FileName), nil, SW_SHOWNORMAL);
+              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
             end
             else
             if (Pos('2008', item.Caption) > 0) and
@@ -1534,8 +1529,7 @@ begin
               'Oxygene\VS2008\GetWMI_Info.oxygene', FileName) then
             begin
               FileName := ChangeFileExt(FileName, '.sln');
-              ShellExecute(Handle, nil,
-                PChar(IdeName), PChar(FileName), nil, SW_SHOWNORMAL);
+              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
             end
             else
             if (Pos('2010', item.Caption) > 0) and
@@ -1544,8 +1538,7 @@ begin
               'Oxygene\VS2010\GetWMI_Info.oxygene', FileName) then
             begin
               FileName := ChangeFileExt(FileName, '.sln');
-              ShellExecute(Handle, nil,
-                PChar(IdeName), PChar(FileName), nil, SW_SHOWNORMAL);
+              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
             end;
 
           end;

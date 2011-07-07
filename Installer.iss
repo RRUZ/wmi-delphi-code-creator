@@ -110,10 +110,12 @@ Source: Templates\TemplateEventsFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsOxygen.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateHelperFunctions.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerDelphi_COM.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerDelphi_COM.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\

@@ -50,8 +50,8 @@ const
 
   ListDelphiWmiEventsTemplates : Array [0..DelphiMaxTypesEventsCodeGen-1] of  string = ('TemplateEventsDelphi.pas', 'TemplateEventsDelphi_COM.pas');
 
-  ListDelphiWmiMethodsStaticTemplates    : Array [0..DelphiMaxTypesMethodCodeGen-1] of  string = ('TemplateStaticMethodInvokerDelphi_TLB.pas', 'TemplateStaticMethodInvokerDelphi.pas','');
-  ListDelphiWmiMethodsNonStaticTemplates : Array [0..DelphiMaxTypesMethodCodeGen-1] of  string = ('TemplateNonStaticMethodInvokerDelphi_TLB.pas', 'TemplateNonStaticMethodInvokerDelphi.pas','');
+  ListDelphiWmiMethodsStaticTemplates    : Array [0..DelphiMaxTypesMethodCodeGen-1] of  string = ('TemplateStaticMethodInvokerDelphi_TLB.pas', 'TemplateStaticMethodInvokerDelphi.pas','TemplateStaticMethodInvokerDelphi_COM.pas');
+  ListDelphiWmiMethodsNonStaticTemplates : Array [0..DelphiMaxTypesMethodCodeGen-1] of  string = ('TemplateNonStaticMethodInvokerDelphi_TLB.pas', 'TemplateNonStaticMethodInvokerDelphi.pas','TemplateNonStaticMethodInvokerDelphi_COM.pas');
 
 
 
@@ -401,7 +401,7 @@ var
 
   IsStatic:  boolean;
   ParamsStr: string;
-
+  Padding: string;
   TemplateCode : string;
 begin
 
@@ -457,7 +457,87 @@ begin
     StrCode := StringReplace(StrCode, sTagWmiPath, WmiPath, [rfReplaceAll]);
 
      case Mode of
-      WmiCode_COM         : ;
+      WmiCode_COM         :
+                            begin
+                              Padding:=StringOfChar(' ',23);
+                              if IsStatic then
+                              begin
+
+           					            //pVal     := 0;
+                                //pClassInstance.Put('Reason', 0, @pVal, 0);
+                                //In Params
+                                if ParamsIn.Count > 0 then
+                                  for Index := 0 to ParamsIn.Count - 1 do
+                                    if Values[Index] <> WbemEmptyParam then
+                                    begin
+                                      if ParamsIn.ValueFromIndex[Index] = wbemtypeString then
+                                      begin
+                                          DynCodeInParams.Add(Format('%s  pVal :=%s;', [Padding,QuotedStr(Values[Index])]));
+                                          DynCodeInParams.Add(Format('%s  pClassInstance.Put(%s, 0, @pVal, 0);', [Padding,QuotedStr(ParamsIn.Names[Index])]));
+                                      end
+                                      else
+                                      begin
+                                          DynCodeInParams.Add(Format('%s  pVal :=%s;', [Padding,Values[Index]]));
+                                          DynCodeInParams.Add(Format('%s  pClassInstance.Put(%s, 0, @pVal, 0);', [Padding,QuotedStr(ParamsIn.Names[Index])]));
+                                      end
+                                    end;
+                              end
+                              else
+                              begin
+
+           					            //pVal     := 0;
+                                //pClassInstance.Put('Reason', 0, @pVal, 0);
+                                //In Params
+                                if ParamsIn.Count > 0 then
+                                  for Index := 0 to ParamsIn.Count - 1 do
+                                    if Values[Index] <> WbemEmptyParam then
+                                    begin
+                                      if ParamsIn.ValueFromIndex[Index] = wbemtypeString then
+                                      begin
+                                          DynCodeInParams.Add(Format('%s  pVal :=%s;', [Padding,QuotedStr(Values[Index])]));
+                                          DynCodeInParams.Add(Format('%s  pClassInstance.Put(%s, 0, @pVal, 0);', [Padding,QuotedStr(ParamsIn.Names[Index])]));
+                                      end
+                                      else
+                                      begin
+                                          DynCodeInParams.Add(Format('%s  pVal :=%s;', [Padding,Values[Index]]));
+                                          DynCodeInParams.Add(Format('%s  pClassInstance.Put(%s, 0, @pVal, 0);', [Padding,QuotedStr(ParamsIn.Names[Index])]));
+                                      end
+                                    end;
+
+                              end;
+                              StrCode := StringReplace(StrCode, sTagDelphiCodeParamsIn, DynCodeInParams.Text, [rfReplaceAll]);
+
+							                //ppOutParams.Get('ReturnValue', 0, pVal, pType, plFlavor);// String
+                              //Writeln(Format('ReturnValue  %s',[pVal]));
+                              //VarClear(pVal);
+
+                              //Out Params
+                              if OutParamsList.Count > 1 then
+                              begin
+                                for Index := 0 to OutParamsList.Count - 1 do
+                                begin
+                                  DynCodeOutParams.Add(Format('%s  ppOutParams.Get(%s, 0, pVal, pType, plFlavor);',[Padding,QuotedStr(OutParamsList[Index])]));
+                                  if UseHelperFunct then
+                                    DynCodeOutParams.Add(
+                                      Format('%s  Writeln(Format(''%-20s  %%s'',[VarStrNull(pVal)]));',[Padding,OutParamsList[Index]]))
+                                  else
+                                    DynCodeOutParams.Add(Format('%s  Writeln(Format(''%-20s  %%s'',[pVal]));',[Padding,OutParamsList[Index]]));
+                                  DynCodeOutParams.Add(Padding+'  VarClear(pVal);');
+                                end;
+                              end
+                              else
+                              if OutParamsList.Count = 1 then
+                              begin
+                                  DynCodeOutParams.Add(Format('%s  ppOutParams.Get(%s, 0, pVal, pType, plFlavor);',[Padding,QuotedStr('ReturnValue')]));
+                                if UseHelperFunct then
+                                  DynCodeOutParams.Add(Padding+'  Writeln(Format(''ReturnValue  %s'',[VarStrNull(pVal)]));')
+                                else
+                                  DynCodeOutParams.Add(Padding+'  Writeln(Format(''ReturnValue  %s'',[pVal]));');
+                                  DynCodeOutParams.Add(Padding+'  VarClear(pVal);');
+                              end;
+                              StrCode := StringReplace(StrCode, sTagDelphiCodeParamsOut, DynCodeOutParams.Text, [rfReplaceAll]);
+
+                            end;
 
 
       WmiCode_Scripting   :
@@ -504,8 +584,7 @@ begin
                                     end;
 
                               end;
-                              StrCode := StringReplace(StrCode, sTagDelphiCodeParamsIn, DynCodeInParams.Text,
-                                [rfReplaceAll]);
+                              StrCode := StringReplace(StrCode, sTagDelphiCodeParamsIn, DynCodeInParams.Text, [rfReplaceAll]);
 
                               //Writeln(Format('ProcessId             %s',[FOutParams.Properties_.Item('ProcessId', 0).Get_Value]));
                               //Out Params
@@ -526,8 +605,7 @@ begin
                                 else
                                   DynCodeOutParams.Add('  Writeln(Format(''ReturnValue  %s'',[FOutParams.Properties_.Item(''ReturnValue'',0).Get_Value]));');
                               end;
-                              StrCode := StringReplace(StrCode, sTagDelphiCodeParamsOut,
-                                DynCodeOutParams.Text, [rfReplaceAll]);
+                              StrCode := StringReplace(StrCode, sTagDelphiCodeParamsOut, DynCodeOutParams.Text, [rfReplaceAll]);
 
                             end;
       WmiCode_LateBinding :
