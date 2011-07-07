@@ -179,7 +179,7 @@ object FrmMain: TFrmMain
                   Left = 9
                   Top = 192
                   Width = 295
-                  Height = 162
+                  Height = 160
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -200,7 +200,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 164
+                  ExplicitHeight = 162
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -363,7 +363,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 106
+                  Height = 104
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -409,7 +409,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 328
+                  Top = 326
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -569,7 +569,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 151
+                  Height = 149
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -666,7 +666,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 333
+                  Top = 331
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -989,8 +989,8 @@ object FrmMain: TFrmMain
   end
   object PopupMenu1: TPopupMenu
     Images = ImageList1
-    Left = 498
-    Top = 308
+    Left = 58
+    Top = 36
     object CompileCode1: TMenuItem
       Caption = 'Compile Code'
       ImageIndex = 21
@@ -1014,7 +1014,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800F80010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800FC0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
