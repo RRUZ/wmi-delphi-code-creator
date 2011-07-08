@@ -94,8 +94,6 @@ Source: Delphi\JwaWinDLLNames.pas; DestDir: {app}\Delphi\
 Source: Delphi\JwaWinNT.pas; DestDir: {app}\Delphi\
 Source: Delphi\JwaWinType.pas; DestDir: {app}\Delphi\
 Source: Delphi\WbemScripting_TLB.pas; DestDir: {app}\Delphi\
-#define MyAppName 'Wmi Delphi Code Creator'
-#define MyAppVersion GetFileVersion('WmiDelphiCodeCreator.exe')
 Source: Templates\TemplateConsoleAppDelphi.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppDelphiSingleton.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppDelphiSingleton_TLB.pas; DestDir: {app}\Templates\
@@ -119,6 +117,8 @@ Source: Templates\TemplateStaticMethodInvokerDelphi_COM.pas; DestDir: {app}\Temp
 Source: Templates\TemplateStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
+#define MyAppName 'Wmi Delphi Code Creator'
+#define MyAppVersion GetFileVersion('WmiDelphiCodeCreator.exe')
 [Setup]
 UsePreviousLanguage=no
 AppName={#MyAppName}
@@ -201,9 +201,6 @@ begin
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
-var
- Filename: String;
- Version : string;
 begin
   if (CurStep=ssInstall) then
   begin
