@@ -71,28 +71,24 @@ const
   
 [HELPER_FUNCTIONS]
 
-function GetExtendedErrorInfo(ErrorCode: Integer):Boolean;
+function GetExtendedErrorInfo(hresErr: HRESULT):Boolean;
 var
-  ErrorInfo       : IErrorInfo;
-  bstrSource      : WideString;
-  bstrDescription : WideString;
-  bstrHelpFile    : WideString;
-  dwHelpContext   : Longint;
+ pStatus    : IWbemStatusCodeText;
+ hres       : HRESULT;
+ MessageText: WideString;
 begin
- Result:=GetErrorInfo(0, ErrorInfo) = S_OK;
-  if Result then
-  begin
-    ErrorInfo.GetSource(bstrSource);
-    ErrorInfo.GetDescription(bstrDescription);
-    ErrorInfo.GetHelpFile(bstrHelpFile);
-    ErrorInfo.GetHelpContext(dwHelpContext);
+  Result:=False;
+    hres := CoCreateInstance(CLSID_WbemStatusCodeText, nil, CLSCTX_INPROC_SERVER, IID_IWbemStatusCodeText, pStatus);
+    if (hres = S_OK) then
+    begin
+     hres := pStatus.GetErrorCodeText(hresErr, 0, 0, MessageText);
+     if(hres <> S_OK) then
+       MessageText := 'Get last error failed';
 
-    Writeln(Format('Error Code %x',[ErrorCode]));
-    Writeln(Format('Source %s',[bstrSource]));
-    Writeln(Format('Description %s',[bstrDescription]));
-    Writeln(Format('HelpFile %s',[bstrHelpFile]));
-    //Writeln(Format('HelpContext %s',[dwHelpContext]));
-  end;
+     Result:=(hres = S_OK);
+     if Result then
+      Writeln(Format( 'ErrorCode %x Description %s',[hresErr,MessageText]));
+    end;
 end;
 
   
