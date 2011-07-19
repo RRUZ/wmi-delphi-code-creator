@@ -40,6 +40,8 @@ object FrmMain: TFrmMain
       MultiLine = True
       TabOrder = 0
       OnChange = PageControlMainChange
+      ExplicitLeft = 0
+      ExplicitTop = 6
       object TabSheetCodeGen: TTabSheet
         Caption = 'Code Generation'
         ImageIndex = 30
@@ -179,7 +181,7 @@ object FrmMain: TFrmMain
                   Left = 9
                   Top = 192
                   Width = 295
-                  Height = 158
+                  Height = 154
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -200,7 +202,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 160
+                  ExplicitHeight = 156
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -363,7 +365,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 102
+                  Height = 98
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -409,7 +411,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 324
+                  Top = 320
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -569,7 +571,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 147
+                  Height = 143
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -666,7 +668,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 329
+                  Top = 325
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -778,7 +780,7 @@ object FrmMain: TFrmMain
                   Width = 972
                   Height = 124
                   Align = alClient
-                  Color = clBlack
+                  Color = clGray
                   Font.Charset = ANSI_CHARSET
                   Font.Color = clWhite
                   Font.Height = -12
@@ -819,9 +821,17 @@ object FrmMain: TFrmMain
           end
         end
       end
-      object TabSheetTreeClasses: TTabSheet
+      object TabSheetWmiExplorer: TTabSheet
         Caption = 'Wmi Explorer'
         ImageIndex = 29
+        ExplicitLeft = 0
+        ExplicitTop = 28
+      end
+      object TabSheetTreeClasses: TTabSheet
+        Caption = 'WMI Classes Tree'
+        ImageIndex = 43
+        ExplicitLeft = 0
+        ExplicitTop = 28
       end
       object TabSheetWmiDatabase: TTabSheet
         Caption = 'WMI Database'
@@ -1014,7 +1024,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800000110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800080110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000

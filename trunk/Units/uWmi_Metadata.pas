@@ -14,7 +14,7 @@
 { The Original Code is uWmi_Metadata.pas.                                                          }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2010 Rodrigo Ruz V.                         }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2010-2011 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -346,8 +346,12 @@ type
   function  GetWmiVersion:string;
   procedure GetListWMINameSpaces(const List :TStrings);  cdecl; overload;
   procedure GetListWMINameSpaces(const RootNameSpace:String;const List :TStrings;ReportException:Boolean=True); cdecl; overload;
+
   procedure GetListWmiClasses(const NameSpace:String;Const List :TStrings); cdecl; overload;
   procedure GetListWmiClasses(const NameSpace:String;const List :TStrings;const IncludeQualifiers,ExcludeQualifiers: Array of string;ExcludeEvents:Boolean); cdecl; overload;
+  procedure GetListWmiParentClasses(const NameSpace:string;Const List :TStrings);
+  procedure GetListWmiSubClasses(const NameSpace,WmiClass:String;Const List :TStrings);
+
   procedure GetListWmiDynamicAndStaticClasses(const NameSpace:String;const List :TStrings); cdecl;
   procedure GetListWmiDynamicClasses(const NameSpace:String;const List :TStrings);
   procedure GetListWmiStaticClasses(const NameSpace:String;const List :TStrings);
@@ -681,13 +685,73 @@ begin
           \\HARANZ\root\CIMV2:Win32_LogicalDisk.DeviceID="D:"
           \\HARANZ\root\CIMV2:Win32_LogicalDisk.DeviceID="Z:"
           }
-        
+
         FWbemObject:=Unassigned;
       end;
   finally
     List.EndUpdate;
   end;
 end;
+
+
+
+procedure  GetListWmiParentClasses(const NameSpace:string;Const List :TStrings);
+const
+  wbemQueryFlagShallow =1;
+var
+  objSWbemLocator : OleVariant;
+  objWMIService   : OleVariant;
+  colItems        : OleVariant;
+  colItem         : OleVariant;
+  oEnum           : IEnumvariant;
+  iValue          : LongWord;
+begin
+  List.Clear;
+  objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+  objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
+  colItems        := objWMIService.SubclassesOf('',wbemQueryFlagShallow);
+  oEnum           := IUnknown(colItems._NewEnum) as IEnumVariant;
+  while oEnum.Next(1, colItem, iValue) = 0 do
+  begin
+    List.Add(colItem.Path_.Class);
+    colItem        :=Unassigned;
+  end;
+
+  objSWbemLocator:=Unassigned;
+  objWMIService  :=Unassigned;
+  colItem        :=Unassigned;
+  colItems       :=Unassigned;
+end;
+
+
+procedure  GetListWmiSubClasses(const NameSpace,WmiClass:String;Const List :TStrings);
+const
+  wbemQueryFlagShallow =1;
+var
+  objSWbemLocator : OleVariant;
+  objWMIService   : OleVariant;
+  colItems        : OleVariant;
+  colItem         : OleVariant;
+  oEnum           : IEnumvariant;
+  iValue          : LongWord;
+begin
+  List.Clear;
+  objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+  objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
+  colItems        := objWMIService.SubclassesOf(WmiClass,wbemQueryFlagShallow);
+  oEnum           := IUnknown(colItems._NewEnum) as IEnumVariant;
+  while oEnum.Next(1, colItem, iValue) = 0 do
+  begin
+    List.Add(colItem.Path_.Class);
+    colItem        :=Unassigned;
+  end;
+
+  objSWbemLocator:=Unassigned;
+  objWMIService  :=Unassigned;
+  colItem        :=Unassigned;
+  colItems       :=Unassigned;
+end;
+
 
 procedure  GetListWmiClasses(const NameSpace:String;Const List :TStrings);
 var
@@ -1205,7 +1269,7 @@ begin
     colItems      := objWMIService.Methods_;
     oEnum         := IUnknown(colItems._NewEnum) as IEnumVariant;
     while oEnum.Next(1, colItem, iValue) = 0 do
-    begin      
+    begin
       GetWmiClassMethodsQualifiers(NameSpace,WmiClass,colItem.Name,Qualifiers);
       for i := 0 to Qualifiers.Count - 1 do
          if CompareText(Qualifiers.Names[i],'Implemented')=0 then

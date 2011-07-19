@@ -41,6 +41,8 @@ type
     FOutputFolder: string;
     FDelphiWmiMethodCodeGenMode: Integer;
     function GetOutputFolder: string;
+    function GetBackGroundColor: TColor;
+    function GetForeGroundColor: TColor;
   published
     property CurrentTheme : string Read FCurrentTheme Write FCurrentTheme;
     property FontName     : string Read FFontName Write FFontName;
@@ -51,6 +53,8 @@ type
     property DelphiWmiMethodCodeGenMode : Integer Read FDelphiWmiMethodCodeGenMode Write FDelphiWmiMethodCodeGenMode;
     property ShowImplementedMethods : Boolean read FShowImplementedMethods write FShowImplementedMethods;
     property OutputFolder : string read GetOutputFolder write FOutputFolder;
+    property BackGroundColor : TColor read GetBackGroundColor;
+    property ForeGroundColor : TColor read GetForeGroundColor;
   end;
 
 
@@ -128,7 +132,10 @@ uses
   SynEditHighlighter,
   StrUtils,
   IOUtils,
-  IniFiles, uWmiDelphiCode, uWmiGenCode, uMisc;
+  IniFiles,
+  uWmiDelphiCode,
+  uWmiGenCode,
+  uMisc;
 
 const
   sThemesExt  ='.theme.xml';
@@ -137,8 +144,38 @@ Var
   DummyFrm : TFrmSettings;
 
 
+function GetCurrentTheme(const ThemeName:string):TIDETheme;
+var
+ FileName : string;
+ i        : Integer;
+begin
+  FileName:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))+'\Themes')+ThemeName+sThemesExt;
+  LoadThemeFromXMLFile(Result, FileName);
+end;
+
 
 { TSettings }
+
+function TSettings.GetBackGroundColor: TColor;
+var
+  Element      : TIDEHighlightElements;
+  IDETheme : TIDETheme;
+begin
+  Element := TIDEHighlightElements.PlainText;
+  IDETheme:=GetCurrentTheme(CurrentTheme);
+  Result := StringToColor(IDETheme[Element].BackgroundColorNew);
+end;
+
+function TSettings.GetForeGroundColor: TColor;
+var
+  Element      : TIDEHighlightElements;
+  IDETheme : TIDETheme;
+begin
+  Element := TIDEHighlightElements.PlainText;
+  IDETheme:=GetCurrentTheme(CurrentTheme);
+  Result := StringToColor(IDETheme[Element].ForegroundColorNew);
+end;
+
 
 function TSettings.GetOutputFolder: string;
 begin
@@ -360,6 +397,7 @@ begin
 end;
 
 
+
 procedure LoadCurrentTheme(Form: TForm;const ThemeName:string);
 var
  FileName : string;
@@ -372,6 +410,8 @@ begin
    if Form.Components[i] is TSynEdit then
      RefreshSynPasHighlighter(FCurrentTheme,TSynEdit(Form.Components[i]));
 end;
+
+
 
 procedure LoadCurrentThemeFont(Form: TForm;const FontName:string;FontSize:Word);
 var
