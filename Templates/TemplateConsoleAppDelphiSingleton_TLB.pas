@@ -53,6 +53,8 @@ begin
       CoUninitialize;
     end;
  except
+    on E:EOleException do
+        Writeln(Format('EOleException %s %x', [E.Message,E.ErrorCode]));  
     on E:Exception do
         Writeln(E.Classname, ':', E.Message);
  end;

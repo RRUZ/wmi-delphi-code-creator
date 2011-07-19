@@ -227,6 +227,10 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7

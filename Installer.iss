@@ -174,6 +174,7 @@ var
   sUnInstallString: String;
   iResultCode: Integer;
 begin
+
   Result := 0;
   sUnInstallString := GetUninstallString();
   if sUnInstallString <> '' then begin
