@@ -40,8 +40,6 @@ object FrmMain: TFrmMain
       MultiLine = True
       TabOrder = 0
       OnChange = PageControlMainChange
-      ExplicitLeft = 0
-      ExplicitTop = 6
       object TabSheetCodeGen: TTabSheet
         Caption = 'Code Generation'
         ImageIndex = 30
@@ -181,7 +179,7 @@ object FrmMain: TFrmMain
                   Left = 9
                   Top = 192
                   Width = 295
-                  Height = 154
+                  Height = 148
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -202,7 +200,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 156
+                  ExplicitHeight = 150
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -365,7 +363,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 98
+                  Height = 92
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -411,7 +409,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 320
+                  Top = 314
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -571,7 +569,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 143
+                  Height = 137
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -668,7 +666,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 325
+                  Top = 319
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -824,14 +822,10 @@ object FrmMain: TFrmMain
       object TabSheetWmiExplorer: TTabSheet
         Caption = 'Wmi Explorer'
         ImageIndex = 29
-        ExplicitLeft = 0
-        ExplicitTop = 28
       end
       object TabSheetTreeClasses: TTabSheet
         Caption = 'WMI Classes Tree'
         ImageIndex = 43
-        ExplicitLeft = 0
-        ExplicitTop = 28
       end
       object TabSheetWmiDatabase: TTabSheet
         Caption = 'WMI Database'
@@ -899,14 +893,14 @@ object FrmMain: TFrmMain
       Left = 0
       Top = 0
       AutoSize = True
-      Caption = 'Ejecute Code'
+      Caption = 'Execute Code'
       DropdownMenu = PopupMenu1
       ImageIndex = 27
       Style = tbsDropDown
       OnClick = ToolButtonRunClick
     end
     object ToolButtonSave: TToolButton
-      Left = 116
+      Left = 119
       Top = 0
       AutoSize = True
       Caption = 'Save'
@@ -914,7 +908,7 @@ object FrmMain: TFrmMain
       OnClick = ToolButtonSaveClick
     end
     object ToolButtonSearch: TToolButton
-      Left = 171
+      Left = 174
       Top = 0
       AutoSize = True
       Caption = 'Search'
@@ -922,7 +916,7 @@ object FrmMain: TFrmMain
       OnClick = ToolButtonSearchClick
     end
     object ToolButtonGetValues: TToolButton
-      Left = 235
+      Left = 238
       Top = 0
       AutoSize = True
       Caption = 'Get Values'
@@ -930,7 +924,7 @@ object FrmMain: TFrmMain
       OnClick = ToolButtonGetValuesClick
     end
     object ToolButtonOnline: TToolButton
-      Left = 317
+      Left = 320
       Top = 0
       AutoSize = True
       Caption = 'Online Class Info'
@@ -938,7 +932,7 @@ object FrmMain: TFrmMain
       OnClick = ToolButtonOnlineClick
     end
     object ToolButtonSettings: TToolButton
-      Left = 429
+      Left = 432
       Top = 0
       AutoSize = True
       Caption = 'Settings'
@@ -946,7 +940,7 @@ object FrmMain: TFrmMain
       OnClick = ToolButtonSettingsClick
     end
     object ToolButton4: TToolButton
-      Left = 499
+      Left = 502
       Top = 0
       Width = 8
       Caption = 'ToolButton4'
@@ -954,7 +948,7 @@ object FrmMain: TFrmMain
       Style = tbsSeparator
     end
     object ToolButtonAbout: TToolButton
-      Left = 507
+      Left = 510
       Top = 0
       AutoSize = True
       Caption = 'About'
@@ -1024,7 +1018,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800080110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800140110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000

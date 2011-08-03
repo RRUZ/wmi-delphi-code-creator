@@ -30,6 +30,7 @@ object FrmSelCompilerVer: TFrmSelCompilerVer
     Width = 75
     Height = 25
     Caption = 'OK'
+    Enabled = False
     ModalResult = 1
     TabOrder = 0
   end
@@ -72,6 +73,7 @@ object FrmSelCompilerVer: TFrmSelCompilerVer
     TabOrder = 2
     ViewStyle = vsReport
     OnDblClick = ListViewIDEsDblClick
+    OnSelectItem = ListViewIDEsSelectItem
   end
   object ImageList1: TImageList
     Left = 88
