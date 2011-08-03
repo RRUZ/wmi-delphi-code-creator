@@ -39,6 +39,8 @@ type
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ListViewIDEsDblClick(Sender: TObject);
+    procedure ListViewIDEsSelectItem(Sender: TObject; Item: TListItem;
+      Selected: Boolean);
   private
     FCompilerType: TCompilerType;
     FShowCompiler: boolean;
@@ -96,6 +98,12 @@ end;
 procedure TFrmSelCompilerVer.ListViewIDEsDblClick(Sender: TObject);
 begin
   ButtonOk.Click;
+end;
+
+procedure TFrmSelCompilerVer.ListViewIDEsSelectItem(Sender: TObject;
+  Item: TListItem; Selected: Boolean);
+begin
+  ButtonOk.Enabled:=Selected;
 end;
 
 procedure TFrmSelCompilerVer.LoadInstalledVersions;
@@ -213,6 +221,8 @@ begin
     end;
   end;
 
+  if ListViewIDEs.Items.Count>0 then
+   ListViewIDEs.Items.Item[0].Selected:=True;
 end;
 
 end.

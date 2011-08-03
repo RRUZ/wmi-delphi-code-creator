@@ -458,6 +458,8 @@ begin
 
 
     FrmMain.ComboBoxClasses.ItemIndex := FrmMain.ComboBoxClasses.Items.IndexOf(Node.Text);
+    FrmMain.ComboBoxClassesChange(FrmMain.ComboBoxClasses);
+
     LoadClassInfo;
     FrmMain.GenerateObjectPascalConsoleCode;
   end

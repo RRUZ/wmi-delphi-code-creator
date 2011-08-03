@@ -27,15 +27,13 @@ interface
 
 //TODO
 {
-  fix disabled icons
-  remote machine
-  improve source code
-  automated tests
-  store cache x machine
-
-  Select different templates for delphi code generation (COM, Late binding, TLB)
-
-
+  Fix disabled icons
+  Remote machine support
+  Code generation to OOP
+  Improve source code
+  Add automated tests
+  Store cache x machin
+  Create code based in plugins and interfaces
 }
 
 uses
@@ -204,7 +202,6 @@ type
     procedure LoadWmiMethods(const Namespace: string);
     procedure LoadWmiProperties(const Namespace, WmiClass: string);
 
-    procedure GetValuesWmiProperties(const Namespace, WmiClass: string);
 
     procedure GenerateObjectPascalMethodInvoker;
     procedure GenerateObjectPascalEventCode;
@@ -229,6 +226,7 @@ type
     procedure LoadWmiClasses(const Namespace: string);
     procedure LoadClassInfo;
     procedure GenerateObjectPascalConsoleCode;
+    procedure GetValuesWmiProperties(const Namespace, WmiClass: string);
   end;
 
 var

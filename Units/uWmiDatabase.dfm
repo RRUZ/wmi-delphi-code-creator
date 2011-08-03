@@ -228,6 +228,7 @@ object FrmWmiDatabase: TFrmWmiDatabase
     TitleFont.Name = 'Tahoma'
     TitleFont.Style = []
     OnDrawColumnCell = DBGridWMIDrawColumnCell
+    OnDblClick = DBGridWMIDblClick
   end
   object DataSource1: TDataSource
     DataSet = ClientDataSetWmi

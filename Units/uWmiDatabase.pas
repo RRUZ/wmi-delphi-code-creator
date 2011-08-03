@@ -63,6 +63,7 @@ type
     procedure ButtonDelBddClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure DBGridWMIDblClick(Sender: TObject);
   private
     FDatabaseFile: string;
     FHistoryFile:  string;
@@ -391,7 +392,6 @@ begin
     FieldDefs.Add('Namespace', ftString, 60);
     FieldDefs.Add('Class', ftString, 60);
     FieldDefs.Add('Name', ftString, 60);
-    //FieldDefs.Add('Type', ftInteger);
     FieldDefs.Add('Type', ftString, 25);
     FieldDefs.Add('Value', ftString, 1024);
     IndexDefs.Add('IxValue', 'value', [ixCaseInsensitive]);
@@ -400,6 +400,12 @@ begin
     LogChanges := False;
     //Open;
   end;
+end;
+
+procedure TFrmWmiDatabase.DBGridWMIDblClick(Sender: TObject);
+begin
+  if ClientDataSetWmi.Active then
+    FrmMain.GetValuesWmiProperties(ClientDataSetWmi.FieldByName('Namespace').AsString, ClientDataSetWmi.FieldByName('Class').AsString);
 end;
 
 procedure TFrmWmiDatabase.DBGridWMIDrawColumnCell(Sender: TObject;

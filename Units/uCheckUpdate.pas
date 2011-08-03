@@ -158,8 +158,8 @@ begin
      Max:=ProgressBar1.Max;
      Rate:=0;
      ProgressBar1.Position:=Pos;
-     if FStopwatch.Elapsed.Seconds>0 then
-     Rate:= Round(Max/1024/FStopwatch.Elapsed.Seconds);
+     if FStopwatch.Elapsed.TotalSeconds>0 then
+     Rate:= Round(Max/1024/FStopwatch.Elapsed.TotalSeconds);
      sRate:= Format('%d Kbytes x second',[Rate]);
      SetMsg(Format('Downloaded %s of %s bytes %n%% %sTransfer Rate %s',[FormatFloat('#,',Pos),FormatFloat('#,',Max),Pos*100/Max,#13#10,sRate]));
    end;
