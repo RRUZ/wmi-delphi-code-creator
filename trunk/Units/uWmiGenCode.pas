@@ -30,6 +30,30 @@ type
   TSourceLanguages = (Lng_Delphi, Lng_FPC, Lng_Oxygen);
   TWmiCode        =  (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
 
+  TWmiCodeGenerator=class
+    FUseHelperFunctions: boolean;
+    FWmiClass: string;
+    FWmiNameSpace: string;
+    FModeCodeGeneration: TWmiCode;
+    FOutPutCode: TStrings;
+    FTemplateCode : string;
+  public
+    property WmiNameSpace : string read FWmiNameSpace write FWmiNameSpace;
+    property WmiClass : string Read FWmiClass write FWmiClass;
+    property UseHelperFunctions : boolean read FUseHelperFunctions write  FUseHelperFunctions;
+    property ModeCodeGeneration:TWmiCode read FModeCodeGeneration write FModeCodeGeneration;
+    property OutPutCode : TStrings read FOutPutCode;
+    procedure GenerateCode;virtual;
+    constructor Create;
+    destructor Destroy; override;
+  end;
+
+  TWmiClassCodeGenerator=class(TWmiCodeGenerator)
+  public
+    function GetWmiClassDescription: string;
+  end;
+
+
 const
   WbemEmptyParam     = 'VarEmpty';
   sTagVersionApp     = '[VERSIONAPP]';
@@ -83,7 +107,31 @@ var
 implementation
 
 Uses
+  ComObj,
+  uWmi_Metadata,
   SysUtils;
+
+{ TWmiCodeGenerator }
+
+constructor TWmiCodeGenerator.Create;
+begin
+  inherited;
+  FUseHelperFunctions:=False;
+  FOutPutCode:=TStringList.Create;
+end;
+
+destructor TWmiCodeGenerator.Destroy;
+begin
+  FOutPutCode.Free;
+  inherited;
+end;
+
+
+procedure TWmiCodeGenerator.GenerateCode;
+begin
+ //Common Code
+
+end;
 
 function GetMaxLengthItem(List: TStrings): integer;
 var
@@ -108,6 +156,38 @@ end;
 function GetTemplateLocation(const TemplateName: string): string;
 begin
   Result := ExtractFilePath(ParamStr(0)) + 'Templates\' + TemplateName;
+end;
+
+{ TWmiClassCodeGenerator }
+
+function TWmiClassCodeGenerator.GetWmiClassDescription: string;
+var
+  ClassDescr : TStringList;
+  i          : Integer;
+begin
+  try
+    Result := uWmi_Metadata.GetWmiClassDescription(FWmiNameSpace, FWmiClass);
+    ClassDescr:=TStringList.Create;
+    try
+      if Pos(#10, Result) = 0 then //check if the description has format
+        ClassDescr.Text := WrapText(Result, 80)
+      else
+        ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
+
+      for i := 0 to ClassDescr.Count - 1 do
+        ClassDescr[i] := Format('// %s', [ClassDescr[i]]);
+
+      Result:=ClassDescr.Text;
+    finally
+      ClassDescr.Free;
+    end;
+  except
+    on E: EOleSysError do
+      if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
+        Result := ''
+      else
+        raise;
+  end;
 end;
 
 end.

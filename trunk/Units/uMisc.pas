@@ -135,7 +135,7 @@ begin
           Buffer[TotalBytesRead] := #0;
           //OemToCharA(Buffer, Buffer);
           OemToAnsi(Buffer, Buffer);
-          OutPutList.Text := OutPutList.Text + AnsiString(Buffer);
+          OutPutList.Text := OutPutList.Text + String(Buffer);
         finally
           CloseHandle(lpProcessInformation.hProcess);
           CloseHandle(lpProcessInformation.hThread);

@@ -36,30 +36,9 @@ const
   DelphiWmiMethodCodeSupported : Array [0..DelphiMaxTypesMethodCodeGen-1] of TWmiCode = (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
 
 type
-  TDelphiWmiCodeGenerator=class
-    FUseHelperFunctions: boolean;
-    FWmiClass: string;
-    FWmiNameSpace: string;
-    FModeCodeGeneration: TWmiCode;
-    FOutPutCode: TStrings;
-    FTemplateCode : string;
+  TDelphiWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
   public
-    property WmiNameSpace : string read FWmiNameSpace write FWmiNameSpace;
-    property WmiClass : string Read FWmiClass write FWmiClass;
-    property UseHelperFunctions : boolean read FUseHelperFunctions write  FUseHelperFunctions;
-    property ModeCodeGeneration:TWmiCode read FModeCodeGeneration write FModeCodeGeneration;
-    property OutPutCode : TStrings read FOutPutCode;
-    procedure GenerateCode;virtual;
-    constructor Create;
-    destructor Destroy; override;
-  end;
-
-
-  TDelphiWmiClassCodeGenerator=class(TDelphiWmiCodeGenerator)
-  private
-    function GetWmiClassDescription: string;
-  public
-    procedure GenerateCode(Props: TStrings);overload;
+    procedure GenerateCode(Props: TStrings);reintroduce; overload;
   end;
 
   TDelphiWmiEventCodeGenerator=class(TDelphiWmiClassCodeGenerator)
@@ -113,26 +92,7 @@ const
   ListDelphiWmiMethodsStaticTemplates    : Array [0..DelphiMaxTypesMethodCodeGen-1] of  string = ('TemplateStaticMethodInvokerDelphi_TLB.pas', 'TemplateStaticMethodInvokerDelphi.pas','TemplateStaticMethodInvokerDelphi_COM.pas');
   ListDelphiWmiMethodsNonStaticTemplates : Array [0..DelphiMaxTypesMethodCodeGen-1] of  string = ('TemplateNonStaticMethodInvokerDelphi_TLB.pas', 'TemplateNonStaticMethodInvokerDelphi.pas','TemplateNonStaticMethodInvokerDelphi_COM.pas');
 
-{ TDelphiWmiCodeGenerator }
 
-constructor TDelphiWmiCodeGenerator.Create;
-begin
-  inherited;
-  FUseHelperFunctions:=False;
-  FOutPutCode:=TStringList.Create;
-end;
-
-destructor TDelphiWmiCodeGenerator.Destroy;
-begin
-  FOutPutCode.Free;
-  inherited;
-end;
-
-
-procedure TDelphiWmiCodeGenerator.GenerateCode;
-begin
- //Coomn Code
-end;
 
 { TDelphiWmiEventCodeGenerator }
 
@@ -399,35 +359,6 @@ begin
 end;
 
 
-function TDelphiWmiClassCodeGenerator.GetWmiClassDescription: string;
-var
-  ClassDescr : TStringList;
-  i          : Integer;
-begin
-  try
-    Result := uWmi_Metadata.GetWmiClassDescription(FWmiNameSpace, FWmiClass);
-    ClassDescr:=TStringList.Create;
-    try
-      if Pos(#10, Result) = 0 then //check if the description has format
-        ClassDescr.Text := WrapText(Result, 80)
-      else
-        ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
-
-      for i := 0 to ClassDescr.Count - 1 do
-        ClassDescr[i] := Format('// %s', [ClassDescr[i]]);
-
-      Result:=ClassDescr.Text;
-    finally
-      ClassDescr.Free;
-    end;
-  except
-    on E: EOleSysError do
-      if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-        Result := ''
-      else
-        raise;
-  end;
-end;
 
 { TDelphiWmiMethodCodeGenerator }
 
@@ -451,9 +382,6 @@ var
   ParamsStr: string;
   Padding: string;
 begin
-
-
-
   DynCodeInParams := TStringList.Create;
   DynCodeOutParams := TStringList.Create;
   OutParamsList  := TStringList.Create;

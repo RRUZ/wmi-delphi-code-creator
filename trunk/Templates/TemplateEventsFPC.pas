@@ -175,7 +175,7 @@ begin
   finally
     CoUninitialize();
   end;
- except
+ except 
     on E:Exception do
         Writeln(E.Classname, ':', E.Message);
  end;  

@@ -41,12 +41,27 @@ object FrmSettings: TFrmSettings
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
+        ExplicitLeft = 0
+        ExplicitTop = 28
         object Label6: TLabel
           Left = 16
           Top = 13
           Width = 194
           Height = 13
           Caption = 'Output folder used for compiled projects'
+        end
+        object Label7: TLabel
+          Left = 16
+          Top = 108
+          Width = 264
+          Height = 87
+          AutoSize = False
+          Caption = 
+            'This option delete the cache  of stored Namespaces and Wmi class' +
+            'es used by the application to improve the performance. Use this ' +
+            'option after your rebuild the WMI repository or when you install' +
+            ' new WMI providers in the system'
+          WordWrap = True
         end
         object EditOutputFolder: TEdit
           Left = 16
@@ -63,6 +78,15 @@ object FrmSettings: TFrmSettings
           Caption = '...'
           TabOrder = 0
           OnClick = BtnSelFolderThemesClick
+        end
+        object BtnDeleteCache: TButton
+          Left = 16
+          Top = 77
+          Width = 264
+          Height = 25
+          Caption = 'Delete Cache'
+          TabOrder = 2
+          OnClick = BtnDeleteCacheClick
         end
       end
       object TabSheet2: TTabSheet
@@ -227,10 +251,6 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -269,7 +289,7 @@ object FrmSettings: TFrmSettings
     end
   end
   object JvBrowseForFolderDialog1: TJvBrowseForFolderDialog
-    Left = 256
-    Top = 112
+    Left = 240
+    Top = 240
   end
 end
