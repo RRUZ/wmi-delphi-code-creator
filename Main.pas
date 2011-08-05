@@ -218,8 +218,13 @@ type
     procedure SaveWMINameSpacesToCache(List: TStrings);
 
     function ExistWmiClassesCache(const namespace: string): boolean;
+    function ExistWmiClassesMethodsCache(const namespace: string): boolean;
     procedure LoadWMIClassesFromCache(const namespace: string; List: TStrings);
+    procedure LoadWMIClassesMethodsFromCache(const namespace: string; List: TStrings);
+
     procedure SaveWMIClassesToCache(const namespace: string; List: TStrings);
+    procedure SaveWMIClassesMethodsToCache(const namespace: string; List: TStrings);
+
 
   public
     procedure SetMsg(const Msg: string);
@@ -469,6 +474,16 @@ begin
   Result   := FileExists(FileName);
 end;
 
+function TFrmMain.ExistWmiClassesMethodsCache(const namespace: string): boolean;
+var
+  FileName: string;
+begin
+  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
+  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '_ClassMethods.wmic';
+  Result   := FileExists(FileName);
+end;
+
+
 function TFrmMain.ExistWmiNameSpaceCache: boolean;
 begin
   Result := FileExists(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
@@ -549,6 +564,7 @@ var
   Props: TStrings;
   Str:   string;
   DelphiWmiCodeGenerator : TDelphiWmiClassCodeGenerator;
+  FPCWmiCodeGenerator    : TFPCWmiClassCodeGenerator;
 begin
   Namespace := ComboBoxNameSpaces.Text;
   WmiClass  := ComboBoxClasses.Text;
@@ -567,7 +583,8 @@ begin
 
 
     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
-      Lng_Delphi: begin
+      Lng_Delphi:
+                  begin
                     DelphiWmiCodeGenerator:=TDelphiWmiClassCodeGenerator.Create;
                     try
                       DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
@@ -583,8 +600,23 @@ begin
                   end;
 
 
-      Lng_FPC: GenerateFPCWmiConsoleCode(
-          SynEditDelphiCode.Lines, Props, Namespace, WmiClass, Settings.DelphiWmiClassHelperFuncts);
+      Lng_FPC: //GenerateFPCWmiConsoleCode(SynEditDelphiCode.Lines, Props, Namespace, WmiClass, Settings.DelphiWmiClassHelperFuncts);
+                  begin
+                    FPCWmiCodeGenerator:=TFPCWmiClassCodeGenerator.Create;
+                    try
+                      FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                      FPCWmiCodeGenerator.WmiNameSpace:=Namespace;
+                      FPCWmiCodeGenerator.WmiClass    :=WmiClass;
+                      FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
+                      FPCWmiCodeGenerator.GenerateCode(Props);
+                      SynEditDelphiCode.Lines.Clear;
+                      SynEditDelphiCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                    finally
+                      FPCWmiCodeGenerator.Free;
+                    end;
+                  end;
+
+
       Lng_Oxygen: GenerateOxygenWmiConsoleCode(
           SynEditDelphiCode.Lines, Props, Namespace, WmiClass, Settings.DelphiWmiClassHelperFuncts);
     end;
@@ -607,6 +639,7 @@ var
   Values: TStringList;
   Str:    string;
   DelphiWmiCodeGenerator : TDelphiWmiMethodCodeGenerator;
+  FPCWmiCodeGenerator : TFPCWmiMethodCodeGenerator;
 begin
   if (ComboBoxClassesMethods.Text = '') or (ComboBoxMethods.Text = '') then
     exit;
@@ -650,10 +683,29 @@ begin
                     DelphiWmiCodeGenerator.Free;
                   end;
                  end;
-
+              {
       Lng_FPC: GenerateFPCWmiInvokerCode(
           SynEditDelphiCodeInvoke.Lines, Params, Values, Namespace, WmiClass, WmiMethod,
           ComboBoxPaths.Text, Settings.DelphiWmiClassHelperFuncts);
+               }
+      Lng_FPC:
+                 begin
+                  FPCWmiCodeGenerator :=TFPCWmiMethodCodeGenerator.Create;
+                  try
+                    FPCWmiCodeGenerator.WmiNameSpace:=Namespace;
+                    FPCWmiCodeGenerator.WmiClass:=WmiClass;
+                    FPCWmiCodeGenerator.WmiMethod:=WmiMethod;
+                    FPCWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
+                    FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                    FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
+                    FPCWmiCodeGenerator.GenerateCode(Params, Values);
+                    SynEditDelphiCodeInvoke.Lines.Clear;
+                    SynEditDelphiCodeInvoke.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                  finally
+                    FPCWmiCodeGenerator.Free;
+                  end;
+                 end;
+
       Lng_Oxygen: GenerateOxygenWmiInvokerCode(
           SynEditDelphiCodeInvoke.Lines, Params, Values, Namespace, WmiClass, WmiMethod,
           ComboBoxPaths.Text, Settings.DelphiWmiClassHelperFuncts);
@@ -682,6 +734,7 @@ var
   Str:    string;
   PropsOut: TStringList;
   DelphiWmiCodeGenerator : TDelphiWmiEventCodeGenerator;
+  FPCWmiCodeGenerator : TFPCWmiEventCodeGenerator;
 
 begin
   if (ComboBoxNamespacesEvents.Text = '') or (ComboBoxEvents.Text = '') then
@@ -738,10 +791,29 @@ begin
                    end;
                  end;
 
+      Lng_FPC:
+                 begin
+                   FPCWmiCodeGenerator := TFPCWmiEventCodeGenerator.Create;
+                   try
+                      FPCWmiCodeGenerator.WmiNameSpace:=Namespace;
+                      FPCWmiCodeGenerator.WmiClass    :=WmiEvent;
+                      FPCWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
+                      FPCWmiCodeGenerator.PollSeconds          := PollSeconds;
+                      FPCWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
+                      //RadioButtonIntrinsic.Checked
+                      FPCWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
+                      SynEditEventCode.Lines.Clear;
+                      SynEditEventCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                   finally
+                      FPCWmiCodeGenerator.Free;
+                   end;
+                 end;
+
+     {
       Lng_FPC: GenerateFPCWmiEventCode(
           SynEditEventCode.Lines, Params, Values, Conds, PropsOut, Namespace, WmiEvent,
           WmiTargetInstance, PollSeconds, Settings.DelphiWmiClassHelperFuncts, RadioButtonIntrinsic.Checked);
-
+      }
       Lng_Oxygen:  GenerateOxygenWmiEventCode(
           SynEditEventCode.Lines, Params, Values, Conds, PropsOut, Namespace, WmiEvent,
           WmiTargetInstance, PollSeconds, Settings.DelphiWmiClassHelperFuncts, RadioButtonIntrinsic.Checked);
@@ -1107,6 +1179,16 @@ begin
   List.LoadFromFile(FileName);
 end;
 
+procedure TFrmMain.LoadWMIClassesMethodsFromCache(const namespace: string;
+  List: TStrings);
+var
+  FileName: string;
+begin
+  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
+  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '_ClassMethods.wmic';
+  List.LoadFromFile(FileName);
+end;
+
 procedure TFrmMain.LoadWmiEvents(const Namespace: string);
 begin
   ComboBoxEvents.Items.BeginUpdate;
@@ -1268,14 +1350,25 @@ procedure TFrmMain.LoadWmiMethods(const Namespace: string);
 begin
   SetMsg(Format('Loading classes with methods in %s', [Namespace]));
   try
-    ComboBoxClassesMethods.Items.BeginUpdate;
-    try
-      GetListWmiClassesWithMethods(Namespace, ComboBoxClassesMethods.Items);
-      LabelClassesMethods.Caption :=
-        Format('Classes (%d)', [ComboBoxClassesMethods.Items.Count]);
-    finally
-      ComboBoxClassesMethods.Items.EndUpdate;
-    end;
+
+
+    if not ExistWmiClassesMethodsCache(Namespace) then
+    begin
+      ComboBoxClassesMethods.Items.BeginUpdate;
+      try
+        GetListWmiClassesWithMethods(Namespace, ComboBoxClassesMethods.Items);
+        LabelClassesMethods.Caption :=
+          Format('Classes (%d)', [ComboBoxClassesMethods.Items.Count]);
+        SaveWMIClassesMethodsToCache(Namespace, ComboBoxClassesMethods.Items);
+      finally
+        ComboBoxClassesMethods.Items.EndUpdate;
+      end
+    end
+    else
+      LoadWMIClassesMethodsFromCache(Namespace, ComboBoxClassesMethods.Items);
+
+
+
 
     if ComboBoxClassesMethods.Items.Count > 0 then
       ComboBoxClassesMethods.ItemIndex := 0
@@ -1329,6 +1422,16 @@ begin
 end;
 
 
+
+procedure TFrmMain.SaveWMIClassesMethodsToCache(const namespace: string;
+  List: TStrings);
+var
+  FileName: string;
+begin
+  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
+  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '_ClassMethods.wmic';
+  List.SaveToFile(FileName);
+end;
 
 procedure TFrmMain.SaveWMIClassesToCache(const namespace: string; List: TStrings);
 var

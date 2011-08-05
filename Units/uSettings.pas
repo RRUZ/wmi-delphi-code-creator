@@ -91,6 +91,8 @@ type
     CbDelphiCodeWmiMethod: TComboBox;
     LabelDescrMethod: TLabel;
     Label8: TLabel;
+    BtnDeleteCache: TButton;
+    Label7: TLabel;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -102,6 +104,7 @@ type
     procedure CbDelphiCodeWmiEventChange(Sender: TObject);
     procedure BtnSelFolderThemesClick(Sender: TObject);
     procedure CbDelphiCodeWmiMethodChange(Sender: TObject);
+    procedure BtnDeleteCacheClick(Sender: TObject);
   private
     FSettings: TSettings;
     //FCurrentTheme:  TIDETheme;
@@ -361,6 +364,16 @@ end;
 procedure TFrmSettings.ButtonGetMoreClick(Sender: TObject);
 begin
   ShellExecute(self.WindowHandle,'open','http://theroadtodelphi.wordpress.com/delphi-ide-theme-editor/',nil,nil, SW_SHOWNORMAL);
+end;
+
+procedure TFrmSettings.BtnDeleteCacheClick(Sender: TObject);
+Var
+ FileName  : string;
+begin
+  for FileName in IOUtils.TDirectory.GetFiles(ExtractFilePath(ParamStr(0))+'cache','*.wmic') do
+    DeleteFile(FileName);
+
+  ShowMessage('The cache was deleted');
 end;
 
 procedure TFrmSettings.BtnSelFolderThemesClick(Sender: TObject);
