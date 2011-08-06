@@ -24,6 +24,7 @@ unit uWmiOxygenCode;
 interface
 
 uses
+ uWmiGenCode,
  Classes;
 
 const
@@ -34,74 +35,76 @@ const
   sTagOxygenCodeParamsIn  = '[DELPHICODEINPARAMS]';
   sTagOxygenCodeParamsOut = '[DELPHICODEOUTPARAMS]';
 
+type
+  TOxygenWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
+  public
+    procedure GenerateCode(Props: TStrings);reintroduce; overload;
+  end;
 
-procedure GenerateOxygenWmiConsoleCode(const DestList, Props: TStrings;
-  const Namespace, WmiClass: string; UseHelperFunct: boolean);
+  TOxygenWmiEventCodeGenerator=class(TOxygenWmiClassCodeGenerator)
+  private
+    FWmiTargetInstance: string;
+    FPollSeconds: Integer;
+  public
+    property WmiTargetInstance : string Read FWmiTargetInstance write FWmiTargetInstance;
+    property PollSeconds : Integer read FPollSeconds write FPollSeconds;
+    procedure GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings);overload;
+  end;
 
-procedure GenerateOxygenWmiInvokerCode(const DestList, ParamsIn, Values: TStrings;
-  const Namespace, WmiClass, WmiMethod, WmiPath: string; UseHelperFunct: boolean);
 
-procedure GenerateOxygenWmiEventCode(
-  const DestList, ParamsIn, Values, Conds, PropsOut: TStrings;
-  const Namespace, WmiEvent, WmiTargetInstance: string; PollSeconds: integer;
-  UseHelperFunct, Intrinsic: boolean);
-
+  TOxygenWmiMethodCodeGenerator=class(TOxygenWmiClassCodeGenerator)
+  private
+    FWmiPath: string;
+    FWmiMethod: string;
+    function GetWmiClassDescription: string;
+  public
+    property WmiPath : string Read FWmiPath write FWmiPath;
+    property WmiMethod : string Read FWmiMethod write FWmiMethod;
+    procedure GenerateCode(ParamsIn, Values: TStrings);overload;
+  end;
 
 implementation
 
 uses
   StrUtils,
-  uWmiGenCode,
   IOUtils,
   ComObj,
   uWmi_Metadata,
   SysUtils;
 
 
-procedure GenerateOxygenWmiConsoleCode(const DestList, Props: TStrings;
-  const Namespace, WmiClass: string; UseHelperFunct: boolean);
+{ TOxygenWmiClassCodeGenerator }
+
+procedure TOxygenWmiClassCodeGenerator.GenerateCode(Props: TStrings);
 var
   StrCode: string;
   Descr: string;
-  ClassDescr: TStrings;
   DynCode: TStrings;
   i: integer;
   TemplateCode : string;
 begin
+  Descr := GetWmiClassDescription;
 
-  try
-    Descr := GetWmiClassDescription(Namespace, WmiClass);
-  except
-    on E: EOleSysError do
-      if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-        Descr := ''
-      else
-        raise;
-  end;
-
-  DestList.BeginUpdate;
+  OutPutCode.BeginUpdate;
   DynCode    := TStringList.Create;
-  ClassDescr := TStringList.Create;
   try
-    DestList.Clear;
+    OutPutCode.Clear;
 
-    if UseHelperFunct then
+    if FUseHelperFunctions then
       TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
     else
       TemplateCode:='';
 
     StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplates[Lng_Oxygen]));
 
-
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
-    StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNamespace, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
-
 
     if Props.Count > 0 then
       for i := 0 to Props.Count - 1 do
-        if UseHelperFunct then
+        if FUseHelperFunctions then
           DynCode.Add(Format(
             '     Console.WriteLine(''{0,-35} {1,-40}'',%s,WmiObject[%s]);// %s',
             [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]))
@@ -111,31 +114,80 @@ begin
             [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
 
     StrCode := StringReplace(StrCode, sTagOxygenCode, DynCode.Text, [rfReplaceAll]);
-
-    if Pos(#10, Descr) = 0 then //check if the description has format
-      ClassDescr.Text := WrapText(Descr, 80)
-    else
-      ClassDescr.Text := Descr;//WrapText(Summary,sLineBreak,[#10],80);
-
-    for i := 0 to ClassDescr.Count - 1 do
-      ClassDescr[i] := Format('// %s', [ClassDescr[i]]);
-
-    StrCode := StringReplace(StrCode, sTagWmiClassDescr, ClassDescr.Text, [rfReplaceAll]);
-    DestList.Text := StrCode;
+    StrCode := StringReplace(StrCode, sTagWmiClassDescr, Descr, [rfReplaceAll]);
+    OutPutCode.Text := StrCode;
   finally
-    ClassDescr.Free;
-    DestList.EndUpdate;
+    OutPutCode.EndUpdate;
     DynCode.Free;
   end;
 end;
 
 
-procedure GenerateOxygenWmiInvokerCode(const DestList, ParamsIn, Values: TStrings;
-  const Namespace, WmiClass, WmiMethod, WmiPath: string; UseHelperFunct: boolean);
+{ TOxygenWmiEventCodeGenerator }
+
+procedure TOxygenWmiEventCodeGenerator.GenerateCode(ParamsIn, Values, Conds,
+  PropsOut: TStrings);
+var
+  StrCode: string;
+  sValue:  string;
+  Wql:     string;
+  i, Len:  integer;
+  Props:   TStrings;
+begin
+  StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_Oxygen]));
+
+  WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
+    WmiTargetInstance]);
+  WQL := Format('  WmiQuery:=%s+%s', [QuotedStr(WQL), sLineBreak]);
+
+  if WmiTargetInstance <> '' then
+  begin
+    sValue := Format('Where TargetInstance ISA "%s" ', [WmiTargetInstance]);
+    WQL    := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
+  end;
+
+  for i := 0 to Conds.Count - 1 do
+  begin
+    sValue := '';
+    if (i > 0) or ((i = 0) and (WmiTargetInstance <> '')) then
+      sValue := 'AND ';
+    sValue := sValue + ' ' + ParamsIn.Names[i] + Conds[i] + Values[i] + ' ';
+    WQL := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
+  end;
+
+  i := LastDelimiter('+', Wql);
+  if i > 0 then
+    Wql[i] := ';';
+
+
+  Len   := GetMaxLengthItem(PropsOut) + 6;
+  Props := TStringList.Create;
+  try
+    for i := 0 to PropsOut.Count - 1 do
+     if StartsText(wbemTargetInstance,PropsOut[i]) then
+      Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + ManagementBaseObject(e.NewEvent[%s])[%s]);',
+      [QuotedStr(PropsOut[i]+' : '),QuotedStr(wbemTargetInstance), QuotedStr(StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]))]))
+     else
+      Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + e.NewEvent.Properties[%s].Value.ToString());', [QuotedStr(PropsOut[i]+' : '), QuotedStr(PropsOut[i])]));
+
+    StrCode := StringReplace(StrCode, sTagOxygenEventsOut, Props.Text, [rfReplaceAll]);
+  finally
+    props.Free;
+  end;
+
+  StrCode := StringReplace(StrCode, sTagOxygenEventsWql, WQL, [rfReplaceAll]);
+  StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNamespace, [rfReplaceAll]);
+  OutPutCode.Text := StrCode;
+end;
+
+
+{ TOxygenWmiMethodCodeGenerator }
+
+procedure TOxygenWmiMethodCodeGenerator.GenerateCode(ParamsIn,
+  Values: TStrings);
 var
   StrCode: string;
   Descr: string;
-  ClassDescr: TStrings;
   DynCodeInParams: TStrings;
   DynCodeOutParams: TStrings;
   i: integer;
@@ -151,21 +203,10 @@ var
   IsStatic: boolean;
   TemplateCode : string;
 begin
-
-  try
-    Descr := GetWmiMethodDescription(Namespace, WmiClass, WmiMethod);
-  except
-    on E: EOleSysError do
-      if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-        Descr := ''
-      else
-        raise;
-  end;
-
-  DestList.BeginUpdate;
+  Descr := GetWmiClassDescription;
+  OutPutCode.BeginUpdate;
   DynCodeInParams := TStringList.Create;
   DynCodeOutParams := TStringList.Create;
-  ClassDescr     := TStringList.Create;
   OutParamsList  := TStringList.Create;
   OutParamsTypes := TStringList.Create;
   OutParamsDescr := TStringList.Create;
@@ -173,16 +214,16 @@ begin
   InParamsTypes  := TStringList.Create;
   InParamsDescr  := TStringList.Create;
   try
-    IsStatic := WmiMethodIsStatic(Namespace, WmiClass, WmiMethod);
-    GetListWmiMethodOutParameters(Namespace, WmiClass, WmiMethod,
+    IsStatic := WmiMethodIsStatic(WmiNamespace, WmiClass, WmiMethod);
+    GetListWmiMethodOutParameters(WmiNamespace, WmiClass, WmiMethod,
       OutParamsList, OutParamsTypes, OutParamsDescr);
-    GetListWmiMethodInParameters(Namespace, WmiClass, WmiMethod,
+    GetListWmiMethodInParameters(WmiNamespace, WmiClass, WmiMethod,
       InParamsList, InParamsTypes, InParamsDescr);
 
-    DestList.Clear;
+    OutPutCode.Clear;
     if IsStatic then
     begin
-      if UseHelperFunct then
+      if FUseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
@@ -193,7 +234,7 @@ begin
     else
     begin
 
-      if UseHelperFunct then
+      if FUseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
@@ -204,7 +245,7 @@ begin
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
-    StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNamespace, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiMethodName, WmiMethod, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiPath, WmiPath, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
@@ -257,20 +298,10 @@ begin
     StrCode := StringReplace(StrCode, sTagOxygenCodeParamsOut,
       DynCodeOutParams.Text, [rfReplaceAll]);
 
-
-    if Pos(#10, Descr) = 0 then //check if the description has format
-      ClassDescr.Text := WrapText(Descr, 80)
-    else
-      ClassDescr.Text := Descr;//WrapText(Summary,sLineBreak,[#10],80);
-
-    for i := 0 to ClassDescr.Count - 1 do
-      ClassDescr[i] := Format('// %s', [ClassDescr[i]]);
-
-    StrCode := StringReplace(StrCode, sTagWmiMethodDescr, ClassDescr.Text, [rfReplaceAll]);
-    DestList.Text := StrCode;
+    StrCode := StringReplace(StrCode, sTagWmiMethodDescr, Descr, [rfReplaceAll]);
+    OutPutCode.Text := StrCode;
   finally
-    ClassDescr.Free;
-    DestList.EndUpdate;
+    OutPutCode.EndUpdate;
     DynCodeInParams.Free;
     DynCodeOutParams.Free;
     OutParamsList.Free;
@@ -282,62 +313,37 @@ begin
   end;
 end;
 
-procedure GenerateOxygenWmiEventCode(
-  const DestList, ParamsIn, Values, Conds, PropsOut: TStrings;
-  const Namespace, WmiEvent, WmiTargetInstance: string; PollSeconds: integer;
-  UseHelperFunct, Intrinsic: boolean);
+
+function TOxygenWmiMethodCodeGenerator.GetWmiClassDescription: string;
 var
-  StrCode: string;
-  sValue:  string;
-  Wql:     string;
-  i, Len:  integer;
-  Props:   TStrings;
+  ClassDescr : TStringList;
+  Index      : Integer;
 begin
-  StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_Oxygen]));
-
-  WQL := Format('Select * From %s Within %d ', [WmiEvent, PollSeconds,
-    WmiTargetInstance]);
-  WQL := Format('  WmiQuery:=%s+%s', [QuotedStr(WQL), sLineBreak]);
-
-  if WmiTargetInstance <> '' then
-  begin
-    sValue := Format('Where TargetInstance ISA "%s" ', [WmiTargetInstance]);
-    WQL    := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
-  end;
-
-  for i := 0 to Conds.Count - 1 do
-  begin
-    sValue := '';
-    if (i > 0) or ((i = 0) and (WmiTargetInstance <> '')) then
-      sValue := 'AND ';
-    sValue := sValue + ' ' + ParamsIn.Names[i] + Conds[i] + Values[i] + ' ';
-    WQL := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
-  end;
-
-  i := LastDelimiter('+', Wql);
-  if i > 0 then
-    Wql[i] := ';';
-
-
-  Len   := GetMaxLengthItem(PropsOut) + 6;
-  Props := TStringList.Create;
   try
-    for i := 0 to PropsOut.Count - 1 do
-     if StartsText(wbemTargetInstance,PropsOut[i]) then
-      Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + ManagementBaseObject(e.NewEvent[%s])[%s]);',
-      [QuotedStr(PropsOut[i]+' : '),QuotedStr(wbemTargetInstance), QuotedStr(StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]))]))
-     else
-      Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + e.NewEvent.Properties[%s].Value.ToString());', [QuotedStr(PropsOut[i]+' : '), QuotedStr(PropsOut[i])]));
+    ClassDescr:=TStringList.Create;
+    try
+      Result := GetWmiMethodDescription(WmiNameSpace, WmiClass, WmiMethod);
 
-    StrCode := StringReplace(StrCode, sTagOxygenEventsOut, Props.Text, [rfReplaceAll]);
-  finally
-    props.Free;
+      if Pos(#10, Result) = 0 then //check if the description has format
+        ClassDescr.Text := WrapText(Result, 80)
+      else
+        ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
+
+      for Index := 0 to ClassDescr.Count - 1 do
+        ClassDescr[Index] := Format('// %s', [ClassDescr[Index]]);
+
+      Result:=ClassDescr.Text;
+    finally
+       ClassDescr.Free;
+    end;
+
+  except
+    on E: EOleSysError do
+      if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
+        Result := ''
+      else
+        raise;
   end;
-
-  StrCode := StringReplace(StrCode, sTagOxygenEventsWql, WQL, [rfReplaceAll]);
-  StrCode := StringReplace(StrCode, sTagWmiNameSpace, Namespace, [rfReplaceAll]);
-  DestList.Text := StrCode;
 end;
-
 
 end.

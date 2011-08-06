@@ -138,7 +138,7 @@ begin
   try
     for i := 0 to FrmMain.ComboBoxNameSpaces.Items.Count - 1 do
     begin
-      FrmMain.SetMsg('Scaning namespace ' + FrmMain.ComboBoxNameSpaces.Items[i]);
+      FrmMain.SetMsg('Scanning namespace ' + FrmMain.ComboBoxNameSpaces.Items[i]);
 
       Classes := TStringList.Create;
       try

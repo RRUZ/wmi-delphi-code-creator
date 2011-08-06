@@ -14,7 +14,6 @@ type
     BtnFillTree: TButton;
     LabelStatus: TLabel;
     ProgressBar1: TProgressBar;
-    procedure FormCreate(Sender: TObject);
     procedure BtnFillTreeClick(Sender: TObject);
     procedure CbNamespacesChange(Sender: TObject);
   private
@@ -22,7 +21,6 @@ type
     procedure SetStaus(const Msg:string);
   public
   end;
-
 
 implementation
 
@@ -32,7 +30,6 @@ uses
   uWmi_Metadata;
 
 {$R *.dfm}
-
 
 procedure TFrmWmiClassTree.BtnFillTreeClick(Sender: TObject);
 begin
@@ -51,6 +48,7 @@ Var
   WmiClasses  : TStringList;
   WmiClass    : string;
   i           : Integer;
+
 
   procedure GetSubClasses(AClass:string;ANode:TTreeNode);
   var
@@ -100,17 +98,6 @@ begin
      SetStaus('');
      ProgressBar1.Position:=0;
    end;
-end;
-
-procedure TFrmWmiClassTree.FormCreate(Sender: TObject);
-begin
-  {
-   SetStaus('');
-   SetStaus('Loading Wmi namespaces');
-   GetListWMINameSpaces(CbNamespaces.Items);
-   CbNamespaces.ItemIndex:=0;
-   FillTree(CbNamespaces.Text);
-   }
 end;
 
 procedure TFrmWmiClassTree.SetStaus(const Msg: string);
