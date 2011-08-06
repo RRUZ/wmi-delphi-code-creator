@@ -29,7 +29,6 @@ interface
 {
   Fix disabled icons
   Remote machine support
-  Code generation to OOP
   Improve source code
   Add automated tests
   Store cache x machin
@@ -245,7 +244,6 @@ uses
   CommCtrl,
   StrUtils,
   uWmi_About,
-  AsyncCalls,
   uWmi_Metadata,
   uSelectCompilerVersion,
   uWmi_ViewPropsValues,
@@ -565,6 +563,8 @@ var
   Str:   string;
   DelphiWmiCodeGenerator : TDelphiWmiClassCodeGenerator;
   FPCWmiCodeGenerator    : TFPCWmiClassCodeGenerator;
+  OxygenWmiCodeGenerator : TOxygenWmiClassCodeGenerator;
+
 begin
   Namespace := ComboBoxNameSpaces.Text;
   WmiClass  := ComboBoxClasses.Text;
@@ -600,7 +600,7 @@ begin
                   end;
 
 
-      Lng_FPC: //GenerateFPCWmiConsoleCode(SynEditDelphiCode.Lines, Props, Namespace, WmiClass, Settings.DelphiWmiClassHelperFuncts);
+      Lng_FPC:
                   begin
                     FPCWmiCodeGenerator:=TFPCWmiClassCodeGenerator.Create;
                     try
@@ -617,8 +617,26 @@ begin
                   end;
 
 
+      Lng_Oxygen:
+                  begin
+                    OxygenWmiCodeGenerator:=TOxygenWmiClassCodeGenerator.Create;
+                    try
+                      OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                      OxygenWmiCodeGenerator.WmiNameSpace:=Namespace;
+                      OxygenWmiCodeGenerator.WmiClass    :=WmiClass;
+                      OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
+                      OxygenWmiCodeGenerator.GenerateCode(Props);
+                      SynEditDelphiCode.Lines.Clear;
+                      SynEditDelphiCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                    finally
+                      OxygenWmiCodeGenerator.Free;
+                    end;
+                  end;
+
+      {
       Lng_Oxygen: GenerateOxygenWmiConsoleCode(
           SynEditDelphiCode.Lines, Props, Namespace, WmiClass, Settings.DelphiWmiClassHelperFuncts);
+      }
     end;
 
     SynEditDelphiCode.SelStart  := SynEditDelphiCode.GetTextLen;
@@ -640,6 +658,7 @@ var
   Str:    string;
   DelphiWmiCodeGenerator : TDelphiWmiMethodCodeGenerator;
   FPCWmiCodeGenerator : TFPCWmiMethodCodeGenerator;
+  OxygenWmiCodeGenerator : TOxygenWmiMethodCodeGenerator;
 begin
   if (ComboBoxClassesMethods.Text = '') or (ComboBoxMethods.Text = '') then
     exit;
@@ -683,11 +702,7 @@ begin
                     DelphiWmiCodeGenerator.Free;
                   end;
                  end;
-              {
-      Lng_FPC: GenerateFPCWmiInvokerCode(
-          SynEditDelphiCodeInvoke.Lines, Params, Values, Namespace, WmiClass, WmiMethod,
-          ComboBoxPaths.Text, Settings.DelphiWmiClassHelperFuncts);
-               }
+
       Lng_FPC:
                  begin
                   FPCWmiCodeGenerator :=TFPCWmiMethodCodeGenerator.Create;
@@ -706,9 +721,23 @@ begin
                   end;
                  end;
 
-      Lng_Oxygen: GenerateOxygenWmiInvokerCode(
-          SynEditDelphiCodeInvoke.Lines, Params, Values, Namespace, WmiClass, WmiMethod,
-          ComboBoxPaths.Text, Settings.DelphiWmiClassHelperFuncts);
+      Lng_Oxygen:
+                 begin
+                  OxygenWmiCodeGenerator :=TOxygenWmiMethodCodeGenerator.Create;
+                  try
+                    OxygenWmiCodeGenerator.WmiNameSpace:=Namespace;
+                    OxygenWmiCodeGenerator.WmiClass:=WmiClass;
+                    OxygenWmiCodeGenerator.WmiMethod:=WmiMethod;
+                    OxygenWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
+                    OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                    OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
+                    OxygenWmiCodeGenerator.GenerateCode(Params, Values);
+                    SynEditDelphiCodeInvoke.Lines.Clear;
+                    SynEditDelphiCodeInvoke.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                  finally
+                    OxygenWmiCodeGenerator.Free;
+                  end;
+                 end;
     end;
 
 
@@ -735,6 +764,7 @@ var
   PropsOut: TStringList;
   DelphiWmiCodeGenerator : TDelphiWmiEventCodeGenerator;
   FPCWmiCodeGenerator : TFPCWmiEventCodeGenerator;
+  OxygenWmiCodeGenerator : TOxygenWmiEventCodeGenerator;
 
 begin
   if (ComboBoxNamespacesEvents.Text = '') or (ComboBoxEvents.Text = '') then
@@ -809,14 +839,23 @@ begin
                    end;
                  end;
 
-     {
-      Lng_FPC: GenerateFPCWmiEventCode(
-          SynEditEventCode.Lines, Params, Values, Conds, PropsOut, Namespace, WmiEvent,
-          WmiTargetInstance, PollSeconds, Settings.DelphiWmiClassHelperFuncts, RadioButtonIntrinsic.Checked);
-      }
-      Lng_Oxygen:  GenerateOxygenWmiEventCode(
-          SynEditEventCode.Lines, Params, Values, Conds, PropsOut, Namespace, WmiEvent,
-          WmiTargetInstance, PollSeconds, Settings.DelphiWmiClassHelperFuncts, RadioButtonIntrinsic.Checked);
+      Lng_Oxygen:
+                 begin
+                   OxygenWmiCodeGenerator := TOxygenWmiEventCodeGenerator.Create;
+                   try
+                      OxygenWmiCodeGenerator.WmiNameSpace:=Namespace;
+                      OxygenWmiCodeGenerator.WmiClass    :=WmiEvent;
+                      OxygenWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
+                      OxygenWmiCodeGenerator.PollSeconds          := PollSeconds;
+                      OxygenWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
+                      OxygenWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
+                      SynEditEventCode.Lines.Clear;
+                      SynEditEventCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                   finally
+                      OxygenWmiCodeGenerator.Free;
+                   end;
+                 end;
+
     end;
 
     SynEditEventCode.SelStart  := SynEditEventCode.GetTextLen;

@@ -12,7 +12,6 @@ object FrmWmiClassTree: TFrmWmiClassTree
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  OnCreate = FormCreate
   DesignSize = (
     518
     469)
@@ -72,7 +71,5 @@ object FrmWmiClassTree: TFrmWmiClassTree
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 3
-    ExplicitTop = 594
-    ExplicitWidth = 395
   end
 end
