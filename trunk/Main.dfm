@@ -179,7 +179,7 @@ object FrmMain: TFrmMain
                   Left = 9
                   Top = 192
                   Width = 295
-                  Height = 144
+                  Height = 142
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -200,7 +200,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 146
+                  ExplicitHeight = 144
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -363,7 +363,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 88
+                  Height = 86
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -409,7 +409,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 310
+                  Top = 308
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -569,7 +569,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 133
+                  Height = 131
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -666,7 +666,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 315
+                  Top = 313
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -981,8 +981,8 @@ object FrmMain: TFrmMain
     CharAttri.Foreground = clWhite
     SymbolAttri.Background = 4598550
     SymbolAttri.Foreground = clWhite
-    Left = 610
-    Top = 182
+    Left = 530
+    Top = 198
   end
   object SaveDialog1: TSaveDialog
     FileName = 'GetWMI_Info.dpr'
@@ -993,8 +993,8 @@ object FrmMain: TFrmMain
   end
   object PopupMenu1: TPopupMenu
     Images = ImageList1
-    Left = 58
-    Top = 36
+    Left = 474
+    Top = 196
     object CompileCode1: TMenuItem
       Caption = 'Compile Code'
       ImageIndex = 21
@@ -1018,7 +1018,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F0078001C0110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800200110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000

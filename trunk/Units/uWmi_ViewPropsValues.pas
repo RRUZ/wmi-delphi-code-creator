@@ -26,7 +26,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, SynEdit, ExtCtrls,
-  ImgList, Contnrs, ActiveX;
+  ImgList, Contnrs, ActiveX, StdCtrls;
 
 type
   TGroupItem = class
@@ -103,6 +103,13 @@ type
     TabSheet1:  TTabSheet;
     ListViewGrid: TListView;
     StatusBar1: TStatusBar;
+    Panel2: TPanel;
+    EditClass: TEdit;
+    Label1: TLabel;
+    EditNameSpace: TEdit;
+    Label2: TLabel;
+    EditURL: TEdit;
+    BtnUrl: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -111,6 +118,7 @@ type
       var DefaultDraw: boolean);
     procedure ListViewWmiClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure BtnUrlClick(Sender: TObject);
   private
     FWmiClass: string;
     FWmiNamespace: string;
@@ -124,11 +132,13 @@ type
     //procedure AddGroupItem(gi : TGroupItem);
 
     procedure Log(const msg: string);
+    procedure SetWmiClass(const Value: string);
+    procedure SetWmiNamespace(const Value: string);
   public
     property ContainValues: boolean Read FContainValues;
     property Wmiproperties: TStrings Read FWmiproperties Write FWmiproperties;
-    property WmiClass: string Read FWmiClass Write FWmiClass;
-    property WmiNamespace: string Read FWmiNamespace Write FWmiNamespace;
+    property WmiClass: string Read FWmiClass Write SetWmiClass;
+    property WmiNamespace: string Read FWmiNamespace Write SetWmiNamespace;
     property WQL: TStrings Read FWQL;
     procedure LoadValues; cdecl;
   end;
@@ -142,6 +152,7 @@ uses
   CommCtrl,
   uListView_Helper,
   ComObj,
+  ShellAPi,
   uWmi_Metadata;
 
 {$R *.dfm}
@@ -193,6 +204,11 @@ begin
   SendMessage(ListView.Handle, LVM_SETITEM, 0, Longint(@LvItemA))
 end;
  }
+
+procedure TFrmWmiVwProps.BtnUrlClick(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open', PChar(EditURL.Text), nil, nil, SW_SHOW);
+end;
 
 procedure TFrmWmiVwProps.ClearListViewGroups;
 var
@@ -394,6 +410,19 @@ end;
 procedure TFrmWmiVwProps.Log(const msg: string);
 begin
   StatusBar1.SimpleText := msg;
+end;
+
+procedure TFrmWmiVwProps.SetWmiClass(const Value: string);
+begin
+  FWmiClass := Value;
+  EditClass.Text:=Value;
+  EditURL.Text:=Format(UrlWmiHelp, [Value]);
+end;
+
+procedure TFrmWmiVwProps.SetWmiNamespace(const Value: string);
+begin
+  FWmiNamespace := Value;
+  EditNameSpace.Text:=Value;
 end;
 
 { TGroupItem }

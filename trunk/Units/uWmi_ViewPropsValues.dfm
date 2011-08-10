@@ -1,6 +1,6 @@
 object FrmWmiVwProps: TFrmWmiVwProps
-  Left = 537
-  Top = 220
+  Left = 535
+  Top = 224
   Caption = 'Properties Values'
   ClientHeight = 475
   ClientWidth = 596
@@ -20,9 +20,9 @@ object FrmWmiVwProps: TFrmWmiVwProps
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 0
+    Top = 81
     Width = 596
-    Height = 456
+    Height = 375
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
@@ -35,7 +35,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
       Left = 5
       Top = 5
       Width = 586
-      Height = 446
+      Height = 365
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
@@ -43,15 +43,12 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheetProps: TTabSheet
         Caption = 'Properties'
         TabVisible = False
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
+        ExplicitHeight = 377
         object ListViewWmi: TListView
           Left = 0
           Top = 0
           Width = 578
-          Height = 418
+          Height = 337
           Align = alClient
           Columns = <
             item
@@ -74,16 +71,18 @@ object FrmWmiVwProps: TFrmWmiVwProps
           OnAdvancedCustomDrawItem = ListViewWmiAdvancedCustomDrawItem
           OnClick = ListViewWmiClick
           OnDblClick = ListViewWmiClick
+          ExplicitHeight = 377
         end
       end
       object TabSheet1: TTabSheet
         Caption = 'Properties'
         ImageIndex = 2
+        ExplicitHeight = 418
         object ListViewGrid: TListView
           Left = 0
           Top = 0
           Width = 578
-          Height = 418
+          Height = 337
           Align = alClient
           Columns = <>
           GridLines = True
@@ -91,6 +90,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           RowSelect = True
           TabOrder = 0
           ViewStyle = vsReport
+          ExplicitHeight = 418
         end
       end
     end
@@ -103,11 +103,67 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Panels = <>
     SimplePanel = True
   end
+  object Panel2: TPanel
+    Left = 0
+    Top = 0
+    Width = 596
+    Height = 81
+    Align = alTop
+    TabOrder = 2
+    ExplicitTop = -1
+    object Label1: TLabel
+      Left = 9
+      Top = 8
+      Width = 25
+      Height = 13
+      Caption = 'Class'
+    end
+    object Label2: TLabel
+      Left = 295
+      Top = 8
+      Width = 55
+      Height = 13
+      Caption = 'Namespace'
+    end
+    object EditClass: TEdit
+      Left = 9
+      Top = 27
+      Width = 280
+      Height = 21
+      ReadOnly = True
+      TabOrder = 0
+    end
+    object EditNameSpace: TEdit
+      Left = 295
+      Top = 27
+      Width = 292
+      Height = 21
+      ReadOnly = True
+      TabOrder = 1
+    end
+    object EditURL: TEdit
+      Left = 9
+      Top = 54
+      Width = 488
+      Height = 21
+      ReadOnly = True
+      TabOrder = 2
+    end
+    object BtnUrl: TButton
+      Left = 512
+      Top = 50
+      Width = 75
+      Height = 25
+      Caption = 'Go'
+      TabOrder = 3
+      OnClick = BtnUrlClick
+    end
+  end
   object listViewImages: TImageList
-    Left = 32
-    Top = 64
+    Left = 144
+    Top = 232
     Bitmap = {
-      494C010102000400540010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101020004005C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
