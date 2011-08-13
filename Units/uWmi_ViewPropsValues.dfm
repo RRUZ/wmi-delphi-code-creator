@@ -3,7 +3,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
   Top = 224
   Caption = 'Properties Values'
   ClientHeight = 475
-  ClientWidth = 596
+  ClientWidth = 713
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,7 +21,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
   object Panel1: TPanel
     Left = 0
     Top = 81
-    Width = 596
+    Width = 713
     Height = 375
     Align = alClient
     BevelOuter = bvNone
@@ -34,20 +34,20 @@ object FrmWmiVwProps: TFrmWmiVwProps
     object PageControl1: TPageControl
       Left = 5
       Top = 5
-      Width = 586
+      Width = 703
       Height = 365
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 586
       ExplicitHeight = 465
       object TabSheetProps: TTabSheet
         Caption = 'Properties'
         TabVisible = False
-        ExplicitHeight = 377
         object ListViewWmi: TListView
           Left = 0
           Top = 0
-          Width = 578
+          Width = 695
           Height = 337
           Align = alClient
           Columns = <
@@ -68,29 +68,25 @@ object FrmWmiVwProps: TFrmWmiVwProps
           SmallImages = listViewImages
           TabOrder = 0
           ViewStyle = vsReport
-          OnAdvancedCustomDrawItem = ListViewWmiAdvancedCustomDrawItem
-          OnClick = ListViewWmiClick
-          OnDblClick = ListViewWmiClick
-          ExplicitHeight = 377
         end
       end
       object TabSheet1: TTabSheet
         Caption = 'Properties'
         ImageIndex = 2
-        ExplicitHeight = 418
         object ListViewGrid: TListView
           Left = 0
           Top = 0
-          Width = 578
+          Width = 695
           Height = 337
           Align = alClient
           Columns = <>
           GridLines = True
+          OwnerData = True
           ReadOnly = True
           RowSelect = True
           TabOrder = 0
           ViewStyle = vsReport
-          ExplicitHeight = 418
+          OnData = ListViewGridData
         end
       end
     end
@@ -98,7 +94,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
   object StatusBar1: TStatusBar
     Left = 0
     Top = 456
-    Width = 596
+    Width = 713
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -106,11 +102,10 @@ object FrmWmiVwProps: TFrmWmiVwProps
   object Panel2: TPanel
     Left = 0
     Top = 0
-    Width = 596
+    Width = 713
     Height = 81
     Align = alTop
     TabOrder = 2
-    ExplicitTop = -1
     object Label1: TLabel
       Left = 9
       Top = 8
@@ -136,7 +131,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     object EditNameSpace: TEdit
       Left = 295
       Top = 27
-      Width = 292
+      Width = 202
       Height = 21
       ReadOnly = True
       TabOrder = 1
@@ -163,7 +158,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C0101020004005C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000400680010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

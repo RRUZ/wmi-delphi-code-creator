@@ -536,6 +536,14 @@ begin
   FrmWMIExplorer.Parent := TabSheetWmiExplorer;
   FrmWMIExplorer.BorderStyle := bsNone;
   FrmWMIExplorer.Align := alClient;
+
+  FrmWMIExplorer.MemoDescr.Color:=Settings.BackGroundColor;
+  FrmWMIExplorer.MemoDescr.Font.Color:=MemoConsole.Font.Color;
+  FrmWMIExplorer.MemoWmiMOF.Color:=Settings.BackGroundColor;
+  FrmWMIExplorer.MemoWmiMOF.Font.Color:=MemoConsole.Font.Color;
+  FrmWMIExplorer.MemoQualifiers.Color:=Settings.BackGroundColor;
+  FrmWMIExplorer.MemoQualifiers.Font.Color:=MemoConsole.Font.Color;
+
   FrmWMIExplorer.Show;
 
   FrmWmiClassTree := TFrmWmiClassTree.Create(Self);
@@ -1662,7 +1670,7 @@ begin
     Frm.CompilerType := Ct;
     Frm.LoadInstalledVersions;
     if Frm.ListViewIDEs.Items.Count = 0 then
-      MsgWarning('Does not exist Object Pascal IDEs installed in this system')
+      MsgWarning('Does not exist a Object Pascal IDEs installed in this system')
     else
     if Frm.ShowModal = mrOk then
     begin
