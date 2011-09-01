@@ -150,7 +150,6 @@ Var
 function GetCurrentTheme(const ThemeName:string):TIDETheme;
 var
  FileName : string;
- i        : Integer;
 begin
   FileName:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))+'\Themes')+ThemeName+sThemesExt;
   LoadThemeFromXMLFile(Result, FileName);

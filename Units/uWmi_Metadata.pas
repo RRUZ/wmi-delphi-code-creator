@@ -338,6 +338,7 @@ type
 
 
   function  VarStrNull(const V:OleVariant):string;
+  function  FormatWbemValue(const V:OleVariant;CIMType:Integer):string;
   function  CIMTypeStr(const CIMType:Integer):string;
   function  GetDefaultValueWmiType(const WmiType:string):string;
   function  WmiTypeToDelphiType(const WmiType:string):string;
@@ -445,6 +446,47 @@ begin
     Result:=VarToStr(V);
   end;
 end;
+
+
+
+function VarDateTimeNull(const V : OleVariant): TDateTime;
+var
+  Dt : OleVariant;
+begin
+  Result:=0;
+  if VarIsNull(V) then exit;
+  Dt:=CreateOleObject('WbemScripting.SWbemDateTime');
+  Dt.Value := V;
+  Result:=Dt.GetVarDate;
+end;
+
+function FormatWbemValue(const V:OleVariant;CIMType:Integer):string;
+begin
+  Result:='';
+  if not VarIsNull(V) then
+  case CIMType of
+    wbemCimtypeSint8,
+    wbemCimtypeUint8,
+    wbemCimtypeSint16,
+    wbemCimtypeUint16,
+    wbemCimtypeSint32,
+    wbemCimtypeUint32,
+    wbemCimtypeSint64,
+    wbemCimtypeUint64,
+    wbemCimtypeReal32,
+    wbemCimtypeReal64,
+    wbemCimtypeBoolean,
+    wbemCimtypeString,
+    wbemCimtypeChar16    : Result:=VarStrNull(V);
+    wbemCimtypeDatetime  : Result:=DateTimeToStr(VarDateTimeNull(V));
+    wbemCimtypeReference : Result:='Reference';
+    wbemCimtypeObject    : Result:='Object'
+   else
+     Result:=VarStrNull(V);
+  end;
+end;
+
+
 
 function CIMTypeStr(const CIMType:Integer):string;
 begin

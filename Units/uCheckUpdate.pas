@@ -40,6 +40,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure BtnCheckUpdatesClick(Sender: TObject);
     procedure BtnInstallClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
   private
     FXmlVersionInfo: string;
     FLocalVersion: string;
@@ -174,6 +175,11 @@ begin
     Application.Terminate;
   end;
 
+end;
+
+procedure TFrmCheckUpdate.FormActivate(Sender: TObject);
+begin
+   BtnCheckUpdates.Click;
 end;
 
 procedure TFrmCheckUpdate.FormCreate(Sender: TObject);

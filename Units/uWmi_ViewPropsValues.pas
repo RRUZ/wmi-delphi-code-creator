@@ -46,17 +46,14 @@ type
     FPassword: string;
     FNameSpace: string;
     FListView: TListView;
-    //FList         : TList;
     FProperties: TStrings;
     FCallback: TWMIQueryCallbackLog;
     FMsg:      string;
     FValues:   TList<TStrings>;
     procedure CreateColumns;
-    procedure AddRecord;
+    procedure SetListViewSize;
     procedure AdjustColumnsWidth;
     procedure SendMsg;
-
-    //procedure Fill_ListView;
   public
     constructor Create(const Server, User, PassWord, NameSpace, WQL: string;
       ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>); overload;
@@ -112,9 +109,9 @@ implementation
 uses
   ComObj,
   CommCtrl,
+  uWmi_Metadata,
   ShellAPi,
-  uListView_Helper,
-  uWmi_Metadata;
+  uListView_Helper;
 
 {$R *.dfm}
 
@@ -256,6 +253,8 @@ begin
     begin
       Column := FListView.Columns.Add;
       Column.Caption := FProperties[i];
+      //Column.Width   := LVSCW_AUTOSIZE_USEHEADER;
+      Column.AutoSize:=True;
     end;
   finally
     FListView.Items.EndUpdate;
@@ -270,7 +269,6 @@ begin
   FWbemObjectSet := Unassigned;
   FWbemObject    := Unassigned;
   FProperties.Free;
-  //FValues.Free;
   inherited;
 end;
 
@@ -283,6 +281,9 @@ var
   i:      integer;
   FCount: integer;
   RowData : TStringList;
+  CimType : integer;
+
+
 begin
   Success := CoInitialize(nil); //CoInitializeEx(nil, COINIT_MULTITHREADED);
   try
@@ -310,7 +311,8 @@ begin
       begin
         while oEnumProp.Next(1, PropItem, iValue) = 0 do
         begin
-          FProperties.Add(PropItem.Name);
+          CimType:=PropItem.CIMType;
+          FProperties.AddObject(PropItem.Name, TObject(CimType));
           PropItem := Unassigned;
         end;
 
@@ -332,13 +334,11 @@ begin
         FValues.Add(RowData);
 
       for i := 0 to FProperties.Count - 1 -1 do
-      //  FValues.Add(Props.Item(FProperties[i]).Value);
-      RowData.Add(VarStrNull(Props.Item(FProperties[i]).Value));
+        RowData.Add(FormatWbemValue(Props.Item(FProperties[i]).Value, Integer(FProperties.Objects[i])));
+
       RowData.Add(VarStrNull(FWbemObject.Path_.RelPath));
 
-      //Synchronize(AddRecord);
-      if not Terminated then
-      FListView.Items.Count:=FValues.Count;
+      Synchronize(SetListViewSize);
 
       FMsg :=Format('%d records retrieved', [FValues.Count]);
       Synchronize(SendMsg);
@@ -373,40 +373,17 @@ begin
   end;
 end;
 
-procedure TWMIQueryToListView.AddRecord;
-var
-  j:    integer;
-  Item: TListItem;
-begin
-{
-  if not Terminated then
-  begin
-    FListView.Items.BeginUpdate;
-    try
-      for j := 0 to FProperties.Count - 1 do
-      begin
-        if j = 0 then
-        begin
-          Item := FListView.Items.Add;
-          Item.Caption := FValues[j];
-        end
-        else
-          Item.SubItems.Add(FValues[j]);
-      end;
-
-      FCallback(Format('%d records retrieved', [FListView.Items.Count]));
-    finally
-      FListView.Items.EndUpdate;
-    end;
-  end;
-}
-end;
 
 
 procedure TWMIQueryToListView.SendMsg;
 begin
   if not Terminated then
   FCallback(FMsg);
+end;
+
+procedure TWMIQueryToListView.SetListViewSize;
+begin
+  FListView.Items.Count:=FValues.Count;
 end;
 
 end.
