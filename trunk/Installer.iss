@@ -150,8 +150,6 @@ procedure LoadSkin(lpszPath: String; lpszIniFileName: String); external 'LoadSki
 procedure UnloadSkin(); external 'UnloadSkin@files:isskin.dll stdcall';
 function  ShowWindow(hWnd: Integer; uType: Integer): Integer; external 'ShowWindow@user32.dll stdcall';
 
-
-
 function GetUninstallString(): String;
 var
   sUnInstPath: String;

@@ -31,7 +31,7 @@ interface
   Remote machine support
   Improve source code
   Add automated tests
-  Store cache x machin
+  Store cache x machine
   Create code based in plugins and interfaces
 }
 
