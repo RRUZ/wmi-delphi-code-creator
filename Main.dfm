@@ -179,7 +179,7 @@ object FrmMain: TFrmMain
                   Left = 9
                   Top = 192
                   Width = 295
-                  Height = 130
+                  Height = 128
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -200,7 +200,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 132
+                  ExplicitHeight = 130
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -363,7 +363,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 74
+                  Height = 72
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -409,7 +409,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 296
+                  Top = 294
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -569,7 +569,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 119
+                  Height = 117
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -666,7 +666,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 301
+                  Top = 299
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -1018,7 +1018,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800380110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F0078003C0110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000

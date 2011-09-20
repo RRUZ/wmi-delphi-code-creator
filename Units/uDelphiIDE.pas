@@ -25,15 +25,10 @@ interface
 
 Uses
   Classes;
-
+   {
 type
   TDelphiVersions =
     (
-{
-    Delphi4,
-    Delphi5,
-    Delphi6,
-}
     Delphi7,
     Delphi8,
     Delphi2005,
@@ -46,11 +41,6 @@ type
 
 const
   DelphiVersionsNames: array[TDelphiVersions] of string = (
-{
-    'Delphi 4',
-    'Delphi 5',
-    'Delphi 6',
-}
     'Delphi 7',
     'Delphi 8',
     'BDS 2005',
@@ -62,11 +52,7 @@ const
     );
 
   DelphiRegPaths: array[TDelphiVersions] of string = (
-{
-    '\Software\Borland\Delphi\4.0',
-    '\Software\Borland\Delphi\5.0',
-    '\Software\Borland\Delphi\6.0',
-}
+
     '\Software\Borland\Delphi\7.0',
     '\Software\Borland\BDS\2.0',
     '\Software\Borland\BDS\3.0',
@@ -75,7 +61,7 @@ const
     '\Software\CodeGear\BDS\6.0',
     '\Software\CodeGear\BDS\7.0',
     '\Software\Embarcadero\BDS\8.0');
-
+ }
 function  CreateDelphiProject(const DestPath, SourcePath: string): boolean;
 procedure CompileAndRunDelphiCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
 
@@ -84,7 +70,8 @@ implementation
 uses
   SysUtils,
   Windows,
-  ShellApi, uMisc;
+  ShellApi,
+  uMisc;
 
 
 procedure CompileAndRunDelphiCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
@@ -92,7 +79,8 @@ var
   ExeFile: string;
 begin
   Console.Add('');
-  CaptureConsoleOutput(Format('"%s" -B -CC "%s"', [CompilerName,ProjectFile]), Console);
+  CaptureConsoleOutput(Format('"%s" -B -CC -NSsystem;vcl;Winapi;System.Win "%s"', [CompilerName,ProjectFile]), Console);
+  //CaptureConsoleOutput(Format('"%s" -B -CC "%s"', [CompilerName,ProjectFile]), Console);
   if Run then
   begin
     ExeFile := ChangeFileExt(ProjectFile, '.exe');

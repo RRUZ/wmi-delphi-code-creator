@@ -63,6 +63,7 @@ uses
   uRegistry,
   uLazarusIDE,
   uDelphiIDE,
+  uDelphiVersions,
   CommCtrl,
   ShellAPI,
   uDelphiPrismIDE;
