@@ -44,12 +44,14 @@ type
   private
     FCompilerType: TCompilerType;
     FShowCompiler: boolean;
+    FShow64BitsCompiler: boolean;
     { Private declarations }
   public
     { Public declarations }
     procedure LoadInstalledVersions;
     property CompilerType: TCompilerType Read FCompilerType Write FCompilerType;
     property ShowCompiler: boolean Read FShowCompiler Write FShowCompiler;
+    property Show64BitsCompiler: boolean Read FShow64BitsCompiler Write FShow64BitsCompiler;
   end;
 
 const
@@ -94,6 +96,7 @@ end;
 procedure TFrmSelCompilerVer.FormCreate(Sender: TObject);
 begin
   FShowCompiler := False;
+  FShow64BitsCompiler :=True;
 end;
 
 procedure TFrmSelCompilerVer.ListViewIDEsDblClick(Sender: TObject);
@@ -132,6 +135,19 @@ begin
             ImageIndex := ImageList1.Count - 1;
             item.ImageIndex := ImageIndex;
             item.Data := Pointer(Ord(Ct_Delphi));
+
+            if (DelphiComp>=DelphiXE2) and FShow64BitsCompiler then
+            begin
+              item := ListViewIDEs.Items.Add;
+              item.Caption := DelphiVersionsNames[DelphiComp] +' 64 Bits Compiler';
+              item.SubItems.Add(FileName);
+              item.SubItems.Add(ExtractFilePath(FileName) + 'Dcc64.exe');
+              ExtractIconFileToImageList(ImageList1, Filename);
+              ImageIndex := ImageList1.Count - 1;
+              item.ImageIndex := ImageIndex;
+              item.Data := Pointer(Ord(Ct_Delphi));
+            end;
+
           end;
 
     end;
