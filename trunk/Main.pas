@@ -1668,6 +1668,7 @@ begin
     Ct := ListCompilerLanguages[TSourceLanguages(
       ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
     Frm.CompilerType := Ct;
+    Frm.Show64BitsCompiler:=False;
     Frm.LoadInstalledVersions;
     if Frm.ListViewIDEs.Items.Count = 0 then
       MsgWarning('Does not exist a Object Pascal IDEs installed in this system')
