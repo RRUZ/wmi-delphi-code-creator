@@ -45,6 +45,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure btnCheckUpdatesClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -93,18 +94,23 @@ begin
    ShellExecute(Handle, 'open', PChar('http://theroadtodelphi.wordpress.com/contributions/'), nil, nil, SW_SHOW);
 end;
 
+procedure TFrmAbout.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+ Action:=caFree;
+end;
+
 procedure TFrmAbout.FormCreate(Sender: TObject);
 begin
   LabelVersion.Caption    := Format('Version %s', [FileVersionStr]);
   LabelWmiVersion.Caption := Format('WMI installed version %s', [GetWmiVersion]);
   MemoCopyRights.Lines.Add(
-    'Author Rodrigo Ruz rodrigo.ruz.v@gmail.com - © 2010 all rights reserved.');
+    'Author Rodrigo Ruz rodrigo.ruz.v@gmail.com - © 2010-2011 all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add(
     'SynEdit http://synedit.svn.sourceforge.net/viewvc/synedit/ all rights reserved.');
   MemoCopyRights.Lines.Add(
-    'AsyncCalls 2.97 Copyright © 2008-2011 Andreas Hausladen all rights reserved. http://andy.jgknet.de/blog/?page_id=100');
-  MemoCopyRights.Lines.Add('');
+    'AsyncCalls 2.97 Copyright © 2008-2011 Andreas Hausladen all rights reserved.');
+  MemoCopyRights.Lines.Add('http://andy.jgknet.de/blog/?page_id=100');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('');
