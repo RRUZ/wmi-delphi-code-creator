@@ -29,7 +29,8 @@ uses
   uWmi_Metadata in 'Units\uWmi_Metadata.pas',
   uCheckUpdate in 'Units\uCheckUpdate.pas' {FrmCheckUpdate},
   uWinInet in 'Units\uWinInet.pas',
-  uWmiClassTree in 'Units\uWmiClassTree.pas' {FrmWmiClassTree};
+  uWmiClassTree in 'Units\uWmiClassTree.pas' {FrmWmiClassTree},
+  uPropValueList in 'Units\uPropValueList.pas' {FrmValueList};
 
 {$R *.res}
 

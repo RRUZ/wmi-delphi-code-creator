@@ -44,10 +44,6 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheetProps: TTabSheet
         Caption = 'Properties'
         TabVisible = False
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object ListViewWmi: TListView
           Left = 0
           Top = 0
@@ -91,6 +87,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           TabOrder = 0
           ViewStyle = vsReport
           OnData = ListViewGridData
+          OnDblClick = ListViewGridDblClick
         end
       end
     end
@@ -162,7 +159,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C010102000400700010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000400740010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

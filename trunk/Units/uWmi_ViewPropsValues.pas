@@ -83,6 +83,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnUrlClick(Sender: TObject);
     procedure ListViewGridData(Sender: TObject; Item: TListItem);
+    procedure ListViewGridDblClick(Sender: TObject);
   private
     FValues:   TList<TStrings>;
     FWmiClass: string;
@@ -95,6 +96,7 @@ type
     procedure Log(const msg: string);
     procedure SetWmiClass(const Value: string);
     procedure SetWmiNamespace(const Value: string);
+    procedure ShowDetails();
   public
     property ContainValues: boolean Read FContainValues;
     property Wmiproperties: TStrings Read FWmiproperties Write FWmiproperties;
@@ -111,7 +113,7 @@ uses
   CommCtrl,
   uWmi_Metadata,
   ShellAPi,
-  uListView_Helper;
+  uListView_Helper, uPropValueList;
 
 {$R *.dfm}
 
@@ -178,6 +180,11 @@ begin
   end;
 end;
 
+procedure TFrmWmiVwProps.ListViewGridDblClick(Sender: TObject);
+begin
+  ShowDetails();
+end;
+
 procedure TFrmWmiVwProps.LoadValues;
 var
   i: integer;
@@ -215,6 +222,22 @@ begin
   EditNameSpace.Text:=Value;
 end;
 
+
+procedure TFrmWmiVwProps.ShowDetails;
+Var
+ Frm  : TFrmValueList;
+ i    : Integer;
+  RowData : TStrings;
+begin
+ if not Assigned(ListViewGrid.Selected) then exit;
+ RowData:=FValues[ListViewGrid.Selected.Index];
+
+ Frm:=TFrmValueList.Create(nil);
+  for i := 0 to ListViewGrid.Columns.Count-1 do
+    Frm.ValueList.InsertRow(ListViewGrid.Columns[i].Caption, RowData[i], True);
+
+ Frm.Show();
+end;
 
 { TWMIQueryToListView }
 

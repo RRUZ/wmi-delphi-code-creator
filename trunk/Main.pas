@@ -1170,9 +1170,7 @@ begin
             SaveWMIClassesToCache(Namespace, FClasses);
           end
           else
-          begin
             LoadWMIClassesFromCache(Namespace, FClasses);
-          end;
 
         except
           on E: EOleSysError do
@@ -1388,8 +1386,8 @@ begin
     SetMsg('');
   finally
     FNameSpaces.Free;
-    Frm.Close;
-    Frm.Free;
+    //Frm.Close;
+    //Frm.Free;
   end;
 end;
 
@@ -1540,7 +1538,7 @@ begin
   try
     Frm.ShowModal();
   finally
-    Frm.Free;
+    //Frm.Free;
   end;
 end;
 

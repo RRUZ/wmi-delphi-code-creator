@@ -1,6 +1,7 @@
 object FrmAbout: TFrmAbout
   Left = 651
   Top = 323
+  ActiveControl = btnCheckUpdates
   BorderStyle = bsSingle
   Caption = 'About'
   ClientHeight = 316
@@ -13,6 +14,7 @@ object FrmAbout: TFrmAbout
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
