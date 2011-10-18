@@ -446,7 +446,7 @@ begin
 
     FrmMain.ComboBoxClasses.ItemIndex := 0;
     FrmMain.LoadClassInfo;
-    FrmMain.GenerateObjectPascalConsoleCode;
+    FrmMain.GenerateConsoleCode;
   end
   else
   if Assigned(Node) and (Node.Level = LevelClass) and (Assigned(Node.Parent)) then
@@ -461,7 +461,7 @@ begin
     FrmMain.ComboBoxClassesChange(FrmMain.ComboBoxClasses);
 
     LoadClassInfo;
-    FrmMain.GenerateObjectPascalConsoleCode;
+    FrmMain.GenerateConsoleCode;
   end
   else
   if Assigned(Node) and (Node.Level = LevelPropertyMethod) then

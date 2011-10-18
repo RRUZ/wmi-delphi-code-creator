@@ -13,7 +13,6 @@ object FrmMain: TFrmMain
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  WindowState = wsMinimized
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -179,7 +178,7 @@ object FrmMain: TFrmMain
                   Left = 9
                   Top = 192
                   Width = 295
-                  Height = 122
+                  Height = 120
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -200,7 +199,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 124
+                  ExplicitHeight = 122
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -229,14 +228,14 @@ object FrmMain: TFrmMain
                   Top = 5
                   Width = 659
                   Height = 394
-                  ActivePage = TabSheetDelphiCode
+                  ActivePage = TabSheetWmiClassCode
                   Align = alClient
                   TabOrder = 0
                   ExplicitHeight = 402
-                  object TabSheetDelphiCode: TTabSheet
+                  object TabSheetWmiClassCode: TTabSheet
                     Caption = 'Code'
                     ExplicitHeight = 368
-                    object SynEditDelphiCode: TSynEdit
+                    object SynEditWMIClassCode: TSynEdit
                       Left = 0
                       Top = 0
                       Width = 651
@@ -262,8 +261,7 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
-                      ExplicitLeft = -3
-                      ExplicitTop = 7
+                      ExplicitHeight = 368
                     end
                   end
                 end
@@ -364,7 +362,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 66
+                  Height = 64
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -410,7 +408,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 288
+                  Top = 286
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -570,7 +568,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 111
+                  Height = 109
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -667,7 +665,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 293
+                  Top = 291
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -801,6 +799,7 @@ object FrmMain: TFrmMain
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 0
+            ExplicitTop = -6
             object Label8: TLabel
               Left = 5
               Top = 14
@@ -982,7 +981,7 @@ object FrmMain: TFrmMain
     CharAttri.Foreground = clWhite
     SymbolAttri.Background = 4598550
     SymbolAttri.Foreground = clWhite
-    Left = 530
+    Left = 538
     Top = 198
   end
   object SaveDialog1: TSaveDialog
@@ -1019,7 +1018,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800480110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F0078004C0110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
@@ -2609,5 +2608,9 @@ object FrmMain: TFrmMain
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
+  end
+  object SynCppSyn1: TSynCppSyn
+    Left = 599
+    Top = 195
   end
 end

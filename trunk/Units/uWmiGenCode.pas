@@ -27,7 +27,7 @@ uses
   Classes;
 
 type
-  TSourceLanguages = (Lng_Delphi, Lng_FPC, Lng_Oxygen);
+  TSourceLanguages = (Lng_Delphi, Lng_FPC, Lng_Oxygen, Lng_BorlandCpp);
   TWmiCode        =  (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
 
   TWmiCodeGenerator=class
@@ -68,26 +68,26 @@ const
   sTemplateTemplateFuncts = 'TemplateHelperFunctions.pas';
 
   ListSourceLanguages: array[TSourceLanguages] of
-    string = ('Delphi', 'Free Pascal', 'Delphi Prism');
+    string = ('Delphi', 'Free Pascal', 'Delphi Prism', 'Borland/Embarcadero C++');
 
   ListSourceTemplates: array[TSourceLanguages] of
     string = ('TemplateConsoleAppDelphi.pas', 'TemplateConsoleAppFPC.pas',
-    'TemplateConsoleAppOxygen.pas');
+    'TemplateConsoleAppOxygen.pas','TemplateConsoleAppBorlandCPP.cpp');
 
   ListSourceTemplatesSingleton: array[TSourceLanguages] of
     string = ('TemplateConsoleAppDelphiSingleton.pas', 'TemplateConsoleAppFPCSingleton.pas',
-    'TemplateConsoleAppOxygen.pas');
+    'TemplateConsoleAppOxygen.pas','');
 
   ListSourceTemplatesStaticInvoker: array[TSourceLanguages] of
     string = ('TemplateStaticMethodInvokerDelphi.pas', 'TemplateStaticMethodInvokerFPC.pas',
-    'TemplateStaticMethodInvokerOxygen.pas');
+    'TemplateStaticMethodInvokerOxygen.pas','');
 
   ListSourceTemplatesNonStaticInvoker: array[TSourceLanguages] of
     string = ('TemplateNonStaticMethodInvokerDelphi.pas',
-    'TemplateNonStaticMethodInvokerFPC.pas', 'TemplateNonStaticMethodInvokerOxygen.pas');
+    'TemplateNonStaticMethodInvokerFPC.pas', 'TemplateNonStaticMethodInvokerOxygen.pas','');
 
   ListSourceTemplatesEvents: array[TSourceLanguages] of
-    string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas');
+    string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas','');
 
   ListWmiCodeName  : array [TWmiCode] of string = ('Microsoft WMI Scripting Library - WbemScripting_TLB','Microsoft WMI Scripting Library - Late Binding', 'WMI COM API');
   ListWmiCodeDescr : array [TWmiCode] of string = ('Generate code using the Microsoft WMI Scripting Library using the WbemScripting_TLB unit',

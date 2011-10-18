@@ -30,7 +30,10 @@ uses
   uCheckUpdate in 'Units\uCheckUpdate.pas' {FrmCheckUpdate},
   uWinInet in 'Units\uWinInet.pas',
   uWmiClassTree in 'Units\uWmiClassTree.pas' {FrmWmiClassTree},
-  uPropValueList in 'Units\uPropValueList.pas' {FrmValueList};
+  uPropValueList in 'Units\uPropValueList.pas' {FrmValueList},
+  uWmiBorlandCppCode in 'Units\uWmiBorlandCppCode.pas',
+  uBorlandCppVersions in 'Units\uBorlandCppVersions.pas',
+  uBorlandCppIDE in 'Units\uBorlandCppIDE.pas';
 
 {$R *.res}
 
