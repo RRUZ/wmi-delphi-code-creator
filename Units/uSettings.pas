@@ -132,6 +132,7 @@ uses
   GraphUtil,
   uDelphiVersions,
   SynHighlighterPas,
+  SynHighlighterCpp,
   SynEditHighlighter,
   StrUtils,
   IOUtils,
@@ -248,6 +249,8 @@ procedure RefreshSynPasHighlighter(FCurrentTheme:TIDETheme;SynEdit: TSynEdit);
 var
   DelphiVer : TDelphiVersions;
 begin
+    if not (SynEdit.Highlighter is TSynPasSyn) then exit;
+
     DelphiVer := DelphiXE;
 
     RefreshSynEdit(FCurrentTheme, SynEdit);
@@ -268,6 +271,35 @@ begin
       SetSynAttr(FCurrentTheme, TIDEHighlightElements.Symbol, SymbolAttri,DelphiVer);
     end;
 end;
+
+procedure RefreshSynCppHighlighter(FCurrentTheme:TIDETheme;SynEdit: TSynEdit);
+var
+  DelphiVer : TDelphiVersions;
+begin
+    if not (SynEdit.Highlighter is TSynCppSyn) then exit;
+    DelphiVer := DelphiXE;
+
+    RefreshSynEdit(FCurrentTheme, SynEdit);
+
+    with TSynCppSyn(SynEdit.Highlighter) do
+    begin
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Assembler, AsmAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Character, CharAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Comment, CommentAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Preprocessor, DirecAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Float, FloatAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Hex, HexAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Identifier, IdentifierAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Preprocessor, InvalidAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.ReservedWord, KeyAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Number, NumberAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Number, OctalAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Whitespace, SpaceAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.String, StringAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Symbol, SymbolAttri,DelphiVer);
+    end;
+end;
+
 
 procedure ReadSettings(var Settings: TSettings);
 var
@@ -420,7 +452,10 @@ begin
   LoadThemeFromXMLFile(FCurrentTheme, FileName);
   for i := 0 to Form.ComponentCount-1 do
    if Form.Components[i] is TSynEdit then
+   begin
      RefreshSynPasHighlighter(FCurrentTheme,TSynEdit(Form.Components[i]));
+     RefreshSynCppHighlighter(FCurrentTheme,TSynEdit(Form.Components[i]));
+   end;
 end;
 
 

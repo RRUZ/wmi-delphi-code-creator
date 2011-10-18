@@ -28,7 +28,7 @@ uses
   Dialogs, StdCtrls, ImgList, ComCtrls;
 
 type
-  TCompilerType = (Ct_Delphi, Ct_Lazarus_FPC, Ct_Oxygene);
+  TCompilerType = (Ct_Delphi, Ct_Lazarus_FPC, Ct_Oxygene, Ct_BorlandCpp);
 
   TFrmSelCompilerVer = class(TForm)
     LabelText:    TLabel;
@@ -55,7 +55,7 @@ type
   end;
 
 const
-  ListCompilerType: array[TCompilerType] of string = ('Delphi', 'Lazarus', 'Oxygene');
+  ListCompilerType: array[TCompilerType] of string = ('Delphi', 'Lazarus', 'Oxygene', 'Borland/Embarcadero C++');
 
 implementation
 
@@ -66,6 +66,7 @@ uses
   uLazarusIDE,
   uDelphiIDE,
   uDelphiVersions,
+  uBorlandCppVersions,
   CommCtrl,
   ShellAPI,
   uDelphiPrismIDE;
@@ -114,10 +115,13 @@ procedure TFrmSelCompilerVer.LoadInstalledVersions;
 var
   item:     TListItem;
   DelphiComp: TDelphiVersions;
+  BorlandCppComp: TBorlandCppVersions;
   FileName: string;
   ImageIndex: integer;
+  RootKey: HKEY;
 begin
   case FCompilerType of
+
     Ct_Delphi:
     begin
       for DelphiComp :=
@@ -149,8 +153,32 @@ begin
             end;
 
           end;
+    end;
+
+    Ct_BorlandCpp:
+    begin
+      for BorlandCppComp :=Low(TBorlandCppVersions) to High(TBorlandCppVersions) do
+      begin
+        RootKey:=HKEY_CURRENT_USER;
+        if not (RegReadStr(BorlandCppRegPaths[BorlandCppComp],'App', FileName, RootKey) and FileExists(FileName)) then
+          RootKey:=HKEY_LOCAL_MACHINE;
+
+          if RegReadStr(BorlandCppRegPaths[BorlandCppComp],
+            'App', FileName, RootKey) and FileExists(FileName) then
+          begin
+            item := ListViewIDEs.Items.Add;
+            item.Caption := BorlandCppVersionsNames[BorlandCppComp];
+            item.SubItems.Add(FileName);
+            item.SubItems.Add(ExtractFilePath(FileName) + 'bcc32.exe');
+            ExtractIconFileToImageList(ImageList1, Filename);
+            ImageIndex := ImageList1.Count - 1;
+            item.ImageIndex := ImageIndex;
+            item.Data := Pointer(Ord(Ct_BorlandCpp));
+          end;
+      end;
 
     end;
+
     Ct_Lazarus_FPC:
     begin
       if IsLazarusInstalled then

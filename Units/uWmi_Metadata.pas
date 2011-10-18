@@ -37,7 +37,7 @@ Const
   wbemtypeSint8    = 'Sint8';
   wbemtypeUint8    = 'Uint8';
   wbemtypeSint16   = 'Sint16';
-  wbemtypeUint16   = 'Uint16';
+  wbemtypeUint16   = 'Uint16';  //uintVal
   wbemtypeSint32   = 'Sint32';
   wbemtypeUint32   = 'Uint32';
   wbemtypeSint64   = 'Sint64';
@@ -1253,11 +1253,13 @@ var
   oEnum         : IEnumvariant;
   iValue        : LongWord;
   Str           : string;
+  i             : Integer;
 begin
   Str:='';
   List.Clear;
   objWMIService := GetWMIObject(Format('winmgmts:\\%s\%s:%s',[wbemLocalhost,NameSpace,WmiClass]));
   colItems      := objWMIService.Properties_;
+
   oEnum         := IUnknown(colItems._NewEnum) as IEnumVariant;
   while oEnum.Next(1, colItem, iValue) = 0 do
   begin
@@ -1265,6 +1267,15 @@ begin
     colItem:=Unassigned;
   end;
   List.CommaText:=Str;
+
+  i:=0;
+  oEnum         := IUnknown(colItems._NewEnum) as IEnumVariant;
+  while oEnum.Next(1, colItem, iValue) = 0 do
+  begin
+    List.Objects[i]:=TObject(Integer(colItem.cimtype));
+    colItem:=Unassigned;
+    inc(i);
+  end;
 
   objWMIService :=Unassigned;
   colItems      :=Unassigned;

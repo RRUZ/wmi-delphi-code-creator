@@ -1,6 +1,6 @@
 {**************************************************************************************************}
 {                                                                                                  }
-{ Unit uDelphiIDE                                                                                  }
+{ Unit uBorlandCppIDE                                                                              }
 { Unit for the WMI Delphi Code Creator                                                             }
 {                                                                                                  }
 { The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
@@ -11,15 +11,14 @@
 { ANY KIND, either express or implied. See the License for the specific language governing rights  }
 { and limitations under the License.                                                               }
 {                                                                                                  }
-{ The Original Code is uDelphiIDE.pas.                                                             }
+{ The Original Code is uBorlandCppIDE.pas.                                                         }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
 { Portions created by Rodrigo Ruz V. are Copyright (C) 2011 Rodrigo Ruz V.                         }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
-
-unit uDelphiIDE;
+unit uBorlandCppIDE;
 
 interface
 
@@ -27,8 +26,8 @@ Uses
   Classes;
 
 
-function  CreateDelphiProject(const DestPath, SourcePath: string): boolean;
-procedure CompileAndRunDelphiCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
+function  CreateBorlandCppiProject(const DestPath, SourcePath: string): boolean;
+procedure CompileAndRunBorlandCppCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
 
 implementation
 
@@ -39,13 +38,13 @@ uses
   uMisc;
 
 
-procedure CompileAndRunDelphiCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
+procedure CompileAndRunBorlandCppCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
 var
   ExeFile: string;
 begin
   Console.Add('');
-  CaptureConsoleOutput(Format('"%s" -B -CC -NSsystem;vcl;Winapi;System.Win "%s"', [CompilerName,ProjectFile]), Console);
-  //CaptureConsoleOutput(Format('"%s" -B -CC "%s"', [CompilerName,ProjectFile]), Console);
+  //CaptureConsoleOutput(Format('"%s" -B -CC -NSsystem;vcl;Winapi;System.Win "%s"', [CompilerName,ProjectFile]), Console);
+  CaptureConsoleOutput(Format('"%s" -n"%s" "%s"', [CompilerName,ExcludeTrailingPathDelimiter(ExtractFilePath(ProjectFile)),ProjectFile]), Console);
   if Run then
   begin
     ExeFile := ChangeFileExt(ProjectFile, '.exe');
@@ -73,7 +72,7 @@ begin
 end;
 
 
-function CreateDelphiProject(const DestPath, SourcePath: string): boolean;
+function CreateBorlandCppiProject(const DestPath, SourcePath: string): boolean;
 begin
   Result := CopyDir(IncludeTrailingPathDelimiter(SourcePath) + '*.*', DestPath);
 end;

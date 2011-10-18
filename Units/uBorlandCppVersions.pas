@@ -1,7 +1,7 @@
 {**************************************************************************************************}
 {                                                                                                  }
-{ Unit uDelphiVersions                                                                             }
-{ unit retrieves the delphi ide installed versions  for the Delphi IDE Theme Editor                }
+{ Unit uBorlandCppVersions                                                                         }
+{ unit retrieves the Borland/Embaradero cpp ide installed versions for the WMI Delphi Code Creator }
 {                                                                                                  }
 { The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
 { you may not use this file except in compliance with the License. You may obtain a copy of the    }
@@ -11,7 +11,7 @@
 { ANY KIND, either express or implied. See the License for the specific language governing rights  }
 { and limitations under the License.                                                               }
 {                                                                                                  }
-{ The Original Code is uDelphiVersions.pas.                                                        }
+{ The Original Code is uBorlandCppVersions.pas.                                                    }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
 { Portions created by Rodrigo Ruz V. are Copyright (C) 2011 Rodrigo Ruz V.                         }
@@ -19,7 +19,7 @@
 {                                                                                                  }
 {**************************************************************************************************}
 
-unit uDelphiVersions;
+unit uBorlandCppVersions;
 
 interface
 
@@ -32,76 +32,46 @@ uses
 {$DEFINE OLDEVERSIONS_SUPPORT}
 
 type
-  TDelphiVersions =
+  TBorlandCppVersions =
     (
   {$IFDEF OLDEVERSIONS_SUPPORT}
-    Delphi5,
-    Delphi6,
+    BorlandCpp5,
   {$ENDIF}
-    Delphi7,
-    Delphi8,
-    Delphi2005,
-    Delphi2006,
-    Delphi2007,
-    Delphi2009,
-    Delphi2010,
-    DelphiXE,
-    DelphiXE2
+    BorlandCpp6,
+    BorlandCppX,
+    BorlandCpp2006,
+    BorlandCpp2007,
+    BorlandCpp2009,
+    BorlandCpp2010,
+    BorlandCppXE,
+    BorlandCppXE2
     );
 
 
 const
   {$IFDEF OLDEVERSIONS_SUPPORT}
-  DelphiOldVersions = 2;
-  DelphiOldVersionNumbers: array[0..DelphiOldVersions-1] of TDelphiVersions =(Delphi5,Delphi6);
+  BorlandCppOldVersions = 1;
+  BorlandCppOldVersionNumbers: array[0..BorlandCppOldVersions-1] of TBorlandCppVersions =(BorlandCpp5);
 
-  DelphiOldColorsCount =16;
+  BorlandCppOldColorsCount =16;
 
 
-{ BGR
-Color0=$000000
-Color1=$000080
-Color2=$008000
-Color3=$008080
-Color4=$800000
-Color5=$800080
-Color6=$808000
-Color7=$C0C0C0
-Color8=$808080
-Color9=$0000FF
-Color10=$00FF00
-Color11=$00FFFF
-Color12=$FF0000
-Color13=$FF00FF
-Color14=$FFFF00
-Color15=$FFFFFF
-}
-  DelphiOldColorsList: array[0..DelphiOldColorsCount-1] of TColor =
+  BorlandCppOldColorsList: array[0..BorlandCppOldColorsCount-1] of TColor =
   (
     $000000,$000080,$008000,$008080,
     $800000,$800080,$808000,$C0C0C0,
     $808080,$0000FF,$00FF00,$00FFFF,
     $FF0000,$FF00FF,$FFFF00,$FFFFFF
   )
-     {
-  (
-    $000000,$800000,$008000,$808000,
-    $000080,$800080,$008080,$C0C0C0,
-    $808080,$FF0000,$00FF00,$FFFF00,
-    $0000FF,$FF00FF,$00FFFF,$FFFFFF
-  )
-   }
   ;
   {$ENDIF}
 
-  DelphiVersionsNames: array[TDelphiVersions] of string = (
+  BorlandCppVersionsNames: array[TBorlandCppVersions] of string = (
   {$IFDEF OLDEVERSIONS_SUPPORT}
-    'Delphi 5',
-    'Delphi 6',
+    'C++ Builder 5',
   {$ENDIF}
-    'Delphi 7',
-    'Delphi 8',
-    'BDS 2005',
+    'C++ Builder 6',
+    'C++ Builder X',
     'BDS 2006',
     'RAD Studio 2007',
     'RAD Studio 2009',
@@ -110,34 +80,30 @@ Color15=$FFFFFF
     'RAD Studio XE2'
     );
 
-  DelphiVersionNumbers: array[TDelphiVersions] of double =
+  BorlandCppVersionNumbers: array[TBorlandCppVersions] of double =
     (
   {$IFDEF OLDEVERSIONS_SUPPORT}
-    13,      // 'Delphi 5',
-    14,      // 'Delphi 6',
+    5,
   {$ENDIF}
-    15,      // 'Delphi 7',
-    16,      // 'Delphi 8',
-    17,      // 'BDS 2005',
-    18,      // 'BDS 2006',
-    18.5,    // 'RAD Studio 2007',
-    20,      // 'RAD Studio 2009',
-    21,      // 'RAD Studio 2010',
-    22,      // 'RAD Studio XE'
-    23       // 'RAD Studio XE2'
+    6,
+    7,
+    10,
+    11,
+    12,
+    14,
+    15,
+    16
     );
 
 
 
-  DelphiRegPaths: array[TDelphiVersions] of string = (
+  BorlandCppRegPaths: array[TBorlandCppVersions] of string = (
   {$IFDEF OLDEVERSIONS_SUPPORT}
-    '\Software\Borland\Delphi\5.0',
-    '\Software\Borland\Delphi\6.0',
+    '\Software\Borland\C++Builder\5.0',
   {$ENDIF}
-    '\Software\Borland\Delphi\7.0',
-    '\Software\Borland\BDS\2.0',
-    '\Software\Borland\BDS\3.0', //2005
-    '\Software\Borland\BDS\4.0',
+    '\Software\Borland\C++Builder\6.0',
+    '\Software\Borland\C++Builder\X',
+    '\Software\Borland\BDS\4.0', //2006
     '\Software\Borland\BDS\5.0',
     '\Software\CodeGear\BDS\6.0',
     '\Software\CodeGear\BDS\7.0',
@@ -146,27 +112,14 @@ Color15=$FFFFFF
     );
 
 
-procedure FillListViewDelphiVersions(ListView: TListView);
-function IsDelphiIDERunning(const DelphiIDEPath: TFileName): boolean;
+procedure FillListViewBorlandCppVersions(ListView: TListView);
+function IsBorlandCppIDERunning(const BorlandCppIDEPath: TFileName): boolean;
 {$IFDEF OLDEVERSIONS_SUPPORT}
-function DelphiIsOldVersion(DelphiVersion:TDelphiVersions) : Boolean;
+function BorlandCppIsOldVersion(DelphiVersion:TBorlandCppVersions) : Boolean;
 function GetIndexClosestColor(AColor:TColor) : Integer;
 {$ENDIF}
 
-function GetDelphiVersionMappedColor(AColor:TColor;DelphiVersion:TDelphiVersions) : TColor;
-
-{
-
-[HKEY_CURRENT_USER\Software\Embarcadero\BDS\8.0\Editor\Highlight\Attribute Names]
-"Bold"="False"
-"Italic"="False"
-"Underline"="False"
-"Default Foreground"="False"
-"Default Background"="False"
-"Foreground Color New"="$00DE4841"
-"Background Color New"="$00272727"
-}
-
+function GetBorlandCppVersionMappedColor(AColor:TColor;BorlandCppVersion:TBorlandCppVersions) : TColor;
 
 
 implementation
@@ -183,13 +136,13 @@ uses
   Registry;
 
 {$IFDEF OLDEVERSIONS_SUPPORT}
-function DelphiIsOldVersion(DelphiVersion:TDelphiVersions) : Boolean;
+function BorlandCppIsOldVersion(DelphiVersion:TBorlandCppVersions) : Boolean;
 var
  i  : integer;
 begin
  Result:=False;
-  for i:=0  to DelphiOldVersions-1 do
-    if DelphiVersion=DelphiOldVersionNumbers[i] then
+  for i:=0  to BorlandCppOldVersions-1 do
+    if DelphiVersion=BorlandCppOldVersionNumbers[i] then
     begin
        Result:=True;
        exit;
@@ -207,11 +160,11 @@ begin
   G1 := GetGValue(AColor);
   B1 := GetBValue(AColor);
 
-    for i := 0 to DelphiOldColorsCount-1 do
+    for i := 0 to BorlandCppOldColorsCount-1 do
     begin
-      R2 := GetRValue(DelphiOldColorsList[i]);
-      G2 := GetGValue(DelphiOldColorsList[i]);
-      B2 := GetBValue(DelphiOldColorsList[i]);
+      R2 := GetRValue(BorlandCppOldColorsList[i]);
+      G2 := GetGValue(BorlandCppOldColorsList[i]);
+      B2 := GetBValue(BorlandCppOldColorsList[i]);
       SqrDist := Sqrt(SQR(R1 - R2) + SQR(G1 - G2) + SQR(B1 - B2));
       if SqrDist < SmallSqrDist then
       begin
@@ -224,12 +177,12 @@ end;
 {$ENDIF}
 
 
-function GetDelphiVersionMappedColor(AColor:TColor;DelphiVersion:TDelphiVersions) : TColor;
+function GetBorlandCppVersionMappedColor(AColor:TColor;BorlandCppVersion:TBorlandCppVersions) : TColor;
 begin
  Result:=AColor;
 {$IFDEF OLDEVERSIONS_SUPPORT}
-  if DelphiIsOldVersion(DelphiVersion) then
-  Result:= DelphiOldColorsList[GetIndexClosestColor(AColor)];
+  if BorlandCppIsOldVersion(BorlandCppVersion) then
+  Result:= BorlandCppOldColorsList[GetIndexClosestColor(AColor)];
 {$ENDIF}
 end;
 
@@ -252,7 +205,7 @@ begin
     end;
 end;
 
-function IsDelphiIDERunning(const DelphiIDEPath: TFileName): boolean;
+function IsBorlandCppIDERunning(const BorlandCppIDEPath: TFileName): boolean;
 var
   HandleSnapShot : Cardinal;
   EntryParentProc: TProcessEntry32;
@@ -265,8 +218,8 @@ begin
     EntryParentProc.dwSize := SizeOf(EntryParentProc);
     if Process32First(HandleSnapShot, EntryParentProc) then
       repeat
-        if CompareText(ExtractFileName(DelphiIDEPath), EntryParentProc.szExeFile) = 0 then
-          if CompareText(ProcessFileName(EntryParentProc.th32ProcessID),  DelphiIDEPath) = 0 then
+        if CompareText(ExtractFileName(BorlandCppIDEPath), EntryParentProc.szExeFile) = 0 then
+          if CompareText(ProcessFileName(EntryParentProc.th32ProcessID),  BorlandCppIDEPath) = 0 then
           begin
             Result := True;
             break;
@@ -294,26 +247,26 @@ begin
   end;
 end;
 
-procedure FillListViewDelphiVersions(ListView: TListView);
+procedure FillListViewBorlandCppVersions(ListView: TListView);
 var
-  DelphiComp: TDelphiVersions;
+  BorlandCppComp: TBorlandCppVersions;
   FileName: string;
   Found: boolean;
   Item: TListItem;
 begin
-  for DelphiComp := Low(TDelphiVersions) to High(TDelphiVersions) do
+  for BorlandCppComp := Low(TBorlandCppVersions) to High(TBorlandCppVersions) do
   begin
-    Found := RegKeyExists(DelphiRegPaths[DelphiComp], HKEY_CURRENT_USER);
+    Found := RegKeyExists(BorlandCppRegPaths[BorlandCppComp], HKEY_CURRENT_USER);
     if Found then
-      Found := RegReadStr(DelphiRegPaths[DelphiComp], 'App', FileName,
+      Found := RegReadStr(BorlandCppRegPaths[BorlandCppComp], 'App', FileName,
         HKEY_CURRENT_USER) and
         FileExists(FileName);
 
     if not Found then
     begin
-      Found := RegKeyExists(DelphiRegPaths[DelphiComp], HKEY_LOCAL_MACHINE);
+      Found := RegKeyExists(BorlandCppRegPaths[BorlandCppComp], HKEY_LOCAL_MACHINE);
       if Found then
-        Found := RegReadStr(DelphiRegPaths[DelphiComp], 'App', FileName,
+        Found := RegReadStr(BorlandCppRegPaths[BorlandCppComp], 'App', FileName,
           HKEY_LOCAL_MACHINE) and FileExists(FileName);
     end;
 
@@ -322,9 +275,9 @@ begin
       ExtractIconFileToImageList(ListView.SmallImages, Filename);
       Item := ListView.Items.Add;
       Item.ImageIndex := ListView.SmallImages.Count - 1;
-      Item.Caption := DelphiVersionsNames[DelphiComp];
+      Item.Caption := BorlandCppVersionsNames[BorlandCppComp];
       item.SubItems.Add(FileName);
-      Item.Data := Pointer(Ord(DelphiComp));
+      Item.Data := Pointer(Ord(BorlandCppComp));
     end;
   end;
 end;
