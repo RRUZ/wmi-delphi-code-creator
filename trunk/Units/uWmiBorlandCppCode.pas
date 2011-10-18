@@ -81,7 +81,6 @@ var
   Descr: string;
   DynCode: TStrings;
   i:   integer;
-  Len: integer;
   Padding: string;
   TemplateCode : string;
   eWmiNameSpace: string;
@@ -103,68 +102,6 @@ begin
     eWmiNameSpace:=StringReplace(WmiNameSpace,'\','\\', [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiNameSpace, eWmiNameSpace, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
-
-
-    Len := GetMaxLengthItemName(Props) + 3;
-
-
-
-		//hr = pclsObj->Get(L"Name", 0, &vtProp, 0, 0);
-		//if (!FAILED(hr))
-		//{
-		//wcout << "Name : " << vtProp.bstrVal << endl;
-		//}
-		//VariantClear(&vtProp);
-
-
-        {
-        LONGLONG llVal;
-        LONG lVal;
-        BYTE bVal;
-        SHORT iVal;
-        FLOAT fltVal;
-        DOUBLE dblVal;
-        VARIANT_BOOL boolVal;
-        SCODE scode;
-        CY cyVal;
-        DATE date;
-        wireBSTR bstrVal;
-        IUnknown *punkVal;
-        IDispatch *pdispVal;
-        wirePSAFEARRAY parray;
-        wireBRECORD brecVal;
-        BYTE *pbVal;
-        SHORT *piVal;
-        LONG *plVal;
-        LONGLONG *pllVal;
-        FLOAT *pfltVal;
-        DOUBLE *pdblVal;
-        VARIANT_BOOL *pboolVal;
-        SCODE *pscode;
-        CY *pcyVal;
-        DATE *pdate;
-        wireBSTR *pbstrVal;
-        IUnknown **ppunkVal;
-        IDispatch **ppdispVal;
-        wirePSAFEARRAY *pparray;
-        wireVARIANT *pvarVal;
-        CHAR cVal;
-        USHORT uiVal;
-        ULONG ulVal;
-        ULONGLONG ullVal;
-        INT intVal;
-        UINT uintVal;
-        DECIMAL decVal;
-        DECIMAL *pdecVal;
-        CHAR *pcVal;
-        USHORT *puiVal;
-        ULONG *pulVal;
-        ULONGLONG *pullVal;
-        INT *pintVal;
-        UINT *puintVal;
-         /* Empty union arm */
-         /* Empty union arm */
-        } 	;
 
     if Props.Count > 0 then
       for i := 0 to Props.Count - 1 do

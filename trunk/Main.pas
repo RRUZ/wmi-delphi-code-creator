@@ -1765,6 +1765,22 @@ begin
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
 
+          Ct_BorlandCpp:
+          begin
+            FileName :=
+              FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.cpp';
+            if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
+              SynEditWMIClassCode.Lines.SaveToFile(FileName)
+            else
+            if PageControlCodeGen.ActivePage = TabSheetMethods then
+              SynEditDelphiCodeInvoke.Lines.SaveToFile(FileName)
+            else
+            if PageControlCodeGen.ActivePage = TabSheetEvents then
+              SynEditEventCode.Lines.SaveToFile(FileName);
+              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
+          end;
+
+
           Ct_Lazarus_FPC:
           begin
             FileName :=
