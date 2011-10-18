@@ -15,6 +15,7 @@
 #include <iostream>
 using namespace std;
 #include <wbemcli.h>
+#include <comdef.h> 
 
 //CREDENTIAL structure
 //http://msdn.microsoft.com/en-us/library/windows/desktop/aa374788%28v=vs.85%29.aspx
@@ -27,7 +28,6 @@ using namespace std;
 #pragma argsused
 int main(int argc, char* argv[])
 {
-	HRESULT hres;
 	wchar_t pszName[CREDUI_MAX_USERNAME_LENGTH+1] = L"user";
 	wchar_t pszPwd[CREDUI_MAX_PASSWORD_LENGTH+1]  = L"password";
 	BSTR strNetworkResource;
@@ -38,25 +38,22 @@ int main(int argc, char* argv[])
 	COAUTHIDENTITY *userAcct =  NULL ;
 	COAUTHIDENTITY authIdent;
 
-	// Step 1: --------------------------------------------------
 	// Initialize COM. ------------------------------------------
 
+	HRESULT hres;
 	hres =  CoInitializeEx(0, COINIT_MULTITHREADED);
 	if (FAILED(hres))
 	{
-		cout << "Failed to initialize COM library. Error code = 0x"	<< hex << hres << endl;
-		return 1;                  // Program has failed.
+        cout << "Failed to initialize COM library. Error code = 0x"	<< hex << hres << endl;
+        cout << _com_error(hres).ErrorMessage() << endl;
+        cout << "press enter to exit" << endl;
+        cin.get();		
+        return 1;                  // Program has failed.
 	}
 
-	// Step 2: --------------------------------------------------
 	// Set general COM security levels --------------------------
-	// Note: If you are using Windows 2000, you need to specify -
-	// the default authentication credentials for a user by using
-	// a SOLE_AUTHENTICATION_LIST structure in the pAuthList ----
-	// parameter of CoInitializeSecurity ------------------------
 
 	if (localconn)
-	{
 		hres =  CoInitializeSecurity(
 			NULL,
 			-1,                          // COM authentication
@@ -68,9 +65,7 @@ int main(int argc, char* argv[])
 			EOAC_NONE,                   // Additional capabilities
 			NULL                         // Reserved
 			);
-	}
 	else
-	{
 		hres =  CoInitializeSecurity(
 			NULL,
 			-1,                          // COM authentication
@@ -82,17 +77,17 @@ int main(int argc, char* argv[])
 			EOAC_NONE,                   // Additional capabilities
 			NULL                         // Reserved
 			);
-
-	}
-
+			
 	if (FAILED(hres))
 	{
-		cout << "Failed to initialize security. Error code = 0x" << hex << hres << endl;
-		CoUninitialize();
-		return 1;                    // Program has failed.
+        cout << "Failed to initialize security. Error code = 0x" << hex << hres << endl;
+        cout << _com_error(hres).ErrorMessage() << endl;
+        CoUninitialize();
+		cout << "press enter to exit" << endl;
+	    cin.get();		
+        return 1;                    // Program has failed.
 	}
 
-    // Step 3: ---------------------------------------------------
 	// Obtain the initial locator to WMI -------------------------
 
 	IWbemLocator *pLoc = NULL;
@@ -100,12 +95,14 @@ int main(int argc, char* argv[])
 
 	if (FAILED(hres))
 	{
-		cout << "Failed to create IWbemLocator object."	<< " Err code = 0x" << hex << hres << endl;
-		CoUninitialize();
-		return 1;                 // Program has failed.
+        cout << "Failed to create IWbemLocator object."	<< " Err code = 0x" << hex << hres << endl;
+        cout << _com_error(hres).ErrorMessage() << endl;
+        CoUninitialize();	    
+        cout << "press enter to exit" << endl;
+		cin.get();		
+        return 1;                 // Program has failed.
 	}
 
-	// Step 4: -----------------------------------------------------
 	// Connect to WMI through the IWbemLocator::ConnectServer method
 
 	IWbemServices *pSvc = NULL;
@@ -133,23 +130,21 @@ int main(int argc, char* argv[])
 			&pSvc                // IWbemServices proxy
 			);
 
-
-
 	if (FAILED(hres))
 	{
-		cout << "Could not connect. Error code = 0x" << hex << hres << endl;
-		pLoc->Release();
-		CoUninitialize();
-		return 1;                // Program has failed.
+        cout << "Could not connect. Error code = 0x" << hex << hres << endl;	
+        cout << _com_error(hres).ErrorMessage() << endl;
+        pLoc->Release();
+        CoUninitialize();
+	    cout << "press enter to exit" << endl;
+	    cin.get();			
+        return 1;                // Program has failed.
 	}
 
 	cout << "Connected to [WMINAMESPACE] WMI namespace" << endl;
 
-
-	// Step 5: --------------------------------------------------
-
+    // Set security levels on the proxy -------------------------
 	if (localconn)
-		// Set security levels on the proxy -------------------------
 		hres = CoSetProxyBlanket(
 		   pSvc,                        // Indicates the proxy to set
 		   RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
@@ -162,7 +157,6 @@ int main(int argc, char* argv[])
 		);
 	else
 	{
-
 		// Create COAUTHIDENTITY that can be used for setting security on proxy
 		memset(&authIdent, 0, sizeof(COAUTHIDENTITY));
 		authIdent.PasswordLength = wcslen (pszPwd);
@@ -174,7 +168,6 @@ int main(int argc, char* argv[])
 		authIdent.Flags = SEC_WINNT_AUTH_IDENTITY_UNICODE;
 		userAcct = &authIdent;
 
-		// Set security levels on a WMI connection ------------------
 		hres = CoSetProxyBlanket(
 		   pSvc,                           // Indicates the proxy to set
 		   RPC_C_AUTHN_DEFAULT,            // RPC_C_AUTHN_xxx
@@ -189,14 +182,16 @@ int main(int argc, char* argv[])
 
 	if (FAILED(hres))
 	{
-		cout << "Could not set proxy blanket. Error code = 0x" << hex << hres << endl;
+        cout << "Could not set proxy blanket. Error code = 0x" << hex << hres << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;
 		pSvc->Release();
 		pLoc->Release();
 		CoUninitialize();
+		cout << "press enter to exit" << endl;
+		cin.get();		
 		return 1;               // Program has failed.
 	}
 
-	// Step 6: --------------------------------------------------
 	// Use the IWbemServices pointer to make requests of WMI ----
 
 	IEnumWbemClassObject* pEnumerator = NULL;
@@ -205,17 +200,20 @@ int main(int argc, char* argv[])
 
 	if (FAILED(hres))
 	{
-		cout << "WQL Sentence failed." << " Error code = 0x"	<< hex << hres << endl;
+		cout << "ExecQuery failed" << " Error code = 0x"	<< hex << hres << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;
 		pSvc->Release();
 		pLoc->Release();
 		CoUninitialize();
+		cout << "press enter to exit" << endl;
+		cin.get();		
 		return 1;               // Program has failed.
 	}
-
-
+    
+	// Secure the enumerator proxy
 	if (!localconn)
 	{
-		// Secure the enumerator proxy
+		
 		hres = CoSetProxyBlanket(
 			pEnumerator,                    // Indicates the proxy to set
 			RPC_C_AUTHN_DEFAULT,            // RPC_C_AUTHN_xxx
@@ -230,17 +228,18 @@ int main(int argc, char* argv[])
 		if (FAILED(hres))
 		{
 			cout << "Could not set proxy blanket on enumerator. Error code = 0x" << hex << hres << endl;
+			cout << _com_error(hres).ErrorMessage() << endl;
 			pEnumerator->Release();
 			pSvc->Release();
 			pLoc->Release();
 			CoUninitialize();
+			cout << "press enter to exit" << endl;
+			cin.get();				
 			return 1;               // Program has failed.
 		}
 	}
 
-	// Step 7: -------------------------------------------------
-	// Get the data from the query in step 6 -------------------
-
+	// Get the data from the WQL sentence
 	IWbemClassObject *pclsObj = NULL;
 	ULONG uReturn = 0;
 
@@ -249,31 +248,25 @@ int main(int argc, char* argv[])
 		HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
 
 		if(0 == uReturn || FAILED(hr))
-		{
-			break;
-		}
+		  break;
 
 		VARIANT vtProp;
 
 [CPPCODE]		
-
 		pclsObj->Release();
 		pclsObj=NULL;
 	}
 
 	// Cleanup
-	// ========
 
 	pSvc->Release();
 	pLoc->Release();
 	pEnumerator->Release();
 	if (pclsObj!=NULL)
-	{
 	 pclsObj->Release();
-	}
 
 	CoUninitialize();
-	cout << "press any key to exit" << endl;
+	cout << "press enter to exit" << endl;
 	cin.get();
 	return 0;   // Program successfully completed.
 }
