@@ -1728,7 +1728,7 @@ begin
       begin
         //Str:=Str+Format('%s=%s, ',[VarStrNull(colItem.Name),CIMTypeStr(colItem.CIMType)]);
         ParamsList.Add(VarStrNull(colItem.Name));
-        ParamsTypes.Add(CIMTypeStr(colItem.CIMType));
+        ParamsTypes.AddObject(CIMTypeStr(colItem.CIMType), TObject(Integer(colItem.CIMType)));
         ParamsDescr.Add('');
 
           oEnumQualif :=  IUnknown(colItem.Qualifiers_._NewEnum) as IEnumVariant;
@@ -1838,7 +1838,7 @@ begin
        begin
         //Str:=Str+Format('%s=%s, ',[VarStrNull(colItem.Name),CIMTypeStr(colItem.CIMType)]);
         ParamsList.Add(VarStrNull(colItem.Name));
-        ParamsTypes.Add(CIMTypeStr(colItem.CIMType));
+        ParamsTypes.AddObject(CIMTypeStr(colItem.CIMType),TObject(Integer(colItem.CIMType)));
         ParamsDescr.Add('');
 
           oEnumQualif :=  IUnknown(colItem.Qualifiers_._NewEnum) as IEnumVariant;

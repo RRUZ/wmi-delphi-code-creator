@@ -102,7 +102,7 @@ type
     Splitter5: TSplitter;
     Panel3:    TPanel;
     PageControl1: TPageControl;
-    TabSheet2: TTabSheet;
+    TabSheetWmiMethodCode: TTabSheet;
     ListViewProperties: TListView;
     MemoMethodDescr: TMemo;
     TabSheetCodeGen: TTabSheet;
@@ -132,7 +132,7 @@ type
     ButtonGetValues: TButton;
     ButtonGenerateCodeInvoker: TButton;
     ButtonGenerateEventCode: TButton;
-    SynEditDelphiCodeInvoke: TSynEdit;
+    SynEditWMIMethodCode: TSynEdit;
     SynEditEventCode: TSynEdit;
     PanelLanguageSet: TPanel;
     ComboBoxLanguageSel: TComboBox;
@@ -336,12 +336,20 @@ procedure TFrmMain.ComboBoxLanguageSelChange(Sender: TObject);
 begin
 
   if TSourceLanguages(ComboBoxLanguageSel.ItemIndex)=Lng_BorlandCpp then
-    SynEditWMIClassCode.Highlighter:=SynCppSyn1
+  begin
+    SynEditWMIClassCode.Highlighter:=SynCppSyn1;
+    SynEditWMIMethodCode.Highlighter:=SynCppSyn1;
+  end
   else
+  begin
     SynEditWMIClassCode.Highlighter:=SynPasSyn1;
+    SynEditWMIMethodCode.Highlighter:=SynPasSyn1;
+  end;
 
   LoadCurrentTheme(Self,Settings.CurrentTheme);
+
   TabSheetWmiClassCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
+  TabSheetWmiMethodCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
 
 
   GenerateConsoleCode;
@@ -705,6 +713,7 @@ var
   DelphiWmiCodeGenerator : TDelphiWmiMethodCodeGenerator;
   FPCWmiCodeGenerator : TFPCWmiMethodCodeGenerator;
   OxygenWmiCodeGenerator : TOxygenWmiMethodCodeGenerator;
+  BorlandCppWmiCodeGenerator : TBorlandCppWmiMethodCodeGenerator;
 begin
   if (ComboBoxClassesMethods.Text = '') or (ComboBoxMethods.Text = '') then
     exit;
@@ -723,7 +732,7 @@ begin
       Str := Str + Format('%s=%s, ', [ListViewMethodsParams.Items[i].Caption,
         ListViewMethodsParams.Items[i].SubItems[0]]);
       if ListViewMethodsParams.Items[i].Checked then
-        Values.Add(ListViewMethodsParams.Items[i].SubItems[1])
+        Values.AddObject(ListViewMethodsParams.Items[i].SubItems[1],ListViewMethodsParams.Items[i].Data)
       else
         Values.Add(WbemEmptyParam);
     end;
@@ -742,10 +751,28 @@ begin
                     DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     DelphiWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     DelphiWmiCodeGenerator.GenerateCode(Params, Values);
-                    SynEditDelphiCodeInvoke.Lines.Clear;
-                    SynEditDelphiCodeInvoke.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
+                    SynEditWMIMethodCode.Lines.Clear;
+                    SynEditWMIMethodCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
                   finally
                     DelphiWmiCodeGenerator.Free;
+                  end;
+                 end;
+
+      Lng_BorlandCpp:
+                 begin
+                  BorlandCppWmiCodeGenerator :=TBorlandCppWmiMethodCodeGenerator.Create;
+                  try
+                    BorlandCppWmiCodeGenerator.WmiNameSpace:=Namespace;
+                    BorlandCppWmiCodeGenerator.WmiClass:=WmiClass;
+                    BorlandCppWmiCodeGenerator.WmiMethod:=WmiMethod;
+                    BorlandCppWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
+                    BorlandCppWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                    BorlandCppWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
+                    BorlandCppWmiCodeGenerator.GenerateCode(Params, Values);
+                    SynEditWMIMethodCode.Lines.Clear;
+                    SynEditWMIMethodCode.Lines.AddStrings(BorlandCppWmiCodeGenerator.OutPutCode);
+                  finally
+                    BorlandCppWmiCodeGenerator.Free;
                   end;
                  end;
 
@@ -760,8 +787,8 @@ begin
                     FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     FPCWmiCodeGenerator.GenerateCode(Params, Values);
-                    SynEditDelphiCodeInvoke.Lines.Clear;
-                    SynEditDelphiCodeInvoke.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                    SynEditWMIMethodCode.Lines.Clear;
+                    SynEditWMIMethodCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
                   finally
                     FPCWmiCodeGenerator.Free;
                   end;
@@ -778,8 +805,8 @@ begin
                     OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     OxygenWmiCodeGenerator.GenerateCode(Params, Values);
-                    SynEditDelphiCodeInvoke.Lines.Clear;
-                    SynEditDelphiCodeInvoke.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                    SynEditWMIMethodCode.Lines.Clear;
+                    SynEditWMIMethodCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
                   finally
                     OxygenWmiCodeGenerator.Free;
                   end;
@@ -787,9 +814,9 @@ begin
     end;
 
 
-    SynEditDelphiCodeInvoke.SelStart  := SynEditDelphiCodeInvoke.GetTextLen;
-    SynEditDelphiCodeInvoke.SelLength := 0;
-    SendMessage(SynEditDelphiCodeInvoke.Handle, EM_SCROLLCARET, 0, 0);
+    SynEditWMIMethodCode.SelStart  := SynEditWMIMethodCode.GetTextLen;
+    SynEditWMIMethodCode.SelLength := 0;
+    SendMessage(SynEditWMIMethodCode.Handle, EM_SCROLLCARET, 0, 0);
   finally
     Params.Free;
     Values.Free;
@@ -1154,6 +1181,7 @@ begin
     begin
       Item := ListViewMethodsParams.Items.Add;
       Item.Caption := ParamsList[i];
+      Item.Data:=ParamsTypes.Objects[i];
       Item.SubItems.Add(ParamsTypes[i]);
       Item.SubItems.Add(GetDefaultValueWmiType(ParamsTypes[i]));
     end;
@@ -1626,7 +1654,7 @@ begin
               SynEditWMIClassCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditDelphiCodeInvoke.Lines.SaveToFile(FileName)
+              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
               SynEditEventCode.Lines.SaveToFile(FileName);
@@ -1649,7 +1677,7 @@ begin
               SynEditWMIClassCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditDelphiCodeInvoke.Lines.SaveToFile(FileName)
+              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
               SynEditEventCode.Lines.SaveToFile(FileName);
@@ -1675,7 +1703,7 @@ begin
               SynEditWMIClassCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditDelphiCodeInvoke.Lines.SaveToFile(FileName)
+              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
               SynEditEventCode.Lines.SaveToFile(FileName);
@@ -1699,7 +1727,7 @@ begin
               SynEditWMIClassCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditDelphiCodeInvoke.Lines.SaveToFile(FileName)
+              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
               SynEditEventCode.Lines.SaveToFile(FileName);
@@ -1758,7 +1786,7 @@ begin
               SynEditWMIClassCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditDelphiCodeInvoke.Lines.SaveToFile(FileName)
+              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
               SynEditEventCode.Lines.SaveToFile(FileName);
@@ -1773,7 +1801,7 @@ begin
               SynEditWMIClassCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditDelphiCodeInvoke.Lines.SaveToFile(FileName)
+              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
               SynEditEventCode.Lines.SaveToFile(FileName);
@@ -1789,7 +1817,7 @@ begin
               SynEditWMIClassCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditDelphiCodeInvoke.Lines.SaveToFile(FileName)
+              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
               SynEditEventCode.Lines.SaveToFile(FileName);
@@ -1808,7 +1836,7 @@ begin
               SynEditWMIClassCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditDelphiCodeInvoke.Lines.SaveToFile(FileName)
+              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
               SynEditEventCode.Lines.SaveToFile(FileName);
@@ -1878,7 +1906,7 @@ begin
     SaveDialog1.FileName := 'InvokeWMI_Method.dpr';
     SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
     if SaveDialog1.Execute then
-      SynEditDelphiCodeInvoke.Lines.SaveToFile(SaveDialog1.FileName);
+      SynEditWMIMethodCode.Lines.SaveToFile(SaveDialog1.FileName);
   end
   else
   if PageControlCodeGen.ActivePage = TabSheetEvents then
