@@ -80,11 +80,11 @@ const
 
   ListSourceTemplatesStaticInvoker: array[TSourceLanguages] of
     string = ('TemplateStaticMethodInvokerDelphi.pas', 'TemplateStaticMethodInvokerFPC.pas',
-    'TemplateStaticMethodInvokerOxygen.pas','');
+    'TemplateStaticMethodInvokerOxygen.pas','TemplateStaticMethodInvokerBorlandCPP.cpp');
 
   ListSourceTemplatesNonStaticInvoker: array[TSourceLanguages] of
     string = ('TemplateNonStaticMethodInvokerDelphi.pas',
-    'TemplateNonStaticMethodInvokerFPC.pas', 'TemplateNonStaticMethodInvokerOxygen.pas','');
+    'TemplateNonStaticMethodInvokerFPC.pas', 'TemplateNonStaticMethodInvokerOxygen.pas','TemplateNonStaticMethodInvokerBorlandCPP.cpp');
 
   ListSourceTemplatesEvents: array[TSourceLanguages] of
     string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas','');
