@@ -353,7 +353,7 @@ function  SetIDEDefaultTheme(DelphiVersion:TDelphiVersions): Boolean;
   Delphi2010 RCDATA 2010.reg
   DelphiXE RCDATA XE.reg
  }
-  Result:=False;
+  //Result:=False;
   ResName  := GetEnumName(TypeInfo(TDelphiVersions),integer(DelphiVersion));
   FileName := ExtractFilePath(Paramstr(0))+'Dummy.reg';
   TFile.Delete(FileName);

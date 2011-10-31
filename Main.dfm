@@ -14,6 +14,7 @@ object FrmMain: TFrmMain
   OldCreateOrder = False
   Position = poScreenCenter
   OnActivate = FormActivate
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
@@ -175,10 +176,10 @@ object FrmMain: TFrmMain
                   TabOrder = 6
                 end
                 object ListViewProperties: TListView
-                  Left = 9
+                  Left = 12
                   Top = 192
                   Width = 295
-                  Height = 112
+                  Height = 108
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -199,7 +200,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 114
+                  ExplicitHeight = 110
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -362,7 +363,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 153
+                  Height = 149
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -386,7 +387,6 @@ object FrmMain: TFrmMain
                   TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewMethodsParamsClick
-                  ExplicitHeight = 155
                 end
                 object MemoMethodDescr: TMemo
                   Left = 11
@@ -409,14 +409,13 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 375
+                  Top = 371
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 8
                   OnClick = ButtonGenerateCodeInvokerClick
-                  ExplicitTop = 377
                 end
                 object ComboBoxPaths: TComboBox
                   Left = 103
@@ -458,10 +457,6 @@ object FrmMain: TFrmMain
                   TabOrder = 0
                   object TabSheetWmiMethodCode: TTabSheet
                     Caption = 'Code'
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object SynEditWMIMethodCode: TSynEdit
                       Left = 0
                       Top = 0
@@ -488,8 +483,6 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
-                      ExplicitLeft = -3
-                      ExplicitTop = 7
                     end
                   end
                 end
@@ -575,7 +568,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 101
+                  Height = 97
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -599,7 +592,6 @@ object FrmMain: TFrmMain
                   TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewEventsCondsClick
-                  ExplicitHeight = 103
                 end
                 object EditValueEvent: TEdit
                   Left = 88
@@ -673,14 +665,13 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 283
+                  Top = 279
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 9
                   OnClick = ButtonGenerateEventCodeClick
-                  ExplicitTop = 285
                 end
                 object RadioButtonIntrinsic: TRadioButton
                   Left = 5
@@ -718,17 +709,13 @@ object FrmMain: TFrmMain
                   Top = 5
                   Width = 551
                   Height = 394
-                  ActivePage = TabSheet1
+                  ActivePage = TabSheetWmiEventCode
                   Align = alClient
                   TabOrder = 0
                   ExplicitHeight = 402
-                  object TabSheet1: TTabSheet
+                  object TabSheetWmiEventCode: TTabSheet
                     Caption = 'Delphi Code'
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
-                    object SynEditEventCode: TSynEdit
+                    object SynEditWMIEventCode: TSynEdit
                       Left = 0
                       Top = 0
                       Width = 543
@@ -834,34 +821,18 @@ object FrmMain: TFrmMain
       object TabSheetWmiExplorer: TTabSheet
         Caption = 'Wmi Explorer'
         ImageIndex = 29
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object TabSheetTreeClasses: TTabSheet
         Caption = 'WMI Classes Tree'
         ImageIndex = 43
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object TabSheetWmiDatabase: TTabSheet
         Caption = 'WMI Database'
         ImageIndex = 31
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object TabSheet6: TTabSheet
         Caption = 'Log'
         ImageIndex = 28
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object MemoLog: TMemo
           Left = 0
           Top = 0
@@ -1046,7 +1017,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F0078005C0110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800640110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000

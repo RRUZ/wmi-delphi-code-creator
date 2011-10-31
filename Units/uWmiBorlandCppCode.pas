@@ -116,35 +116,58 @@ begin
     StrCode := StringReplace(StrCode, sTagWmiNameSpace, eWmiNameSpace, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
 
+
+    (*
+				hr = pclsObj->Get(L"TotalVirtualMemorySize", 0, &vtProp, 0, 0);// Uint64
+				if (!FAILED(hr))
+				{
+					if ((vtProp.vt==VT_NULL) || (vtProp.vt==VT_EMPTY))
+					  wcout << "TotalVirtualMemorySize : " << "NULL" << endl;
+					else
+					if ((vtProp.vt & VT_ARRAY))
+					  wcout << "TotalVirtualMemorySize : " << "Array types not supported (yet)" << endl;
+					else
+					  wcout << "TotalVirtualMemorySize : " << vtProp.uintVal << endl;
+				}
+				VariantClear(&vtProp);
+    *)
+
     if Props.Count > 0 then
       for i := 0 to Props.Count - 1 do
        begin
           DynCode.Add(Padding + Format('hr = pclsObj->Get(L"%s", 0, &vtProp, 0, 0);// %s',[Props.Names[i],Props.ValueFromIndex[i]]));
           DynCode.Add(Padding + 'if (!FAILED(hr))');
-          //DynCode.Add(Padding + '{');
+          DynCode.Add(Padding + '{');
+          DynCode.Add(Padding + '  if ((vtProp.vt==VT_NULL) || (vtProp.vt==VT_EMPTY))');
+          DynCode.Add(Padding + Format('    wcout << "%s : " << ((vtProp.vt==VT_NULL) ? "%s" : "%s") << endl;',[Props.Names[i],'NULL','EMPTY']));
+          DynCode.Add(Padding + '  else');
+          DynCode.Add(Padding + '  if ((vtProp.vt & VT_ARRAY))');
+          DynCode.Add(Padding + Format('    wcout << "%s : " << "%s" << endl;',[Props.Names[i],'Array types not supported (yet)']));
+          DynCode.Add(Padding + '  else');
+
 
           CimType:=Integer(Props.Objects[i]);
           case CimType of
-              wbemCimtypeSint8     : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.iVal   << endl;',[Props.Names[i]]));
-              wbemCimtypeUint8     : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.uiVal   << endl;',[Props.Names[i]]));
-              wbemCimtypeSint16    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.intVal << endl;',[Props.Names[i]]));
-              wbemCimtypeUint16    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.uintVal << endl;',[Props.Names[i]]));
-              wbemCimtypeSint32    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.intVal << endl;',[Props.Names[i]]));
-              wbemCimtypeUint32    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.uintVal << endl;',[Props.Names[i]]));
-              wbemCimtypeSint64    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.llVal << endl;',[Props.Names[i]]));
-              wbemCimtypeUint64    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.ullVal << endl;',[Props.Names[i]]));
-              wbemCimtypeReal32    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.fltVal << endl;',[Props.Names[i]]));
-              wbemCimtypeReal64    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.dblVal << endl;',[Props.Names[i]]));
-              wbemCimtypeBoolean   : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.boolVal << endl;',[Props.Names[i]]));
-              wbemCimtypeString    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));
-              wbemCimtypeDatetime  : DynCode.Add(Padding + Format('wcout << "%s : " << "Not supported" << endl;',[Props.Names[i]]));
-              wbemCimtypeReference : DynCode.Add(Padding + Format('wcout << "%s : " << "Not supported" << endl;',[Props.Names[i]]));
-              wbemCimtypeChar16    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));
-              wbemCimtypeObject    : DynCode.Add(Padding + Format('wcout << "%s : " << "Not supported" << endl;',[Props.Names[i]]));
+              wbemCimtypeSint8     : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bVal   << endl;',[Props.Names[i]]));
+              wbemCimtypeUint8     : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bVal   << endl;',[Props.Names[i]]));
+              wbemCimtypeSint16    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.iVal << endl;',[Props.Names[i]]));
+              wbemCimtypeUint16    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.uiVal << endl;',[Props.Names[i]]));
+              wbemCimtypeSint32    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.intVal << endl;',[Props.Names[i]]));
+              wbemCimtypeUint32    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.uintVal << endl;',[Props.Names[i]]));
+              wbemCimtypeSint64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.intVal << endl;',[Props.Names[i]]));
+              wbemCimtypeUint64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.uintVal << endl;',[Props.Names[i]]));
+              wbemCimtypeReal32    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.fltVal << endl;',[Props.Names[i]]));
+              wbemCimtypeReal64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.dblVal << endl;',[Props.Names[i]]));
+              wbemCimtypeBoolean   : DynCode.Add(Padding + Format('    wcout << "%s : " << (vtProp.boolVal ? "True" : "False") << endl;',[Props.Names[i]]));//ok
+              wbemCimtypeString    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));//ok
+              wbemCimtypeDatetime  : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));//ok
+              wbemCimtypeReference : DynCode.Add(Padding + Format('    wcout << "%s : " << "Reference Type is not supported" << endl;',[Props.Names[i]]));
+              wbemCimtypeChar16    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));
+              wbemCimtypeObject    : DynCode.Add(Padding + Format('    wcout << "%s : " << "Object Type is not supported" << endl;',[Props.Names[i]]));
           end;
 
 
-          //DynCode.Add(Padding + '}');
+          DynCode.Add(Padding + '}');
           DynCode.Add(Padding+ 'VariantClear(&vtProp);');
           DynCode.Add('');
        end;
@@ -276,7 +299,7 @@ var
   InParamsDescr: TStringList;
 
   IsStatic:  boolean;
-  ParamsStr: string;
+  //ParamsStr: string;
   TemplateCode : string;
   Padding : string;
   CimType : Integer;
@@ -382,22 +405,22 @@ begin
  */
 
 
-              wbemCimtypeSint8     : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.iVal   << endl;',[Props.Names[i]]));
-              wbemCimtypeUint8     : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.uiVal   << endl;',[Props.Names[i]]));
-              wbemCimtypeSint16    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.intVal << endl;',[Props.Names[i]]));
-              wbemCimtypeUint16    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.uintVal << endl;',[Props.Names[i]]));
-              wbemCimtypeSint32    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.intVal << endl;',[Props.Names[i]]));
-              wbemCimtypeUint32    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.uintVal << endl;',[Props.Names[i]]));
-              wbemCimtypeSint64    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.llVal << endl;',[Props.Names[i]]));
-              wbemCimtypeUint64    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.ullVal << endl;',[Props.Names[i]]));
-              wbemCimtypeReal32    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.fltVal << endl;',[Props.Names[i]]));
-              wbemCimtypeReal64    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.dblVal << endl;',[Props.Names[i]]));
-              wbemCimtypeBoolean   : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.boolVal << endl;',[Props.Names[i]]));
-              wbemCimtypeString    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));
-              wbemCimtypeDatetime  : DynCode.Add(Padding + Format('wcout << "%s : " << "Not supported" << endl;',[Props.Names[i]]));
-              wbemCimtypeReference : DynCode.Add(Padding + Format('wcout << "%s : " << "Not supported" << endl;',[Props.Names[i]]));
-              wbemCimtypeChar16    : DynCode.Add(Padding + Format('wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));
-              wbemCimtypeObject    : DynCode.Add(Padding + Format('wcout << "%s : " << "Not supported" << endl;',[Props.Names[i]]));
+              wbemCimtypeSint8     : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bVal   << endl;',[Props.Names[i]]));
+              wbemCimtypeUint8     : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bVal   << endl;',[Props.Names[i]]));
+              wbemCimtypeSint16    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.iVal << endl;',[Props.Names[i]]));
+              wbemCimtypeUint16    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.uiVal << endl;',[Props.Names[i]]));
+              wbemCimtypeSint32    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.intVal << endl;',[Props.Names[i]]));
+              wbemCimtypeUint32    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.uintVal << endl;',[Props.Names[i]]));
+              wbemCimtypeSint64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.intVal << endl;',[Props.Names[i]]));
+              wbemCimtypeUint64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.uintVal << endl;',[Props.Names[i]]));
+              wbemCimtypeReal32    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.fltVal << endl;',[Props.Names[i]]));
+              wbemCimtypeReal64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.dblVal << endl;',[Props.Names[i]]));
+              wbemCimtypeBoolean   : DynCode.Add(Padding + Format('    wcout << "%s : " << (vtProp.boolVal ? "True" : "False") << endl;',[Props.Names[i]]));//ok
+              wbemCimtypeString    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));//ok
+              wbemCimtypeDatetime  : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));//ok
+              wbemCimtypeReference : DynCode.Add(Padding + Format('    wcout << "%s : " << "Reference Type is not supported" << endl;',[Props.Names[i]]));
+              wbemCimtypeChar16    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));
+              wbemCimtypeObject    : DynCode.Add(Padding + Format('    wcout << "%s : " << "Object Type is not supported" << endl;',[Props.Names[i]]));
     }
 
         {
@@ -420,23 +443,23 @@ begin
               wbemCimtypeSint8     :
                                     begin
                                       DynCodeInParams.Add(Padding+'varCommand.vt = VT_I1;');
-                                      DynCodeInParams.Add(Padding+Format('varCommand.iVal = %s;',[Values[i]]));
+                                      DynCodeInParams.Add(Padding+Format('varCommand.bVal = %s;',[Values[i]]));
                                     end;
               wbemCimtypeUint8     :
                                     begin
                                       DynCodeInParams.Add(Padding+'varCommand.vt = VT_UI1;');
-                                      DynCodeInParams.Add(Padding+Format('varCommand.uiVal = %s;',[Values[i]]));
+                                      DynCodeInParams.Add(Padding+Format('varCommand.bVal = %s;',[Values[i]]));
                                     end;
 
               wbemCimtypeSint16    :
                                     begin
                                       DynCodeInParams.Add(Padding+'varCommand.vt = VT_I2;');
-                                      DynCodeInParams.Add(Padding+Format('varCommand.intVal = %s;',[Values[i]]));
+                                      DynCodeInParams.Add(Padding+Format('varCommand.iVal = %s;',[Values[i]]));
                                     end;
               wbemCimtypeUint16    :
                                     begin
                                       DynCodeInParams.Add(Padding+'varCommand.vt = VT_UI2;');
-                                      DynCodeInParams.Add(Padding+Format('varCommand.uintVal = %s;',[Values[i]]));
+                                      DynCodeInParams.Add(Padding+Format('varCommand.uiVal = %s;',[Values[i]]));
                                     end;
               wbemCimtypeSint32    :
                                     begin
@@ -451,12 +474,12 @@ begin
               wbemCimtypeSint64    :
                                     begin
                                       DynCodeInParams.Add(Padding+'varCommand.vt = VT_I8;');
-                                      DynCodeInParams.Add(Padding+Format('varCommand.llVal = %s;',[Values[i]]));
+                                      DynCodeInParams.Add(Padding+Format('varCommand.intVal = %s;',[Values[i]]));
                                     end;
               wbemCimtypeUint64    :
                                     begin
                                       DynCodeInParams.Add(Padding+'varCommand.vt = VT_UI8;');
-                                      DynCodeInParams.Add(Padding+Format('varCommand.ullVal = %s;',[Values[i]]));
+                                      DynCodeInParams.Add(Padding+Format('varCommand.uintVal = %s;',[Values[i]]));
                                     end;
 
               wbemCimtypeReal32    :
@@ -534,12 +557,10 @@ begin
       DynCodeOutParams.Add(Padding+'VARIANT varReturnValue;');
       for i := 0 to OutParamsList.Count - 1 do
         begin
-          //DynCodeOutParams.Add(Format('  sValue:=FOutParams.%s;', [OutParamsList[i]]));
-          //DynCodeOutParams.Add(Format('  Writeln(Format(''%-20s  %%s'',[sValue]));', [OutParamsList[i]]));
           DynCodeOutParams.Add(Padding+Format('hres = pOutParams->Get(L"%s", 0, &varReturnValue, NULL, 0);',[OutParamsList[i]]));
+
+          {
           DynCodeOutParams.Add(Padding+'if (!FAILED(hres))');
-
-
           CimType:=Integer(OutParamsTypes.Objects[i]);
           case CimType of
               wbemCimtypeSint8     : DynCodeOutParams.Add(Padding + Format('wcout << "%s : " << varReturnValue.iVal   << endl;',[OutParamsList[i]]));
@@ -559,8 +580,40 @@ begin
               wbemCimtypeChar16    : DynCodeOutParams.Add(Padding + Format('wcout << "%s : " << varReturnValue.bstrVal << endl;',[OutParamsList[i]]));
               wbemCimtypeObject    : DynCodeOutParams.Add(Padding + Format('wcout << "%s : " << "Not supported" << endl;',[OutParamsList[i]]));
           end;
+          }
+
+          DynCodeOutParams.Add(Padding + 'if (!FAILED(hres))');
+          DynCodeOutParams.Add(Padding + '{');
+          DynCodeOutParams.Add(Padding + '  if ((varReturnValue.vt==VT_NULL) || (varReturnValue.vt==VT_EMPTY))');
+          DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << ((varReturnValue.vt==VT_NULL) ? "%s" : "%s") << endl;',[OutParamsList[i],'NULL','EMPTY']));
+          DynCodeOutParams.Add(Padding + '  else');
+          DynCodeOutParams.Add(Padding + '  if ((varReturnValue.vt & VT_ARRAY))');
+          DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << "%s" << endl;',[OutParamsList[i],'Array types not supported (yet)']));
+          DynCodeOutParams.Add(Padding + '  else');
 
 
+          CimType:=Integer(OutParamsTypes.Objects[i]);
+          case CimType of
+              wbemCimtypeSint8     : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bVal   << endl;',[OutParamsList[i]]));
+              wbemCimtypeUint8     : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bVal   << endl;',[OutParamsList[i]]));
+              wbemCimtypeSint16    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.iVal << endl;',[OutParamsList[i]]));
+              wbemCimtypeUint16    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uiVal << endl;',[OutParamsList[i]]));
+              wbemCimtypeSint32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.intVal << endl;',[OutParamsList[i]]));
+              wbemCimtypeUint32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uintVal << endl;',[OutParamsList[i]]));
+              wbemCimtypeSint64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.intVal << endl;',[OutParamsList[i]]));
+              wbemCimtypeUint64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uintVal << endl;',[OutParamsList[i]]));
+              wbemCimtypeReal32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.fltVal << endl;',[OutParamsList[i]]));
+              wbemCimtypeReal64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.dblVal << endl;',[OutParamsList[i]]));
+              wbemCimtypeBoolean   : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << (varReturnValue.boolVal ? "True" : "False") << endl;',[OutParamsList[i]]));//ok
+              wbemCimtypeString    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[OutParamsList[i]]));//ok
+              wbemCimtypeDatetime  : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[OutParamsList[i]]));//ok
+              wbemCimtypeReference : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << "Reference Type is not supported" << endl;',[OutParamsList[i]]));
+              wbemCimtypeChar16    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[OutParamsList[i]]));
+              wbemCimtypeObject    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << "Object Type is not supported" << endl;',[OutParamsList[i]]));
+          end;
+
+
+          DynCodeOutParams.Add(Padding + '}');
           DynCodeOutParams.Add(Padding+'VariantClear(&varReturnValue);');
           DynCodeOutParams.Add('');
         end;

@@ -319,6 +319,7 @@ type
     Destructor  Destroy; override;
     property URI     : string read FURI;
     property Description     : string read FDescription;
+
     property PropertiesCount : Integer read GetPropertiesCount;
     property Properties      [index:integer]  : string read GetPropertyName;
     property PropertiesTypes [index:integer]  : string read GetPropertyType;
@@ -327,6 +328,7 @@ type
     property PropertyMetaData[index:integer]  : TWMiPropertyMetaData read GetPropertyMetaData;
     property PropertyValidValues[index:integer]  : TStrings read GetPropertyValidValues;
     property PropertyValidMapValues[index:integer]  : TStrings read GetPropertyValidMapValues;
+
     property MethodsCount    : Integer read GetMethodsCount;
     property Methods       [index:integer]  : string read GetMethodName;
     property MethodsTypes  [index:integer]  : string read GetMethodType;
@@ -891,7 +893,7 @@ var
   ClassName         : string;
   i                 : Integer;
   Ok                : Boolean;
-  QualifCount       : Integer;
+  //QualifCount       : Integer;
 begin
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
@@ -906,12 +908,12 @@ begin
       Continue;
      end;
 
-      QualifCount := 0;
+      //QualifCount := 0;
       Ok          := True;
       oEnumQualif := IUnknown(objClass.Qualifiers_._NewEnum) as IEnumVariant;
       while (oEnumQualif.Next(1, objClassQualifier, iValue) = 0) and Ok do
       begin
-        inc(QualifCount);
+        //inc(QualifCount);
 
         for i := Low(ExcludeQualifiers) to High(ExcludeQualifiers) do
         if CompareText(objClassQualifier.Name,ExcludeQualifiers[i])=0 then
@@ -1452,9 +1454,6 @@ begin
   colItem         :=Unassigned;
   Qualifiers      :=Unassigned;
 end;
-
-
-
 
 function  GetWmiPropertyDescription(const NameSpace,WmiClass,WmiProperty:String):string;
 var

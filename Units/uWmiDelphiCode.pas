@@ -148,8 +148,7 @@ begin
                               Props := TStringList.Create;
                               try
                                 for i := 0 to PropsOut.Count - 1 do
-                                  Props.Add(Format('  Writeln(Format(''%-' + IntToStr(Len) +
-                                    's : %%s '',[PropVal.%s]));', [PropsOut[i], PropsOut[i]]));
+                                  Props.Add(Format('  Writeln(Format(''%-' + IntToStr(Len) +'s : %%s '',[PropVal.%s]));', [PropsOut[i], PropsOut[i]]));
 
                                 StrCode := StringReplace(StrCode, sTagDelphiEventsOut, Props.Text, [rfReplaceAll]);
                               finally
@@ -161,7 +160,9 @@ begin
                               StrCode := StringReplace(StrCode, sTagWmiNameSpace, FWmiNameSpace, [rfReplaceAll]);
                               StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
                          end;
+
      WmiCode_LateBinding:;
+
      WmiCode_COM:        begin
 
                             WQL := Format('Select * From %s Within %d ', [FWmiClass, PollSeconds,
@@ -267,6 +268,7 @@ var
   Len: integer;
   Singleton: boolean;
   Padding: string;
+  CimType:Integer;
 begin
   Singleton := WmiClassIsSingleton(FWmiNameSpace, FWmiClass);
   Descr :=GetWmiClassDescription;
@@ -308,8 +310,32 @@ begin
                                   DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
                                     Len) + 's %%s'',[VarStrNull(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]))
                                 else
-                                  DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
-                                    Len) + 's %%s'',[FWbemPropertySet.Item(%s, 0).Get_Value]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+                                begin
+                                  //DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[FWbemPropertySet.Item(%s, 0).Get_Value]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+                                  CimType:=Integer(Props.Objects[i]);
+                                  case CimType of
+
+                                      wbemCimtypeSint8,
+                                      wbemCimtypeUint8,
+                                      wbemCimtypeSint16,
+                                      wbemCimtypeUint16,
+                                      wbemCimtypeSint32,
+                                      wbemCimtypeUint32,
+                                      wbemCimtypeSint64,
+                                      wbemCimtypeUint64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%d'',[Integer(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+                                      wbemCimtypeReal32    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+                                      wbemCimtypeReal64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+                                      wbemCimtypeBoolean,
+                                      wbemCimtypeDatetime,
+                                      wbemCimtypeString,
+                                      wbemCimtypeChar16    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[String(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+
+                                            {
+                                      wbemCimtypeReference : ;
+                                      wbemCimtypeObject    : ;
+                                             }
+                                  end;
+                                end;
                           end;
 
       WmiCode_LateBinding:
@@ -321,9 +347,44 @@ begin
                                     Len) + 's %%s'',[VarStrNull(FWbemObject.%s)]));// %s',
                                     [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]))
                                 else
+                                begin
+                                  {
                                   DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
                                     Len) + 's %%s'',[FWbemObject.%s]));// %s', [Props.Names[i], Props.Names[i],
                                     Props.ValueFromIndex[i]]));
+                                   }
+
+                                  CimType:=Integer(Props.Objects[i]);
+                                  case CimType of
+
+                                      wbemCimtypeSint8,
+                                      wbemCimtypeUint8,
+                                      wbemCimtypeSint16,
+                                      wbemCimtypeUint16,
+                                      wbemCimtypeSint32,
+                                      wbemCimtypeUint32,
+                                      wbemCimtypeSint64,
+                                      wbemCimtypeUint64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%d'',[Integer(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i],
+                                    Props.ValueFromIndex[i]]));
+                                      wbemCimtypeReal32    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i],
+                                    Props.ValueFromIndex[i]]));
+                                      wbemCimtypeReal64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i],
+                                    Props.ValueFromIndex[i]]));
+                                      wbemCimtypeBoolean,
+                                      wbemCimtypeDatetime,
+                                      wbemCimtypeString,
+                                      wbemCimtypeChar16    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[String(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i],
+                                    Props.ValueFromIndex[i]]));
+
+                                            {
+                                      wbemCimtypeReference : DynCode.Add(Padding + Format('wcout << "%s : " << "Not supported" << endl;',[Props.Names[i]]));
+                                      wbemCimtypeObject    : DynCode.Add(Padding + Format('wcout << "%s : " << "Not supported" << endl;',[Props.Names[i]]));
+                                             }
+                                  end;
+
+
+
+                                end;
                           end;
 
       WmiCode_COM:
@@ -342,7 +403,34 @@ begin
                                 if FUseHelperFunctions then
                                   DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[VarStrNull(pVal)]));', [Props.Names[i]]))
                                 else
-                                  DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[pVal]));', [Props.Names[i]]));
+                                begin
+                                  //DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[pVal]));', [Props.Names[i]]));
+                                  CimType:=Integer(Props.Objects[i]);
+                                  case CimType of
+                                      wbemCimtypeSint8,
+                                      wbemCimtypeUint8,
+                                      wbemCimtypeSint16,
+                                      wbemCimtypeUint16,
+                                      wbemCimtypeSint32,
+                                      wbemCimtypeUint32,
+                                      wbemCimtypeSint64,
+                                      wbemCimtypeUint64    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%d'',[Integer(pVal)]));', [Props.Names[i]]));
+                                      wbemCimtypeReal32    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(pVal)]));', [Props.Names[i]]));
+                                      wbemCimtypeReal64    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(pVal)]));', [Props.Names[i]]));
+                                      wbemCimtypeBoolean,
+                                      wbemCimtypeDatetime,
+                                      wbemCimtypeString,
+                                      wbemCimtypeChar16    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[String(pVal)]));', [Props.Names[i]]));
+                                      {
+                                      wbemCimtypeReference : ;
+                                      wbemCimtypeObject    : ;
+                                      }
+                                  end;
+
+                                end;
+
+
+
                                   DynCode.Add(Padding + 'VarClear(pVal);');
                                   DynCode.Add('');
                               end;
@@ -424,51 +512,25 @@ begin
       WmiCode_COM         :
                             begin
                               Padding:=StringOfChar(' ',23);
-                              if IsStatic then
-                              begin
-
-           					            //pVal     := 0;
-                                //pClassInstance.Put('Reason', 0, @pVal, 0);
-                                //In Params
-                                if ParamsIn.Count > 0 then
-                                  for Index := 0 to ParamsIn.Count - 1 do
-                                    if Values[Index] <> WbemEmptyParam then
+                              //pVal     := 0;
+                              //pClassInstance.Put('Reason', 0, @pVal, 0);
+                              //In Params
+                              if ParamsIn.Count > 0 then
+                                for Index := 0 to ParamsIn.Count - 1 do
+                                  if Values[Index] <> WbemEmptyParam then
+                                  begin
+                                    if ParamsIn.ValueFromIndex[Index] = wbemtypeString then
                                     begin
-                                      if ParamsIn.ValueFromIndex[Index] = wbemtypeString then
-                                      begin
-                                          DynCodeInParams.Add(Format('%s  pVal :=%s;', [Padding,QuotedStr(Values[Index])]));
-                                          DynCodeInParams.Add(Format('%s  pClassInstance.Put(%s, 0, @pVal, 0);', [Padding,QuotedStr(ParamsIn.Names[Index])]));
-                                      end
-                                      else
-                                      begin
-                                          DynCodeInParams.Add(Format('%s  pVal :=%s;', [Padding,Values[Index]]));
-                                          DynCodeInParams.Add(Format('%s  pClassInstance.Put(%s, 0, @pVal, 0);', [Padding,QuotedStr(ParamsIn.Names[Index])]));
-                                      end
-                                    end;
-                              end
-                              else
-                              begin
-
-           					            //pVal     := 0;
-                                //pClassInstance.Put('Reason', 0, @pVal, 0);
-                                //In Params
-                                if ParamsIn.Count > 0 then
-                                  for Index := 0 to ParamsIn.Count - 1 do
-                                    if Values[Index] <> WbemEmptyParam then
+                                        DynCodeInParams.Add(Format('%s  pVal :=%s;', [Padding,QuotedStr(Values[Index])]));
+                                        DynCodeInParams.Add(Format('%s  pClassInstance.Put(%s, 0, @pVal, 0);', [Padding,QuotedStr(ParamsIn.Names[Index])]));
+                                    end
+                                    else
                                     begin
-                                      if ParamsIn.ValueFromIndex[Index] = wbemtypeString then
-                                      begin
-                                          DynCodeInParams.Add(Format('%s  pVal :=%s;', [Padding,QuotedStr(Values[Index])]));
-                                          DynCodeInParams.Add(Format('%s  pClassInstance.Put(%s, 0, @pVal, 0);', [Padding,QuotedStr(ParamsIn.Names[Index])]));
-                                      end
-                                      else
-                                      begin
-                                          DynCodeInParams.Add(Format('%s  pVal :=%s;', [Padding,Values[Index]]));
-                                          DynCodeInParams.Add(Format('%s  pClassInstance.Put(%s, 0, @pVal, 0);', [Padding,QuotedStr(ParamsIn.Names[Index])]));
-                                      end
-                                    end;
+                                        DynCodeInParams.Add(Format('%s  pVal :=%s;', [Padding,Values[Index]]));
+                                        DynCodeInParams.Add(Format('%s  pClassInstance.Put(%s, 0, @pVal, 0);', [Padding,QuotedStr(ParamsIn.Names[Index])]));
+                                    end
+                                  end;
 
-                              end;
                               StrCode := StringReplace(StrCode, sTagDelphiCodeParamsIn, DynCodeInParams.Text, [rfReplaceAll]);
 
 							                //ppOutParams.Get('ReturnValue', 0, pVal, pType, plFlavor);// String
@@ -506,48 +568,24 @@ begin
 
       WmiCode_Scripting   :
                             begin
-                              if IsStatic then
-                              begin
-                                //In Params
-                                if ParamsIn.Count > 0 then
-                                  for Index := 0 to ParamsIn.Count - 1 do
-                                    if Values[Index] <> WbemEmptyParam then
+                              //varValue      := 'notepad.exe';
+                              //FInParams.Properties_.Item('CommandLine', 0).Set_Value(varValue);
+                              //In Params
+                              if ParamsIn.Count > 0 then
+                                for Index := 0 to ParamsIn.Count - 1 do
+                                  if Values[Index] <> WbemEmptyParam then
+                                  begin
+                                    if ParamsIn.ValueFromIndex[Index] = wbemtypeString then
                                     begin
-                                      if ParamsIn.ValueFromIndex[Index] = wbemtypeString then
-                                      begin
-                                          DynCodeInParams.Add(Format('  varValue :=%s;', [QuotedStr(Values[Index])]));
-                                          DynCodeInParams.Add(Format('  FInParams.Properties_.Item(%s, 0).Set_Value(varValue);', [QuotedStr(ParamsIn.Names[Index])]));
-                                      end
-                                      else
-                                      begin
-                                          DynCodeInParams.Add(Format('  varValue :=%s;', [Values[Index]]));
-                                          DynCodeInParams.Add(Format('  FInParams.Properties_.Item(%s, 0).Set_Value(varValue);', [QuotedStr(ParamsIn.Names[Index])]));
-                                      end
-                                    end;
-                              end
-                              else
-                              begin
-
-                                //varValue      := 'notepad.exe';
-                                //FInParams.Properties_.Item('CommandLine', 0).Set_Value(varValue);
-                                //In Params
-                                if ParamsIn.Count > 0 then
-                                  for Index := 0 to ParamsIn.Count - 1 do
-                                    if Values[Index] <> WbemEmptyParam then
+                                        DynCodeInParams.Add(Format('  varValue :=%s;', [QuotedStr(Values[Index])]));
+                                        DynCodeInParams.Add(Format('  FInParams.Properties_.Item(%s, 0).Set_Value(varValue);', [QuotedStr(ParamsIn.Names[Index])]));
+                                    end
+                                    else
                                     begin
-                                      if ParamsIn.ValueFromIndex[Index] = wbemtypeString then
-                                      begin
-                                          DynCodeInParams.Add(Format('  varValue :=%s;', [QuotedStr(Values[Index])]));
-                                          DynCodeInParams.Add(Format('  FInParams.Properties_.Item(%s, 0).Set_Value(varValue);', [QuotedStr(ParamsIn.Names[Index])]));
-                                      end
-                                      else
-                                      begin
-                                          DynCodeInParams.Add(Format('  varValue :=%s;', [Values[Index]]));
-                                          DynCodeInParams.Add(Format('  FInParams.Properties_.Item(%s, 0).Set_Value(varValue);', [QuotedStr(ParamsIn.Names[Index])]));
-                                      end
-                                    end;
-
-                              end;
+                                        DynCodeInParams.Add(Format('  varValue :=%s;', [Values[Index]]));
+                                        DynCodeInParams.Add(Format('  FInParams.Properties_.Item(%s, 0).Set_Value(varValue);', [QuotedStr(ParamsIn.Names[Index])]));
+                                    end
+                                  end;
                               StrCode := StringReplace(StrCode, sTagDelphiCodeParamsIn, DynCodeInParams.Text, [rfReplaceAll]);
 
                               //Writeln(Format('ProcessId             %s',[FOutParams.Properties_.Item('ProcessId', 0).Get_Value]));
