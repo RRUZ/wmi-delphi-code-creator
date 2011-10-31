@@ -150,9 +150,9 @@ object FrmMain: TFrmMain
                   OnChange = ComboBoxNameSpacesChange
                 end
                 object CheckBoxSelAllProps: TCheckBox
-                  Left = 8
+                  Left = 9
                   Top = 169
-                  Width = 118
+                  Width = 114
                   Height = 17
                   Caption = 'Select all Properties'
                   TabOrder = 4
@@ -176,10 +176,10 @@ object FrmMain: TFrmMain
                   TabOrder = 6
                 end
                 object ListViewProperties: TListView
-                  Left = 12
+                  Left = 7
                   Top = 192
                   Width = 295
-                  Height = 108
+                  Height = 210
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -200,7 +200,6 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 110
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -363,7 +362,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 149
+                  Height = 147
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -409,7 +408,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 371
+                  Top = 369
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -568,7 +567,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 97
+                  Height = 95
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -665,7 +664,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 279
+                  Top = 277
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -1017,7 +1016,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800640110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800680110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
