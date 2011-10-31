@@ -117,6 +117,9 @@ Source: Templates\TemplateStaticMethodInvokerDelphi_COM.pas; DestDir: {app}\Temp
 Source: Templates\TemplateStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppBorlandCPP.cpp; DestDir: {app}\Templates\
 #define MyAppName 'Wmi Delphi Code Creator'
 #define MyAppVersion GetFileVersion('WmiDelphiCodeCreator.exe')
 [Setup]

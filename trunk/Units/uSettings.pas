@@ -40,10 +40,12 @@ type
     FDelphiWmiEventCodeGenMode: Integer;
     FOutputFolder: string;
     FDelphiWmiMethodCodeGenMode: Integer;
+    FLastWmiNameSpace: string;
+    FLastWmiClass: string;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
-  published
+  public
     property CurrentTheme : string Read FCurrentTheme Write FCurrentTheme;
     property FontName     : string Read FFontName Write FFontName;
     property FontSize     : Word Read FFontSize Write FFontSize;
@@ -55,6 +57,9 @@ type
     property OutputFolder : string read GetOutputFolder write FOutputFolder;
     property BackGroundColor : TColor read GetBackGroundColor;
     property ForeGroundColor : TColor read GetForeGroundColor;
+
+    property LastWmiNameSpace : string read FLastWmiNameSpace Write FLastWmiNameSpace;
+    property LastWmiClass : string read FLastWmiClass Write FLastWmiClass;
   end;
 
 
@@ -122,6 +127,7 @@ type
   procedure LoadCurrentTheme(Form: TForm;const ThemeName:string);
   procedure LoadCurrentThemeFont(Form: TForm;const FontName:string;FontSize:Word);
   procedure ReadSettings(var Settings: TSettings);
+  procedure WriteSettings(const Settings: TSettings);
 
 implementation
 
@@ -316,6 +322,8 @@ begin
     Settings.DelphiWmiEventCodeGenMode     := iniFile.ReadInteger('Global', 'DelphiWmiEventCodeGenMode', integer(WmiCode_Scripting));
     Settings.OutputFolder                  := iniFile.ReadString('Global', 'OutputFolder', GetTempDirectory);
     Settings.DelphiWmiMethodCodeGenMode    := iniFile.ReadInteger('Global', 'DelphiWmiMethodCodeGenMode', integer(WmiCode_Scripting));
+    Settings.LastWmiNameSpace              := iniFile.ReadString('Global', 'LastWmiNameSpace', 'root\CIMV2');
+    Settings.LastWmiClass                  := iniFile.ReadString('Global', 'LastWmiClass', 'Win32_OperatingSystem');
   finally
     iniFile.Free;
   end;
@@ -336,6 +344,8 @@ begin
     iniFile.WriteInteger('Global', 'DelphiWmiEventCodeGenMode', Settings.DelphiWmiEventCodeGenMode);
     iniFile.WriteString('Global', 'OutputFolder', Settings.OutputFolder);
     iniFile.WriteInteger('Global', 'DelphiWmiMethodCodeGenMode', Settings.DelphiWmiMethodCodeGenMode);
+    iniFile.WriteString('Global', 'LastWmiNameSpace', Settings.LastWmiNameSpace);
+    iniFile.WriteString('Global', 'LastWmiClass', Settings.LastWmiClass);
   finally
     iniFile.Free;
   end;

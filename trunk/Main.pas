@@ -124,7 +124,7 @@ type
     Splitter6: TSplitter;
     Panel5:    TPanel;
     PageControl3: TPageControl;
-    TabSheet1: TTabSheet;
+    TabSheetWmiEventCode: TTabSheet;
     ToolButtonGetValues: TToolButton;
     Label3:    TLabel;
     EditEventWait: TEdit;
@@ -133,7 +133,7 @@ type
     ButtonGenerateCodeInvoker: TButton;
     ButtonGenerateEventCode: TButton;
     SynEditWMIMethodCode: TSynEdit;
-    SynEditEventCode: TSynEdit;
+    SynEditWMIEventCode: TSynEdit;
     PanelLanguageSet: TPanel;
     ComboBoxLanguageSel: TComboBox;
     Label8:    TLabel;
@@ -185,6 +185,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure RadioButtonIntrinsicClick(Sender: TObject);
     procedure ToolButtonSettingsClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     FDataLoaded: boolean;
@@ -350,7 +351,7 @@ begin
 
   TabSheetWmiClassCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
   TabSheetWmiMethodCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
-
+  TabSheetWmiEventCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
 
   GenerateConsoleCode;
   GenerateMethodInvoker;
@@ -379,7 +380,6 @@ procedure TFrmMain.ComboBoxNamespacesEventsChange(Sender: TObject);
 begin
   LoadWmiEvents(ComboBoxNamespacesEvents.Text);
 end;
-
 
 procedure TFrmMain.ComboBoxPathsChange(Sender: TObject);
 begin
@@ -414,6 +414,7 @@ begin
         begin
           Item := ListVieweventsConds.Items.Add;
           Item.Caption := Format('%s.%s', [wbemTargetInstance, List.Names[i]]);
+          Item.Data:=List.Objects[i];//CimType
           Item.SubItems.Add(List.ValueFromIndex[i]);
           Item.SubItems.Add('');
           Item.SubItems.Add(GetDefaultValueWmiType(List.ValueFromIndex[i]));
@@ -439,48 +440,7 @@ begin
   AutoResizeColumns([ListViewEventsConds.Column[0], ListViewEventsConds.Column[1],
     ListViewEventsConds.Column[2]]);
 
-
   GenerateEventCode;
-end;
-
-
-
-
-
-procedure TFrmMain.ComboBoxCondExit(Sender: TObject);
-begin
-  if Assigned(FItem) then
-  begin
-    FItem.SubItems[COND_EVENTPARAM_COLUMN - 1] := TComboBox(Sender).Text;
-    FItem := nil;
-  end;
-  PostMessage(handle, WM_NEXTDLGCTL, ListViewEventsConds.Handle, 1);
-  TComboBox(Sender).Visible := True;
-end;
-
-
-procedure TFrmMain.EditValueEventExit(Sender: TObject);
-begin
-  if Assigned(FItem) then
-  begin
-    FItem.SubItems[VALUE_EVENTPARAM_COLUMN - 1] := TEdit(Sender).Text;
-    FItem := nil;
-  end;
-  PostMessage(handle, WM_NEXTDLGCTL, ListViewEventsConds.Handle, 1);
-  TEdit(Sender).Visible := True;
-end;
-
-procedure TFrmMain.EditValueMethodParamExit(Sender: TObject);
-begin
-  if Assigned(FItem) then
-  begin
-    FItem.SubItems[VALUE_METHODPARAM_COLUMN - 1] := TEdit(Sender).Text;
-    FItem := nil;
-  end;
-  PostMessage(handle, WM_NEXTDLGCTL, ListViewMethodsParams.Handle, 1);
-  TEdit(Sender).Visible := True;
-
-  GenerateMethodInvoker;
 end;
 
 
@@ -502,7 +462,6 @@ begin
   Result   := FileExists(FileName);
 end;
 
-
 function TFrmMain.ExistWmiNameSpaceCache: boolean;
 begin
   Result := FileExists(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
@@ -512,6 +471,13 @@ procedure TFrmMain.FormActivate(Sender: TObject);
 begin
   if not FDataLoaded then
     LoadWmiMetaData;
+end;
+
+procedure TFrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Settings.LastWmiNameSpace:=ComboBoxNameSpaces.Text;
+  Settings.LastWmiClass:=ComboBoxClasses.Text;
+  WriteSettings(Settings);
 end;
 
 procedure TFrmMain.FormCreate(Sender: TObject);
@@ -573,7 +539,6 @@ begin
   FrmWmiClassTree.Align := alClient;
   FrmWmiClassTree.Show;
 end;
-
 
 
 procedure TFrmMain.FormDestroy(Sender: TObject);
@@ -887,8 +852,8 @@ begin
                       DelphiWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       //RadioButtonIntrinsic.Checked
                       DelphiWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      SynEditEventCode.Lines.Clear;
-                      SynEditEventCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
+                      SynEditWMIEventCode.Lines.Clear;
+                      SynEditWMIEventCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
                    finally
                       DelphiWmiCodeGenerator.Free;
                    end;
@@ -905,8 +870,8 @@ begin
                       FPCWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       //RadioButtonIntrinsic.Checked
                       FPCWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      SynEditEventCode.Lines.Clear;
-                      SynEditEventCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                      SynEditWMIEventCode.Lines.Clear;
+                      SynEditWMIEventCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
                    finally
                       FPCWmiCodeGenerator.Free;
                    end;
@@ -922,8 +887,8 @@ begin
                       OxygenWmiCodeGenerator.PollSeconds          := PollSeconds;
                       OxygenWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       OxygenWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      SynEditEventCode.Lines.Clear;
-                      SynEditEventCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                      SynEditWMIEventCode.Lines.Clear;
+                      SynEditWMIEventCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
                    finally
                       OxygenWmiCodeGenerator.Free;
                    end;
@@ -931,9 +896,9 @@ begin
 
     end;
 
-    SynEditEventCode.SelStart  := SynEditEventCode.GetTextLen;
-    SynEditEventCode.SelLength := 0;
-    SendMessage(SynEditEventCode.Handle, EM_SCROLLCARET, 0, 0);
+    SynEditWMIEventCode.SelStart  := SynEditWMIEventCode.GetTextLen;
+    SynEditWMIEventCode.SelLength := 0;
+    SendMessage(SynEditWMIEventCode.Handle, EM_SCROLLCARET, 0, 0);
   finally
     Conds.Free;
     Params.Free;
@@ -969,7 +934,6 @@ begin
       Frm.LoadValues;
       Frm.Show();
 
-
     finally
       SetMsg('');
       ProgressBarWmi.Visible := False;
@@ -979,54 +943,10 @@ begin
   end;
 end;
 
-
 procedure TFrmMain.ListBoxPropertiesClick(Sender: TObject);
 begin
   CheckBoxSelAllProps.Checked := False;
   GenerateConsoleCode;
-end;
-
-
-procedure TFrmMain.ListViewEventsCondsClick(Sender: TObject);
-var
-  pt: TPoint;
-  HitTestInfo: TLVHitTestInfo;
-begin
-  EditValueEvent.Visible := False;
-  ComboBoxCond.Visible   := False;
-
-  pt := TListView(Sender).ScreenToClient(Mouse.CursorPos);
-  FillChar(HitTestInfo, SizeOf(HitTestInfo), 0);
-  HitTestInfo.pt := pt;
-
-  if (-1 <> TListView(Sender).Perform(LVM_SUBITEMHITTEST, 0,
-    lparam(@HitTestInfo))) and
-    (HitTestInfo.iSubItem = VALUE_EVENTPARAM_COLUMN) then
-    PostMessage(Self.Handle, UM_EDITEVENTVALUE, HitTestInfo.iItem, 0)
-  else
-  if (-1 <> TListView(Sender).Perform(LVM_SUBITEMHITTEST, 0,
-    lparam(@HitTestInfo))) and
-    (HitTestInfo.iSubItem = COND_EVENTPARAM_COLUMN) then
-    PostMessage(Self.Handle, UM_EDITEVENTCOND, HitTestInfo.iItem, 0);
-
-  GenerateEventCode;
-end;
-
-procedure TFrmMain.ListViewMethodsParamsClick(Sender: TObject);
-var
-  pt: TPoint;
-  HitTestInfo: TLVHitTestInfo;
-begin
-  EditValueMethodParam.Visible := False;
-  pt := TListView(Sender).ScreenToClient(Mouse.CursorPos);
-  FillChar(HitTestInfo, sizeof(HitTestInfo), 0);
-  HitTestInfo.pt := pt;
-  if (-1 <> TListView(Sender).Perform(LVM_SUBITEMHITTEST, 0,
-    lparam(@HitTestInfo))) and
-    (HitTestInfo.iSubItem = VALUE_METHODPARAM_COLUMN) then
-    PostMessage(Self.Handle, UM_EDITPARAMVALUE, HitTestInfo.iItem, 0);
-
-  GenerateMethodInvoker;
 end;
 
 procedure TFrmMain.LoadClassInfo;
@@ -1053,7 +973,6 @@ begin
     ProgressBarWmi.Visible := False;
   end;
 end;
-
 
 procedure TFrmMain.LoadEventsInfo;
 var
@@ -1082,6 +1001,7 @@ begin
       Item := ListVieweventsConds.Items.Add;
       Item.Checked := False;
       Item.Caption := List.Names[i];
+      item.Data    := List.Objects[i];
       Item.SubItems.Add(List.ValueFromIndex[i]);
       Item.SubItems.Add('');
       Item.SubItems.Add(GetDefaultValueWmiType(List.ValueFromIndex[i]));
@@ -1181,7 +1101,7 @@ begin
     begin
       Item := ListViewMethodsParams.Items.Add;
       Item.Caption := ParamsList[i];
-      Item.Data:=ParamsTypes.Objects[i];
+      Item.Data:=ParamsTypes.Objects[i];//CimType
       Item.SubItems.Add(ParamsTypes[i]);
       Item.SubItems.Add(GetDefaultValueWmiType(ParamsTypes[i]));
     end;
@@ -1246,7 +1166,6 @@ begin
             else
               raise;
         end;
-
 
       finally
         FClasses.EndUpdate;
@@ -1383,6 +1302,7 @@ begin
           FrmWmiClassTree.CbNamespaces.Items.Clear;
           FrmWmiClassTree.CbNamespaces.Items.AddStrings(FNameSpaces);
           FrmWmiClassTree.CbNamespaces.ItemIndex:=0;
+
                {
 
            GWmiNamespaces := AsyncCall(@GetListWMINameSpaces, ['root', FNameSpaces]);
@@ -1440,9 +1360,18 @@ begin
       FrmWMIExplorer.TreeViewWmiClasses.Items.EndUpdate;
     end;
 
-    ComboBoxNameSpaces.ItemIndex := 0;
+    if Settings.LastWmiNameSpace<>'' then
+      ComboBoxNameSpaces.ItemIndex := ComboBoxNameSpaces.Items.IndexOf(Settings.LastWmiNameSpace)
+    else
+      ComboBoxNameSpaces.ItemIndex := 0;
+
     LoadWmiClasses(ComboBoxNameSpaces.Text);
-    ComboBoxClasses.ItemIndex := 0;
+    if Settings.LastWmiClass<>'' then
+      ComboBoxClasses.ItemIndex := ComboBoxClasses.Items.IndexOf(Settings.LastWmiClass)
+    else
+      ComboBoxClasses.ItemIndex := 0;
+
+
     LoadClassInfo;
 
     ComboBoxNamespacesEvents.ItemIndex := 0;
@@ -1464,7 +1393,6 @@ begin
   SetMsg(Format('Loading classes with methods in %s', [Namespace]));
   try
 
-
     if not ExistWmiClassesMethodsCache(Namespace) then
     begin
       ComboBoxClassesMethods.Items.BeginUpdate;
@@ -1479,9 +1407,6 @@ begin
     end
     else
       LoadWMIClassesMethodsFromCache(Namespace, ComboBoxClassesMethods.Items);
-
-
-
 
     if ComboBoxClassesMethods.Items.Count > 0 then
       ComboBoxClassesMethods.ItemIndex := 0
@@ -1536,7 +1461,6 @@ begin
 end;
 
 
-
 procedure TFrmMain.SaveWMIClassesMethodsToCache(const namespace: string;
   List: TStrings);
 var
@@ -1567,7 +1491,6 @@ begin
   MemoConsole.SelLength := 0;
   SendMessage(MemoConsole.Handle, EM_SCROLLCARET, 0, 0);
 end;
-
 
 procedure TFrmMain.SetMsg(const Msg: string);
 begin
@@ -1616,7 +1539,6 @@ begin
   GetValuesWmiProperties(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
 end;
 
-
 procedure TFrmMain.ToolButtonRunClick(Sender: TObject);
 var
   Frm: TFrmSelCompilerVer;
@@ -1657,7 +1579,7 @@ begin
               SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditEventCode.Lines.SaveToFile(FileName);
+              SynEditWMIEventCode.Lines.SaveToFile(FileName);
 
             if CreateDelphiProject(
               ExtractFilePath(FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +'Delphi') then
@@ -1680,7 +1602,7 @@ begin
               SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditEventCode.Lines.SaveToFile(FileName);
+              SynEditWMIEventCode.Lines.SaveToFile(FileName);
 
               {
             if CreateDelphiProject(
@@ -1706,7 +1628,7 @@ begin
               SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditEventCode.Lines.SaveToFile(FileName);
+              SynEditWMIEventCode.Lines.SaveToFile(FileName);
 
             if CreateLazarusProject(
               ExtractFileName(FileName), ExtractFilePath(FileName), IncludeTrailingPathDelimiter(
@@ -1730,7 +1652,7 @@ begin
               SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditEventCode.Lines.SaveToFile(FileName);
+              SynEditWMIEventCode.Lines.SaveToFile(FileName);
 
             if CreateOxygeneProject(
               ExtractFileName(FileName), ExtractFilePath(FileName), IncludeTrailingPathDelimiter(
@@ -1776,7 +1698,6 @@ begin
         IdeName := item.SubItems[0];
         FileName := IncludeTrailingPathDelimiter(Settings.OutputFolder);
 
-
         case ct of
           Ct_Delphi:
           begin
@@ -1789,7 +1710,7 @@ begin
               SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditEventCode.Lines.SaveToFile(FileName);
+              SynEditWMIEventCode.Lines.SaveToFile(FileName);
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
 
@@ -1804,10 +1725,9 @@ begin
               SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditEventCode.Lines.SaveToFile(FileName);
+              SynEditWMIEventCode.Lines.SaveToFile(FileName);
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
-
 
           Ct_Lazarus_FPC:
           begin
@@ -1820,13 +1740,14 @@ begin
               SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditEventCode.Lines.SaveToFile(FileName);
+              SynEditWMIEventCode.Lines.SaveToFile(FileName);
 
             if CreateLazarusProject(
               ExtractFileName(FileName), ExtractFilePath(FileName), IncludeTrailingPathDelimiter(
               ExtractFilePath(ParamStr(0))) + 'Lazarus\TemplateConsole.lpi') then
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
+
           Ct_Oxygene:
           begin
             FileName := FileName + 'Program.pas';
@@ -1839,7 +1760,7 @@ begin
               SynEditWMIMethodCode.Lines.SaveToFile(FileName)
             else
             if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditEventCode.Lines.SaveToFile(FileName);
+              SynEditWMIEventCode.Lines.SaveToFile(FileName);
 
             if StartsText('Monodevelop', item.Caption) and
               CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
@@ -1894,8 +1815,29 @@ begin
   begin
     if PageControlCode.ActivePage = TabSheetWmiClassCode then
     begin
-      SaveDialog1.FileName := 'GetWMI_Info.dpr';
-      SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
+     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
+      Lng_Delphi     :
+                  begin
+                    SaveDialog1.FileName := 'GetWMI_Info.dpr';
+                    SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
+                  end;
+      Lng_FPC        :
+                  begin
+                    SaveDialog1.FileName := 'GetWMI_Info.pas';
+                    SaveDialog1.Filter   := 'Lazarus Source Code files|*.pas';
+                  end;
+      Lng_Oxygen     :
+                  begin
+                    SaveDialog1.FileName := 'GetWMI_Info.pas';
+                    SaveDialog1.Filter   := 'Oxygen Source Code files|*.pas';
+                  end;
+      Lng_BorlandCpp :
+                  begin
+                    SaveDialog1.FileName := 'GetWMI_Info.cpp';
+                    SaveDialog1.Filter   := 'C++ Source Code files|*.pas';
+                  end;
+     end;
+
       if SaveDialog1.Execute then
         SynEditWMIClassCode.Lines.SaveToFile(SaveDialog1.FileName);
     end;
@@ -1903,18 +1845,63 @@ begin
   else
   if PageControlCodeGen.ActivePage = TabSheetMethods then
   begin
-    SaveDialog1.FileName := 'InvokeWMI_Method.dpr';
-    SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
+
+     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
+      Lng_Delphi     :
+                  begin
+                    SaveDialog1.FileName := 'InvokeWMI_Method.dpr';
+                    SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
+                  end;
+      Lng_FPC        :
+                  begin
+                    SaveDialog1.FileName := 'InvokeWMI_Method.pas';
+                    SaveDialog1.Filter   := 'Lazarus Source Code files|*.pas';
+                  end;
+      Lng_Oxygen     :
+                  begin
+                    SaveDialog1.FileName := 'InvokeWMI_Method.pas';
+                    SaveDialog1.Filter   := 'Oxygen Source Code files|*.pas';
+                  end;
+      Lng_BorlandCpp :
+                  begin
+                    SaveDialog1.FileName := 'InvokeWMI_Method.cpp';
+                    SaveDialog1.Filter   := 'C++ Source Code files|*.pas';
+                  end;
+     end;
+
+
     if SaveDialog1.Execute then
       SynEditWMIMethodCode.Lines.SaveToFile(SaveDialog1.FileName);
   end
   else
   if PageControlCodeGen.ActivePage = TabSheetEvents then
   begin
-    SaveDialog1.FileName := 'EventWMI_Method.dpr';
-    SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
+
+     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
+      Lng_Delphi     :
+                  begin
+                    SaveDialog1.FileName := 'EventWMI_Method.dpr';
+                    SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
+                  end;
+      Lng_FPC        :
+                  begin
+                    SaveDialog1.FileName := 'EventWMI_Method.pas';
+                    SaveDialog1.Filter   := 'Lazarus Source Code files|*.pas';
+                  end;
+      Lng_Oxygen     :
+                  begin
+                    SaveDialog1.FileName := 'EventWMI_Method.pas';
+                    SaveDialog1.Filter   := 'Oxygen Source Code files|*.pas';
+                  end;
+      Lng_BorlandCpp :
+                  begin
+                    SaveDialog1.FileName := 'EventWMI_Method.cpp';
+                    SaveDialog1.Filter   := 'C++ Source Code files|*.pas';
+                  end;
+     end;
+
     if SaveDialog1.Execute then
-      SynEditEventCode.Lines.SaveToFile(SaveDialog1.FileName);
+      SynEditWMIEventCode.Lines.SaveToFile(SaveDialog1.FileName);
   end;
 
 end;
@@ -1939,6 +1926,85 @@ begin
     ReadSettings(Settings);
   end;
 end;
+
+
+procedure TFrmMain.ComboBoxCondExit(Sender: TObject);
+begin
+  if Assigned(FItem) then
+  begin
+    FItem.SubItems[COND_EVENTPARAM_COLUMN - 1] := TComboBox(Sender).Text;
+    FItem := nil;
+  end;
+  PostMessage(handle, WM_NEXTDLGCTL, ListViewEventsConds.Handle, 1);
+  TComboBox(Sender).Visible := True;
+end;
+
+procedure TFrmMain.EditValueEventExit(Sender: TObject);
+begin
+  if Assigned(FItem) then
+  begin
+    FItem.SubItems[VALUE_EVENTPARAM_COLUMN - 1] := TEdit(Sender).Text;
+    FItem := nil;
+  end;
+  PostMessage(handle, WM_NEXTDLGCTL, ListViewEventsConds.Handle, 1);
+  TEdit(Sender).Visible := True;
+end;
+
+procedure TFrmMain.EditValueMethodParamExit(Sender: TObject);
+begin
+  if Assigned(FItem) then
+  begin
+    FItem.SubItems[VALUE_METHODPARAM_COLUMN - 1] := TEdit(Sender).Text;
+    FItem := nil;
+  end;
+  PostMessage(handle, WM_NEXTDLGCTL, ListViewMethodsParams.Handle, 1);
+  TEdit(Sender).Visible := True;
+
+  GenerateMethodInvoker;
+end;
+
+procedure TFrmMain.ListViewEventsCondsClick(Sender: TObject);
+var
+  pt: TPoint;
+  HitTestInfo: TLVHitTestInfo;
+begin
+  EditValueEvent.Visible := False;
+  ComboBoxCond.Visible   := False;
+
+  pt := TListView(Sender).ScreenToClient(Mouse.CursorPos);
+  FillChar(HitTestInfo, SizeOf(HitTestInfo), 0);
+  HitTestInfo.pt := pt;
+
+  if (-1 <> TListView(Sender).Perform(LVM_SUBITEMHITTEST, 0,
+    lparam(@HitTestInfo))) and
+    (HitTestInfo.iSubItem = VALUE_EVENTPARAM_COLUMN) then
+    PostMessage(Self.Handle, UM_EDITEVENTVALUE, HitTestInfo.iItem, 0)
+  else
+  if (-1 <> TListView(Sender).Perform(LVM_SUBITEMHITTEST, 0,
+    lparam(@HitTestInfo))) and
+    (HitTestInfo.iSubItem = COND_EVENTPARAM_COLUMN) then
+    PostMessage(Self.Handle, UM_EDITEVENTCOND, HitTestInfo.iItem, 0);
+
+  GenerateEventCode;
+end;
+
+procedure TFrmMain.ListViewMethodsParamsClick(Sender: TObject);
+var
+  pt: TPoint;
+  HitTestInfo: TLVHitTestInfo;
+begin
+  EditValueMethodParam.Visible := False;
+  pt := TListView(Sender).ScreenToClient(Mouse.CursorPos);
+  FillChar(HitTestInfo, sizeof(HitTestInfo), 0);
+  HitTestInfo.pt := pt;
+  if (-1 <> TListView(Sender).Perform(LVM_SUBITEMHITTEST, 0,
+    lparam(@HitTestInfo))) and
+    (HitTestInfo.iSubItem = VALUE_METHODPARAM_COLUMN) then
+    PostMessage(Self.Handle, UM_EDITPARAMVALUE, HitTestInfo.iItem, 0);
+
+  GenerateMethodInvoker;
+end;
+
 
 procedure TFrmMain.UMEditEventCond(var msg: TMessage);
 var
