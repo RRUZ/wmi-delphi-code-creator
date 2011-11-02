@@ -212,8 +212,6 @@ Const
 {$ENDIF}
 
 type
-  TArrayBoolean = Array of Boolean;
-
   TWMiQualifierMetaData=class
   private
     FName: string;
@@ -221,51 +219,6 @@ type
   public
     property Name : string read FName;
     property Value : string read FValue;
-  end;
-
-  TWMiMethodMetaData=class
-  private
-    FInParams: TStrings;
-    FInParamsTypes: TStrings;
-    FInParamsDescr: TStrings;
-    FOutParamsTypes: TStrings;
-    FOutParamsDescr: TStrings;
-    FValidValues: TStrings;
-    FValidMapValues: TStrings;
-    FOutParams: TStrings;
-    FIsStatic   : Boolean;
-    FIsFunction : Boolean;
-    FMethodInParamsDecl: string;
-    FMethodOutParamsDecl: string;
-    FMethodInParamsPascalDecl: string;
-    FMethodOutParamsPascalDecl: string;
-    FName: string;
-    FDescription: string;
-    FType: string;
-    FInParamsIsArray : TArrayBoolean;
-    FOutParamsIsArray: TArrayBoolean;
-    FQualifiers: TList<TWMiQualifierMetaData>;
-  public
-    constructor Create; overload;
-    Destructor  Destroy; override;
-    property Name : string read FName;
-    property Description : string read FDescription;
-    property &Type : string read FType;
-    property InParamsIsArray: TArrayBoolean read FInParamsIsArray;
-    property InParams       : TStrings read FInParams;
-    property InParamsTypes  : TStrings read FInParamsTypes;
-    property InParamsDescr  : TStrings read FInParamsDescr;
-    property OutParamsIsArray: TArrayBoolean read FOutParamsIsArray;
-    property OutParams      : TStrings read FOutParams;
-    property OutParamsTypes : TStrings read FOutParamsTypes;
-    property OutParamsDescr : TStrings read FOutParamsDescr;
-    property MethodInParamsPascalDecl : string read FMethodInParamsPascalDecl;
-    property MethodOutParamsPascalDecl : string read FMethodOutParamsPascalDecl;
-    property MethodInParamsDecl : string read FMethodInParamsDecl;
-    property MethodOutParamsDecl : string read FMethodOutParamsDecl;
-    property IsStatic : Boolean read FIsStatic;
-    property IsFunction : Boolean read FIsFunction;
-    property Qualifiers : TList<TWMiQualifierMetaData> read FQualifiers;
   end;
 
   TWMiPropertyMetaData=class
@@ -295,6 +248,40 @@ type
     property Qualifiers : TList<TWMiQualifierMetaData> read FQualifiers;
   end;
 
+  TWMiMethodMetaData=class
+  private
+    FValidValues: TStrings;
+    FValidMapValues: TStrings;
+    FIsStatic   : Boolean;
+    FIsFunction : Boolean;
+    FMethodInParamsDecl: string;
+    FMethodOutParamsDecl: string;
+    FMethodInParamsPascalDecl: string;
+    FMethodOutParamsPascalDecl: string;
+    FName: string;
+    FDescription: string;
+    FType: string;
+    FQualifiers: TList<TWMiQualifierMetaData>;
+    FOutParameters: TList<TWMiPropertyMetaData>;
+    FInParameters: TList<TWMiPropertyMetaData>;
+    FImplemented: Boolean;
+  public
+    constructor Create; overload;
+    Destructor  Destroy; override;
+    property Name : string read FName;
+    property Description : string read FDescription;
+    property &Type : string read FType;
+    property MethodInParamsPascalDecl : string read FMethodInParamsPascalDecl;
+    property MethodOutParamsPascalDecl : string read FMethodOutParamsPascalDecl;
+    property MethodInParamsDecl : string read FMethodInParamsDecl;
+    property MethodOutParamsDecl : string read FMethodOutParamsDecl;
+    property Implemented : Boolean read FImplemented;
+    property IsStatic : Boolean read FIsStatic;
+    property IsFunction : Boolean read FIsFunction;
+    property Qualifiers : TList<TWMiQualifierMetaData> read FQualifiers;
+    property InParameters : TList<TWMiPropertyMetaData> read FInParameters;
+    property OutParameters : TList<TWMiPropertyMetaData> read FOutParameters;
+  end;
 
   TWMiClassMetaData=class
   private
@@ -2056,6 +2043,7 @@ var
   oEnumParam        : IEnumvariant;
   iValue            : LongWord;
   PropertyMetaData  : TWMiPropertyMetaData;
+  ParameterMetaData : TWMiPropertyMetaData;
   MethodMetaData    : TWMiMethodMetaData;
   QualifierMetaData : TWMiQualifierMetaData;
   i                 : integer;
@@ -2164,6 +2152,7 @@ begin
   begin
     MethodMetaData:=TWMiMethodMetaData.Create;
     MethodMetaData.FIsStatic:=False;
+    MethodMetaData.FImplemented:=False;
     FCollectionMethodMetaData.Add(MethodMetaData);
     MethodMetaData.FName:=colItem.Name;
     MethodMetaData.FType:=wbemtypeSint32;
@@ -2179,6 +2168,9 @@ begin
         MethodMetaData.Qualifiers[MethodMetaData.Qualifiers.Count-1].FValue:=VarStrNull(Qualif.Value);
         MethodMetaData.Qualifiers[MethodMetaData.Qualifiers.Count-1].FName :=VarStrNull(Qualif.Name);
 
+        if CompareText(VarStrNull(Qualif.Name),'Implemented')=0 then
+          MethodMetaData.FImplemented:=True
+        else
         if CompareText(VarStrNull(Qualif.Name),'description')=0 then
           MethodMetaData.FDescription := VarStrNull(Qualif.Value)
         else
@@ -2202,6 +2194,7 @@ begin
         Qualif:=Unassigned;
       end;
 
+       //get data of in params
         Parameters:= colItem.InParameters;
         if not VarIsNull(Parameters) then
         begin
@@ -2210,16 +2203,24 @@ begin
             oEnumParam:= IUnknown(Parameters._NewEnum) as IEnumVariant;
             while oEnumParam.Next(1, Param, iValue) = 0 do
             begin
-              MethodMetaData.InParams.Add(VarStrNull(Param.Name));
-              MethodMetaData.InParamsTypes.Add(CIMTypeStr(Param.CIMType));
-              MethodMetaData.InParamsDescr.Add('');
-              MethodMetaData.InParamsIsArray[MethodMetaData.InParams.Count-1]:=Param.IsArray;
+              ParameterMetaData:=TWMiPropertyMetaData.Create;
+              MethodMetaData.FInParameters.Add(ParameterMetaData);
+              ParameterMetaData.FName:=Param.Name;
+              ParameterMetaData.FType:=CIMTypeStr(Param.CIMType);
+              ParameterMetaData.FCimType:=Param.CIMType;
+              ParameterMetaData.FIsArray:=Param.IsArray;
+
 
               oEnumQualif :=  IUnknown(Param.Qualifiers_._NewEnum) as IEnumVariant;
                while oEnumQualif.Next(1, Qualif, iValue) = 0 do
                 begin
-                   if  CompareText(Qualif.Name,'Description')=0 Then
-                    MethodMetaData.InParamsDescr[MethodMetaData.InParamsDescr.Count-1]:= VarStrNull(Qualif.Value);
+                  ParameterMetaData.Qualifiers.Add(TWMiQualifierMetaData.Create);
+                  ParameterMetaData.Qualifiers[ParameterMetaData.Qualifiers.Count-1].FValue:=VarStrNull(Qualif.Value);
+                  ParameterMetaData.Qualifiers[ParameterMetaData.Qualifiers.Count-1].FName :=VarStrNull(Qualif.Name);
+
+                  if  CompareText(Qualif.Name,'Description')=0 Then
+                    ParameterMetaData.FDescription:=VarStrNull(Qualif.Value);
+
                   Qualif:=Unassigned;
                 end;
               Param:=Unassigned;
@@ -2228,7 +2229,7 @@ begin
           end;
         end;
 
-
+       //get data of out params
         Parameters:= colItem.OutParameters;
         if not VarIsNull(Parameters) then
         begin
@@ -2237,16 +2238,23 @@ begin
             oEnumParam:= IUnknown(Parameters._NewEnum) as IEnumVariant;
             while oEnumParam.Next(1, Param, iValue) = 0 do
             begin
-              MethodMetaData.OutParams.Add(VarStrNull(Param.Name));
-              MethodMetaData.OutParamsTypes.Add(CIMTypeStr(Param.CIMType));
-              MethodMetaData.OutParamsDescr.Add('');
-              MethodMetaData.OutParamsIsArray[MethodMetaData.OutParams.Count-1]:=Param.IsArray;
+              ParameterMetaData:=TWMiPropertyMetaData.Create;
+              MethodMetaData.FOutParameters.Add(ParameterMetaData);
+              ParameterMetaData.FName:=Param.Name;
+              ParameterMetaData.FType:=CIMTypeStr(Param.CIMType);
+              ParameterMetaData.FCimType:=Param.CIMType;
+              ParameterMetaData.FIsArray:=Param.IsArray;
 
               oEnumQualif :=  IUnknown(Param.Qualifiers_._NewEnum) as IEnumVariant;
                while oEnumQualif.Next(1, Qualif, iValue) = 0 do
                 begin
-                   if  CompareText(Qualif.Name,'Description')=0 Then
-                    MethodMetaData.OutParamsDescr[MethodMetaData.OutParamsDescr.Count-1]:= VarStrNull(Qualif.Value);
+                  ParameterMetaData.Qualifiers.Add(TWMiQualifierMetaData.Create);
+                  ParameterMetaData.Qualifiers[ParameterMetaData.Qualifiers.Count-1].FValue:=VarStrNull(Qualif.Value);
+                  ParameterMetaData.Qualifiers[ParameterMetaData.Qualifiers.Count-1].FName :=VarStrNull(Qualif.Name);
+
+                  if  CompareText(Qualif.Name,'Description')=0 Then
+                   ParameterMetaData.FDescription:=VarStrNull(Qualif.Value);
+
                   Qualif:=Unassigned;
                 end;
               Param:=Unassigned;
@@ -2258,54 +2266,52 @@ begin
 
 
         MethodMetaData.FMethodInParamsDecl:='';
-        for i := 0 to MethodMetaData.InParams.Count-1 do
-         if MethodMetaData.InParamsIsArray[i] then
+        for i := 0 to MethodMetaData.FInParameters.Count-1 do
+         if MethodMetaData.InParameters[i].IsArray then
             MethodMetaData.FMethodInParamsDecl:=MethodMetaData.FMethodInParamsDecl+Format('%s : Array of %s -',
-            [MethodMetaData.InParams[i],MethodMetaData.InParamsTypes[i]])
+            [MethodMetaData.FInParameters[i].Name,MethodMetaData.InParameters[i].&Type])
          else
             MethodMetaData.FMethodInParamsDecl:=MethodMetaData.FMethodInParamsDecl+Format('%s : %s -',
-            [MethodMetaData.InParams[i],MethodMetaData.InParamsTypes[i]]);
+            [MethodMetaData.FInParameters[i].Name,MethodMetaData.InParameters[i].&Type]);
 
         if MethodMetaData.FMethodInParamsDecl<>'' then
         Delete(MethodMetaData.FMethodInParamsDecl,Length(MethodMetaData.FMethodInParamsDecl),1);
 
         MethodMetaData.FMethodOutParamsDecl:='';
-        for i := 0 to MethodMetaData.OutParams.Count-1 do
-         if MethodMetaData.OutParamsIsArray[i] then
+        for i := 0 to MethodMetaData.OutParameters.Count-1 do
+         if MethodMetaData.OutParameters[i].IsArray then
             MethodMetaData.FMethodOutParamsDecl:=MethodMetaData.FMethodOutParamsDecl+Format('%s : Array of %s -',
-            [MethodMetaData.OutParams[i],MethodMetaData.OutParamsTypes[i]])
+            [MethodMetaData.OutParameters[i].Name,MethodMetaData.OutParameters[i].&Type])
          else
             MethodMetaData.FMethodOutParamsDecl:=MethodMetaData.FMethodOutParamsDecl+Format('%s : %s -',
-            [MethodMetaData.OutParams[i],MethodMetaData.OutParamsTypes[i]]);
+            [MethodMetaData.OutParameters[i].Name,MethodMetaData.OutParameters[i].&Type]);
 
         if MethodMetaData.FMethodOutParamsDecl<>'' then
         Delete(MethodMetaData.FMethodOutParamsDecl,Length(MethodMetaData.FMethodOutParamsDecl),1);
 
 
-
         MethodMetaData.FMethodInParamsPascalDecl:='';
-        for i := 0 to MethodMetaData.InParams.Count-1 do
-         if MethodMetaData.InParamsIsArray[i] then
+        for i := 0 to MethodMetaData.InParameters.Count-1 do
+         if MethodMetaData.InParameters[i].IsArray then
             MethodMetaData.FMethodInParamsPascalDecl:=MethodMetaData.FMethodInParamsPascalDecl+Format('const %s : Array of %s;',
-            [EscapeDelphiReservedWord(MethodMetaData.InParams[i]),WmiTypeToDelphiType(MethodMetaData.InParamsTypes[i])])
+            [EscapeDelphiReservedWord(MethodMetaData.InParameters[i].Name),WmiTypeToDelphiType(MethodMetaData.InParameters[i].&Type)])
          else
             MethodMetaData.FMethodInParamsPascalDecl:=MethodMetaData.FMethodInParamsPascalDecl+Format('const %s : %s;',
-            [EscapeDelphiReservedWord(MethodMetaData.InParams[i]),WmiTypeToDelphiType(MethodMetaData.InParamsTypes[i])]);
+            [EscapeDelphiReservedWord(MethodMetaData.InParameters[i].Name),WmiTypeToDelphiType(MethodMetaData.InParameters[i].&Type)]);
 
         if MethodMetaData.FMethodInParamsPascalDecl<>'' then
         Delete(MethodMetaData.FMethodInParamsPascalDecl,Length(MethodMetaData.FMethodInParamsPascalDecl),1);
 
         MethodMetaData.FMethodOutParamsPascalDecl:='';
-        for i := 0 to MethodMetaData.OutParams.Count-1 do
-        if CompareText(MethodMetaData.OutParams[i],'ReturnValue')<>0 then
-          MethodMetaData.FMethodOutParamsPascalDecl:= MethodMetaData.FMethodOutParamsPascalDecl + Format('var %s : %s;',[EscapeDelphiReservedWord(MethodMetaData.OutParams[i]),WmiTypeToDelphiType(MethodMetaData.OutParamsTypes[i])]);
+        for i := 0 to MethodMetaData.OutParameters.Count-1 do
+        if CompareText(MethodMetaData.OutParameters[i].Name,'ReturnValue')<>0 then
+          MethodMetaData.FMethodOutParamsPascalDecl:= MethodMetaData.FMethodOutParamsPascalDecl + Format('var %s : %s;',
+          [EscapeDelphiReservedWord(MethodMetaData.OutParameters[i].Name),WmiTypeToDelphiType(MethodMetaData.OutParameters[i].&Type)]);
 
         if MethodMetaData.FMethodOutParamsPascalDecl<>'' then
-        Delete(MethodMetaData.FMethodOutParamsPascalDecl,Length(MethodMetaData.FMethodOutParamsPascalDecl),1);
+         Delete(MethodMetaData.FMethodOutParamsPascalDecl,Length(MethodMetaData.FMethodOutParamsPascalDecl),1);
 
-
-
-        MethodMetaData.FIsFunction:=MethodMetaData.OutParams.Count>0;
+        MethodMetaData.FIsFunction:=MethodMetaData.OutParameters.Count>0;
         if not MethodMetaData.FIsFunction then  //delete default type value for method because is a method and not a function.
          MethodMetaData.FType:='';
 
@@ -2500,37 +2506,31 @@ end;
 constructor TWMiMethodMetaData.Create;
 begin
   inherited Create;
-  FInParams       := TStringList.Create;
-  FInParamsTypes  := TStringList.Create;
-  FInParamsDescr  := TStringList.Create;
-  FOutParams      := TStringList.Create;
-  FOutParamsTypes := TStringList.Create;
-  FOutParamsDescr := TStringList.Create;
   FValidValues    := TStringList.Create;
   FValidMapValues := TStringList.Create;
-  SetLength(FInParamsIsArray,256);
-  SetLength(FOutParamsIsArray,256);
-  FQualifiers:=TList<TWMiQualifierMetaData>.Create;
+  FQualifiers   :=TList<TWMiQualifierMetaData>.Create;
+  FInParameters :=TList<TWMiPropertyMetaData>.Create;
+  FOutParameters:=TList<TWMiPropertyMetaData>.Create;
 end;
 
 destructor TWMiMethodMetaData.Destroy;
 var
  i : Integer;
 begin
-  FInParams.Free;
-  FInParamsTypes.Free;
-  FInParamsDescr.Free;
-  FOutParamsTypes.Free;
-  FOutParamsDescr.Free;
-  FOutParams.Free;
   FValidValues.Free;
   FValidMapValues.Free;
-  SetLength(FInParamsIsArray,0);
-  SetLength(FOutParamsIsArray,0);
 
   for i:=0 to FQualifiers.Count-1 do
    FQualifiers[i].Free;
   FQualifiers.Free;
+
+  for i:=0 to FInParameters.Count-1 do
+   FInParameters[i].Free;
+  FInParameters.Free;
+
+  for i:=0 to FOutParameters.Count-1 do
+   FOutParameters[i].Free;
+  FOutParameters.Free;
 
   inherited;
 end;

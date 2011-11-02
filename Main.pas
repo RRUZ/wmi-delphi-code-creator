@@ -202,17 +202,14 @@ type
     procedure LoadWmiEvents(const Namespace: string);
     procedure LoadWmiMethods(const Namespace: string);
 
-    //procedure LoadWmiProperties(const Namespace, WmiClass: string);
     procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
-
-
 
     procedure GenerateMethodInvoker;
     procedure GenerateEventCode;
 
     procedure LoadEventsInfo;
     procedure LoadMethodInfo;
-    procedure LoadParametersMethodInfo;
+    procedure LoadParametersMethodInfo(WmiMetaClassInfo : TWMiClassMetaData);
 
     procedure SetToolBar;
     procedure ScrollMemoConsole;
@@ -308,7 +305,7 @@ end;
 
 procedure TFrmMain.CheckBoxPathClick(Sender: TObject);
 begin
-  LoadParametersMethodInfo;
+  LoadParametersMethodInfo(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
 end;
 
 procedure TFrmMain.CheckBoxSelAllPropsClick(Sender: TObject);
@@ -362,7 +359,7 @@ end;
 
 procedure TFrmMain.ComboBoxMethodsChange(Sender: TObject);
 begin
-  LoadParametersMethodInfo;
+  LoadParametersMethodInfo(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
   GenerateMethodInvoker;
 end;
 
@@ -391,54 +388,39 @@ end;
 procedure TFrmMain.ComboBoxTargetInstanceChange(Sender: TObject);
 var
   i:    integer;
-  List: TStringList;
-  Namespace: string;
-  WmiClass: string;
   Item: TListItem;
+  WmiMetaClassInfo : TWMiClassMetaData;
 begin
-  Namespace := ComboBoxNamespacesEvents.Text;
-  WmiClass  := ComboBoxTargetInstance.Text;
 
   ListVieweventsConds.Items.BeginUpdate;
   try
     for i := ListVieweventsConds.Items.Count - 1 downto 0 do
-    begin
       if AnsiStartsStr(wbemTargetInstance, ListVieweventsConds.Items[i].Caption) then
         ListVieweventsConds.Items.Delete(i);
-    end;
 
-    if WmiClass <> '' then
+    if ComboBoxTargetInstance.Text <> '' then
     begin
-      List := TStringList.Create;
+      WmiMetaClassInfo := TWMiClassMetaData.Create(ComboBoxNamespacesEvents.Text, ComboBoxTargetInstance.Text);
       try
-        GetListWmiClassPropertiesTypes(Namespace, WmiClass, List);
-        for i := 0 to List.Count - 1 do
+        for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
         begin
           Item := ListVieweventsConds.Items.Add;
-          Item.Caption := Format('%s.%s', [wbemTargetInstance, List.Names[i]]);
-          Item.Data:=List.Objects[i];//CimType
-          Item.SubItems.Add(List.ValueFromIndex[i]);
+          Item.Caption := Format('%s.%s', [wbemTargetInstance, WmiMetaClassInfo.Properties[i].Name]);
+          Item.Data:=Pointer(WmiMetaClassInfo.Properties[i].CimType);
+          Item.SubItems.Add(WmiMetaClassInfo.Properties[i].&Type);
           Item.SubItems.Add('');
-          Item.SubItems.Add(GetDefaultValueWmiType(List.ValueFromIndex[i]));
+          Item.SubItems.Add(GetDefaultValueWmiType(WmiMetaClassInfo.Properties[i].&Type));
+          Item.SubItems.Add(WmiMetaClassInfo.Properties[i].Description);
         end;
       finally
-        List.Free;
+        WmiMetaClassInfo.Free;
       end;
     end;
 
   finally
     ListVieweventsConds.Items.EndUpdate;
-    {
-    ListVieweventsConds.Column[0].Width:=0;
-    ListVieweventsConds.Column[0].Width:=-1;
-    }
   end;
 
-   {
-   AutoResizeColumn(ListViewEventsConds.Column[0]);
-   AutoResizeColumn(ListViewEventsConds.Column[1]);
-   AutoResizeColumn(ListViewEventsConds.Column[2]);
-    }
   AutoResizeColumns([ListViewEventsConds.Column[0], ListViewEventsConds.Column[1],
     ListViewEventsConds.Column[2]]);
 
@@ -488,7 +470,7 @@ var
   ProgressBarStyle: integer;
   Frm: TFrmWmiDatabase;
 begin
-  //ReportMemoryLeaksOnShutdown:=DebugHook<>0;
+  ReportMemoryLeaksOnShutdown:=DebugHook<>0;
   Settings :=TSettings.Create;
   SetToolBar;
 
@@ -554,6 +536,14 @@ begin
     TWMiClassMetaData(ComboBoxClasses.Items.Objects[i]).Free;
     ComboBoxClasses.Items.Objects[i]:=nil;
    end;
+
+  for i := 0 to ComboBoxClassesMethods.Items.Count-1 do
+   if ComboBoxClassesMethods.Items.Objects[i]<>nil then
+   begin
+    TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[i]).Free;
+    ComboBoxClassesMethods.Items.Objects[i]:=nil;
+   end;
+
 
 
   FrmWMIExplorer.Free;
@@ -997,39 +987,35 @@ end;
 
 procedure TFrmMain.LoadEventsInfo;
 var
-  Namespace: string;
-  EventClass: string;
   Item: TListItem;
-  List: TStringList;
   i:    integer;
+  WmiMetaClassInfo : TWMiClassMetaData;
 begin
-  Namespace  := ComboBoxNamespacesEvents.Text;
-  EventClass := ComboBoxEvents.Text;
-
-  StatusBar1.SimpleText := Format('Loading Properties of %s:%s', [Namespace, EventClass]);
+  StatusBar1.SimpleText := Format('Loading Properties of %s:%s', [ComboBoxNamespacesEvents.Text, ComboBoxEvents.Text]);
   //ListVieweventsConds
-  List := TStringList.Create;
+  WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNamespacesEvents.Text, ComboBoxEvents.Text);
   ListVieweventsConds.Items.BeginUpdate;
   try
     ListVieweventsConds.Items.Clear;
-    GetListWmiClassPropertiesTypes(NameSpace, EventClass, List);
+
+    //GetListWmiClassPropertiesTypes(NameSpace, EventClass, List);
     LabelEventsConds.Caption :=
-      Format('%d Properties of %s:%s', [ListViewProperties.Items.Count, Namespace, EventClass]);
+      Format('%d Properties of %s:%s', [WmiMetaClassInfo.PropertiesCount, WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]);
 
-
-    for i := 0 to List.Count - 1 do
+    for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
     begin
       Item := ListVieweventsConds.Items.Add;
       Item.Checked := False;
-      Item.Caption := List.Names[i];
-      item.Data    := List.Objects[i];
-      Item.SubItems.Add(List.ValueFromIndex[i]);
+      Item.Caption := WmiMetaClassInfo.Properties[i].Name;
+      item.Data    := Pointer(WmiMetaClassInfo.Properties[i].CimType);
+      Item.SubItems.Add(WmiMetaClassInfo.Properties[i].&Type);
       Item.SubItems.Add('');
-      Item.SubItems.Add(GetDefaultValueWmiType(List.ValueFromIndex[i]));
+      Item.SubItems.Add(GetDefaultValueWmiType(WmiMetaClassInfo.Properties[i].&Type));
+      Item.SubItems.Add(WmiMetaClassInfo.Properties[i].Description);
     end;
   finally
     ListVieweventsConds.Items.EndUpdate;
-    List.Free;
+    WmiMetaClassInfo.Free;
     SetMsg('');
   end;
   {
@@ -1044,18 +1030,45 @@ begin
 end;
 
 procedure TFrmMain.LoadMethodInfo;
+Var
+  WmiMetaClassInfo : TWMiClassMetaData;
+  i                : Integer;
 begin
+  if ComboBoxClassesMethods.ItemIndex=-1 then exit;
+
   ComboBoxMethods.Items.BeginUpdate;
   try
     ComboBoxMethods.Items.Clear;
+
+    if ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]=nil then
+    begin
+      WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text);
+      ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]:= WmiMetaClassInfo;
+    end
+    else
+      WmiMetaClassInfo:=TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]);
+
+
     if ComboBoxClassesMethods.Text <> '' then
     begin
+
+      {
       if Settings.ShowImplementedMethods then
         GetListWmiClassImplementedMethods(ComboBoxNamespaceMethods.Text,
           ComboBoxClassesMethods.Text, ComboBoxMethods.Items)
       else
         GetListWmiClassMethods(ComboBoxNamespaceMethods.Text,
           ComboBoxClassesMethods.Text, ComboBoxMethods.Items);
+      }
+      if Settings.ShowImplementedMethods then
+        for i:= 0 to WmiMetaClassInfo.MethodsCount-1 do
+        begin
+         if WmiMetaClassInfo.Methods[i].Implemented then
+           ComboBoxMethods.Items.Add(WmiMetaClassInfo.Methods[i].Name)
+        end
+      else
+        for i:= 0 to WmiMetaClassInfo.MethodsCount-1 do
+          ComboBoxMethods.Items.Add(WmiMetaClassInfo.Methods[i].Name);
 
       ComboBoxPaths.Items.Clear;
     end;
@@ -1070,67 +1083,59 @@ begin
   else
     ComboBoxMethods.ItemIndex := -1;
 
-  LoadParametersMethodInfo;
+  LoadParametersMethodInfo(WmiMetaClassInfo);
   GenerateMethodInvoker;
 end;
 
-procedure TFrmMain.LoadParametersMethodInfo;
+procedure TFrmMain.LoadParametersMethodInfo(WmiMetaClassInfo : TWMiClassMetaData);
 var
-  ParamsList, ParamsTypes, ParamsDescr: TStringList;
   i:    integer;
+  Index : Integer;
   Item: TListItem;
 begin
-  ParamsList  := TStringList.Create;
-  ParamsTypes := TStringList.Create;
-  ParamsDescr := TStringList.Create;
+  if not Assigned(WmiMetaClassInfo) then exit;
+  Index:=-1;
   ListViewMethodsParams.Items.BeginUpdate;
   try
     ListViewMethodsParams.Items.Clear;
     if (ComboBoxClassesMethods.Text <> '') and (ComboBoxMethods.Text <> '') then
     begin
+      for i:=0 to WmiMetaClassInfo.MethodsCount-1 do
+       if CompareText(WmiMetaClassInfo.Methods[i].Name,ComboBoxMethods.Text)=0 then
+       begin
+         Index:=i;
+         break;
+       end;
 
-      if not WmiMethodIsStatic(ComboBoxNamespaceMethods.Text,
-        ComboBoxClassesMethods.Text, ComboBoxMethods.Text) and CheckBoxPath.Checked then
+      if not WmiMetaClassInfo.Methods[Index].IsStatic and CheckBoxPath.Checked then
       begin
-        GetWmiClassPath(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text,
-          ComboBoxPaths.Items);
+        GetWmiClassPath(WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass, ComboBoxPaths.Items);
         if ComboBoxPaths.Items.Count > 0 then
           ComboBoxPaths.ItemIndex := 0;
-
-        //ComboBoxPaths.Visible:=True;
-        //CheckBoxPath.Visible:=True;
       end
       else
-      begin
-        //ComboBoxPaths.Visible:=False;
-        //CheckBoxPath.Visible:=False;
         ComboBoxPaths.Items.Clear;
-      end;
 
-
-      MemoMethodDescr.Text := GetWmiMethodDescription(
-        ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text, ComboBoxMethods.Text);
+      MemoMethodDescr.Text := WmiMetaClassInfo.Methods[Index].Description;
 
       if MemoMethodDescr.Text = '' then
         MemoMethodDescr.Text := 'Method without description available';
 
-      GetListWmiMethodInParameters(ComboBoxNamespaceMethods.Text,
-        ComboBoxClassesMethods.Text, ComboBoxMethods.Text, ParamsList, ParamsTypes, ParamsDescr);
+      //GetListWmiMethodInParameters(ComboBoxNamespaceMethods.Text,  ComboBoxClassesMethods.Text, ComboBoxMethods.Text, ParamsList, ParamsTypes, ParamsDescr);
     end;
 
-    for i := 0 to ParamsList.Count - 1 do
+    if Index>=0 then
+    for i := 0 to WmiMetaClassInfo.Methods[Index].InParameters.Count - 1 do
     begin
       Item := ListViewMethodsParams.Items.Add;
-      Item.Caption := ParamsList[i];
-      Item.Data:=ParamsTypes.Objects[i];//CimType
-      Item.SubItems.Add(ParamsTypes[i]);
-      Item.SubItems.Add(GetDefaultValueWmiType(ParamsTypes[i]));
+      Item.Caption := WmiMetaClassInfo.Methods[Index].InParameters[i].Name;
+      Item.Data    := Pointer(WmiMetaClassInfo.Methods[Index].InParameters[i].CimType);
+      Item.SubItems.Add(WmiMetaClassInfo.Methods[Index].InParameters[i].&Type);
+      Item.SubItems.Add(GetDefaultValueWmiType(WmiMetaClassInfo.Methods[Index].InParameters[i].&Type));
+      Item.SubItems.Add(WmiMetaClassInfo.Methods[Index].InParameters[i].Description);
     end;
   finally
     ListViewMethodsParams.Items.EndUpdate;
-    ParamsList.Free;
-    ParamsTypes.Free;
-    ParamsDescr.Free;
   end;
 
   AutoResizeColumn(ListViewMethodsParams.Column[0]);
@@ -1419,9 +1424,18 @@ begin
 end;
 
 procedure TFrmMain.LoadWmiMethods(const Namespace: string);
+var
+  i  : Integer;
 begin
   SetMsg(Format('Loading classes with methods in %s', [Namespace]));
   try
+
+    for i := 0 to ComboBoxClassesMethods.Items.Count-1 do
+     if ComboBoxClassesMethods.Items.Objects[i]<>nil then
+     begin
+      TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[i]).Free;
+      ComboBoxClassesMethods.Items.Objects[i]:=nil;
+     end;
 
     if not ExistWmiClassesMethodsCache(Namespace) then
     begin
@@ -1454,7 +1468,6 @@ begin
   List.LoadFromFile(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
 end;
 
-//procedure TFrmMain.LoadWmiProperties(const Namespace, WmiClass: string);
 procedure TFrmMain.LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
 var
   i:     integer;
@@ -1487,41 +1500,6 @@ begin
     AutoResizeColumn(ListViewProperties.Column[i]);
 
   GenerateConsoleCode;
-
-
- {
-  StatusBar1.SimpleText := Format('Loading Properties of %s:%s', [Namespace, WmiClass]);
-  ListViewProperties.Items.BeginUpdate;
-  Props := TStringList.Create;
-  try
-    ListViewProperties.Items.Clear;
-    GetListWmiClassPropertiesTypes(NameSpace, WmiClass, Props);
-
-    for i := 0 to Props.Count - 1 do
-    begin
-      item := ListViewProperties.Items.Add;
-      item.Caption := Props.Names[i];
-      item.SubItems.Add(Props.ValueFromIndex[i]);
-      item.Checked := CheckBoxSelAllProps.Checked;
-      item.Data    := Props.Objects[i]; //Cimtype
-    end;
-
-    LabelProperties.Caption := Format('%d Properties of %s:%s',
-      [ListViewProperties.Items.Count, Namespace, WmiClass]);
-  finally
-    ListViewProperties.Items.EndUpdate;
-    Props.Free;
-  end;
-  SetMsg('');
-
-  for i := 0 to ListViewProperties.Columns.Count - 1 do
-    AutoResizeColumn(ListViewProperties.Column[i]);
-
-  GenerateConsoleCode;
- }
-
-
-
 end;
 
 
@@ -1578,7 +1556,6 @@ begin
   ProgressBarWmi.Width  := Rect.Right - Rect.Left - 15;
   ProgressBarWmi.Height := Rect.Bottom - Rect.Top;
 end;
-
 
 procedure TFrmMain.ToolButtonOnlineClick(Sender: TObject);
 begin
