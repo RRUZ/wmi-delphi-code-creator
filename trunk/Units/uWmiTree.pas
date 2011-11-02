@@ -259,21 +259,21 @@ begin
                 end;
 
               //Add methods In parameters
-                for j := 0 to WmiMetaClassInfo.Methods[i].InParams.Count - 1 do
+                for j := 0 to WmiMetaClassInfo.Methods[i].InParameters.Count - 1 do
                 begin
                   NodeQ :=
                     TreeViewWmiClasses.Items.AddChild(
-                    NodeC, Format('[In] %s:%s', [WmiMetaClassInfo.Methods[i].InParams[j], WmiMetaClassInfo.Methods[i].InParamsTypes[j]]));
+                    NodeC, Format('[In] %s:%s', [WmiMetaClassInfo.Methods[i].InParameters[j].Name, WmiMetaClassInfo.Methods[i].InParameters[j].&Type]));
                   NodeQ.ImageIndex := ParameterInImageIndex;
                   NodeQ.SelectedIndex := ParameterInImageIndex;
                 end;
 
               //Add methods Out parameters
-                for j := 0 to WmiMetaClassInfo.Methods[i].OutParams.Count- 1 do
+                for j := 0 to WmiMetaClassInfo.Methods[i].OutParameters.Count- 1 do
                 begin
                   NodeQ :=
                     TreeViewWmiClasses.Items.AddChild(
-                    NodeC, Format('[Out] %s:%s', [WmiMetaClassInfo.Methods[i].OutParams[j], WmiMetaClassInfo.Methods[i].OutParamsTypes[j]]));
+                    NodeC, Format('[Out] %s:%s', [WmiMetaClassInfo.Methods[i].OutParameters[j].Name, WmiMetaClassInfo.Methods[i].OutParameters[j].&Type]));
                   NodeQ.ImageIndex := ParameterOutImageIndex;
                   NodeQ.SelectedIndex := ParameterOutImageIndex;
                 end;

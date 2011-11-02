@@ -2,7 +2,7 @@ object FrmMain: TFrmMain
   Left = 379
   Top = 129
   Caption = 'Wmi Delphi Code Creator'
-  ClientHeight = 730
+  ClientHeight = 731
   ClientWidth = 1008
   Color = clBtnFace
   DoubleBuffered = True
@@ -23,23 +23,25 @@ object FrmMain: TFrmMain
     Left = 0
     Top = 30
     Width = 1008
-    Height = 681
+    Height = 682
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
     ExplicitTop = 36
+    ExplicitHeight = 681
     object PageControlMain: TPageControl
       Left = 5
       Top = 5
       Width = 998
-      Height = 671
+      Height = 672
       ActivePage = TabSheetCodeGen
       Align = alClient
       Images = ImageList1
       MultiLine = True
       TabOrder = 0
       OnChange = PageControlMainChange
+      ExplicitHeight = 671
       object TabSheetCodeGen: TTabSheet
         Caption = 'Code Generation'
         ImageIndex = 30
@@ -51,7 +53,7 @@ object FrmMain: TFrmMain
           Left = 0
           Top = 0
           Width = 990
-          Height = 642
+          Height = 643
           Align = alClient
           BevelOuter = bvNone
           BevelWidth = 5
@@ -59,7 +61,7 @@ object FrmMain: TFrmMain
           ExplicitHeight = 650
           object Splitter4: TSplitter
             Left = 0
-            Top = 474
+            Top = 475
             Width = 990
             Height = 5
             Cursor = crVSplit
@@ -72,13 +74,12 @@ object FrmMain: TFrmMain
             Left = 0
             Top = 41
             Width = 990
-            Height = 433
+            Height = 434
             ActivePage = TabSheetWmiClasses
             Align = alClient
             Images = ImageList1
             MultiLine = True
             TabOrder = 1
-            ExplicitHeight = 434
             object TabSheetWmiClasses: TTabSheet
               Caption = 'WMI Classes'
               ImageIndex = 40
@@ -90,7 +91,7 @@ object FrmMain: TFrmMain
                 Left = 308
                 Top = 0
                 Width = 5
-                Height = 404
+                Height = 405
                 ExplicitLeft = 289
                 ExplicitHeight = 704
               end
@@ -98,14 +99,14 @@ object FrmMain: TFrmMain
                 Left = 0
                 Top = 0
                 Width = 308
-                Height = 404
+                Height = 405
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
                 ExplicitHeight = 406
                 DesignSize = (
                   308
-                  404)
+                  405)
                 object LabelProperties: TLabel
                   Left = 9
                   Top = 142
@@ -179,7 +180,7 @@ object FrmMain: TFrmMain
                   Left = 7
                   Top = 192
                   Width = 295
-                  Height = 208
+                  Height = 207
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -206,7 +207,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 210
+                  ExplicitHeight = 208
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -224,7 +225,7 @@ object FrmMain: TFrmMain
                 Left = 313
                 Top = 0
                 Width = 669
-                Height = 404
+                Height = 405
                 Align = alClient
                 BevelOuter = bvNone
                 BorderWidth = 5
@@ -234,7 +235,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 5
                   Width = 659
-                  Height = 394
+                  Height = 395
                   ActivePage = TabSheetWmiClassCode
                   Align = alClient
                   TabOrder = 0
@@ -246,7 +247,7 @@ object FrmMain: TFrmMain
                       Left = 0
                       Top = 0
                       Width = 651
-                      Height = 366
+                      Height = 367
                       Align = alClient
                       Color = 4598550
                       ActiveLineColor = clBlue
@@ -285,7 +286,7 @@ object FrmMain: TFrmMain
                 Left = 393
                 Top = 0
                 Width = 5
-                Height = 404
+                Height = 405
                 ExplicitLeft = 405
                 ExplicitHeight = 473
               end
@@ -293,13 +294,14 @@ object FrmMain: TFrmMain
                 Left = 0
                 Top = 0
                 Width = 393
-                Height = 404
+                Height = 405
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
+                ExplicitHeight = 404
                 DesignSize = (
                   393
-                  404)
+                  405)
                 object Label4: TLabel
                   Left = 11
                   Top = 18
@@ -369,7 +371,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 145
+                  Height = 144
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -388,6 +390,10 @@ object FrmMain: TFrmMain
                     item
                       Caption = 'Value'
                       Width = 150
+                    end
+                    item
+                      Caption = 'Description'
+                      Width = 250
                     end>
                   ReadOnly = True
                   TabOrder = 6
@@ -415,13 +421,14 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 367
+                  Top = 366
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 8
                   OnClick = ButtonGenerateCodeInvokerClick
+                  ExplicitTop = 365
                 end
                 object ComboBoxPaths: TComboBox
                   Left = 103
@@ -447,7 +454,7 @@ object FrmMain: TFrmMain
                 Left = 398
                 Top = 0
                 Width = 584
-                Height = 404
+                Height = 405
                 Align = alClient
                 BevelOuter = bvNone
                 BorderWidth = 5
@@ -457,17 +464,19 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 5
                   Width = 574
-                  Height = 394
+                  Height = 395
                   ActivePage = TabSheetWmiMethodCode
                   Align = alClient
                   TabOrder = 0
+                  ExplicitHeight = 394
                   object TabSheetWmiMethodCode: TTabSheet
                     Caption = 'Code'
+                    ExplicitHeight = 366
                     object SynEditWMIMethodCode: TSynEdit
                       Left = 0
                       Top = 0
                       Width = 566
-                      Height = 366
+                      Height = 367
                       Align = alClient
                       Color = 4598550
                       ActiveLineColor = clBlue
@@ -489,6 +498,7 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
+                      ExplicitHeight = 366
                     end
                   end
                 end
@@ -505,7 +515,7 @@ object FrmMain: TFrmMain
                 Left = 416
                 Top = 0
                 Width = 5
-                Height = 404
+                Height = 405
                 ExplicitLeft = 402
                 ExplicitHeight = 454
               end
@@ -513,14 +523,14 @@ object FrmMain: TFrmMain
                 Left = 0
                 Top = 0
                 Width = 416
-                Height = 404
+                Height = 405
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
                 ExplicitHeight = 412
                 DesignSize = (
                   416
-                  404)
+                  405)
                 object LabelEventsConds: TLabel
                   Left = 5
                   Top = 157
@@ -574,7 +584,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 93
+                  Height = 196
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -593,11 +603,15 @@ object FrmMain: TFrmMain
                     item
                       Caption = 'Value'
                       Width = 60
+                    end
+                    item
+                      Caption = 'Description'
                     end>
                   ReadOnly = True
                   TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewEventsCondsClick
+                  ExplicitHeight = 195
                 end
                 object EditValueEvent: TEdit
                   Left = 88
@@ -671,13 +685,14 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 275
+                  Top = 378
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 9
                   OnClick = ButtonGenerateEventCodeClick
+                  ExplicitTop = 377
                 end
                 object RadioButtonIntrinsic: TRadioButton
                   Left = 5
@@ -704,7 +719,7 @@ object FrmMain: TFrmMain
                 Left = 421
                 Top = 0
                 Width = 561
-                Height = 404
+                Height = 405
                 Align = alClient
                 BevelOuter = bvNone
                 BorderWidth = 5
@@ -714,18 +729,19 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 5
                   Width = 551
-                  Height = 394
+                  Height = 395
                   ActivePage = TabSheetWmiEventCode
                   Align = alClient
                   TabOrder = 0
                   ExplicitHeight = 402
                   object TabSheetWmiEventCode: TTabSheet
                     Caption = 'Delphi Code'
+                    ExplicitHeight = 366
                     object SynEditWMIEventCode: TSynEdit
                       Left = 0
                       Top = 0
                       Width = 543
-                      Height = 366
+                      Height = 367
                       Align = alClient
                       Color = 4598550
                       ActiveLineColor = clBlue
@@ -747,6 +763,7 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
+                      ExplicitHeight = 366
                     end
                   end
                 end
@@ -755,7 +772,7 @@ object FrmMain: TFrmMain
           end
           object PanelConsole: TPanel
             Left = 0
-            Top = 479
+            Top = 480
             Width = 990
             Height = 163
             Align = alBottom
@@ -827,23 +844,27 @@ object FrmMain: TFrmMain
       object TabSheetWmiExplorer: TTabSheet
         Caption = 'Wmi Explorer'
         ImageIndex = 29
+        ExplicitHeight = 642
       end
       object TabSheetTreeClasses: TTabSheet
         Caption = 'WMI Classes Tree'
         ImageIndex = 43
+        ExplicitHeight = 642
       end
       object TabSheetWmiDatabase: TTabSheet
         Caption = 'WMI Database'
         ImageIndex = 31
+        ExplicitHeight = 642
       end
       object TabSheet6: TTabSheet
         Caption = 'Log'
         ImageIndex = 28
+        ExplicitHeight = 642
         object MemoLog: TMemo
           Left = 0
           Top = 0
           Width = 990
-          Height = 642
+          Height = 643
           Align = alClient
           Color = clBlack
           Font.Charset = ANSI_CHARSET
@@ -853,13 +874,14 @@ object FrmMain: TFrmMain
           Font.Style = []
           ParentFont = False
           TabOrder = 0
+          ExplicitHeight = 642
         end
       end
     end
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 711
+    Top = 712
     Width = 1008
     Height = 19
     Panels = <
@@ -875,6 +897,7 @@ object FrmMain: TFrmMain
         Width = 250
       end>
     OnDrawPanel = StatusBar1DrawPanel
+    ExplicitTop = 711
   end
   object ToolBar1: TToolBar
     Left = 0
@@ -1023,7 +1046,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F0078006C0110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800700110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
