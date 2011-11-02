@@ -25,7 +25,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, SynEditHighlighter, ImgList,
+  Dialogs, SynEditHighlighter, ImgList, uWmi_Metadata,
   OleCtrls, SHDocVw, SynEdit, ComCtrls, StdCtrls, ExtCtrls;
 
 const
@@ -70,7 +70,7 @@ type
     procedure LoadXMLWMIClass(const Xml: string);
   public
     { Public declarations }
-    procedure LoadClassInfo;
+    procedure LoadClassInfo(WmiMetaClassInfo : TWMiClassMetaData);
   end;
 
 function FindTextTreeView(const AText: string;
@@ -82,7 +82,6 @@ uses
   XMLDoc,
   XMLIntf,
   StrUtils,
-  uWmi_Metadata,
   Main,
   uMisc;
 
@@ -185,58 +184,37 @@ begin
 end;
 
 
-procedure TFrmWMITree.LoadClassInfo;
+procedure TFrmWMITree.LoadClassInfo(WmiMetaClassInfo : TWMiClassMetaData);
 var
-  Props: TStringList;
-  List: TStringList;
-  List2: TStringList;
   i, j: integer;
   Node: TTreeNode;
   NodeC: TTreeNode;
   NodeQ: TTreeNode;
-  Namespace: string;
-  WmiClass: string;
   Xml: string;
-
-  ParamsList, ParamsTypes, ParamsDescr: TStringList;
 begin
   FrmMain.ProgressBarWmi.Visible := True;
   try
-
-    Namespace := FrmMain.ComboBoxNameSpaces.Text;
-    WmiClass  := FrmMain.ComboBoxClasses.Text;
-    if (Namespace <> '') and (WmiClass <> '') then
+    if Assigned(WmiMetaClassInfo)  then
     begin
-      FrmMain.SetMsg(Format('Loading Info Class %s:%s', [Namespace, WmiClass]));
-             {
-             MemoClassDescr.Text:=GetWmiClassDescription(Namespace,WmiClass);
-             if MemoClassDescr.Text='' then
-             MemoClassDescr.Text:='Class without description available';
-             }
-      WebBrowserWmi.Navigate(Format(UrlWmiHelp, [WmiClass]));
-      MemoWmiMOF.Lines.Text := GetWmiClassMOF(Namespace, WmiClass);
-      Xml := GetWmiClassXML(Namespace, WmiClass);
-      LoadXMLWMIClass(Xml);
+      FrmMain.SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
-             {
-             LoadWmiProperties(Namespace, WmiClass);
-             }
-      List := TStringList.Create;
+      WebBrowserWmi.Navigate(Format(UrlWmiHelp, [WmiMetaClassInfo.WmiClass]));
+      MemoWmiMOF.Lines.Text := WmiMetaClassInfo.WmiClassMOF;
+      Xml := WmiMetaClassInfo.WmiClassXML;
+      LoadXMLWMIClass(Xml);
       MemoQualifiers.Lines.BeginUpdate;
       MemoQualifiers.Lines.Clear;
       try
-        GetWmiClassQualifiers(Namespace, WmiClass, List);
-        for i := 0 to List.Count - 1 do
+        for i := 0 to WmiMetaClassInfo.QualifiersCount - 1 do
           MemoQualifiers.Lines.Add(
-            Format('%-30s %s', [List.Names[i], List.ValueFromIndex[i]]));
+            Format('%-30s %s', [WmiMetaClassInfo.Qualifiers[i].Name, WmiMetaClassInfo.Qualifiers[i].Value]));
       finally
-        List.Free;
         MemoQualifiers.Lines.EndUpdate;
       end;
 
-      Node := FindTextTreeView(Namespace, TreeViewWmiClasses);
+      Node := FindTextTreeView(WmiMetaClassInfo.WmiNameSpace, TreeViewWmiClasses);
       if Assigned(Node) then
-        Node := FindTextTreeView(WmiClass, TreeViewWmiClasses, Node);
+        Node := FindTextTreeView(WmiMetaClassInfo.WmiClass, TreeViewWmiClasses, Node);
 
       if Assigned(Node) and (Node.Count = 0) then
         //only if not has child node add the info
@@ -244,114 +222,63 @@ begin
         TreeViewWmiClasses.Items.BeginUpdate;
         try
           //add properties and info about it
-          Props := TStringList.Create;
-          try
-            GetListWmiClassPropertiesTypes(Namespace, WmiClass, List);
-
-            for i := 0 to Props.Count - 1 do
+            for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
             begin
               NodeC := TreeViewWmiClasses.Items.AddChild(
-                Node, Format('Property %s : %s', [Props.Names[i], Props.ValueFromIndex[i]]));
+                Node, Format('Property %s : %s', [WmiMetaClassInfo.Properties[i].Name, WmiMetaClassInfo.Properties[i].&Type]));
               NodeC.ImageIndex := PropertyImageIndex;
               NodeC.SelectedIndex := PropertyImageIndex;
 
               //Add props Qualifiers
-              List := TStringList.Create;
-              try
-                GetWmiClassPropertiesQualifiers(
-                  Namespace, WmiClass, Props.Names[i], List);
-                for j := 0 to List.Count - 1 do
-                begin
-                  NodeQ :=
-                    TreeViewWmiClasses.Items.AddChild(
-                    NodeC, Format('%s=%s', [List.Names[j], List.ValueFromIndex[j]]));
-                  NodeQ.ImageIndex := QualifierImageIndex;
-                  NodeQ.SelectedIndex := QualifierImageIndex;
-                end;
-              finally
-                List.Free;
+              //GetWmiClassPropertiesQualifiers( Namespace, WmiClass, Props.Names[i], List);
+              for j := 0 to WmiMetaClassInfo.Properties[i].Qualifiers.Count - 1 do
+              begin
+                NodeQ :=
+                  TreeViewWmiClasses.Items.AddChild(
+                  NodeC, Format('%s=%s', [WmiMetaClassInfo.Properties[i].Qualifiers[j].Name, WmiMetaClassInfo.Properties[i].Qualifiers[j].Value]));
+                NodeQ.ImageIndex := QualifierImageIndex;
+                NodeQ.SelectedIndex := QualifierImageIndex;
               end;
             end;
-          finally
-            Props.Free;
-          end;
 
-          List := TStringList.Create;
-          try
-            GetListWmiClassMethods(Namespace, WmiClass, List);
             //add methods and info about it
-            for i := 0 to List.Count - 1 do
+            for i := 0 to WmiMetaClassInfo.MethodsCount - 1 do
             begin
-              NodeC := TreeViewWmiClasses.Items.AddChild(Node,
-                Format('Method %s', [List[i]]));
+              NodeC := TreeViewWmiClasses.Items.AddChild(Node, Format('Method %s', [WmiMetaClassInfo.Methods[i].Name]));
               NodeC.ImageIndex := MethodImageIndex;
               NodeC.SelectedIndex := MethodImageIndex;
 
               //Add methods Qualifiers
-              List2 := TStringList.Create;
-              try
-                GetWmiClassMethodsQualifiers(Namespace, WmiClass, List[i], List2);
-                //MemoLog.Lines.Add(List2.CommaText);
-                for j := 0 to List2.Count - 1 do
+                for j := 0 to WmiMetaClassInfo.Methods[i].Qualifiers.Count - 1 do
                 begin
                   NodeQ :=
                     TreeViewWmiClasses.Items.AddChild(
-                    NodeC, Format('%s=%s', [List2.Names[j], List2.ValueFromIndex[j]]));
+                    NodeC, Format('%s=%s', [WmiMetaClassInfo.Methods[i].Qualifiers[j].Name, WmiMetaClassInfo.Methods[i].Qualifiers[j].Value]));
                   NodeQ.ImageIndex := QualifierImageIndex;
                   NodeQ.SelectedIndex := QualifierImageIndex;
                 end;
-              finally
-                List2.Free;
-              end;
 
               //Add methods In parameters
-              ParamsList  := TStringList.Create;
-              ParamsTypes := TStringList.Create;
-              ParamsDescr := TStringList.Create;
-              try
-                GetListWmiMethodInParameters(
-                  Namespace, WmiClass, List[i], ParamsList, ParamsTypes, ParamsDescr);
-                //MemoLog.Lines.Add(List2.CommaText);
-                for j := 0 to List2.Count - 1 do
+                for j := 0 to WmiMetaClassInfo.Methods[i].InParams.Count - 1 do
                 begin
                   NodeQ :=
                     TreeViewWmiClasses.Items.AddChild(
-                    NodeC, Format('[In] %s:%s', [ParamsList[j], ParamsTypes[j]]));
+                    NodeC, Format('[In] %s:%s', [WmiMetaClassInfo.Methods[i].InParams[j], WmiMetaClassInfo.Methods[i].InParamsTypes[j]]));
                   NodeQ.ImageIndex := ParameterInImageIndex;
                   NodeQ.SelectedIndex := ParameterInImageIndex;
                 end;
-              finally
-                ParamsList.Free;
-                ParamsTypes.Free;
-                ParamsDescr.Free;
-              end;
 
               //Add methods Out parameters
-              ParamsList  := TStringList.Create;
-              ParamsTypes := TStringList.Create;
-              ParamsDescr := TStringList.Create;
-              try
-                GetListWmiMethodOutParameters(
-                  Namespace, WmiClass, List[i], ParamsList, ParamsTypes, ParamsDescr);
-                //MemoLog.Lines.Add(List2.CommaText);
-                for j := 0 to List2.Count - 1 do
+                for j := 0 to WmiMetaClassInfo.Methods[i].OutParams.Count- 1 do
                 begin
                   NodeQ :=
                     TreeViewWmiClasses.Items.AddChild(
-                    NodeC, Format('[Out] %s:%s', [ParamsList[j], ParamsTypes[j]]));
+                    NodeC, Format('[Out] %s:%s', [WmiMetaClassInfo.Methods[i].OutParams[j], WmiMetaClassInfo.Methods[i].OutParamsTypes[j]]));
                   NodeQ.ImageIndex := ParameterOutImageIndex;
                   NodeQ.SelectedIndex := ParameterOutImageIndex;
                 end;
-              finally
-                ParamsList.Free;
-                ParamsTypes.Free;
-                ParamsDescr.Free;
-              end;
-
             end;
-          finally
-            List.Free;
-          end;
+
         finally
           TreeViewWmiClasses.Items.EndUpdate;
         end;
@@ -433,9 +360,9 @@ end;
 procedure TFrmWMITree.TreeViewWmiClassesChange(Sender: TObject; xNode: TTreeNode);
 var
   Node:   TTreeNode;
-  sValue: string;
+  WMiClassMetaData : TWMiClassMetaData;
 begin
-  MemoDescr.Lines.Clear;
+  //MemoDescr.Lines.Clear;
   Node := TreeViewWmiClasses.Selected;
   if Assigned(Node) and (Node.Level = LevelNameSpace) and (Node.Count = 0) then
   begin
@@ -455,24 +382,23 @@ begin
     FrmMain.ComboBoxNameSpaces.ItemIndex :=
       FrmMain.ComboBoxNameSpaces.Items.IndexOf(Node.Parent.Text);
     FrmMain.LoadWmiClasses(FrmMain.ComboBoxNameSpaces.Text);
-
-
     FrmMain.ComboBoxClasses.ItemIndex := FrmMain.ComboBoxClasses.Items.IndexOf(Node.Text);
     FrmMain.ComboBoxClassesChange(FrmMain.ComboBoxClasses);
-
-    LoadClassInfo;
+    WMiClassMetaData:=TWMiClassMetaData(FrmMain.ComboBoxClasses.Items.Objects[FrmMain.ComboBoxClasses.ItemIndex]);
+    MemoDescr.Lines.Text :=WMiClassMetaData.DescriptionEx;
+    LoadClassInfo(WMiClassMetaData);
     FrmMain.GenerateConsoleCode;
   end
   else
   if Assigned(Node) and (Node.Level = LevelPropertyMethod) then
   begin
+    {
     //'Property %s : %s'
     if StartsText('Property', Node.Text) then
     begin
       sValue := StringReplace(Node.Text, 'Property ', '', [rfReplaceAll]);
       sValue := Trim(Copy(sValue, 1, Pos(':', sValue) - 1));
-      MemoDescr.Lines.Text := GetWmiPropertyDescription(
-        Node.Parent.Parent.Text, Node.Parent.Text, sValue);
+      MemoDescr.Lines.Text := GetWmiPropertyDescription(Node.Parent.Parent.Text, Node.Parent.Text, sValue);
     end
     else
     if StartsText('Method', Node.Text) then
@@ -481,6 +407,7 @@ begin
       MemoDescr.Lines.Text := GetWmiMethodDescription(
         Node.Parent.Parent.Text, Node.Parent.Text, sValue);
     end;
+    }
   end
   else
   if Assigned(Node) and (Node.Level = LevelNameSpace) then

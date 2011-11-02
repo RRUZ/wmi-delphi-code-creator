@@ -38,7 +38,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, SynEditHighlighter, SynHighlighterPas,
-  SynEdit, ImgList, ToolWin, uWmiTree, uSettings,
+  SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmi_Metadata,
   Menus, Buttons, uComboBox, uWmiClassTree, SynHighlighterCpp;
 
 const
@@ -201,7 +201,10 @@ type
     procedure LoadWmiMetaData;
     procedure LoadWmiEvents(const Namespace: string);
     procedure LoadWmiMethods(const Namespace: string);
-    procedure LoadWmiProperties(const Namespace, WmiClass: string);
+
+    //procedure LoadWmiProperties(const Namespace, WmiClass: string);
+    procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
+
 
 
     procedure GenerateMethodInvoker;
@@ -246,7 +249,6 @@ uses
   CommCtrl,
   StrUtils,
   uWmi_About,
-  uWmi_Metadata,
   uSelectCompilerVersion,
   uWmi_ViewPropsValues,
   uListView_Helper,
@@ -486,6 +488,7 @@ var
   ProgressBarStyle: integer;
   Frm: TFrmWmiDatabase;
 begin
+  //ReportMemoryLeaksOnShutdown:=DebugHook<>0;
   Settings :=TSettings.Create;
   SetToolBar;
 
@@ -542,7 +545,17 @@ end;
 
 
 procedure TFrmMain.FormDestroy(Sender: TObject);
+var
+ i : Integer;
 begin
+  for i := 0 to ComboBoxClasses.Items.Count-1 do
+   if ComboBoxClasses.Items.Objects[i]<>nil then
+   begin
+    TWMiClassMetaData(ComboBoxClasses.Items.Objects[i]).Free;
+    ComboBoxClasses.Items.Objects[i]:=nil;
+   end;
+
+
   FrmWMIExplorer.Free;
   FrmWmiClassTree.Free;
   Settings.Free;
@@ -951,22 +964,30 @@ end;
 
 procedure TFrmMain.LoadClassInfo;
 var
-  Namespace: string;
-  WmiClass:  string;
+  WmiMetaClassInfo : TWMiClassMetaData;
 begin
+  if ComboBoxClasses.ItemIndex=-1 then exit;
+  
   ProgressBarWmi.Visible := True;
   try
-    Namespace := ComboBoxNameSpaces.Text;
-    WmiClass  := ComboBoxClasses.Text;
-    if (Namespace <> '') and (WmiClass <> '') then
+    if ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]=nil then
     begin
-      SetMsg(Format('Loading Info Class %s:%s', [Namespace, WmiClass]));
-      MemoClassDescr.Text := GetWmiClassDescription(Namespace, WmiClass);
+      WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
+      ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]:= WmiMetaClassInfo;
+    end
+    else
+      WmiMetaClassInfo:=TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
+
+    if Assigned(WmiMetaClassInfo) then
+    begin
+      SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
+      MemoClassDescr.Text :=  WmiMetaClassInfo.Description; //GetWmiClassDescription(Namespace, WmiClass);
       if MemoClassDescr.Text = '' then
         MemoClassDescr.Text := 'Class without description available';
-      LoadWmiProperties(Namespace, WmiClass);
 
-      FrmWMIExplorer.LoadClassInfo;
+      //LoadWmiProperties(Namespace, WmiClass);
+      LoadWmiProperties(WmiMetaClassInfo);
+      FrmWMIExplorer.LoadClassInfo(WmiMetaClassInfo);
     end;
   finally
     SetMsg('');
@@ -1127,6 +1148,15 @@ begin
   Node := FindTextTreeView(Namespace, FrmWMIExplorer.TreeViewWmiClasses);
   if Assigned(Node) then
   begin
+
+    for i := 0 to ComboBoxClasses.Items.Count-1 do
+     if ComboBoxClasses.Items.Objects[i]<>nil then
+     begin
+      TWMiClassMetaData(ComboBoxClasses.Items.Objects[i]).Free;
+      ComboBoxClasses.Items.Objects[i]:=nil;
+     end;
+
+
     if Assigned(Node.Data) then
     begin
       FClasses := TStringList(Node.Data);
@@ -1424,12 +1454,42 @@ begin
   List.LoadFromFile(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
 end;
 
-procedure TFrmMain.LoadWmiProperties(const Namespace, WmiClass: string);
+//procedure TFrmMain.LoadWmiProperties(const Namespace, WmiClass: string);
+procedure TFrmMain.LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
 var
   i:     integer;
-  Props: TStringList;
+  //Props: TStringList;
   item:  TListItem;
 begin
+  StatusBar1.SimpleText := Format('Loading Properties of %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]);
+  ListViewProperties.Items.BeginUpdate;
+  try
+    ListViewProperties.Items.Clear;
+
+    for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
+    begin
+      item := ListViewProperties.Items.Add;
+      item.Caption := WmiMetaClassInfo.Properties[i].Name;
+      item.SubItems.Add(WmiMetaClassInfo.Properties[i].&Type);
+      item.SubItems.Add(WmiMetaClassInfo.Properties[i].Description);
+      item.Checked := CheckBoxSelAllProps.Checked;
+      item.Data    := Pointer(WmiMetaClassInfo.Properties[i].CimType); //Cimtype
+    end;
+
+    LabelProperties.Caption := Format('%d Properties of %s:%s',
+      [ListViewProperties.Items.Count, WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]);
+  finally
+    ListViewProperties.Items.EndUpdate;
+  end;
+  SetMsg('');
+
+  for i := 0 to ListViewProperties.Columns.Count - 1 do
+    AutoResizeColumn(ListViewProperties.Column[i]);
+
+  GenerateConsoleCode;
+
+
+ {
   StatusBar1.SimpleText := Format('Loading Properties of %s:%s', [Namespace, WmiClass]);
   ListViewProperties.Items.BeginUpdate;
   Props := TStringList.Create;
@@ -1458,6 +1518,10 @@ begin
     AutoResizeColumn(ListViewProperties.Column[i]);
 
   GenerateConsoleCode;
+ }
+
+
+
 end;
 
 
