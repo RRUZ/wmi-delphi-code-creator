@@ -28,6 +28,7 @@ uses
   SysUtils,
   ActiveX,
   ComObj,
+  Generics.Collections,
   Variants;
 
 
@@ -212,6 +213,16 @@ Const
 
 type
   TArrayBoolean = Array of Boolean;
+
+  TWMiQualifierMetaData=class
+  private
+    FName: string;
+    FValue: string;
+  public
+    property Name : string read FName;
+    property Value : string read FValue;
+  end;
+
   TWMiMethodMetaData=class
   private
     FInParams: TStrings;
@@ -233,6 +244,7 @@ type
     FType: string;
     FInParamsIsArray : TArrayBoolean;
     FOutParamsIsArray: TArrayBoolean;
+    FQualifiers: TList<TWMiQualifierMetaData>;
   public
     constructor Create; overload;
     Destructor  Destroy; override;
@@ -253,6 +265,7 @@ type
     property MethodOutParamsDecl : string read FMethodOutParamsDecl;
     property IsStatic : Boolean read FIsStatic;
     property IsFunction : Boolean read FIsFunction;
+    property Qualifiers : TList<TWMiQualifierMetaData> read FQualifiers;
   end;
 
   TWMiPropertyMetaData=class
@@ -260,11 +273,13 @@ type
     FName: string;
     FDescription: string;
     FType: string;
+    FCimType: Integer;
     FPascalType: string;
     FValidValues: TStrings;
     FValidMapValues: TStrings;
     FIsOrdinal: Boolean;
     FIsArray : Boolean;
+    FQualifiers: TList<TWMiQualifierMetaData>;
   public
     constructor Create; overload;
     Destructor  Destroy; override;
@@ -273,9 +288,11 @@ type
     property Name : string read FName;
     property Description : string read FDescription;
     property &Type : string read FType;
+    property CimType : integer read FCimType;
     property PascalType : string read FPascalType;
     property ValidValues :  TStrings  read FValidValues;
     property ValidMapValues : TStrings  read FValidMapValues;
+    property Qualifiers : TList<TWMiQualifierMetaData> read FQualifiers;
   end;
 
 
@@ -289,27 +306,22 @@ type
     FClass     : string;
     FCollectionMethodMetaData  : TList;
     FCollectionPropertyMetaData: TList;
+    FCollectionQualifierMetaData: TList;
     FDescription: string;
     FURI: string;
+    FWmiClassMOF: string;
+    FWmiClassXML: string;
     {$IFDEF USEXML}
     procedure LoadWmiClassDataXML;
     {$ENDIF}
     procedure LoadWmiClassData;
-    function GetWMiMethodMetaData(index: integer): TWMiMethodMetaData;
-    function GetMethodName(index: integer): string;
-    function GetMethodDescr(index: integer): string;
-    function GetMethodType(index: integer): string;
     function GetMethodsCount: Integer;
     function GetPropertiesCount: Integer;
-    function GetPropertyDescription(index: integer): string;
-    function GetPropertyName(index: integer): string;
-    function GetPropertyPascalType(index: integer): string;
-    function GetPropertyType(index: integer): string;
-    function GetPropertyMetaData(index: integer): TWMiPropertyMetaData;
-    function GetPropertyValidMapValues(index: integer): TStrings;
-    function GetPropertyValidValues(index: integer): TStrings;
-    function GetMethodValidMapValues(index: integer): TStrings;
-    function GetMethodValidValues(index: integer): TStrings;
+    function GetQualifiersCount: Integer;
+    function GetProperty(index: integer): TWMiPropertyMetaData;
+    function GetMethod(index: integer): TWMiMethodMetaData;
+    function GetDescriptionEx: string;
+    function GetQualifiers(index: integer): TWMiQualifierMetaData;
   public
     {$IFDEF USEXML}
     property Xml : string Read FXml;
@@ -319,23 +331,19 @@ type
     Destructor  Destroy; override;
     property URI     : string read FURI;
     property Description     : string read FDescription;
+    property DescriptionEx   : string read GetDescriptionEx;
 
     property PropertiesCount : Integer read GetPropertiesCount;
-    property Properties      [index:integer]  : string read GetPropertyName;
-    property PropertiesTypes [index:integer]  : string read GetPropertyType;
-    property PropertiesPascalTypes [index:integer]  : string read GetPropertyPascalType;
-    property PropertiesDescr [index:integer]  : string read GetPropertyDescription;
-    property PropertyMetaData[index:integer]  : TWMiPropertyMetaData read GetPropertyMetaData;
-    property PropertyValidValues[index:integer]  : TStrings read GetPropertyValidValues;
-    property PropertyValidMapValues[index:integer]  : TStrings read GetPropertyValidMapValues;
-
+    property Properties      [index:integer]  : TWMiPropertyMetaData read GetProperty;
     property MethodsCount    : Integer read GetMethodsCount;
-    property Methods       [index:integer]  : string read GetMethodName;
-    property MethodsTypes  [index:integer]  : string read GetMethodType;
-    property MethodsDescr  [index:integer]  : string read GetMethodDescr;
-    property MethodMetaData[index:integer]  : TWMiMethodMetaData read GetWMiMethodMetaData;
-    property MethodValidValues[index:integer]  : TStrings read GetMethodValidValues;
-    property MethodValidMapValues[index:integer]  : TStrings read GetMethodValidMapValues;
+    property Methods         [index:integer]  : TWMiMethodMetaData read GetMethod;
+    property QualifiersCount : Integer read GetQualifiersCount;
+    property Qualifiers      [index:integer]  : TWMiQualifierMetaData read GetQualifiers;
+
+    Property WmiClass     : string read FClass;
+    Property WmiNameSpace : string read FNameSpace;
+    property WmiClassMOF  : string read FWmiClassMOF;
+    property WmiClassXML  : string read FWmiClassXML;
   end;
 
 
@@ -1932,6 +1940,7 @@ begin
   {$ENDIF}
   FCollectionMethodMetaData    := TList.Create;
   FCollectionPropertyMetaData  := TList.Create;
+  FCollectionQualifierMetaData := TList.Create;
   FURI               := Format(UrlWmiHelp,[AClass]);
   LoadWmiClassData;
 end;
@@ -1942,23 +1951,65 @@ var
 begin
   for i:=0 to FCollectionMethodMetaData.Count-1 do
    TWMiMethodMetaData(FCollectionMethodMetaData[i]).Free;
+
   FCollectionMethodMetaData.Free;
 
   for i:=0 to FCollectionPropertyMetaData.Count-1 do
    TWMiPropertyMetaData(FCollectionPropertyMetaData[i]).Free;
 
   FCollectionPropertyMetaData.Free;
+
+  for i:=0 to FCollectionQualifierMetaData.Count-1 do
+   TWMiQualifierMetaData(FCollectionQualifierMetaData[i]).Free;
+
+  FCollectionQualifierMetaData.Free;
   inherited;
 end;
 
-function TWMiClassMetaData.GetMethodDescr(index: integer): string;
+function TWMiClassMetaData.GetDescriptionEx: string;
+Var
+  List : TStringList;
+  i    : Integer;
 begin
-   Result:=TWMiMethodMetaData(FCollectionMethodMetaData[index]).FDescription;
+  List:=TStringList.Create;
+  try
+    List.Add(WmiClass);
+    List.Add('');
+
+    if PropertiesCount>0 then
+    begin
+      List.Add('Properties');
+      List.Add('');
+      for i := 0 to PropertiesCount-1 do
+      begin
+         List.Add('  '+Properties[i].Name);
+         List.Add('    '+Properties[i].Description);
+         List.Add('');
+      end;
+    end;
+
+    if MethodsCount>0 then
+    begin
+      List.Add('Methods');
+      List.Add('');
+      for i := 0 to MethodsCount-1 do
+      begin
+         List.Add('  '+Methods[i].Name);
+         List.Add('    '+Methods[i].Description);
+         List.Add('');
+      end;
+    end;
+
+
+    Result:=List.Text;
+  finally
+    List.Free;
+  end;
 end;
 
-function TWMiClassMetaData.GetMethodName(index: integer): string;
+function TWMiClassMetaData.GetMethod(index: integer): TWMiMethodMetaData;
 begin
-   Result:=TWMiMethodMetaData(FCollectionMethodMetaData[index]).FName;
+   Result:=TWMiMethodMetaData(FCollectionMethodMetaData[index]);
 end;
 
 function TWMiClassMetaData.GetMethodsCount: Integer;
@@ -1966,64 +2017,26 @@ begin
    Result:=FCollectionMethodMetaData.Count;
 end;
 
-function TWMiClassMetaData.GetMethodType(index: integer): string;
-begin
-   Result:=TWMiMethodMetaData(FCollectionMethodMetaData[index]).FType;
-end;
-
-function TWMiClassMetaData.GetMethodValidMapValues(index: integer): TStrings;
-begin
-   Result:=TWMiMethodMetaData(FCollectionMethodMetaData[index]).FValidMapValues;
-end;
-
-function TWMiClassMetaData.GetMethodValidValues(index: integer): TStrings;
-begin
-   Result:=TWMiMethodMetaData(FCollectionMethodMetaData[index]).FValidValues;
-end;
 
 function TWMiClassMetaData.GetPropertiesCount: Integer;
 begin
    Result:=FCollectionPropertyMetaData.Count;
 end;
 
-function TWMiClassMetaData.GetPropertyDescription(index: integer): string;
+function TWMiClassMetaData.GetProperty(index: integer): TWMiPropertyMetaData;
 begin
-   Result:=TWMiPropertyMetaData(FCollectionPropertyMetaData[index]).FDescription;
+  Result:=TWMiPropertyMetaData(FCollectionPropertyMetaData[index]);
 end;
 
-function TWMiClassMetaData.GetPropertyMetaData(index: integer): TWMiPropertyMetaData;
+
+function TWMiClassMetaData.GetQualifiers(index: integer): TWMiQualifierMetaData;
 begin
-   Result:=TWMiPropertyMetaData(FCollectionPropertyMetaData[index]);
+   Result:=TWMiQualifierMetaData(FCollectionQualifierMetaData[index]);
 end;
 
-function TWMiClassMetaData.GetPropertyName(index: integer): string;
+function TWMiClassMetaData.GetQualifiersCount: Integer;
 begin
-   Result:=TWMiPropertyMetaData(FCollectionPropertyMetaData[index]).FName;
-end;
-
-function TWMiClassMetaData.GetPropertyPascalType(index: integer): string;
-begin
-   Result:=TWMiPropertyMetaData(FCollectionPropertyMetaData[index]).FPascalType;
-end;
-
-function TWMiClassMetaData.GetPropertyType(index: integer): string;
-begin
-   Result:=TWMiPropertyMetaData(FCollectionPropertyMetaData[index]).FType;
-end;
-
-function TWMiClassMetaData.GetPropertyValidMapValues(index: integer): TStrings;
-begin
-   Result:=TWMiPropertyMetaData(FCollectionPropertyMetaData[index]).FValidMapValues;
-end;
-
-function TWMiClassMetaData.GetPropertyValidValues(index: integer): TStrings;
-begin
-   Result:=TWMiPropertyMetaData(FCollectionPropertyMetaData[index]).FValidValues;
-end;
-
-function TWMiClassMetaData.GetWMiMethodMetaData(index: integer): TWMiMethodMetaData;
-begin
-   Result:=TWMiMethodMetaData(FCollectionMethodMetaData[index]);
+   Result:=FCollectionQualifierMetaData.Count;
 end;
 
 procedure TWMiClassMetaData.LoadWmiClassData;
@@ -2037,23 +2050,42 @@ var
   Qualif            : OleVariant;
   Qualifiers        : OleVariant;
   Parameters        : OleVariant;
+  colNamedValueSet  : OleVariant;
   oEnum             : IEnumvariant;
   oEnumQualif       : IEnumvariant;
   oEnumParam        : IEnumvariant;
   iValue            : LongWord;
   PropertyMetaData  : TWMiPropertyMetaData;
   MethodMetaData    : TWMiMethodMetaData;
+  QualifierMetaData : TWMiQualifierMetaData;
   i                 : integer;
+  Value             : string;
 begin
   objSWbemLocator  := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService    := objSWbemLocator.ConnectServer(wbemLocalhost, FNameSpace, '', '');
   objSWbemObjectSet:= objWMIService.Get(FClass, wbemFlagUseAmendedQualifiers);
 
+  //Get MOF definition
+  FWmiClassMOF     :=VarStrNull(objSWbemObjectSet.GetObjectText_);
 
+  //Get XML Wmi class definition
+  colNamedValueSet:= CreateOleObject('Wbemscripting.SWbemNamedValueSet');
+  colNamedValueSet.Add('LocalOnly', False);
+  colNamedValueSet.Add('IncludeQualifiers', True);
+  colNamedValueSet.Add('ExcludeSystemProperties', False);
+  colNamedValueSet.Add('IncludeClassOrigin', True);
+  FWmiClassXML:=VarStrNull(objSWbemObjectSet.GetText_(wbemObjectTextFormatWMIDTD20, 0, colNamedValueSet));
+  FWmiClassXML:=xmlDoc.FormatXMLData(FWmiClassXML);
+
+
+  //Get Qualifiers of the class
   Qualifiers    := objSWbemObjectSet.Qualifiers_;
   oEnum         := IUnknown(Qualifiers._NewEnum) as IEnumVariant;
   while oEnum.Next(1, colItem, iValue) = 0 do
    begin
+    QualifierMetaData:=TWMiQualifierMetaData.Create;
+    FCollectionQualifierMetaData.Add(QualifierMetaData);
+    {
     if CompareText(VarStrNull(colItem.Name),'Description')=0 then
     begin
      FDescription:=VarStrNull(colItem.Value);
@@ -2061,6 +2093,16 @@ begin
      break;
     end;
     colItem:=Unassigned;
+    }
+    //Value:=StringReplace(VarStrNull(colItem.Value),',',';',[rfReplaceAll,rfIgnoreCase]);
+    //Value:=StringReplace(Value,' ','_',[rfReplaceAll,rfIgnoreCase]);
+    Value:=VarStrNull(colItem.Value);
+    QualifierMetaData.FName :=VarStrNull(colItem.Name);
+    QualifierMetaData.FValue:=Value;
+
+    //get description of the class
+    if CompareText(VarStrNull(colItem.Name),'Description')=0 then
+     FDescription:=VarStrNull(colItem.Value);
    end;
 
   colItems         := objSWbemObjectSet.Properties_;
@@ -2071,15 +2113,24 @@ begin
     FCollectionPropertyMetaData.Add(PropertyMetaData);
     PropertyMetaData.FName:=VarStrNull(colItem.Name);
     PropertyMetaData.FType:=CIMTypeStr(colItem.cimtype);
+    PropertyMetaData.FCimType:=colItem.cimtype;
     PropertyMetaData.FPascalType :=WmiTypeToDelphiType(CIMTypeStr(colItem.cimtype));
     PropertyMetaData.FIsOrdinal  :=CIMTypeOrdinal(colItem.cimtype);
     PropertyMetaData.FIsArray    :=colItem.IsArray;
+
 
 
       Qualifiers      := colItem.Qualifiers_;
       oEnumQualif     := IUnknown(Qualifiers._NewEnum) as IEnumVariant;
       while oEnumQualif.Next(1, Qualif, iValue) = 0 do
       begin
+
+        //Get qualifiers of properties.
+        PropertyMetaData.Qualifiers.Add(TWMiQualifierMetaData.Create);
+        PropertyMetaData.Qualifiers[PropertyMetaData.Qualifiers.Count-1].FValue:=VarStrNull(Qualif.Value);
+        PropertyMetaData.Qualifiers[PropertyMetaData.Qualifiers.Count-1].FName :=VarStrNull(Qualif.Name);
+
+
         if CompareText(VarStrNull(Qualif.Name),'Description')=0 then
          PropertyMetaData.FDescription := VarStrNull(Qualif.Value)
         else
@@ -2122,6 +2173,12 @@ begin
 
       while oEnumQualif.Next(1, Qualif, iValue) = 0 do
       begin
+
+        //Get qualifiers of methods.
+        MethodMetaData.Qualifiers.Add(TWMiQualifierMetaData.Create);
+        MethodMetaData.Qualifiers[MethodMetaData.Qualifiers.Count-1].FValue:=VarStrNull(Qualif.Value);
+        MethodMetaData.Qualifiers[MethodMetaData.Qualifiers.Count-1].FName :=VarStrNull(Qualif.Name);
+
         if CompareText(VarStrNull(Qualif.Name),'description')=0 then
           MethodMetaData.FDescription := VarStrNull(Qualif.Value)
         else
@@ -2453,9 +2510,12 @@ begin
   FValidMapValues := TStringList.Create;
   SetLength(FInParamsIsArray,256);
   SetLength(FOutParamsIsArray,256);
+  FQualifiers:=TList<TWMiQualifierMetaData>.Create;
 end;
 
 destructor TWMiMethodMetaData.Destroy;
+var
+ i : Integer;
 begin
   FInParams.Free;
   FInParamsTypes.Free;
@@ -2467,6 +2527,11 @@ begin
   FValidMapValues.Free;
   SetLength(FInParamsIsArray,0);
   SetLength(FOutParamsIsArray,0);
+
+  for i:=0 to FQualifiers.Count-1 do
+   FQualifiers[i].Free;
+  FQualifiers.Free;
+
   inherited;
 end;
 
@@ -2476,12 +2541,20 @@ constructor TWMiPropertyMetaData.Create;
 begin
   FValidValues:=TStringList.Create;
   FValidMapValues:=TStringList.Create;
+  FQualifiers:=TList<TWMiQualifierMetaData>.Create;
 end;
 
 destructor TWMiPropertyMetaData.Destroy;
+var
+ i : Integer;
 begin
   FValidValues.Free;
   FValidMapValues.Free;
+
+  for i:=0 to FQualifiers.Count-1 do
+   FQualifiers[i].Free;
+  FQualifiers.Free;
+
   inherited;
 end;
 
