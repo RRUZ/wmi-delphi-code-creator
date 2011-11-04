@@ -197,7 +197,6 @@ Const
   wbemErrTimedout = $80043001;
   wbemErrResetToDefault = $80043002;
 
-
   wbemFlagForwardOnly          = $00000020;
   wbemFlagUseAmendedQualifiers = $00020000;
   wbemObjectTextFormatWMIDTD20 = 2;
@@ -391,7 +390,7 @@ type
 implementation
 
 uses
- XMLDoc, uDelphiSyntax, StrUtils;
+ XMLDoc, uDelphiSyntax, StrUtils, uOleVariantEnum;
 
 function VarArrayToStr(const vArray: variant): string;
 
@@ -605,19 +604,14 @@ var
   objWMIService : OLEVariant;
   colItems      : OLEVariant;
   colItem       : OLEVariant;
-  oEnum         : IEnumvariant;
-  iValue        : LongWord;
   sValue        : string;
 begin
   Result:=False;
   objWMIService := GetWMIObject(Format('winmgmts:\\%s\%s:%s',[wbemLocalhost,NameSpace,WmiClass]));
   colItems      := objWMIService.Qualifiers_;
-  oEnum         := IUnknown(colItems._NewEnum) as IEnumVariant;
-
-  while oEnum.Next(1, colItem, iValue) = 0 do
+  for colItem in GetOleVariantEnum(colItems) do
    begin
     sValue:=colItem.Name;
-    colItem:=Unassigned;
       if CompareText(sValue,'Singleton')=0 then
       begin
         Result:=True;
@@ -668,19 +662,15 @@ var
   objWMIService   : OleVariant;
   colItems        : OLEVariant;
   colItem         : OLEVariant;
-  oEnum           : IEnumvariant;
-  iValue          : LongWord;
   sValue          : string;
 begin
  try
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, RootNameSpace, '', '');
   colItems        := objWMIService.InstancesOf('__NAMESPACE');
-  oEnum           := IUnknown(colItems._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
+  for colItem in GetOleVariantEnum(colItems) do
   begin
     sValue:=VarStrNull(colItem.Name);
-    colItem:=Unassigned;
     List.Add(RootNameSpace+'\'+sValue);
     GetListWMINameSpaces(RootNameSpace+'\'+sValue,List);
   end;
@@ -696,10 +686,6 @@ var
   FWMIService     : OLEVariant;
   FWbemObjectSet  : OLEVariant;
   FWbemObject     : OLEVariant;
-  iValue          : Cardinal;
-  oEnum           : IEnumvariant;
-  //WmiPath         : string;
-  //Index           : integer;
 begin
   List.BeginUpdate;
   try
@@ -707,26 +693,8 @@ begin
     FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
     FWMIService   := FSWbemLocator.ConnectServer(wbemLocalhost, WmiNameSpace, '', '');
     FWbemObjectSet:= FWMIService.ExecQuery(Format('SELECT * FROM %s',[WmiClass]),'WQL',wbemFlagForwardOnly);
-    oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
-      while oEnum.Next(1, FWbemObject, iValue) = 0 do
-      begin
-        {
-        WmiPath:=FWbemObject.Path_;
-        Index:=pos(':',WmiPath);
-        if Index>0 then
-         WmiPath:=Copy(WmiPath,Index+1,length(WmiPath));
-        List.Add(WmiPath);
-        }
+      for FWbemObject in GetOleVariantEnum(FWbemObjectSet) do
         List.Add(FWbemObject.Path_.RelPath);
-
-          {
-          \\HARANZ\root\CIMV2:Win32_LogicalDisk.DeviceID="C:"
-          \\HARANZ\root\CIMV2:Win32_LogicalDisk.DeviceID="D:"
-          \\HARANZ\root\CIMV2:Win32_LogicalDisk.DeviceID="Z:"
-          }
-
-        FWbemObject:=Unassigned;
-      end;
   finally
     List.EndUpdate;
   end;
@@ -742,19 +710,13 @@ var
   objWMIService   : OleVariant;
   colItems        : OleVariant;
   colItem         : OleVariant;
-  oEnum           : IEnumvariant;
-  iValue          : LongWord;
 begin
   List.Clear;
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colItems        := objWMIService.SubclassesOf('',wbemQueryFlagShallow);
-  oEnum           := IUnknown(colItems._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
-  begin
+  for colItem in GetOleVariantEnum(colItems) do
     List.Add(colItem.Path_.Class);
-    colItem        :=Unassigned;
-  end;
 
   objSWbemLocator:=Unassigned;
   objWMIService  :=Unassigned;
@@ -771,19 +733,14 @@ var
   objWMIService   : OleVariant;
   colItems        : OleVariant;
   colItem         : OleVariant;
-  oEnum           : IEnumvariant;
-  iValue          : LongWord;
 begin
   List.Clear;
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colItems        := objWMIService.SubclassesOf(WmiClass,wbemQueryFlagShallow);
-  oEnum           := IUnknown(colItems._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
-  begin
+
+  for colItem in GetOleVariantEnum(colItems) do
     List.Add(colItem.Path_.Class);
-    colItem        :=Unassigned;
-  end;
 
   objSWbemLocator:=Unassigned;
   objWMIService  :=Unassigned;
@@ -798,43 +755,19 @@ var
   objWMIService   : OleVariant;
   colItems        : OleVariant;
   colItem         : OleVariant;
-  oEnum           : IEnumvariant;
-  iValue          : LongWord;
 begin
   List.Clear;
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colItems        := objWMIService.SubclassesOf();
-  oEnum           := IUnknown(colItems._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
-  begin
+  for colItem in GetOleVariantEnum(colItems) do
     List.Add(colItem.Path_.Class);
-    colItem        :=Unassigned;
-  end;
 
   objSWbemLocator:=Unassigned;
   objWMIService  :=Unassigned;
   colItem        :=Unassigned;
   colItems       :=Unassigned;
 end;
-
-{
-procedure  GetListWmiClasses(const NameSpace:String;const List :TStrings);
-var
-  objWMIService : OLEVariant;
-  colItems      : OLEVariant;
-  colItem       : OLEVariant;
-  oEnum         : IEnumvariant;
-  iValue        : LongWord;
-begin
-  List.Clear;
-  objWMIService := GetWMIObject(Format('winmgmts:\\%s\%s',[wbemLocalhost,NameSpace]));
-  colItems      := objWMIService.ExecQuery('select * from meta_class');
-  oEnum         := IUnknown(colItems._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
-    List.Add(colItem.Path_.Class);
-end;
-}
 
 procedure  GetListWmiDynamicAndStaticClasses(const NameSpace:String;const List :TStrings);
 var
@@ -843,28 +776,19 @@ var
   colClasses        : OLEVariant;
   objClass          : OLEVariant;
   objClassQualifier : OLEVariant;
-  oEnum             : IEnumvariant;
-  oEnumQualif       : IEnumvariant;
-  iValue            : LongWord;
 begin
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colClasses    := objWMIService.SubclassesOf();
-  oEnum         := IUnknown(colClasses._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, objClass, iValue) = 0 do
-  begin
-      oEnumQualif :=  IUnknown(objClass.Qualifiers_._NewEnum) as IEnumVariant;
-       while oEnumQualif.Next(1, objClassQualifier, iValue) = 0 do
-        begin
-          if (CompareText(objClassQualifier.Name,'dynamic')=0) or (CompareText(objClassQualifier.Name,'static')=0) Then
-          begin
-            List.Add(objClass.Path_.Class);
-            break;
-          end;
-          objClassQualifier:=Unassigned;
-        end;
-      objClass:=Unassigned;
-  end;
+  for objClass in GetOleVariantEnum(colClasses) do
+   for objClassQualifier in GetOleVariantEnum(objClass.Qualifiers_)  do
+    begin
+      if (CompareText(objClassQualifier.Name,'dynamic')=0) or (CompareText(objClassQualifier.Name,'static')=0) Then
+      begin
+        List.Add(objClass.Path_.Class);
+        break;
+      end;
+    end;
 
   objSWbemLocator   :=Unassigned;
   objWMIService     :=Unassigned;
@@ -882,57 +806,41 @@ var
   colClasses        : OLEVariant;
   objClass          : OLEVariant;
   objClassQualifier : OLEVariant;
-  oEnum             : IEnumvariant;
-  oEnumQualif       : IEnumvariant;
-  iValue            : LongWord;
   ClassName         : string;
   i                 : Integer;
   Ok                : Boolean;
-  //QualifCount       : Integer;
 begin
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colClasses      := objWMIService.SubclassesOf();
-  oEnum           := IUnknown(colClasses._NewEnum) as IEnumVariant;
-  while (oEnum.Next(1, objClass, iValue) = 0)  do
+  for objClass in GetOleVariantEnum(colClasses) do
   begin
      ClassName:= objClass.Path_.Class;
-     if ExcludeEvents and StartsText('_',ClassName) then     //ugly hack to detect events classes
-     begin
-      objClass:=Unassigned;
+     if ExcludeEvents and StartsText('_',ClassName) then //ugly hack to fast detection events classes
       Continue;
-     end;
 
-      //QualifCount := 0;
       Ok          := True;
-      oEnumQualif := IUnknown(objClass.Qualifiers_._NewEnum) as IEnumVariant;
-      while (oEnumQualif.Next(1, objClassQualifier, iValue) = 0) and Ok do
-      begin
-        //inc(QualifCount);
-
-        for i := Low(ExcludeQualifiers) to High(ExcludeQualifiers) do
-        if CompareText(objClassQualifier.Name,ExcludeQualifiers[i])=0 then
+      for objClassQualifier in GetOleVariantEnum(objClass.Qualifiers_) do
+        if ok then
         begin
-         objClassQualifier:=Unassigned;
-         Ok:=False;
+          //inc(QualifCount);
+
+          for i := Low(ExcludeQualifiers) to High(ExcludeQualifiers) do
+          if CompareText(objClassQualifier.Name,ExcludeQualifiers[i])=0 then
+           Ok:=False;
+
+
+          for i := Low(IncludeQualifiers) to High(IncludeQualifiers) do
+          if CompareText(objClassQualifier.Name,IncludeQualifiers[i])=0 then
+          begin
+            List.Add(ClassName);
+            Ok:=False;
+            Break;
+          end;
         end;
-
-
-        for i := Low(IncludeQualifiers) to High(IncludeQualifiers) do
-        if CompareText(objClassQualifier.Name,IncludeQualifiers[i])=0 then
-        begin
-          List.Add(ClassName);
-          Ok:=False;
-          Break;
-        end;
-
-        objClassQualifier:=Unassigned;
-      end;
 
       if (Length(IncludeQualifiers)=0) then
         List.Add(ClassName);
-
-      objClass:=Unassigned;
   end;
 
   objSWbemLocator   :=Unassigned;
@@ -949,26 +857,16 @@ var
   colClasses        : OLEVariant;
   objClass          : OLEVariant;
   objClassQualifier : OLEVariant;
-  oEnum             : IEnumvariant;
-  oEnumQualif       : IEnumvariant;
-  iValue            : LongWord;
 begin
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colClasses      := objWMIService.SubclassesOf();
-  oEnum           := IUnknown(colClasses._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, objClass, iValue) = 0 do
+  for objClass in GetOleVariantEnum(colClasses) do
   begin
-    oEnumQualif :=  IUnknown(objClass.Qualifiers_._NewEnum) as IEnumVariant;
-     while oEnumQualif.Next(1, objClassQualifier, iValue) = 0 do
-      begin
+     for objClassQualifier in GetOleVariantEnum(objClass.Qualifiers_) do
         if  CompareText(objClassQualifier.Name,'dynamic')=0 Then
           List.Add(objClass.Path_.Class);
-        objClassQualifier:=Unassigned;
-      end;
-    objClass:=Unassigned;
   end;
-
 
   objSWbemLocator   :=Unassigned;
   objWMIService     :=Unassigned;
@@ -1039,26 +937,15 @@ var
   colClasses        : OLEVariant;
   objClass          : OLEVariant;
   objClassQualifier : OLEVariant;
-  oEnum             : IEnumvariant;
-  oEnumQualif       : IEnumvariant;
-  iValue            : LongWord;
 begin
   List.Clear;
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colClasses      := objWMIService.SubclassesOf();
-  oEnum           := IUnknown(colClasses._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, objClass, iValue) = 0 do
-  begin
-      oEnumQualif :=  IUnknown(objClass.Qualifiers_._NewEnum) as IEnumVariant;
-       while oEnumQualif.Next(1, objClassQualifier, iValue) = 0 do
-        begin
-          if  ((CompareText(objClassQualifier.Name,'dynamic')=0) and (objClass.Methods_.Count>0)) then
-            List.Add(objClass.Path_.Class);
-          objClassQualifier:=Unassigned;
-        end;
-     objClass:=Unassigned;
-  end;
+  for objClass in GetOleVariantEnum(colClasses) do
+   for objClassQualifier in GetOleVariantEnum(objClass.Qualifiers_) do
+    if  ((CompareText(objClassQualifier.Name,'dynamic')=0) and (objClass.Methods_.Count>0)) then
+      List.Add(objClass.Path_.Class);
 
   objSWbemLocator   :=Unassigned;
   objWMIService     :=Unassigned;
@@ -1103,19 +990,13 @@ var
   objWMIService  : OLEVariant;
   colItems       : OLEVariant;
   colItem        : OLEVariant;
-  oEnum          : IEnumvariant;
-  iValue         : LongWord;
 begin
   List.Clear;
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colItems        := objWMIService.ExecQuery('select * from meta_class where __this isa ''__ExtrinsicEvent''');
-  oEnum           := IUnknown(colItems._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
-  begin
+  for colItem in GetOleVariantEnum(colItems) do
     List.Add(colItem.Path_.Class);
-    colItem:=Unassigned;
-  end;
 
   objSWbemLocator:=Unassigned;
   objWMIService  :=Unassigned;
@@ -1129,8 +1010,6 @@ var
   objWMIService  : OLEVariant;
   colItems       : OLEVariant;
   colItem        : OLEVariant;
-  oEnum          : IEnumvariant;
-  iValue         : LongWord;
   Extrinsic      : TStrings;
 begin
   Extrinsic:=TStringList.Create;
@@ -1140,13 +1019,9 @@ begin
     objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
     objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
     colItems        := objWMIService.ExecQuery('select * from meta_class where __this isa ''__Event''');
-    oEnum           := IUnknown(colItems._NewEnum) as IEnumVariant;
-    while oEnum.Next(1, colItem, iValue) = 0 do
-    begin
+    for colItem in GetOleVariantEnum(colItems) do
       if Extrinsic.IndexOf(colItem.Path_.Class)=-1 then
        List.Add(colItem.Path_.Class);
-      colItem:=Unassigned;
-    end;
 
     objSWbemLocator:=Unassigned;
     objWMIService  :=Unassigned;
@@ -1223,18 +1098,12 @@ var
   objWMIService : OLEVariant;
   colItems      : OLEVariant;
   colItem       : OLEVariant;
-  oEnum         : IEnumvariant;
-  iValue        : LongWord;
 begin
   List.Clear;
   objWMIService := GetWMIObject(Format('winmgmts:\\%s\%s:%s',[wbemLocalhost,NameSpace,WmiClass]));
   colItems      := objWMIService.Properties_;
-  oEnum         := IUnknown(colItems._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
-   begin
+  for colItem in GetOleVariantEnum(colItems) do
     List.Add(colItem.Name);
-    colItem:=Unassigned;
-   end;
 
   objWMIService :=Unassigned;
   colItems      :=Unassigned;
@@ -1284,18 +1153,12 @@ var
   objWMIService : OLEVariant;
   colItems      : OLEVariant;
   colItem       : OLEVariant;
-  oEnum         : IEnumvariant;
-  iValue        : LongWord;
 begin
   List.Clear;
   objWMIService := GetWMIObject(Format('winmgmts:\\%s\%s:%s',[wbemLocalhost,NameSpace,WmiClass]));
   colItems      := objWMIService.Methods_;
-  oEnum         := IUnknown(colItems._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
-  begin
+  for colItem in GetOleVariantEnum(colItems) do
     List.Add(colItem.Name);
-    colItem:=Unassigned;
-  end;
 
   objWMIService :=Unassigned;
   colItems      :=Unassigned;
@@ -1390,24 +1253,18 @@ var
   colItems       : OLEVariant;
   colItem        : OLEVariant;
   Qualifiers     : OLEVariant;
-  oEnum          : IEnumvariant;
-  iValue         : LongWord;
 begin
   Result:='';
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colItems      := objWMIService.Get(WmiClass, wbemFlagUseAmendedQualifiers);
   Qualifiers    := colItems.Qualifiers_;
-  oEnum         := IUnknown(Qualifiers._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
-   begin
+  for colItem in GetOleVariantEnum(Qualifiers) do
     if CompareText(VarStrNull(colItem.Name),'description')=0 then
     begin
      Result:=VarStrNull(colItem.Value);
      break;
     end;
-    colItem:=Unassigned;
-   end;
 
   objSWbemLocator:=Unassigned;
   objWMIService  :=Unassigned;
@@ -1425,23 +1282,17 @@ var
   colItems        : OLEVariant;
   colItem         : OLEVariant;
   Qualifiers      : OLEVariant;
-  oEnum           : IEnumvariant;
-  iValue          : LongWord;
 begin
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colItems      := objWMIService.Get(WmiClass, wbemFlagUseAmendedQualifiers);
   Qualifiers    := colItems.Methods_.Item(WmiMethod).Qualifiers_;
-  oEnum         := IUnknown(Qualifiers._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
-  begin
+  for colItem in GetOleVariantEnum(Qualifiers) do
     if CompareText(VarStrNull(colItem.Name),'description')=0 then
     begin
      Result:= VarStrNull(colItem.Value);
      break;
     end;
-    colItem:=Unassigned;
-  end;
 
   objSWbemLocator :=Unassigned;
   objWMIService   :=Unassigned;
@@ -1457,24 +1308,17 @@ var
   colItems        : OLEVariant;
   colItem         : OLEVariant;
   Qualifiers      : OLEVariant;
-  oEnum           : IEnumvariant;
-  iValue          : LongWord;
 begin
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
   colItems        := objWMIService.Get(WmiClass, wbemFlagUseAmendedQualifiers);
   Qualifiers      := colItems.Properties_.Item(WmiProperty).Qualifiers_;
-  oEnum           := IUnknown(Qualifiers._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
-  begin
+  for colItem in GetOleVariantEnum(Qualifiers) do
     if CompareText(VarStrNull(colItem.Name),'description')=0 then
     begin
      Result:= VarStrNull(colItem.Value);
-     colItem:=Unassigned;
      break;
     end;
-    colItem:=Unassigned;
-  end;
 
   objSWbemLocator :=Unassigned;
   objWMIService   :=Unassigned;
@@ -1598,9 +1442,6 @@ var
   objWMIService : OLEVariant;
   colItems      : OLEVariant;
   colItem       : OLEVariant;
-  oEnum         : IEnumvariant;
-  oEnumQualif   : IEnumvariant;
-  iValue        : LongWord;
   Qualifiers    : OLEVariant;
   Qualif        : OLEVariant;
   Str           : string;
@@ -1610,26 +1451,19 @@ begin
   Str:='';
   objWMIService := GetWMIObject(Format('winmgmts:\\%s\%s:%s',[wbemLocalhost,NameSpace,WmiClass]));
   colItems      := objWMIService.Methods_;
-  oEnum         := IUnknown(colItems._NewEnum) as IEnumVariant;
-    while oEnum.Next(1, colItem, iValue) = 0 do
+    for colItem in GetOleVariantEnum(colItems) do
     if VarStrNull(colItem.Name)=WmiMethod then
     begin
        Qualifiers    := colItem.Qualifiers_;
-       oEnumQualif   := IUnknown(Qualifiers._NewEnum) as IEnumVariant;
-         while oEnumQualif.Next(1, Qualif, iValue) = 0 do
+         for Qualif in GetOleVariantEnum(Qualifiers) do
          begin
           Value:=StringReplace(VarStrNull(Qualif.Value),',',';',[rfReplaceAll,rfIgnoreCase]);
           Value:=StringReplace(Value,' ','_',[rfReplaceAll,rfIgnoreCase]);
           str:=Str+Format('%s=%s, ',[VarStrNull(Qualif.Name),Value]);
-          Qualif:=Unassigned;
          end;
-      colItem:=Unassigned;
-    end
-    else
-    colItem:=Unassigned;
+    end;
 
-    List.CommaText := Str;
-
+  List.CommaText := Str;
   objWMIService :=Unassigned;
   colItems      :=Unassigned;
   colItem       :=Unassigned;
@@ -1700,10 +1534,6 @@ var
   colItem           : OLEVariant;
   Parameters        : OLEVariant;
   objParamQualifier : OLEVariant;
-  oEnum             : IEnumvariant;
-  oEnumQualif       : IEnumvariant;
-  iValue            : LongWord;
-  //Str               : string;
 begin
   ParamsList.Clear;
   ParamsTypes.Clear;
@@ -1717,26 +1547,19 @@ begin
   //if (not VarIsNull(Parameters)) and (not VarIsEmpty(Parameters)) then
   try
     Parameters:= Parameters.Properties_;
-    oEnum     := IUnknown(Parameters._NewEnum) as IEnumVariant;
-      while oEnum.Next(1, colItem, iValue) = 0 do
+      for colItem in GetOleVariantEnum(Parameters) do
       begin
         //Str:=Str+Format('%s=%s, ',[VarStrNull(colItem.Name),CIMTypeStr(colItem.CIMType)]);
         ParamsList.Add(VarStrNull(colItem.Name));
         ParamsTypes.AddObject(CIMTypeStr(colItem.CIMType), TObject(Integer(colItem.CIMType)));
         ParamsDescr.Add('');
 
-          oEnumQualif :=  IUnknown(colItem.Qualifiers_._NewEnum) as IEnumVariant;
-           while oEnumQualif.Next(1, objParamQualifier, iValue) = 0 do
-            begin
-              //Writeln(VarStrNull(objParamQualifier.Name));
+           for objParamQualifier in GetOleVariantEnum(colItem.Qualifiers_) do
               if  CompareText(objParamQualifier.Name,'Description')=0 Then
               begin
                 ParamsDescr[ParamsDescr.Count-1]:= VarStrNull(objParamQualifier.Value);
                 break;
               end;
-              objParamQualifier:=Unassigned;
-            end;
-        colItem:=Unassigned;
       end;
   except
     //Str:='';
@@ -1780,8 +1603,6 @@ begin
           oEnumQualif :=  IUnknown(colItem.Qualifiers_._NewEnum) as IEnumVariant;
            while oEnumQualif.Next(1, objParamQualifier, iValue) = 0 do
             begin
-              //Writeln(objParamQualifier.Name);
-
               if  CompareText(objParamQualifier.Name,'Values')=0 Then
               begin
                if not VarIsNull(objParamQualifier.Value) and  VarIsArray(objParamQualifier.Value) then
@@ -1814,9 +1635,6 @@ var
   colItem           : OLEVariant;
   Parameters        : OLEVariant;
   objParamQualifier : OLEVariant;
-  oEnum             : IEnumvariant;
-  oEnumQualif       : IEnumvariant;
-  iValue            : LongWord;
 begin
   ParamsList.Clear;
   ParamsTypes.Clear;
@@ -1827,25 +1645,17 @@ begin
   Parameters    := colItems.Methods_.Item(WmiMethod).OutParameters;
   try
     Parameters:= Parameters.Properties_;
-    oEnum     := IUnknown(Parameters._NewEnum) as IEnumVariant;
-      while oEnum.Next(1, colItem, iValue) = 0 do
+      for colItem in GetOleVariantEnum(Parameters) do
        begin
-        //Str:=Str+Format('%s=%s, ',[VarStrNull(colItem.Name),CIMTypeStr(colItem.CIMType)]);
         ParamsList.Add(VarStrNull(colItem.Name));
         ParamsTypes.AddObject(CIMTypeStr(colItem.CIMType),TObject(Integer(colItem.CIMType)));
         ParamsDescr.Add('');
-
-          oEnumQualif :=  IUnknown(colItem.Qualifiers_._NewEnum) as IEnumVariant;
-           while oEnumQualif.Next(1, objParamQualifier, iValue) = 0 do
+         for objParamQualifier in GetOleVariantEnum(colItem.Qualifiers_) do
+            if  CompareText(objParamQualifier.Name,'Description')=0 Then
             begin
-              if  CompareText(objParamQualifier.Name,'Description')=0 Then
-              begin
-                ParamsDescr[ParamsDescr.Count-1]:= VarStrNull(objParamQualifier.Value);
-                break;
-              end;
-              objParamQualifier:=Unassigned;
+              ParamsDescr[ParamsDescr.Count-1]:= VarStrNull(objParamQualifier.Value);
+              break;
             end;
-        colItem:=Unassigned;
        end;
   except
   end;
@@ -2038,10 +1848,6 @@ var
   Qualifiers        : OleVariant;
   Parameters        : OleVariant;
   colNamedValueSet  : OleVariant;
-  oEnum             : IEnumvariant;
-  oEnumQualif       : IEnumvariant;
-  oEnumParam        : IEnumvariant;
-  iValue            : LongWord;
   PropertyMetaData  : TWMiPropertyMetaData;
   ParameterMetaData : TWMiPropertyMetaData;
   MethodMetaData    : TWMiMethodMetaData;
@@ -2068,8 +1874,7 @@ begin
 
   //Get Qualifiers of the class
   Qualifiers    := objSWbemObjectSet.Qualifiers_;
-  oEnum         := IUnknown(Qualifiers._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
+  for colItem in GetOleVariantEnum(Qualifiers) do
    begin
     QualifierMetaData:=TWMiQualifierMetaData.Create;
     FCollectionQualifierMetaData.Add(QualifierMetaData);
@@ -2093,9 +1898,8 @@ begin
      FDescription:=VarStrNull(colItem.Value);
    end;
 
-  colItems         := objSWbemObjectSet.Properties_;
-  oEnum            := IUnknown(colItems._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
+  colItems := objSWbemObjectSet.Properties_;
+  for colItem in GetOleVariantEnum(colItems) do
   begin
     PropertyMetaData:=TWMiPropertyMetaData.Create;
     FCollectionPropertyMetaData.Add(PropertyMetaData);
@@ -2106,18 +1910,13 @@ begin
     PropertyMetaData.FIsOrdinal  :=CIMTypeOrdinal(colItem.cimtype);
     PropertyMetaData.FIsArray    :=colItem.IsArray;
 
-
-
       Qualifiers      := colItem.Qualifiers_;
-      oEnumQualif     := IUnknown(Qualifiers._NewEnum) as IEnumVariant;
-      while oEnumQualif.Next(1, Qualif, iValue) = 0 do
+      for Qualif in GetOleVariantEnum(Qualifiers) do
       begin
-
         //Get qualifiers of properties.
         PropertyMetaData.Qualifiers.Add(TWMiQualifierMetaData.Create);
         PropertyMetaData.Qualifiers[PropertyMetaData.Qualifiers.Count-1].FValue:=VarStrNull(Qualif.Value);
         PropertyMetaData.Qualifiers[PropertyMetaData.Qualifiers.Count-1].FName :=VarStrNull(Qualif.Name);
-
 
         if CompareText(VarStrNull(Qualif.Name),'Description')=0 then
          PropertyMetaData.FDescription := VarStrNull(Qualif.Value)
@@ -2135,20 +1934,16 @@ begin
             for i := VarArrayLowBound(Qualif.Value, 1) to VarArrayHighBound(Qualif.Value, 1) do
               PropertyMetaData.FValidMapValues.Add(VarStrNull(Qualif.Value[i]));
         end;
-        Qualif:=Unassigned;
       end;
 
     //avoid problems when the length of Valid Map Values list is distinct from the length of the Valid Values list
     if PropertyMetaData.FValidMapValues.Count>0 then
        if PropertyMetaData.FValidMapValues.Count<>PropertyMetaData.FValidValues.Count then
        PropertyMetaData.FValidMapValues.Clear;
-
-    colItem:=Unassigned;
   end;
 
   colItems      := objSWbemObjectSet.Methods_;
-  oEnum         := IUnknown(colItems._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, colItem, iValue) = 0 do
+  for colItem in GetOleVariantEnum(colItems) do
   begin
     MethodMetaData:=TWMiMethodMetaData.Create;
     MethodMetaData.FIsStatic:=False;
@@ -2158,9 +1953,7 @@ begin
     MethodMetaData.FType:=wbemtypeSint32;
 
       Qualifiers      := colItem.Qualifiers_;
-      oEnumQualif     := IUnknown(Qualifiers._NewEnum) as IEnumVariant;
-
-      while oEnumQualif.Next(1, Qualif, iValue) = 0 do
+      for Qualif in GetOleVariantEnum(Qualifiers) do
       begin
 
         //Get qualifiers of methods.
@@ -2191,7 +1984,6 @@ begin
             MethodMetaData.FValidMapValues.Add(VarStrNull(Qualif.Value[i]));
         end;
 
-        Qualif:=Unassigned;
       end;
 
        //get data of in params
@@ -2200,8 +1992,7 @@ begin
         begin
           try
             Parameters:= Parameters.Properties_;
-            oEnumParam:= IUnknown(Parameters._NewEnum) as IEnumVariant;
-            while oEnumParam.Next(1, Param, iValue) = 0 do
+            for Param in GetOleVariantEnum(Parameters) do
             begin
               ParameterMetaData:=TWMiPropertyMetaData.Create;
               MethodMetaData.FInParameters.Add(ParameterMetaData);
@@ -2210,9 +2001,7 @@ begin
               ParameterMetaData.FCimType:=Param.CIMType;
               ParameterMetaData.FIsArray:=Param.IsArray;
 
-
-              oEnumQualif :=  IUnknown(Param.Qualifiers_._NewEnum) as IEnumVariant;
-               while oEnumQualif.Next(1, Qualif, iValue) = 0 do
+               for Qualif in  GetOleVariantEnum(Param.Qualifiers_) do
                 begin
                   ParameterMetaData.Qualifiers.Add(TWMiQualifierMetaData.Create);
                   ParameterMetaData.Qualifiers[ParameterMetaData.Qualifiers.Count-1].FValue:=VarStrNull(Qualif.Value);
@@ -2220,10 +2009,7 @@ begin
 
                   if  CompareText(Qualif.Name,'Description')=0 Then
                     ParameterMetaData.FDescription:=VarStrNull(Qualif.Value);
-
-                  Qualif:=Unassigned;
                 end;
-              Param:=Unassigned;
             end;
           except
           end;
@@ -2235,8 +2021,7 @@ begin
         begin
           try
             Parameters:= Parameters.Properties_;
-            oEnumParam:= IUnknown(Parameters._NewEnum) as IEnumVariant;
-            while oEnumParam.Next(1, Param, iValue) = 0 do
+            for Param in GetOleVariantEnum(Parameters) do
             begin
               ParameterMetaData:=TWMiPropertyMetaData.Create;
               MethodMetaData.FOutParameters.Add(ParameterMetaData);
@@ -2245,8 +2030,7 @@ begin
               ParameterMetaData.FCimType:=Param.CIMType;
               ParameterMetaData.FIsArray:=Param.IsArray;
 
-              oEnumQualif :=  IUnknown(Param.Qualifiers_._NewEnum) as IEnumVariant;
-               while oEnumQualif.Next(1, Qualif, iValue) = 0 do
+               for Qualif in GetOleVariantEnum(Param.Qualifiers_) do
                 begin
                   ParameterMetaData.Qualifiers.Add(TWMiQualifierMetaData.Create);
                   ParameterMetaData.Qualifiers[ParameterMetaData.Qualifiers.Count-1].FValue:=VarStrNull(Qualif.Value);
@@ -2254,10 +2038,7 @@ begin
 
                   if  CompareText(Qualif.Name,'Description')=0 Then
                    ParameterMetaData.FDescription:=VarStrNull(Qualif.Value);
-
-                  Qualif:=Unassigned;
                 end;
-              Param:=Unassigned;
             end;
           except
 
@@ -2319,8 +2100,6 @@ begin
     if MethodMetaData.FValidMapValues.Count>0 then
        if MethodMetaData.FValidMapValues.Count<>MethodMetaData.FValidValues.Count then
        MethodMetaData.FValidMapValues.Clear;
-
-    colItem:=Unassigned;
   end;
 
 

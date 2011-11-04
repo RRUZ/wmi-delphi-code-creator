@@ -33,7 +33,8 @@ uses
   uPropValueList in 'Units\uPropValueList.pas' {FrmValueList},
   uWmiBorlandCppCode in 'Units\uWmiBorlandCppCode.pas',
   uBorlandCppVersions in 'Units\uBorlandCppVersions.pas',
-  uBorlandCppIDE in 'Units\uBorlandCppIDE.pas';
+  uBorlandCppIDE in 'Units\uBorlandCppIDE.pas',
+  uOleVariantEnum in 'Units\uOleVariantEnum.pas';
 
 {$R *.res}
 
