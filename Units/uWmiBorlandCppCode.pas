@@ -628,6 +628,7 @@ var
   ClassDescr : TStringList;
   Index      : Integer;
 begin
+  ClassDescr:=TStringList.Create;
   try
     Result := WMiClassMetaData.MethodByName[WmiMethod].Description;
 
