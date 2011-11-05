@@ -106,21 +106,21 @@ var
   Props:   TStrings;
 begin
 
-  if FUseHelperFunctions then
-    FTemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
+  if UseHelperFunctions then
+    TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
   else
-    FTemplateCode:='';
+    TemplateCode:='';
 
    for i:=0  to DelphiMaxTypesEventsCodeGen-1 do
-    if DelphiWmiEventCodeSupported[i]=FModeCodeGeneration then
+    if DelphiWmiEventCodeSupported[i]=ModeCodeGeneration then
       break;
 
     StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiEventsTemplates[i]));
 
-    case FModeCodeGeneration of
+    case ModeCodeGeneration of
      WmiCode_Scripting :
                          begin
-                              WQL := Format('Select * From %s Within %d ', [FWmiClass, PollSeconds,
+                              WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
                                 FWmiTargetInstance]);
                               WQL := Format('  FWQL:=%s+%s', [QuotedStr(WQL), sLineBreak]);
 
@@ -157,15 +157,14 @@ begin
 
 
                               StrCode := StringReplace(StrCode, sTagDelphiEventsWql, WQL, [rfReplaceAll]);
-                              StrCode := StringReplace(StrCode, sTagWmiNameSpace, FWmiNameSpace, [rfReplaceAll]);
+                              StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNameSpace, [rfReplaceAll]);
                               StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
                          end;
 
      WmiCode_LateBinding:;
 
      WmiCode_COM:        begin
-
-                            WQL := Format('Select * From %s Within %d ', [FWmiClass, PollSeconds,
+                            WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
                               FWmiTargetInstance]);
                             WQL := Format('  WQL =%s+%s', [QuotedStr(WQL), sLineBreak]);
 
@@ -187,7 +186,6 @@ begin
                             i := LastDelimiter('+', Wql);
                             if i > 0 then
                               Wql[i] := ';';
-
 
                             //not wbemTargetInstance
                             Props := TStringList.Create;
@@ -244,16 +242,15 @@ begin
                               props.Free;
                             end;
 
-
                             StrCode := StringReplace(StrCode, sTagDelphiEventsWql, WQL, [rfReplaceAll]);
-                            StrCode := StringReplace(StrCode, sTagWmiNameSpace, FWmiNameSpace, [rfReplaceAll]);
+                            StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNameSpace, [rfReplaceAll]);
                             StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
                          end;
 
     end;
 
-  StrCode := StringReplace(StrCode, sTagHelperTemplate, FTemplateCode, [rfReplaceAll]);
-  FOutPutCode.Text := StrCode;
+  StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
+  OutPutCode.Text := StrCode;
 end;
 
 
@@ -270,43 +267,43 @@ var
   Padding: string;
   CimType:Integer;
 begin
-  Singleton := WmiClassIsSingleton(FWmiNameSpace, FWmiClass);
-  Descr :=GetWmiClassDescription;
+  Singleton := WMiClassMetaData.IsSingleton;
+  Descr     := GetWmiClassDescription;
 
   DynCode    := TStringList.Create;
   try
-    FOutPutCode.Clear;
+    OutPutCode.Clear;
 
-    if FUseHelperFunctions then
-      FTemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
+    if UseHelperFunctions then
+      TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
     else
-      FTemplateCode:='';
+      TemplateCode:='';
 
     if Singleton then
     begin
         Padding := '';
-        StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiClassSingletonTemplates[Integer(FModeCodeGeneration)]));
+        StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiClassSingletonTemplates[Integer(ModeCodeGeneration)]));
     end
     else
     begin
         Padding := '  ';
-        StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiClassTemplates[Integer(FModeCodeGeneration)]));
+        StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiClassTemplates[Integer(ModeCodeGeneration)]));
     end;
 
 
-    StrCode := StringReplace(StrCode, sTagHelperTemplate, FTemplateCode, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
-    StrCode := StringReplace(StrCode, sTagWmiClassName, FWmiClass, [rfReplaceAll]);
-    StrCode := StringReplace(StrCode, sTagWmiNameSpace, FWmiNameSpace, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNameSpace, [rfReplaceAll]);
 
     Len := GetMaxLengthItemName(Props) + 3;
 
-    case FModeCodeGeneration of
+    case ModeCodeGeneration of
       WmiCode_Scripting:
                           begin
                             if Props.Count > 0 then
                               for i := 0 to Props.Count - 1 do
-                                if FUseHelperFunctions then
+                                if UseHelperFunctions then
                                   DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
                                     Len) + 's %%s'',[VarStrNull(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]))
                                 else
@@ -342,7 +339,7 @@ begin
                           begin
                             if Props.Count > 0 then
                               for i := 0 to Props.Count - 1 do
-                                if FUseHelperFunctions then
+                                if UseHelperFunctions then
                                   DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
                                     Len) + 's %%s'',[VarStrNull(FWbemObject.%s)]));// %s',
                                     [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]))
@@ -400,7 +397,7 @@ begin
                               for i := 0 to Props.Count - 1 do
                               begin
                                   DynCode.Add(Padding + Format('apObjects.Get(%s, 0, pVal, pType, plFlavor);// %s',[QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
-                                if FUseHelperFunctions then
+                                if UseHelperFunctions then
                                   DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[VarStrNull(pVal)]));', [Props.Names[i]]))
                                 else
                                 begin
@@ -440,7 +437,7 @@ begin
 
     StrCode := StringReplace(StrCode, sTagDelphiCode, DynCode.Text, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassDescr, Descr, [rfReplaceAll]);
-    FOutPutCode.Text := StrCode;
+    OutPutCode.Text := StrCode;
   finally
     DynCode.Free;
   end;
@@ -457,58 +454,37 @@ var
   DynCodeInParams: TStrings;
   DynCodeOutParams: TStrings;
   Index: integer;
-
-  OutParamsList:  TStringList;
-  OutParamsTypes: TStringList;
-  OutParamsDescr: TStringList;
-
-  InParamsList:  TStringList;
-  InParamsTypes: TStringList;
-  InParamsDescr: TStringList;
-
   IsStatic:  boolean;
   ParamsStr: string;
   Padding: string;
 begin
   DynCodeInParams := TStringList.Create;
   DynCodeOutParams := TStringList.Create;
-  OutParamsList  := TStringList.Create;
-  OutParamsTypes := TStringList.Create;
-  OutParamsDescr := TStringList.Create;
-  InParamsList   := TStringList.Create;
-  InParamsTypes  := TStringList.Create;
-  InParamsDescr  := TStringList.Create;
   try
-    IsStatic := WmiMethodIsStatic(WmiNameSpace, WmiClass, WmiMethod);
-    GetListWmiMethodOutParameters(WmiNameSpace, WmiClass, WmiMethod,
-      OutParamsList, OutParamsTypes, OutParamsDescr);
-    GetListWmiMethodInParameters(WmiNameSpace, WmiClass, WmiMethod,
-      InParamsList, InParamsTypes, InParamsDescr);
+    IsStatic := WMiClassMetaData.MethodByName[WmiMethod].IsStatic;
 
-
-    if FUseHelperFunctions then
-      FTemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
+    if UseHelperFunctions then
+      TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
     else
-      FTemplateCode:='';
+      TemplateCode:='';
 
    for Index:=0  to DelphiMaxTypesMethodCodeGen-1 do
-    if DelphiWmiMethodCodeSupported[Index]=FModeCodeGeneration then
+    if DelphiWmiMethodCodeSupported[Index]=ModeCodeGeneration then
       break;
 
-
     if IsStatic then
-        StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiMethodsStaticTemplates[Index]))
+      StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiMethodsStaticTemplates[Index]))
     else
-        StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiMethodsNonStaticTemplates[Index]));
+      StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiMethodsNonStaticTemplates[Index]));
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
-    StrCode := StringReplace(StrCode, sTagHelperTemplate, FTemplateCode, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
-    StrCode := StringReplace(StrCode, sTagWmiNameSpace, FWmiNameSpace, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNameSpace, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiMethodName, WmiMethod, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiPath, WmiPath, [rfReplaceAll]);
 
-     case FModeCodeGeneration of
+     case ModeCodeGeneration of
       WmiCode_COM         :
                             begin
                               Padding:=StringOfChar(' ',23);
@@ -533,29 +509,26 @@ begin
 
                               StrCode := StringReplace(StrCode, sTagDelphiCodeParamsIn, DynCodeInParams.Text, [rfReplaceAll]);
 
-							                //ppOutParams.Get('ReturnValue', 0, pVal, pType, plFlavor);// String
-                              //Writeln(Format('ReturnValue  %s',[pVal]));
-                              //VarClear(pVal);
 
                               //Out Params
-                              if OutParamsList.Count > 1 then
+                              if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count > 1 then
                               begin
-                                for Index := 0 to OutParamsList.Count - 1 do
+                                for Index := 0 to WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count - 1 do
                                 begin
-                                  DynCodeOutParams.Add(Format('%s  ppOutParams.Get(%s, 0, pVal, pType, plFlavor);',[Padding,QuotedStr(OutParamsList[Index])]));
-                                  if FUseHelperFunctions then
+                                  DynCodeOutParams.Add(Format('%s  ppOutParams.Get(%s, 0, pVal, pType, plFlavor);',[Padding,QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name)]));
+                                  if UseHelperFunctions then
                                     DynCodeOutParams.Add(
-                                      Format('%s  Writeln(Format(''%-20s  %%s'',[VarStrNull(pVal)]));',[Padding,OutParamsList[Index]]))
+                                      Format('%s  Writeln(Format(''%-20s  %%s'',[VarStrNull(pVal)]));',[Padding,WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name]))
                                   else
-                                    DynCodeOutParams.Add(Format('%s  Writeln(Format(''%-20s  %%s'',[pVal]));',[Padding,OutParamsList[Index]]));
+                                    DynCodeOutParams.Add(Format('%s  Writeln(Format(''%-20s  %%s'',[pVal]));',[Padding,WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name]));
                                   DynCodeOutParams.Add(Padding+'  VarClear(pVal);');
                                 end;
                               end
                               else
-                              if OutParamsList.Count = 1 then
+                              if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count = 1 then
                               begin
                                   DynCodeOutParams.Add(Format('%s  ppOutParams.Get(%s, 0, pVal, pType, plFlavor);',[Padding,QuotedStr('ReturnValue')]));
-                                if FUseHelperFunctions then
+                                if UseHelperFunctions then
                                   DynCodeOutParams.Add(Padding+'  Writeln(Format(''ReturnValue  %s'',[VarStrNull(pVal)]));')
                                 else
                                   DynCodeOutParams.Add(Padding+'  Writeln(Format(''ReturnValue  %s'',[pVal]));');
@@ -590,19 +563,19 @@ begin
 
                               //Writeln(Format('ProcessId             %s',[FOutParams.Properties_.Item('ProcessId', 0).Get_Value]));
                               //Out Params
-                              if OutParamsList.Count > 1 then
+                              if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count > 1 then
                               begin
-                                for Index := 0 to OutParamsList.Count - 1 do
-                                  if FUseHelperFunctions then
+                                for Index := 0 to WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count - 1 do
+                                  if UseHelperFunctions then
                                     DynCodeOutParams.Add(
-                                      Format('  Writeln(Format(''%-20s  %%s'',[VarStrNull(FOutParams.Properties_.Item(%s,0).Get_Value)]));',[OutParamsList[Index], QuotedStr(OutParamsList[Index])]))
+                                      Format('  Writeln(Format(''%-20s  %%s'',[VarStrNull(FOutParams.Properties_.Item(%s,0).Get_Value)]));',[WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name, QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name)]))
                                   else
-                                    DynCodeOutParams.Add(Format('  Writeln(Format(''%-20s  %%s'',[FOutParams.Properties_.Item(%s,0).Get_Value]));',[OutParamsList[Index], QuotedStr(OutParamsList[Index])]));
+                                    DynCodeOutParams.Add(Format('  Writeln(Format(''%-20s  %%s'',[FOutParams.Properties_.Item(%s,0).Get_Value]));',[WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name, QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name)]));
                               end
                               else
-                              if OutParamsList.Count = 1 then
+                              if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count = 1 then
                               begin
-                                if FUseHelperFunctions then
+                                if UseHelperFunctions then
                                   DynCodeOutParams.Add('  Writeln(Format(''ReturnValue  %s'',[VarStrNull(FOutParams.Properties_.Item(''ReturnValue'',0).Get_Value)]));')
                                 else
                                   DynCodeOutParams.Add('  Writeln(Format(''ReturnValue  %s'',[FOutParams.Properties_.Item(''ReturnValue'',0).Get_Value]));');
@@ -627,7 +600,7 @@ begin
                               end
                               else
                               begin
-                               if InParamsList.Count = 0 then
+                                if WMiClassMetaData.MethodByName[WmiMethod].InParameters.Count = 0 then
                                 begin
                                   //DynCodeInParams.Add(Format('  FWbemObjectSet:= FWMIService.Get(%s);',[QuotedStr(WmiPath)]));
                                   DynCodeInParams.Add(Format('  FOutParams:=FWbemObjectSet.%s();', [WmiMethod]));
@@ -635,7 +608,7 @@ begin
                                 else
                                 begin
                                   ParamsStr := '';
-                                  for Index := 0 to InParamsList.Count - 1 do
+                                  for Index := 0 to WMiClassMetaData.MethodByName[WmiMethod].InParameters.Count - 1 do
                                     ParamsStr := ParamsStr + Values[Index] + ',';
                                   Delete(ParamsStr, length(ParamsStr), 1);
                                   DynCodeInParams.Add(
@@ -647,22 +620,22 @@ begin
 
 
                               //Out Params
-                              if OutParamsList.Count > 1 then
+                              if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count > 1 then
                               begin
-                                for Index := 0 to OutParamsList.Count - 1 do
-                                  if FUseHelperFunctions then
+                                for Index := 0 to WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count - 1 do
+                                  if UseHelperFunctions then
                                     DynCodeOutParams.Add(
                                       Format('  Writeln(Format(''%-20s  %%s'',[VarStrNull(FOutParams.%s)]));',
-                                      [OutParamsList[Index], OutParamsList[Index]]))
+                                      [WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name, WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name]))
                                   else
                                     DynCodeOutParams.Add(
                                       Format('  Writeln(Format(''%-20s  %%s'',[FOutParams.%s]));',
-                                      [OutParamsList[Index], OutParamsList[Index]]));
+                                      [WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name, WMiClassMetaData.MethodByName[WmiMethod].OutParameters[Index].Name]));
                               end
                               else
-                              if OutParamsList.Count = 1 then
+                              if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count = 1 then
                               begin
-                                if FUseHelperFunctions then
+                                if UseHelperFunctions then
                                   DynCodeOutParams.Add(
                                     '  Writeln(Format(''ReturnValue           %s'',[VarStrNull(FOutParams)]));')
                                 else
@@ -674,20 +647,12 @@ begin
                             end;
 
      end;
-
-
     Descr:=GetWmiClassDescription;
     StrCode := StringReplace(StrCode, sTagWmiMethodDescr, Descr, [rfReplaceAll]);
     OutPutCode.Text := StrCode;
   finally
     DynCodeInParams.Free;
     DynCodeOutParams.Free;
-    OutParamsList.Free;
-    OutParamsTypes.Free;
-    OutParamsDescr.Free;
-    InParamsList.Free;
-    InParamsTypes.Free;
-    InParamsDescr.Free;
   end;
 end;
 
@@ -697,30 +662,21 @@ var
   ClassDescr : TStringList;
   Index      : Integer;
 begin
+  ClassDescr:=TStringList.Create;
   try
-    ClassDescr:=TStringList.Create;
-    try
-      Result := GetWmiMethodDescription(WmiNameSpace, WmiClass, WmiMethod);
+    Result := WMiClassMetaData.MethodByName[WmiMethod].Description;
 
-      if Pos(#10, Result) = 0 then //check if the description has format
-        ClassDescr.Text := WrapText(Result, 80)
-      else
-        ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
+    if Pos(#10, Result) = 0 then //check if the description has format
+      ClassDescr.Text := WrapText(Result, 80)
+    else
+      ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
 
-      for Index := 0 to ClassDescr.Count - 1 do
-        ClassDescr[Index] := Format('// %s', [ClassDescr[Index]]);
+    for Index := 0 to ClassDescr.Count - 1 do
+      ClassDescr[Index] := Format('// %s', [ClassDescr[Index]]);
 
-      Result:=ClassDescr.Text;
-    finally
-       ClassDescr.Free;
-    end;
-
-  except
-    on E: EOleSysError do
-      if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-        Result := ''
-      else
-        raise;
+    Result:=ClassDescr.Text;
+  finally
+     ClassDescr.Free;
   end;
 end;
 

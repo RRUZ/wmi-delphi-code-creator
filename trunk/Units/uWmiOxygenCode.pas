@@ -72,7 +72,6 @@ uses
   uWmi_Metadata,
   SysUtils;
 
-
 { TOxygenWmiClassCodeGenerator }
 
 procedure TOxygenWmiClassCodeGenerator.GenerateCode(Props: TStrings);
@@ -90,7 +89,7 @@ begin
   try
     OutPutCode.Clear;
 
-    if FUseHelperFunctions then
+    if UseHelperFunctions then
       TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
     else
       TemplateCode:='';
@@ -104,7 +103,7 @@ begin
 
     if Props.Count > 0 then
       for i := 0 to Props.Count - 1 do
-        if FUseHelperFunctions then
+        if UseHelperFunctions then
           DynCode.Add(Format(
             '     Console.WriteLine(''{0,-35} {1,-40}'',%s,WmiObject[%s]);// %s',
             [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]))
@@ -192,14 +191,6 @@ var
   DynCodeOutParams: TStrings;
   i: integer;
 
-  OutParamsList:  TStringList;
-  OutParamsTypes: TStringList;
-  OutParamsDescr: TStringList;
-
-  InParamsList:  TStringList;
-  InParamsTypes: TStringList;
-  InParamsDescr: TStringList;
-
   IsStatic: boolean;
   TemplateCode : string;
 begin
@@ -207,23 +198,13 @@ begin
   OutPutCode.BeginUpdate;
   DynCodeInParams := TStringList.Create;
   DynCodeOutParams := TStringList.Create;
-  OutParamsList  := TStringList.Create;
-  OutParamsTypes := TStringList.Create;
-  OutParamsDescr := TStringList.Create;
-  InParamsList   := TStringList.Create;
-  InParamsTypes  := TStringList.Create;
-  InParamsDescr  := TStringList.Create;
   try
-    IsStatic := WmiMethodIsStatic(WmiNamespace, WmiClass, WmiMethod);
-    GetListWmiMethodOutParameters(WmiNamespace, WmiClass, WmiMethod,
-      OutParamsList, OutParamsTypes, OutParamsDescr);
-    GetListWmiMethodInParameters(WmiNamespace, WmiClass, WmiMethod,
-      InParamsList, InParamsTypes, InParamsDescr);
+    IsStatic := WMiClassMetaData.MethodByName[WmiMethod].IsStatic;
 
     OutPutCode.Clear;
     if IsStatic then
     begin
-      if FUseHelperFunctions then
+      if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
@@ -234,7 +215,7 @@ begin
     else
     begin
 
-      if FUseHelperFunctions then
+      if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
@@ -251,44 +232,28 @@ begin
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
 
 
-    if IsStatic then
-    begin
-      //In Params
-      if ParamsIn.Count > 0 then
-        for i := 0 to ParamsIn.Count - 1 do
-          if Values[i] <> WbemEmptyParam then
-            if ParamsIn.ValueFromIndex[i] = wbemtypeString then
-              DynCodeInParams.Add(
-                Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), QuotedStr(Values[i])]))
-            else
-              DynCodeInParams.Add(
-                Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), Values[i]]));
-    end
-    else
-    begin
-      if ParamsIn.Count > 0 then
-        for i := 0 to ParamsIn.Count - 1 do
-          if Values[i] <> WbemEmptyParam then
-            if ParamsIn.ValueFromIndex[i] = wbemtypeString then
-              DynCodeInParams.Add(
-                Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), QuotedStr(Values[i])]))
-            else
-              DynCodeInParams.Add(
-                Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), Values[i]]));
-    end;
+    //In Params
+    if ParamsIn.Count > 0 then
+      for i := 0 to ParamsIn.Count - 1 do
+        if Values[i] <> WbemEmptyParam then
+          if ParamsIn.ValueFromIndex[i] = wbemtypeString then
+            DynCodeInParams.Add(
+              Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), QuotedStr(Values[i])]))
+          else
+            DynCodeInParams.Add(
+              Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), Values[i]]));
     StrCode := StringReplace(StrCode, sTagOxygenCodeParamsIn, DynCodeInParams.Text, [rfReplaceAll]);
 
-
     //Out Params
-    if OutParamsList.Count > 1 then
+    if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count > 1 then
     begin
-      for i := 0 to OutParamsList.Count - 1 do
+      for i := 0 to WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count - 1 do
         DynCodeOutParams.Add(
           Format('  Console.WriteLine(''{0,-35} {1,-40}'',%s,outParams[%s]);',
-          [QuotedStr(OutParamsList[i]), QuotedStr(OutParamsList[i])]));
+          [QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name), QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name)]));
     end
     else
-    if OutParamsList.Count = 1 then
+    if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count = 1 then
     begin
       DynCodeOutParams.Add(
         Format('  Console.WriteLine(''{0,-35} {1,-40}'',''Return Value'',%s);',
@@ -304,12 +269,6 @@ begin
     OutPutCode.EndUpdate;
     DynCodeInParams.Free;
     DynCodeOutParams.Free;
-    OutParamsList.Free;
-    OutParamsTypes.Free;
-    OutParamsDescr.Free;
-    InParamsList.Free;
-    InParamsTypes.Free;
-    InParamsDescr.Free;
   end;
 end;
 
@@ -319,30 +278,21 @@ var
   ClassDescr : TStringList;
   Index      : Integer;
 begin
+  ClassDescr:=TStringList.Create;
   try
-    ClassDescr:=TStringList.Create;
-    try
-      Result := GetWmiMethodDescription(WmiNameSpace, WmiClass, WmiMethod);
+    Result := WMiClassMetaData.MethodByName[WmiMethod].Description;
 
-      if Pos(#10, Result) = 0 then //check if the description has format
-        ClassDescr.Text := WrapText(Result, 80)
-      else
-        ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
+    if Pos(#10, Result) = 0 then //check if the description has format
+      ClassDescr.Text := WrapText(Result, 80)
+    else
+      ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
 
-      for Index := 0 to ClassDescr.Count - 1 do
-        ClassDescr[Index] := Format('// %s', [ClassDescr[Index]]);
+    for Index := 0 to ClassDescr.Count - 1 do
+      ClassDescr[Index] := Format('// %s', [ClassDescr[Index]]);
 
-      Result:=ClassDescr.Text;
-    finally
-       ClassDescr.Free;
-    end;
-
-  except
-    on E: EOleSysError do
-      if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-        Result := ''
-      else
-        raise;
+    Result:=ClassDescr.Text;
+  finally
+     ClassDescr.Free;
   end;
 end;
 

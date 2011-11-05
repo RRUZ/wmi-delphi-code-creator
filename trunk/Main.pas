@@ -204,8 +204,8 @@ type
 
     procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
 
-    procedure GenerateMethodInvoker;
-    procedure GenerateEventCode;
+    procedure GenerateMethodInvoker(WmiMetaClassInfo : TWMiClassMetaData);
+    procedure GenerateEventCode(WmiMetaClassInfo : TWMiClassMetaData);
 
     procedure LoadEventsInfo;
     procedure LoadMethodInfo;
@@ -231,7 +231,7 @@ type
     procedure SetMsg(const Msg: string);
     procedure LoadWmiClasses(const Namespace: string);
     procedure LoadClassInfo;
-    procedure GenerateConsoleCode;
+    procedure GenerateConsoleCode(WmiMetaClassInfo : TWMiClassMetaData);
     procedure GetValuesWmiProperties(const Namespace, WmiClass: string);
   end;
 
@@ -290,12 +290,12 @@ end;
 
 procedure TFrmMain.ButtonGenerateCodeInvokerClick(Sender: TObject);
 begin
-  GenerateMethodInvoker;
+  GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
 end;
 
 procedure TFrmMain.ButtonGenerateEventCodeClick(Sender: TObject);
 begin
-  GenerateEventCode;
+  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
 end;
 
 procedure TFrmMain.ButtonGetValuesClick(Sender: TObject);
@@ -314,7 +314,8 @@ var
 begin
   for i := 0 to ListViewProperties.Items.Count - 1 do
     ListViewProperties.Items[i].Checked := CheckBoxSelAllProps.Checked;
-  GenerateConsoleCode;
+
+  GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
 end;
 
 procedure TFrmMain.ComboBoxClassesChange(Sender: TObject);
@@ -352,15 +353,18 @@ begin
   TabSheetWmiMethodCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
   TabSheetWmiEventCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
 
-  GenerateConsoleCode;
-  GenerateMethodInvoker;
-  GenerateEventCode;
+  if ComboBoxClasses.ItemIndex>=0 then
+    GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
+  if ComboBoxClassesMethods.ItemIndex>=0 then
+    GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
+  if ComboBoxEvents.ItemIndex>=0 then
+    GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
 end;
 
 procedure TFrmMain.ComboBoxMethodsChange(Sender: TObject);
 begin
   LoadParametersMethodInfo(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
-  GenerateMethodInvoker;
+  GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
 end;
 
 procedure TFrmMain.ComboBoxNamespaceMethodsChange(Sender: TObject);
@@ -382,7 +386,7 @@ end;
 
 procedure TFrmMain.ComboBoxPathsChange(Sender: TObject);
 begin
-  GenerateMethodInvoker;
+  GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
 end;
 
 procedure TFrmMain.ComboBoxTargetInstanceChange(Sender: TObject);
@@ -424,7 +428,7 @@ begin
   AutoResizeColumns([ListViewEventsConds.Column[0], ListViewEventsConds.Column[1],
     ListViewEventsConds.Column[2]]);
 
-  GenerateEventCode;
+  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
 end;
 
 
@@ -544,6 +548,12 @@ begin
     ComboBoxClassesMethods.Items.Objects[i]:=nil;
    end;
 
+  for i := 0 to ComboBoxEvents.Items.Count-1 do
+   if ComboBoxEvents.Items.Objects[i]<>nil then
+   begin
+    TWMiClassMetaData(ComboBoxEvents.Items.Objects[i]).Free;
+    ComboBoxEvents.Items.Objects[i]:=nil;
+   end;
 
 
   FrmWMIExplorer.Free;
@@ -551,10 +561,8 @@ begin
   Settings.Free;
 end;
 
-procedure TFrmMain.GenerateConsoleCode;
+procedure TFrmMain.GenerateConsoleCode(WmiMetaClassInfo : TWMiClassMetaData);
 var
-  Namespace: string;
-  WmiClass: string;
   i,j:     integer;
   Props: TStrings;
   Str:  string;
@@ -564,8 +572,7 @@ var
   CppWmiCodeGenerator    : TBorlandCppWmiClassCodeGenerator;
 
 begin
-  Namespace := ComboBoxNameSpaces.Text;
-  WmiClass  := ComboBoxClasses.Text;
+  if not Assigned(WmiMetaClassInfo) then Exit;
 
   //Object Pascal console Code
   Props := TStringList.Create;
@@ -592,9 +599,8 @@ begin
                   begin
                     DelphiWmiCodeGenerator:=TDelphiWmiClassCodeGenerator.Create;
                     try
+                      DelphiWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
                       DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      DelphiWmiCodeGenerator.WmiNameSpace:=Namespace;
-                      DelphiWmiCodeGenerator.WmiClass    :=WmiClass;
                       DelphiWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       DelphiWmiCodeGenerator.GenerateCode(Props);
                       SynEditWMIClassCode.Lines.Clear;
@@ -609,9 +615,8 @@ begin
                   begin
                     FPCWmiCodeGenerator:=TFPCWmiClassCodeGenerator.Create;
                     try
+                      FPCWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
                       FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      FPCWmiCodeGenerator.WmiNameSpace:=Namespace;
-                      FPCWmiCodeGenerator.WmiClass    :=WmiClass;
                       FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       FPCWmiCodeGenerator.GenerateCode(Props);
                       SynEditWMIClassCode.Lines.Clear;
@@ -626,9 +631,8 @@ begin
                   begin
                     OxygenWmiCodeGenerator:=TOxygenWmiClassCodeGenerator.Create;
                     try
+                      OxygenWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
                       OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      OxygenWmiCodeGenerator.WmiNameSpace:=Namespace;
-                      OxygenWmiCodeGenerator.WmiClass    :=WmiClass;
                       OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       OxygenWmiCodeGenerator.GenerateCode(Props);
                       SynEditWMIClassCode.Lines.Clear;
@@ -642,9 +646,8 @@ begin
                   begin
                     CppWmiCodeGenerator:=TBorlandCppWmiClassCodeGenerator.Create;
                     try
+                      CppWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
                       CppWmiCodeGenerator.UseHelperFunctions:=false;//Settings.DelphiWmiClassHelperFuncts;
-                      CppWmiCodeGenerator.WmiNameSpace:=Namespace;
-                      CppWmiCodeGenerator.WmiClass    :=WmiClass;
                       CppWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       CppWmiCodeGenerator.GenerateCode(Props);
                       SynEditWMIClassCode.Lines.Clear;
@@ -669,7 +672,7 @@ begin
   end;
 end;
 
-procedure TFrmMain.GenerateMethodInvoker;
+procedure TFrmMain.GenerateMethodInvoker(WmiMetaClassInfo : TWMiClassMetaData);
 var
   Namespace: string;
   WmiClass: string;
@@ -712,8 +715,7 @@ begin
                  begin
                   DelphiWmiCodeGenerator :=TDelphiWmiMethodCodeGenerator.Create;
                   try
-                    DelphiWmiCodeGenerator.WmiNameSpace:=Namespace;
-                    DelphiWmiCodeGenerator.WmiClass:=WmiClass;
+                    DelphiWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                     DelphiWmiCodeGenerator.WmiMethod:=WmiMethod;
                     DelphiWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
                     DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
@@ -730,8 +732,7 @@ begin
                  begin
                   BorlandCppWmiCodeGenerator :=TBorlandCppWmiMethodCodeGenerator.Create;
                   try
-                    BorlandCppWmiCodeGenerator.WmiNameSpace:=Namespace;
-                    BorlandCppWmiCodeGenerator.WmiClass:=WmiClass;
+                    BorlandCppWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                     BorlandCppWmiCodeGenerator.WmiMethod:=WmiMethod;
                     BorlandCppWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
                     BorlandCppWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
@@ -748,8 +749,7 @@ begin
                  begin
                   FPCWmiCodeGenerator :=TFPCWmiMethodCodeGenerator.Create;
                   try
-                    FPCWmiCodeGenerator.WmiNameSpace:=Namespace;
-                    FPCWmiCodeGenerator.WmiClass:=WmiClass;
+                    FPCWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                     FPCWmiCodeGenerator.WmiMethod:=WmiMethod;
                     FPCWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
                     FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
@@ -766,8 +766,7 @@ begin
                  begin
                   OxygenWmiCodeGenerator :=TOxygenWmiMethodCodeGenerator.Create;
                   try
-                    OxygenWmiCodeGenerator.WmiNameSpace:=Namespace;
-                    OxygenWmiCodeGenerator.WmiClass:=WmiClass;
+                    OxygenWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                     OxygenWmiCodeGenerator.WmiMethod:=WmiMethod;
                     OxygenWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
                     OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
@@ -848,8 +847,7 @@ begin
                  begin
                    DelphiWmiCodeGenerator := TDelphiWmiEventCodeGenerator.Create;
                    try
-                      DelphiWmiCodeGenerator.WmiNameSpace:=Namespace;
-                      DelphiWmiCodeGenerator.WmiClass    :=WmiEvent;
+                      DelphiWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                       DelphiWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
                       DelphiWmiCodeGenerator.PollSeconds          := PollSeconds;
                       DelphiWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
@@ -866,8 +864,7 @@ begin
                  begin
                    FPCWmiCodeGenerator := TFPCWmiEventCodeGenerator.Create;
                    try
-                      FPCWmiCodeGenerator.WmiNameSpace:=Namespace;
-                      FPCWmiCodeGenerator.WmiClass    :=WmiEvent;
+                      FPCWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                       FPCWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
                       FPCWmiCodeGenerator.PollSeconds          := PollSeconds;
                       FPCWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
@@ -884,8 +881,7 @@ begin
                  begin
                    OxygenWmiCodeGenerator := TOxygenWmiEventCodeGenerator.Create;
                    try
-                      OxygenWmiCodeGenerator.WmiNameSpace:=Namespace;
-                      OxygenWmiCodeGenerator.WmiClass    :=WmiEvent;
+                      OxygenWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                       OxygenWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
                       OxygenWmiCodeGenerator.PollSeconds          := PollSeconds;
                       OxygenWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
@@ -949,7 +945,7 @@ end;
 procedure TFrmMain.ListBoxPropertiesClick(Sender: TObject);
 begin
   CheckBoxSelAllProps.Checked := False;
-  GenerateConsoleCode;
+  GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
 end;
 
 procedure TFrmMain.LoadClassInfo;
@@ -957,7 +953,7 @@ var
   WmiMetaClassInfo : TWMiClassMetaData;
 begin
   if ComboBoxClasses.ItemIndex=-1 then exit;
-  
+
   ProgressBarWmi.Visible := True;
   try
     if ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]=nil then
@@ -993,10 +989,18 @@ var
 begin
   StatusBar1.SimpleText := Format('Loading Properties of %s:%s', [ComboBoxNamespacesEvents.Text, ComboBoxEvents.Text]);
   //ListVieweventsConds
-  WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNamespacesEvents.Text, ComboBoxEvents.Text);
   ListVieweventsConds.Items.BeginUpdate;
   try
     ListVieweventsConds.Items.Clear;
+
+    if ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]=nil then
+    begin
+      WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNamespacesEvents.Text, ComboBoxEvents.Text);
+      ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]:= WmiMetaClassInfo;
+    end
+    else
+      WmiMetaClassInfo:=TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]);
+
 
     //GetListWmiClassPropertiesTypes(NameSpace, EventClass, List);
     LabelEventsConds.Caption :=
@@ -1015,7 +1019,6 @@ begin
     end;
   finally
     ListVieweventsConds.Items.EndUpdate;
-    WmiMetaClassInfo.Free;
     SetMsg('');
   end;
   {
@@ -1026,7 +1029,7 @@ begin
   AutoResizeColumn(ListViewEventsConds.Column[1]);
   AutoResizeColumn(ListViewEventsConds.Column[2]);
 
-  GenerateEventCode;
+  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
 end;
 
 procedure TFrmMain.LoadMethodInfo;
@@ -1084,7 +1087,7 @@ begin
     ComboBoxMethods.ItemIndex := -1;
 
   LoadParametersMethodInfo(WmiMetaClassInfo);
-  GenerateMethodInvoker;
+  GenerateMethodInvoker(WmiMetaClassInfo);
 end;
 
 procedure TFrmMain.LoadParametersMethodInfo(WmiMetaClassInfo : TWMiClassMetaData);
@@ -1255,9 +1258,20 @@ begin
 end;
 
 procedure TFrmMain.LoadWmiEvents(const Namespace: string);
+var
+  i : Integer;
 begin
   ComboBoxEvents.Items.BeginUpdate;
   try
+
+    for i := 0 to ComboBoxEvents.Items.Count-1 do
+     if ComboBoxEvents.Items.Objects[i]<>nil then
+     begin
+      TWMiClassMetaData(ComboBoxEvents.Items.Objects[i]).Free;
+      ComboBoxEvents.Items.Objects[i]:=nil;
+     end;
+
+
     ComboBoxEvents.Items.Clear;
 
     if RadioButtonIntrinsic.Checked then
@@ -1499,7 +1513,7 @@ begin
   for i := 0 to ListViewProperties.Columns.Count - 1 do
     AutoResizeColumn(ListViewProperties.Column[i]);
 
-  GenerateConsoleCode;
+  GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
 end;
 
 
@@ -2001,7 +2015,7 @@ begin
   PostMessage(handle, WM_NEXTDLGCTL, ListViewMethodsParams.Handle, 1);
   TEdit(Sender).Visible := True;
 
-  GenerateMethodInvoker;
+  GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
 end;
 
 procedure TFrmMain.ListViewEventsCondsClick(Sender: TObject);
@@ -2026,7 +2040,7 @@ begin
     (HitTestInfo.iSubItem = COND_EVENTPARAM_COLUMN) then
     PostMessage(Self.Handle, UM_EDITEVENTCOND, HitTestInfo.iItem, 0);
 
-  GenerateEventCode;
+  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
 end;
 
 procedure TFrmMain.ListViewMethodsParamsClick(Sender: TObject);
@@ -2043,7 +2057,7 @@ begin
     (HitTestInfo.iSubItem = VALUE_METHODPARAM_COLUMN) then
     PostMessage(Self.Handle, UM_EDITPARAMVALUE, HitTestInfo.iItem, 0);
 
-  GenerateMethodInvoker;
+  GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
 end;
 
 

@@ -41,7 +41,6 @@ object FrmMain: TFrmMain
       MultiLine = True
       TabOrder = 0
       OnChange = PageControlMainChange
-      ExplicitHeight = 671
       object TabSheetCodeGen: TTabSheet
         Caption = 'Code Generation'
         ImageIndex = 30
@@ -80,6 +79,7 @@ object FrmMain: TFrmMain
             Images = ImageList1
             MultiLine = True
             TabOrder = 1
+            ExplicitHeight = 435
             object TabSheetWmiClasses: TTabSheet
               Caption = 'WMI Classes'
               ImageIndex = 40
@@ -103,7 +103,7 @@ object FrmMain: TFrmMain
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
-                ExplicitHeight = 406
+                ExplicitHeight = 407
                 DesignSize = (
                   308
                   405)
@@ -180,7 +180,7 @@ object FrmMain: TFrmMain
                   Left = 7
                   Top = 192
                   Width = 295
-                  Height = 207
+                  Height = 205
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -207,7 +207,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 208
+                  ExplicitHeight = 207
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -242,7 +242,7 @@ object FrmMain: TFrmMain
                   ExplicitHeight = 402
                   object TabSheetWmiClassCode: TTabSheet
                     Caption = 'Code'
-                    ExplicitHeight = 368
+                    ExplicitHeight = 369
                     object SynEditWMIClassCode: TSynEdit
                       Left = 0
                       Top = 0
@@ -269,7 +269,7 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
-                      ExplicitHeight = 368
+                      ExplicitHeight = 369
                     end
                   end
                 end
@@ -298,7 +298,6 @@ object FrmMain: TFrmMain
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
-                ExplicitHeight = 404
                 DesignSize = (
                   393
                   405)
@@ -371,7 +370,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 144
+                  Height = 142
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -421,14 +420,13 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 366
+                  Top = 364
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 8
                   OnClick = ButtonGenerateCodeInvokerClick
-                  ExplicitTop = 365
                 end
                 object ComboBoxPaths: TComboBox
                   Left = 103
@@ -471,7 +469,6 @@ object FrmMain: TFrmMain
                   ExplicitHeight = 394
                   object TabSheetWmiMethodCode: TTabSheet
                     Caption = 'Code'
-                    ExplicitHeight = 366
                     object SynEditWMIMethodCode: TSynEdit
                       Left = 0
                       Top = 0
@@ -498,7 +495,6 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
-                      ExplicitHeight = 366
                     end
                   end
                 end
@@ -584,7 +580,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 196
+                  Height = 194
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -611,7 +607,6 @@ object FrmMain: TFrmMain
                   TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewEventsCondsClick
-                  ExplicitHeight = 195
                 end
                 object EditValueEvent: TEdit
                   Left = 88
@@ -685,14 +680,13 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 378
+                  Top = 376
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 9
                   OnClick = ButtonGenerateEventCodeClick
-                  ExplicitTop = 377
                 end
                 object RadioButtonIntrinsic: TRadioButton
                   Left = 5
@@ -736,7 +730,6 @@ object FrmMain: TFrmMain
                   ExplicitHeight = 402
                   object TabSheetWmiEventCode: TTabSheet
                     Caption = 'Delphi Code'
-                    ExplicitHeight = 366
                     object SynEditWMIEventCode: TSynEdit
                       Left = 0
                       Top = 0
@@ -763,7 +756,6 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
-                      ExplicitHeight = 366
                     end
                   end
                 end
@@ -844,22 +836,18 @@ object FrmMain: TFrmMain
       object TabSheetWmiExplorer: TTabSheet
         Caption = 'Wmi Explorer'
         ImageIndex = 29
-        ExplicitHeight = 642
       end
       object TabSheetTreeClasses: TTabSheet
         Caption = 'WMI Classes Tree'
         ImageIndex = 43
-        ExplicitHeight = 642
       end
       object TabSheetWmiDatabase: TTabSheet
         Caption = 'WMI Database'
         ImageIndex = 31
-        ExplicitHeight = 642
       end
       object TabSheet6: TTabSheet
         Caption = 'Log'
         ImageIndex = 28
-        ExplicitHeight = 642
         object MemoLog: TMemo
           Left = 0
           Top = 0
@@ -874,7 +862,6 @@ object FrmMain: TFrmMain
           Font.Style = []
           ParentFont = False
           TabOrder = 0
-          ExplicitHeight = 642
         end
       end
     end
@@ -897,7 +884,6 @@ object FrmMain: TFrmMain
         Width = 250
       end>
     OnDrawPanel = StatusBar1DrawPanel
-    ExplicitTop = 711
   end
   object ToolBar1: TToolBar
     Left = 0
@@ -1046,7 +1032,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800700110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800740110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
