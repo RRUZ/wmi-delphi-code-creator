@@ -24,6 +24,7 @@ unit uWmiGenCode;
 interface
 
 uses
+  uWmi_Metadata,
   Classes;
 
 type
@@ -31,18 +32,22 @@ type
   TWmiCode        =  (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
 
   TWmiCodeGenerator=class
+  private
     FUseHelperFunctions: boolean;
-    FWmiClass: string;
-    FWmiNameSpace: string;
     FModeCodeGeneration: TWmiCode;
     FOutPutCode: TStrings;
     FTemplateCode : string;
+    FWMiClassMetaData: TWMiClassMetaData;
+    function GetWmiClass: string;
+    function GetWmiNameSpace: string;
   public
-    property WmiNameSpace : string read FWmiNameSpace write FWmiNameSpace;
-    property WmiClass : string Read FWmiClass write FWmiClass;
+    property WmiNameSpace : string read GetWmiNameSpace;
+    property WmiClass : string Read GetWmiClass;
     property UseHelperFunctions : boolean read FUseHelperFunctions write  FUseHelperFunctions;
     property ModeCodeGeneration:TWmiCode read FModeCodeGeneration write FModeCodeGeneration;
     property OutPutCode : TStrings read FOutPutCode;
+    property WMiClassMetaData : TWMiClassMetaData read FWMiClassMetaData write FWMiClassMetaData;
+    property TemplateCode : string read FTemplateCode write FTemplateCode;
     procedure GenerateCode;virtual;
     constructor Create;
     destructor Destroy; override;
@@ -108,7 +113,6 @@ implementation
 
 Uses
   ComObj,
-  uWmi_Metadata,
   SysUtils;
 
 { TWmiCodeGenerator }
@@ -131,6 +135,16 @@ procedure TWmiCodeGenerator.GenerateCode;
 begin
  //Common Code
 
+end;
+
+function TWmiCodeGenerator.GetWmiClass: string;
+begin
+  Result:=FWMiClassMetaData.WmiClass;
+end;
+
+function TWmiCodeGenerator.GetWmiNameSpace: string;
+begin
+  Result:=FWMiClassMetaData.WmiNameSpace;
 end;
 
 function GetMaxLengthItem(List: TStrings): integer;
@@ -165,28 +179,20 @@ var
   ClassDescr : TStringList;
   i          : Integer;
 begin
+  Result := WMiClassMetaData.Description;
+  ClassDescr:=TStringList.Create;
   try
-    Result := uWmi_Metadata.GetWmiClassDescription(FWmiNameSpace, FWmiClass);
-    ClassDescr:=TStringList.Create;
-    try
-      if Pos(#10, Result) = 0 then //check if the description has format
-        ClassDescr.Text := WrapText(Result, 80)
-      else
-        ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
+    if Pos(#10, Result) = 0 then //check if the description has format
+      ClassDescr.Text := WrapText(Result, 80)
+    else
+      ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
 
-      for i := 0 to ClassDescr.Count - 1 do
-        ClassDescr[i] := Format('// %s', [ClassDescr[i]]);
+    for i := 0 to ClassDescr.Count - 1 do
+      ClassDescr[i] := Format('// %s', [ClassDescr[i]]);
 
-      Result:=ClassDescr.Text;
-    finally
-      ClassDescr.Free;
-    end;
-  except
-    on E: EOleSysError do
-      if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-        Result := ''
-      else
-        raise;
+    Result:=ClassDescr.Text;
+  finally
+    ClassDescr.Free;
   end;
 end;
 

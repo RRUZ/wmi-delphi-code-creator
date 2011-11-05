@@ -297,6 +297,7 @@ type
     FURI: string;
     FWmiClassMOF: string;
     FWmiClassXML: string;
+    FIsSingleton : Boolean;
     {$IFDEF USEXML}
     procedure LoadWmiClassDataXML;
     {$ENDIF}
@@ -305,7 +306,8 @@ type
     function GetPropertiesCount: Integer;
     function GetQualifiersCount: Integer;
     function GetProperty(index: integer): TWMiPropertyMetaData;
-    function GetMethod(index: integer): TWMiMethodMetaData;
+    function GetMethod(index: integer): TWMiMethodMetaData;overload;
+    function GetMethod(const Name: string): TWMiMethodMetaData;overload;
     function GetDescriptionEx: string;
     function GetQualifiers(index: integer): TWMiQualifierMetaData;
   public
@@ -322,7 +324,8 @@ type
     property PropertiesCount : Integer read GetPropertiesCount;
     property Properties      [index:integer]  : TWMiPropertyMetaData read GetProperty;
     property MethodsCount    : Integer read GetMethodsCount;
-    property Methods         [index:integer]  : TWMiMethodMetaData read GetMethod;
+    property Methods         [index:integer]      : TWMiMethodMetaData read GetMethod;
+    property MethodByName    [const Name:String]  : TWMiMethodMetaData read GetMethod;
     property QualifiersCount : Integer read GetQualifiersCount;
     property Qualifiers      [index:integer]  : TWMiQualifierMetaData read GetQualifiers;
 
@@ -330,6 +333,7 @@ type
     Property WmiNameSpace : string read FNameSpace;
     property WmiClassMOF  : string read FWmiClassMOF;
     property WmiClassXML  : string read FWmiClassXML;
+    property IsSingleton  : boolean read FIsSingleton;
   end;
 
 
@@ -1809,6 +1813,21 @@ begin
    Result:=TWMiMethodMetaData(FCollectionMethodMetaData[index]);
 end;
 
+function TWMiClassMetaData.GetMethod(const Name: string): TWMiMethodMetaData;
+Var
+ i,Index: Integer;
+begin
+  Index:=-1;
+  for i := 0 to FCollectionMethodMetaData.Count-1 do
+  if CompareText(TWMiMethodMetaData(FCollectionMethodMetaData[i]).Name, Name)=0 then
+  begin
+   Index:=i;
+   break;
+  end;
+
+  Result:=TWMiMethodMetaData(FCollectionMethodMetaData[index]);
+end;
+
 function TWMiClassMetaData.GetMethodsCount: Integer;
 begin
    Result:=FCollectionMethodMetaData.Count;
@@ -1918,6 +1937,9 @@ begin
         PropertyMetaData.Qualifiers[PropertyMetaData.Qualifiers.Count-1].FValue:=VarStrNull(Qualif.Value);
         PropertyMetaData.Qualifiers[PropertyMetaData.Qualifiers.Count-1].FName :=VarStrNull(Qualif.Name);
 
+        if CompareText(VarStrNull(Qualif.Name),'Singleton')=0 then
+         FIsSingleton := True
+        else
         if CompareText(VarStrNull(Qualif.Name),'Description')=0 then
          PropertyMetaData.FDescription := VarStrNull(Qualif.Value)
         else
@@ -2104,6 +2126,7 @@ begin
 
 
 end;
+
 
 {$IFDEF USEXML}
 procedure TWMiClassMetaData.LoadWmiClassDataXML;

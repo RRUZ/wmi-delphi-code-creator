@@ -101,10 +101,10 @@ var
 begin
   Descr     := GetWmiClassDescription;
 
-  FOutPutCode.BeginUpdate;
+  OutPutCode.BeginUpdate;
   DynCode    := TStringList.Create;
   try
-    FOutPutCode.Clear;
+    OutPutCode.Clear;
 
     Padding := StringOfChar(' ',16);
     TemplateCode:='';
@@ -174,9 +174,9 @@ begin
 
     StrCode := StringReplace(StrCode, sTagCppCode, DynCode.Text, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassDescr, Descr, [rfReplaceAll]);
-    FOutPutCode.Text := StrCode;
+    OutPutCode.Text := StrCode;
   finally
-    FOutPutCode.EndUpdate;
+    OutPutCode.EndUpdate;
     DynCode.Free;
   end;
 end;
@@ -193,7 +193,7 @@ var
 begin
   StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_FPC]));
 
-  WQL := Format('Select * From %s Within %d ', [FWmiClass, PollSeconds,
+  WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
     WmiTargetInstance]);
   WQL := Format('  WQL =%s+%s', [QuotedStr(WQL), sLineBreak]);
 
@@ -277,7 +277,7 @@ begin
   StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNamespace, [rfReplaceAll]);
   StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
 
-  FOutPutCode.Text := StrCode;
+  OutPutCode.Text := StrCode;
 end;
 
 { TFPCWmiMethodCodeGenerator }
@@ -290,37 +290,20 @@ var
   DynCodeOutParams: TStrings;
   i: integer;
 
-  OutParamsList:  TStringList;
-  OutParamsTypes: TStringList;
-  OutParamsDescr: TStringList;
-
-  InParamsList:  TStringList;
-  InParamsTypes: TStringList;
-  InParamsDescr: TStringList;
-
   IsStatic:  boolean;
   //ParamsStr: string;
   TemplateCode : string;
   Padding : string;
   CimType : Integer;
+  ParamName : string;
 begin
   Descr := GetWmiClassDescription;
 
   //OutPutCode.BeginUpdate;
   DynCodeInParams := TStringList.Create;
   DynCodeOutParams := TStringList.Create;
-  OutParamsList  := TStringList.Create;
-  OutParamsTypes := TStringList.Create;
-  OutParamsDescr := TStringList.Create;
-  InParamsList   := TStringList.Create;
-  InParamsTypes  := TStringList.Create;
-  InParamsDescr  := TStringList.Create;
   try
-    IsStatic := WmiMethodIsStatic(WmiNamespace, WmiClass, WmiMethod);
-    GetListWmiMethodOutParameters(WmiNamespace, WmiClass, WmiMethod,
-      OutParamsList, OutParamsTypes, OutParamsDescr);
-    GetListWmiMethodInParameters(WmiNamespace, WmiClass, WmiMethod,
-      InParamsList, InParamsTypes, InParamsDescr);
+    IsStatic := WMiClassMetaData.MethodByName[WmiMethod].IsStatic;
 
     OutPutCode.Clear;
     if IsStatic then
@@ -552,12 +535,12 @@ begin
             }
 
     //Out Params
-    if OutParamsList.Count > 1 then
+    if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count > 1 then
     begin
       DynCodeOutParams.Add(Padding+'VARIANT varReturnValue;');
-      for i := 0 to OutParamsList.Count - 1 do
+      for i := 0 to WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count - 1 do
         begin
-          DynCodeOutParams.Add(Padding+Format('hres = pOutParams->Get(L"%s", 0, &varReturnValue, NULL, 0);',[OutParamsList[i]]));
+          DynCodeOutParams.Add(Padding+Format('hres = pOutParams->Get(L"%s", 0, &varReturnValue, NULL, 0);',[WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name]));
 
           {
           DynCodeOutParams.Add(Padding+'if (!FAILED(hres))');
@@ -585,31 +568,32 @@ begin
           DynCodeOutParams.Add(Padding + 'if (!FAILED(hres))');
           DynCodeOutParams.Add(Padding + '{');
           DynCodeOutParams.Add(Padding + '  if ((varReturnValue.vt==VT_NULL) || (varReturnValue.vt==VT_EMPTY))');
-          DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << ((varReturnValue.vt==VT_NULL) ? "%s" : "%s") << endl;',[OutParamsList[i],'NULL','EMPTY']));
+          DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << ((varReturnValue.vt==VT_NULL) ? "%s" : "%s") << endl;',[WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name,'NULL','EMPTY']));
           DynCodeOutParams.Add(Padding + '  else');
           DynCodeOutParams.Add(Padding + '  if ((varReturnValue.vt & VT_ARRAY))');
-          DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << "%s" << endl;',[OutParamsList[i],'Array types not supported (yet)']));
+          DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << "%s" << endl;',[WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name,'Array types not supported (yet)']));
           DynCodeOutParams.Add(Padding + '  else');
 
+          ParamName:=WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name;
+          CimType  :=WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].CimType;
 
-          CimType:=Integer(OutParamsTypes.Objects[i]);
           case CimType of
-              wbemCimtypeSint8     : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bVal   << endl;',[OutParamsList[i]]));
-              wbemCimtypeUint8     : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bVal   << endl;',[OutParamsList[i]]));
-              wbemCimtypeSint16    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.iVal << endl;',[OutParamsList[i]]));
-              wbemCimtypeUint16    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uiVal << endl;',[OutParamsList[i]]));
-              wbemCimtypeSint32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.intVal << endl;',[OutParamsList[i]]));
-              wbemCimtypeUint32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uintVal << endl;',[OutParamsList[i]]));
-              wbemCimtypeSint64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.intVal << endl;',[OutParamsList[i]]));
-              wbemCimtypeUint64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uintVal << endl;',[OutParamsList[i]]));
-              wbemCimtypeReal32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.fltVal << endl;',[OutParamsList[i]]));
-              wbemCimtypeReal64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.dblVal << endl;',[OutParamsList[i]]));
-              wbemCimtypeBoolean   : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << (varReturnValue.boolVal ? "True" : "False") << endl;',[OutParamsList[i]]));//ok
-              wbemCimtypeString    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[OutParamsList[i]]));//ok
-              wbemCimtypeDatetime  : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[OutParamsList[i]]));//ok
-              wbemCimtypeReference : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << "Reference Type is not supported" << endl;',[OutParamsList[i]]));
-              wbemCimtypeChar16    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[OutParamsList[i]]));
-              wbemCimtypeObject    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << "Object Type is not supported" << endl;',[OutParamsList[i]]));
+              wbemCimtypeSint8     : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bVal   << endl;',[ParamName]));
+              wbemCimtypeUint8     : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bVal   << endl;',[ParamName]));
+              wbemCimtypeSint16    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.iVal << endl;',[ParamName]));
+              wbemCimtypeUint16    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uiVal << endl;',[ParamName]));
+              wbemCimtypeSint32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.intVal << endl;',[ParamName]));
+              wbemCimtypeUint32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uintVal << endl;',[ParamName]));
+              wbemCimtypeSint64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.intVal << endl;',[ParamName]));
+              wbemCimtypeUint64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uintVal << endl;',[ParamName]));
+              wbemCimtypeReal32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.fltVal << endl;',[ParamName]));
+              wbemCimtypeReal64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.dblVal << endl;',[ParamName]));
+              wbemCimtypeBoolean   : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << (varReturnValue.boolVal ? "True" : "False") << endl;',[ParamName]));//ok
+              wbemCimtypeString    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[ParamName]));//ok
+              wbemCimtypeDatetime  : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[ParamName]));//ok
+              wbemCimtypeReference : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << "Reference Type is not supported" << endl;',[ParamName]));
+              wbemCimtypeChar16    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[ParamName]));
+              wbemCimtypeObject    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << "Object Type is not supported" << endl;',[ParamName]));
           end;
 
 
@@ -619,7 +603,7 @@ begin
         end;
     end
     else
-    if OutParamsList.Count = 1 then
+    if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count = 1 then
     begin
         DynCodeOutParams.Add(Padding+'VARIANT varReturnValue;');
         DynCodeOutParams.Add(Padding+'hres = pOutParams->Get(L"ReturnValue", 0, &varReturnValue, NULL, 0);');
@@ -636,12 +620,6 @@ begin
   finally
     DynCodeInParams.Free;
     DynCodeOutParams.Free;
-    OutParamsList.Free;
-    OutParamsTypes.Free;
-    OutParamsDescr.Free;
-    InParamsList.Free;
-    InParamsTypes.Free;
-    InParamsDescr.Free;
   end;
 end;
 
@@ -651,29 +629,19 @@ var
   Index      : Integer;
 begin
   try
-    ClassDescr:=TStringList.Create;
-    try
-      Result := GetWmiMethodDescription(WmiNameSpace, WmiClass, WmiMethod);
+    Result := WMiClassMetaData.MethodByName[WmiMethod].Description;
 
-      if Pos(#10, Result) = 0 then //check if the description has format
-        ClassDescr.Text := WrapText(Result, 80)
-      else
-        ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
+    if Pos(#10, Result) = 0 then //check if the description has format
+      ClassDescr.Text := WrapText(Result, 80)
+    else
+      ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
 
-      for Index := 0 to ClassDescr.Count - 1 do
-        ClassDescr[Index] := Format('// %s', [ClassDescr[Index]]);
+    for Index := 0 to ClassDescr.Count - 1 do
+      ClassDescr[Index] := Format('// %s', [ClassDescr[Index]]);
 
-      Result:=ClassDescr.Text;
-    finally
-       ClassDescr.Free;
-    end;
-
-  except
-    on E: EOleSysError do
-      if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-        Result := ''
-      else
-        raise;
+    Result:=ClassDescr.Text;
+  finally
+     ClassDescr.Free;
   end;
 end;
 

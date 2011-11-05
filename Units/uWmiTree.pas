@@ -373,7 +373,7 @@ begin
 
     FrmMain.ComboBoxClasses.ItemIndex := 0;
     FrmMain.LoadClassInfo;
-    FrmMain.GenerateConsoleCode;
+    FrmMain.GenerateConsoleCode(TWMiClassMetaData(FrmMain.ComboBoxClasses.Items.Objects[FrmMain.ComboBoxClasses.ItemIndex]));
   end
   else
   if Assigned(Node) and (Node.Level = LevelClass) and (Assigned(Node.Parent)) then
@@ -387,7 +387,7 @@ begin
     WMiClassMetaData:=TWMiClassMetaData(FrmMain.ComboBoxClasses.Items.Objects[FrmMain.ComboBoxClasses.ItemIndex]);
     MemoDescr.Lines.Text :=WMiClassMetaData.DescriptionEx;
     LoadClassInfo(WMiClassMetaData);
-    FrmMain.GenerateConsoleCode;
+    FrmMain.GenerateConsoleCode(TWMiClassMetaData(FrmMain.ComboBoxClasses.Items.Objects[FrmMain.ComboBoxClasses.ItemIndex]));
   end
   else
   if Assigned(Node) and (Node.Level = LevelPropertyMethod) then
