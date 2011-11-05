@@ -39,7 +39,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmi_Metadata,
-  Menus, Buttons, uComboBox, uWmiClassTree, SynHighlighterCpp;
+  Menus, Buttons, uComboBox, uWmiClassTree, SynHighlighterCpp, uSynEditPopupEdit;
 
 const
   UM_EDITPARAMVALUE = WM_USER + 111;

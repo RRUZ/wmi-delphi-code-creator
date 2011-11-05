@@ -34,7 +34,8 @@ uses
   uWmiBorlandCppCode in 'Units\uWmiBorlandCppCode.pas',
   uBorlandCppVersions in 'Units\uBorlandCppVersions.pas',
   uBorlandCppIDE in 'Units\uBorlandCppIDE.pas',
-  uOleVariantEnum in 'Units\uOleVariantEnum.pas';
+  uOleVariantEnum in 'Units\uOleVariantEnum.pas',
+  uSynEditPopupEdit in 'Units\uSynEditPopupEdit.pas';
 
 {$R *.res}
 
