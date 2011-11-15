@@ -33,8 +33,9 @@ type
   TSynEdit = class(SynEdit.TSynEdit)
   private
     FActnList: TActionList;
-    FPopMenu : TPopupMenu;
-    procedure FillPopupMenu;
+    FPopupMenu : TPopupMenu;
+    procedure CreateActns;
+    procedure FillPopupMenu(APopupMenu : TPopupMenu);
     procedure CutExecute(Sender: TObject);
     procedure CutUpdate(Sender: TObject);
     procedure CopyExecute(Sender: TObject);
@@ -49,12 +50,22 @@ type
     procedure RedoUpdate(Sender: TObject);
     procedure UndoExecute(Sender: TObject);
     procedure UndoUpdate(Sender: TObject);
+    procedure SetPopupMenu_(const Value: TPopupMenu);
+    function  GetPopupMenu_: TPopupMenu;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+  published
+    property PopupMenu: TPopupMenu read GetPopupMenu_ write SetPopupMenu_;
   end;
 
 implementation
+
+uses
+ SysUtils;
+
+const
+ MenuName='uSynEditPopupMenu';
 
 procedure TSynEdit.CopyExecute(Sender: TObject);
 begin
@@ -130,23 +141,17 @@ constructor TSynEdit.Create(AOwner: TComponent);
 begin
   inherited;
   FActnList:=TActionList.Create(Self);
-  FPopMenu:=TPopupMenu.Create(Self);
-  FillPopupMenu;
-  PopupMenu:=FPopMenu;
+  FPopupMenu:=TPopupMenu.Create(Self);
+  FPopupMenu.Name:=MenuName;
+  CreateActns;
+  FillPopupMenu(FPopupMenu);
+  PopupMenu:=FPopupMenu;
 end;
 
-destructor TSynEdit.Destroy;
-begin
-  FPopMenu.Free;
-  FActnList.Free;
-  inherited;
-end;
+procedure TSynEdit.CreateActns;
 
-procedure TSynEdit.FillPopupMenu;
-
- procedure AddMenuItem(const AText:string;AShortCut : TShortCut;AEnabled:Boolean;OnExecute,OnUpdate:TNotifyEvent);
+ procedure AddActItem(const AText:string;AShortCut : TShortCut;AEnabled:Boolean;OnExecute,OnUpdate:TNotifyEvent);
  Var
-    MenuItem    : TMenuItem;
     ActionItem  : TAction;
   begin
     ActionItem:=TAction.Create(FActnList);
@@ -156,24 +161,60 @@ procedure TSynEdit.FillPopupMenu;
     ActionItem.Enabled :=AEnabled;
     ActionItem.OnExecute :=OnExecute;
     ActionItem.OnUpdate  :=OnUpdate;
-
-
-    MenuItem:=TMenuItem.Create(FPopMenu);
-    MenuItem.Action  :=ActionItem;
-    FPopMenu.Items.Add(MenuItem);
   end;
 
 begin
-  AddMenuItem('&Undo',Menus.ShortCut(Word('Z'), [ssCtrl]),False,UndoExecute, UndoUpdate);
-  AddMenuItem('&Redo',Menus.ShortCut(Word('Z'), [ssCtrl,ssShift]),False,RedoExecute, RedoUpdate);
-  AddMenuItem('-',0,False,nil,nil);
-  AddMenuItem('Cu&t',Menus.ShortCut(Word('X'), [ssCtrl]),False,CutExecute, CutUpdate);
-  AddMenuItem('&Copy',Menus.ShortCut(Word('C'), [ssCtrl]),False,CopyExecute, CopyUpdate);
-  AddMenuItem('&Paste',Menus.ShortCut(Word('V'), [ssCtrl]),False,PasteExecute, PasteUpdate);
-  AddMenuItem('De&lete',0,False,DeleteExecute, DeleteUpdate);
-  AddMenuItem('-',0,False,nil,nil);
-  AddMenuItem('Select &All',Menus.ShortCut(Word('A'), [ssCtrl]),False,SelectAllExecute, SelectAllUpdate);
+  AddActItem('&Undo',Menus.ShortCut(Word('Z'), [ssCtrl]),False,UndoExecute, UndoUpdate);
+  AddActItem('&Redo',Menus.ShortCut(Word('Z'), [ssCtrl,ssShift]),False,RedoExecute, RedoUpdate);
+  AddActItem('-',0,False,nil,nil);
+  AddActItem('Cu&t',Menus.ShortCut(Word('X'), [ssCtrl]),False,CutExecute, CutUpdate);
+  AddActItem('&Copy',Menus.ShortCut(Word('C'), [ssCtrl]),False,CopyExecute, CopyUpdate);
+  AddActItem('&Paste',Menus.ShortCut(Word('V'), [ssCtrl]),False,PasteExecute, PasteUpdate);
+  AddActItem('De&lete',0,False,DeleteExecute, DeleteUpdate);
+  AddActItem('-',0,False,nil,nil);
+  AddActItem('Select &All',Menus.ShortCut(Word('A'), [ssCtrl]),False,SelectAllExecute, SelectAllUpdate);
 end;
+
+procedure TSynEdit.SetPopupMenu_(const Value: TPopupMenu);
+Var
+  MenuItem : TMenuItem;
+begin
+  SynEdit.TSynEdit(Self).PopupMenu:=Value;
+  if CompareText(MenuName,Value.Name)<>0 then
+  begin
+   MenuItem:=TMenuItem.Create(Value);
+   MenuItem.Caption:='-';
+   Value.Items.Add(MenuItem);
+   FillPopupMenu(Value);
+  end;
+end;
+
+function TSynEdit.GetPopupMenu_: TPopupMenu;
+begin
+  Result:=SynEdit.TSynEdit(Self).PopupMenu;
+end;
+
+destructor TSynEdit.Destroy;
+begin
+  FPopupMenu.Free;
+  FActnList.Free;
+  inherited;
+end;
+
+procedure TSynEdit.FillPopupMenu(APopupMenu : TPopupMenu);
+var
+  i        : integer;
+  MenuItem : TMenuItem;
+begin
+  if Assigned(FActnList) then
+  for i := 0 to FActnList.ActionCount-1 do
+  begin
+    MenuItem:=TMenuItem.Create(APopupMenu);
+    MenuItem.Action  :=FActnList.Actions[i];
+    APopupMenu.Items.Add(MenuItem);
+  end;
+end;
+
 
 
 end.

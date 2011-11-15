@@ -180,7 +180,7 @@ object FrmMain: TFrmMain
                   Left = 7
                   Top = 192
                   Width = 295
-                  Height = 203
+                  Height = 199
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -207,7 +207,7 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 205
+                  ExplicitHeight = 201
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -269,8 +269,7 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
-                      ExplicitLeft = -3
-                      ExplicitTop = 7
+                      ExplicitHeight = 369
                     end
                   end
                 end
@@ -371,7 +370,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 140
+                  Height = 136
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -421,7 +420,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 362
+                  Top = 358
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -581,7 +580,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 192
+                  Height = 188
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -681,7 +680,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 374
+                  Top = 370
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -1033,7 +1032,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800780110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800800110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
@@ -2627,5 +2626,15 @@ object FrmMain: TFrmMain
   object SynCppSyn1: TSynCppSyn
     Left = 599
     Top = 195
+  end
+  object PopupMenuSyn: TPopupMenu
+    Left = 463
+    Top = 315
+    object item11: TMenuItem
+      Caption = 'Item 1'
+    end
+    object Item21: TMenuItem
+      Caption = 'Item 2'
+    end
   end
 end
