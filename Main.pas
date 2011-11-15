@@ -149,6 +149,9 @@ type
     ToolButtonSettings: TToolButton;
     TabSheetTreeClasses: TTabSheet;
     SynCppSyn1: TSynCppSyn;
+    PopupMenuSyn: TPopupMenu;
+    item11: TMenuItem;
+    Item21: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure ComboBoxNameSpacesChange(Sender: TObject);
