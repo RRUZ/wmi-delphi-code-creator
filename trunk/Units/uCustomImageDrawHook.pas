@@ -51,7 +51,6 @@ type
     Addr:   PPointer;
   end;
 
-
   TCustomImageListHack = class(TCustomImageList);
 
 var
@@ -73,28 +72,28 @@ end;
 
 procedure HookProc(Proc, Dest: Pointer; var BackupCode: TXRedirCode);
 var
-  n:    DWORD;
+  lpNumberOfBytesRead:    SIZE_T;
   Code: TXRedirCode;
 begin
   Proc := GetActualAddr(Proc);
   Assert(Proc <> nil);
-  if ReadProcessMemory(GetCurrentProcess, Proc, @BackupCode, SizeOf(BackupCode), n) then
+  if ReadProcessMemory(GetCurrentProcess, Proc, @BackupCode, SizeOf(BackupCode), lpNumberOfBytesRead) then
   begin
     Code.Jump   := $E9;
     Code.Offset := PAnsiChar(Dest) - PAnsiChar(Proc) - SizeOf(Code);
-    WriteProcessMemory(GetCurrentProcess, Proc, @Code, SizeOf(Code), n);
+    WriteProcessMemory(GetCurrentProcess, Proc, @Code, SizeOf(Code), lpNumberOfBytesRead);
   end;
 end;
 
 procedure UnhookProc(Proc: Pointer; var BackupCode: TXRedirCode);
 var
-  n: cardinal;
+  lpNumberOfBytesWritten: SIZE_T;
 begin
   if (BackupCode.Jump <> 0) and (Proc <> nil) then
   begin
     Proc := GetActualAddr(Proc);
     Assert(Proc <> nil);
-    WriteProcessMemory(GetCurrentProcess, Proc, @BackupCode, SizeOf(BackupCode), n);
+    WriteProcessMemory(GetCurrentProcess, Proc, @BackupCode, SizeOf(BackupCode), lpNumberOfBytesWritten);
     BackupCode.Jump := 0;
   end;
 end;

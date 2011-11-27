@@ -122,6 +122,20 @@ Source: Templates\TemplateStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Temp
 Source: Templates\TemplateConsoleAppBorlandCPP.cpp; DestDir: {app}\Templates\
 #define MyAppName 'Wmi Delphi Code Creator'
 #define MyAppVersion GetFileVersion('WmiDelphiCodeCreator.exe')
+Source: Styles\AmethystKamri.vsf; DestDir: {app}\Styles\
+Source: Styles\AquaGraphite.vsf; DestDir: {app}\Styles\
+Source: Styles\AquaLightSlate.vsf; DestDir: {app}\Styles\
+Source: Styles\Carbon.vsf; DestDir: {app}\Styles\
+Source: Styles\CobaltXEMedia.vsf; DestDir: {app}\Styles\
+Source: Styles\EmeraldLightSlate.vsf; DestDir: {app}\Styles\
+Source: Styles\GoldenGraphite.vsf; DestDir: {app}\Styles\
+Source: Styles\IcebergClassico.vsf; DestDir: {app}\Styles\
+Source: Styles\LavenderClassico.vsf; DestDir: {app}\Styles\
+Source: Styles\RubyGraphite.vsf; DestDir: {app}\Styles\
+Source: Styles\SapphireKamri.vsf; DestDir: {app}\Styles\
+Source: Styles\Sky.vsf; DestDir: {app}\Styles\
+Source: Styles\SlateClassico.vsf; DestDir: {app}\Styles\
+Source: Styles\SmokeyQuartzKamri.vsf; DestDir: {app}\Styles\
 [Setup]
 UsePreviousLanguage=no
 AppName={#MyAppName}
@@ -227,6 +241,7 @@ Name: {app}\Oxygene\VS2010
 Name: {app}\Oxygene\VS2010\Properties
 Name: {app}\Delphi
 Name: {app}\Templates
+Name: {app}\Styles
 [Icons]
 Name: {group}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}
 Name: {userdesktop}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}

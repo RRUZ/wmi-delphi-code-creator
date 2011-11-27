@@ -244,6 +244,8 @@ var
 implementation
 
 uses
+  uXE2Patches,
+  VCl.Themes,
   ComObj,
   ShellApi,
   CommCtrl,
@@ -482,6 +484,7 @@ begin
   SetToolBar;
 
   ReadSettings(Settings);
+  LoadVCLStyle(Settings.VCLStyle);
   LoadCurrentTheme(Self,Settings.CurrentTheme);
   LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
 
@@ -1332,7 +1335,8 @@ begin
   FNameSpaces := TStringList.Create;
   Frm := TFrmAbout.Create(Self);
   try
-    if DebugHook=0 then
+
+    if (DebugHook=0) and (CompareText(Settings.VCLStyle,'Windows')=0) then
     Frm.Show;
 
     SetMsg('Loading Namespaces');
@@ -1558,10 +1562,12 @@ end;
 
 procedure TFrmMain.SetToolBar;
 begin
+  {
   ToolButtonRun.Enabled    := (PageControlMain.ActivePage = TabSheetCodeGen);
   ToolButtonSave.Enabled   := (PageControlMain.ActivePage = TabSheetCodeGen);
   ToolButtonSearch.Enabled := (PageControlMain.ActivePage = TabSheetWmiExplorer);
   ToolButtonGetValues.Enabled := (PageControlMain.ActivePage = TabSheetWmiExplorer);
+  }
 end;
 
 procedure TFrmMain.StatusBar1DrawPanel(StatusBar: TStatusBar;
@@ -2051,6 +2057,8 @@ var
   pt: TPoint;
   HitTestInfo: TLVHitTestInfo;
 begin
+  if TListView(Sender).Items.Count=0  then exit;
+
   EditValueMethodParam.Visible := False;
   pt := TListView(Sender).ScreenToClient(Mouse.CursorPos);
   FillChar(HitTestInfo, sizeof(HitTestInfo), 0);
@@ -2124,6 +2132,8 @@ begin
   EditValueMethodParam.SetFocus;
 end;
 
-
-
+initialization
+   TCustomStyleEngine.RegisterStyleHook(TCustomSynEdit, TMemoStyleHook);
+   //TCustomStyleEngine.UnRegisterStyleHook(TCustomTabControl, TTabControlStyleHook);
+   TCustomStyleEngine.RegisterStyleHook(TCustomTabControl, TMyTabControlStyleHook);
 end.
