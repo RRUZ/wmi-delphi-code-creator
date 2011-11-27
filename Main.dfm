@@ -39,15 +39,9 @@ object FrmMain: TFrmMain
       MultiLine = True
       TabOrder = 0
       OnChange = PageControlMainChange
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 1008
-      ExplicitHeight = 682
       object TabSheetCodeGen: TTabSheet
         Caption = 'Code Generation'
         ImageIndex = 30
-        ExplicitWidth = 1000
-        ExplicitHeight = 653
         object PanelCodeGen: TPanel
           Left = 0
           Top = 0
@@ -57,8 +51,6 @@ object FrmMain: TFrmMain
           BevelOuter = bvNone
           BevelWidth = 5
           TabOrder = 0
-          ExplicitWidth = 1000
-          ExplicitHeight = 653
           object Splitter4: TSplitter
             Left = 0
             Top = 475
@@ -80,13 +72,9 @@ object FrmMain: TFrmMain
             Images = ImageList1
             MultiLine = True
             TabOrder = 1
-            ExplicitWidth = 1000
-            ExplicitHeight = 444
             object TabSheetWmiClasses: TTabSheet
               Caption = 'WMI Classes'
               ImageIndex = 40
-              ExplicitWidth = 992
-              ExplicitHeight = 415
               object Splitter1: TSplitter
                 Left = 308
                 Top = 0
@@ -103,7 +91,6 @@ object FrmMain: TFrmMain
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
-                ExplicitHeight = 415
                 DesignSize = (
                   308
                   405)
@@ -180,7 +167,7 @@ object FrmMain: TFrmMain
                   Left = 7
                   Top = 192
                   Width = 295
-                  Height = 189
+                  Height = 187
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -207,7 +194,6 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 199
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -230,8 +216,6 @@ object FrmMain: TFrmMain
                 BevelOuter = bvNone
                 BorderWidth = 5
                 TabOrder = 1
-                ExplicitWidth = 679
-                ExplicitHeight = 415
                 object PageControlCode: TPageControl
                   Left = 5
                   Top = 5
@@ -240,12 +224,8 @@ object FrmMain: TFrmMain
                   ActivePage = TabSheetWmiClassCode
                   Align = alClient
                   TabOrder = 0
-                  ExplicitWidth = 669
-                  ExplicitHeight = 405
                   object TabSheetWmiClassCode: TTabSheet
                     Caption = 'Code'
-                    ExplicitWidth = 661
-                    ExplicitHeight = 377
                     object SynEditWMIClassCode: TSynEdit
                       Left = 0
                       Top = 0
@@ -272,8 +252,6 @@ object FrmMain: TFrmMain
                       Gutter.GradientStartColor = 4539717
                       Gutter.GradientEndColor = 2565927
                       Highlighter = SynPasSyn1
-                      ExplicitWidth = 661
-                      ExplicitHeight = 377
                     end
                   end
                 end
@@ -282,6 +260,8 @@ object FrmMain: TFrmMain
             object TabSheetMethods: TTabSheet
               Caption = 'Execute a WMI method'
               ImageIndex = 41
+              ExplicitLeft = 0
+              ExplicitTop = 0
               ExplicitWidth = 992
               ExplicitHeight = 415
               object Splitter5: TSplitter
@@ -373,7 +353,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 126
+                  Height = 124
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -424,7 +404,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 348
+                  Top = 346
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -467,11 +447,13 @@ object FrmMain: TFrmMain
                 object PageControl1: TPageControl
                   Left = 5
                   Top = 5
-                  Width = 584
-                  Height = 405
+                  Width = 574
+                  Height = 395
                   ActivePage = TabSheetWmiMethodCode
                   Align = alClient
                   TabOrder = 0
+                  ExplicitWidth = 584
+                  ExplicitHeight = 405
                   object TabSheetWmiMethodCode: TTabSheet
                     Caption = 'Code'
                     ExplicitLeft = 0
@@ -512,6 +494,8 @@ object FrmMain: TFrmMain
             object TabSheetEvents: TTabSheet
               Caption = 'Receive a WMI Event'
               ImageIndex = 45
+              ExplicitLeft = 0
+              ExplicitTop = 0
               ExplicitWidth = 992
               ExplicitHeight = 415
               object Splitter6: TSplitter
@@ -587,7 +571,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 178
+                  Height = 176
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -688,7 +672,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 360
+                  Top = 358
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -732,11 +716,13 @@ object FrmMain: TFrmMain
                 object PageControl3: TPageControl
                   Left = 5
                   Top = 5
-                  Width = 561
-                  Height = 405
+                  Width = 551
+                  Height = 395
                   ActivePage = TabSheetWmiEventCode
                   Align = alClient
                   TabOrder = 0
+                  ExplicitWidth = 561
+                  ExplicitHeight = 405
                   object TabSheetWmiEventCode: TTabSheet
                     Caption = 'Delphi Code'
                     ExplicitLeft = 0
@@ -784,8 +770,6 @@ object FrmMain: TFrmMain
             BevelOuter = bvNone
             BorderWidth = 5
             TabOrder = 2
-            ExplicitTop = 490
-            ExplicitWidth = 1000
             object PageControl2: TPageControl
               Left = 5
               Top = 5
@@ -795,11 +779,9 @@ object FrmMain: TFrmMain
               Align = alClient
               Images = ImageList1
               TabOrder = 0
-              ExplicitWidth = 990
               object TabSheet3: TTabSheet
                 Caption = 'Console Output'
                 ImageIndex = 17
-                ExplicitWidth = 982
                 object MemoConsole: TMemo
                   Left = 0
                   Top = 0
@@ -815,7 +797,6 @@ object FrmMain: TFrmMain
                   ParentFont = False
                   ScrollBars = ssBoth
                   TabOrder = 0
-                  ExplicitWidth = 982
                 end
               end
             end
@@ -828,7 +809,6 @@ object FrmMain: TFrmMain
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 0
-            ExplicitWidth = 1000
             object Label8: TLabel
               Left = 5
               Top = 14
@@ -1063,7 +1043,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800940110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800980110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
