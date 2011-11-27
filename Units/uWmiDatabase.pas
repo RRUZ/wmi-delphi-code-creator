@@ -412,10 +412,11 @@ procedure TFrmWmiDatabase.DBGridWMIDrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: integer; Column: TColumn; State: TGridDrawState);
 var
   DbGrid: TDBGrid;
-  Row:    integer;
+ // Row:    integer;
 begin
+
   DbGrid := Sender as TDBGrid;
-  Row    := DbGrid.DataSource.DataSet.RecNo;
+{  Row    := DbGrid.DataSource.DataSet.RecNo;
 
   if (gdSelected in State) then
   begin
@@ -431,7 +432,7 @@ begin
     DbGrid.Canvas.Brush.Color := clWindow
   else
     DbGrid.Canvas.Brush.Color := clBtnFace;
-
+}
   DbGrid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
 end;
 

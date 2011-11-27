@@ -35,7 +35,10 @@ uses
   uBorlandCppVersions in 'Units\uBorlandCppVersions.pas',
   uBorlandCppIDE in 'Units\uBorlandCppIDE.pas',
   uOleVariantEnum in 'Units\uOleVariantEnum.pas',
-  uSynEditPopupEdit in 'Units\uSynEditPopupEdit.pas';
+  uSynEditPopupEdit in 'Units\uSynEditPopupEdit.pas',
+  Vcl.Themes,
+  Vcl.Styles,
+  uXE2Patches in 'Units\uXE2Patches.pas';
 
 {$R *.res}
 

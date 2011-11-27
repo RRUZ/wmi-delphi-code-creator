@@ -25,10 +25,6 @@ object FrmSettings: TFrmSettings
     Align = alClient
     BorderWidth = 5
     TabOrder = 0
-    ExplicitLeft = 64
-    ExplicitTop = 32
-    ExplicitWidth = 185
-    ExplicitHeight = 41
     object PageControl1: TPageControl
       Left = 6
       Top = 6
@@ -37,7 +33,6 @@ object FrmSettings: TFrmSettings
       ActivePage = TabSheet4
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 295
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
@@ -179,16 +174,16 @@ object FrmSettings: TFrmSettings
         object Label1: TLabel
           Left = 11
           Top = 8
-          Width = 32
+          Width = 127
           Height = 13
-          Caption = 'Theme'
+          Caption = 'Syntax Highlighting Theme'
         end
         object Label2: TLabel
           Left = 11
           Top = 51
-          Width = 22
+          Width = 81
           Height = 13
-          Caption = 'Font'
+          Caption = 'Code Editor Font'
         end
         object Label3: TLabel
           Left = 219
@@ -196,6 +191,13 @@ object FrmSettings: TFrmSettings
           Width = 19
           Height = 13
           Caption = 'Size'
+        end
+        object Label9: TLabel
+          Left = 11
+          Top = 97
+          Width = 45
+          Height = 13
+          Caption = 'VCL Style'
         end
         object ComboBoxTheme: TComboBox
           Left = 11
@@ -245,6 +247,15 @@ object FrmSettings: TFrmSettings
           TabOrder = 0
           OnClick = ButtonGetMoreClick
         end
+        object ComboBoxVCLStyle: TComboBox
+          Left = 11
+          Top = 116
+          Width = 202
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 5
+          OnChange = ComboBoxVCLStyleChange
+        end
       end
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
@@ -285,9 +296,5 @@ object FrmSettings: TFrmSettings
       TabOrder = 1
       OnClick = ButtonCancelClick
     end
-  end
-  object JvBrowseForFolderDialog1: TJvBrowseForFolderDialog
-    Left = 240
-    Top = 240
   end
 end

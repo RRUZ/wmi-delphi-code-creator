@@ -3,7 +3,7 @@ object FrmSelCompilerVer: TFrmSelCompilerVer
   Top = 403
   BorderStyle = bsToolWindow
   Caption = 'Select compiler'
-  ClientHeight = 157
+  ClientHeight = 203
   ClientWidth = 443
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -26,7 +26,7 @@ object FrmSelCompilerVer: TFrmSelCompilerVer
   end
   object ButtonOk: TButton
     Left = 279
-    Top = 127
+    Top = 175
     Width = 75
     Height = 25
     Caption = 'OK'
@@ -36,7 +36,7 @@ object FrmSelCompilerVer: TFrmSelCompilerVer
   end
   object ButtonCancel: TButton
     Left = 360
-    Top = 127
+    Top = 175
     Width = 75
     Height = 25
     Caption = 'Cancel'
@@ -47,7 +47,7 @@ object FrmSelCompilerVer: TFrmSelCompilerVer
     Left = 8
     Top = 27
     Width = 427
-    Height = 94
+    Height = 142
     Columns = <
       item
         Caption = 'Version'

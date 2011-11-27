@@ -24,9 +24,6 @@ object FrmWMITree: TFrmWMITree
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 0
-    ExplicitTop = -6
-    ExplicitWidth = 990
-    ExplicitHeight = 643
     object Splitter7: TSplitter
       Left = 901
       Top = 34
@@ -70,10 +67,6 @@ object FrmWMITree: TFrmWMITree
       ReadOnly = True
       TabOrder = 1
       OnChange = TreeViewWmiClassesChange
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 795
-      ExplicitHeight = 418
     end
     object MemoDescr: TMemo
       Left = 906
@@ -99,9 +92,6 @@ object FrmWMITree: TFrmWMITree
       BevelOuter = bvNone
       BorderWidth = 5
       TabOrder = 3
-      ExplicitLeft = 0
-      ExplicitTop = 418
-      ExplicitWidth = 990
       object PageControl2: TPageControl
         Left = 5
         Top = 5
@@ -132,10 +122,6 @@ object FrmWMITree: TFrmWMITree
         object TabSheetXMLClass: TTabSheet
           Caption = 'XML Class Definition'
           ImageIndex = 1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object TreeView1: TTreeView
             Left = 0
             Top = 0
@@ -144,19 +130,11 @@ object FrmWMITree: TFrmWMITree
             Align = alClient
             Indent = 19
             TabOrder = 0
-            ExplicitLeft = 152
-            ExplicitTop = 72
-            ExplicitWidth = 121
-            ExplicitHeight = 97
           end
         end
         object TabSheet3: TTabSheet
           Caption = 'Online Help'
           ImageIndex = 2
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object WebBrowserWmi: TWebBrowser
             Left = 0
             Top = 0
@@ -176,10 +154,6 @@ object FrmWMITree: TFrmWMITree
         object TabSheet4: TTabSheet
           Caption = 'Class Qualifiers'
           ImageIndex = 3
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object MemoQualifiers: TMemo
             Left = 0
             Top = 0
@@ -206,10 +180,11 @@ object FrmWMITree: TFrmWMITree
   end
   object ImageList1: TImageList
     ColorDepth = cd32Bit
+    DrawingStyle = dsTransparent
     Left = 176
     Top = 128
     Bitmap = {
-      494C010107000800380010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010107000800400010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

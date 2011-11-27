@@ -25,8 +25,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
-  JvBaseDlg, JvBrowseFolder;
+  Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox;
 
 type
   TSettings = class
@@ -42,6 +41,7 @@ type
     FDelphiWmiMethodCodeGenMode: Integer;
     FLastWmiNameSpace: string;
     FLastWmiClass: string;
+    FVCLStyle: string;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -57,9 +57,9 @@ type
     property OutputFolder : string read GetOutputFolder write FOutputFolder;
     property BackGroundColor : TColor read GetBackGroundColor;
     property ForeGroundColor : TColor read GetForeGroundColor;
-
     property LastWmiNameSpace : string read FLastWmiNameSpace Write FLastWmiNameSpace;
     property LastWmiClass : string read FLastWmiClass Write FLastWmiClass;
+    property VCLStyle : string read FVCLStyle Write FVCLStyle;
   end;
 
 
@@ -92,12 +92,13 @@ type
     EditOutputFolder: TEdit;
     Label6: TLabel;
     BtnSelFolderThemes: TButton;
-    JvBrowseForFolderDialog1: TJvBrowseForFolderDialog;
     CbDelphiCodeWmiMethod: TComboBox;
     LabelDescrMethod: TLabel;
     Label8: TLabel;
     BtnDeleteCache: TButton;
     Label7: TLabel;
+    ComboBoxVCLStyle: TComboBox;
+    Label9: TLabel;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -110,12 +111,14 @@ type
     procedure BtnSelFolderThemesClick(Sender: TObject);
     procedure CbDelphiCodeWmiMethodChange(Sender: TObject);
     procedure BtnDeleteCacheClick(Sender: TObject);
+    procedure ComboBoxVCLStyleChange(Sender: TObject);
   private
     FSettings: TSettings;
     //FCurrentTheme:  TIDETheme;
     FForm: TForm;
     procedure LoadFixedWidthFonts;
     procedure LoadThemes;
+    procedure LoadStyles;
     procedure LoadCodeGenData;
 
   public
@@ -126,6 +129,7 @@ type
 
   procedure LoadCurrentTheme(Form: TForm;const ThemeName:string);
   procedure LoadCurrentThemeFont(Form: TForm;const FontName:string;FontSize:Word);
+  procedure LoadVCLStyle(Const StyleName:String);
   procedure ReadSettings(var Settings: TSettings);
   procedure WriteSettings(const Settings: TSettings);
 
@@ -136,6 +140,7 @@ implementation
 uses
   ShellAPI,
   GraphUtil,
+  FileCtrl,
   uDelphiVersions,
   SynHighlighterPas,
   SynHighlighterCpp,
@@ -145,6 +150,8 @@ uses
   IniFiles,
   uWmiDelphiCode,
   uWmiGenCode,
+  Vcl.Styles,
+  Vcl.Themes,
   uMisc;
 
 const
@@ -153,6 +160,27 @@ const
 Var
   DummyFrm : TFrmSettings;
 
+procedure RegisterVCLStyle(const StyleFileName: string);
+begin
+   if TStyleManager.IsValidStyle(StyleFileName) then
+     TStyleManager.LoadFromFile(StyleFileName)
+   else
+     ShowMessage('the Style is not valid');
+end;
+
+procedure LoadVCLStyle(Const StyleName:String);
+begin
+  if StyleName<>'' then
+   TStyleManager.SetStyle(StyleName)
+  else
+   TStyleManager.SetStyle(TStyleManager.SystemStyle.Name);
+       {
+  if CompareText(StyleName,'Windows')=0 then
+   TStyleManager.SetStyle(TStyleManager.SystemStyle.Name)
+  else
+   RegisterAndSetVCLStyle( IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+'Styles\'+StyleName+'.vsf');
+       }
+end;
 
 function GetCurrentTheme(const ThemeName:string):TIDETheme;
 var
@@ -188,7 +216,7 @@ end;
 
 function TSettings.GetOutputFolder: string;
 begin
-  if (FOutputFolder='') or not DirectoryExists(FOutputFolder) then
+  if (FOutputFolder='') or not SysUtils.DirectoryExists(FOutputFolder) then
     Result:=GetTempDirectory
   else
     Result := FOutputFolder;
@@ -324,6 +352,7 @@ begin
     Settings.DelphiWmiMethodCodeGenMode    := iniFile.ReadInteger('Global', 'DelphiWmiMethodCodeGenMode', integer(WmiCode_Scripting));
     Settings.LastWmiNameSpace              := iniFile.ReadString('Global', 'LastWmiNameSpace', 'root\CIMV2');
     Settings.LastWmiClass                  := iniFile.ReadString('Global', 'LastWmiClass', 'Win32_OperatingSystem');
+    Settings.VCLStyle                      := iniFile.ReadString('Global', 'VCLStyle', 'Windows');
   finally
     iniFile.Free;
   end;
@@ -346,6 +375,7 @@ begin
     iniFile.WriteInteger('Global', 'DelphiWmiMethodCodeGenMode', Settings.DelphiWmiMethodCodeGenMode);
     iniFile.WriteString('Global', 'LastWmiNameSpace', Settings.LastWmiNameSpace);
     iniFile.WriteString('Global', 'LastWmiClass', Settings.LastWmiClass);
+    iniFile.WriteString('Global', 'VCLStyle', Settings.VCLStyle);
   finally
     iniFile.Free;
   end;
@@ -355,33 +385,33 @@ procedure TFrmSettings.LoadCodeGenData;
 var
   i : integer;
 begin
- CbDelphiCodewmiClass.Items.Clear;
- CbDelphiCodewmiClass.Items.BeginUpdate;
- try
-   for i := 0 to DelphiMaxTypesClassCodeGen-1 do
-     //CbDelphiCodewmiClass.Items.Add(ListWmiCodeName[DelphiWmiClassCodeSupported[i]])
-     CbDelphiCodewmiClass.Items.AddObject(ListWmiCodeName[DelphiWmiClassCodeSupported[i]],TObject(DelphiWmiClassCodeSupported[i]));
- finally
-    CbDelphiCodewmiClass.Items.EndUpdate;
- end;
+   CbDelphiCodewmiClass.Items.Clear;
+   CbDelphiCodewmiClass.Items.BeginUpdate;
+   try
+     for i := 0 to DelphiMaxTypesClassCodeGen-1 do
+       //CbDelphiCodewmiClass.Items.Add(ListWmiCodeName[DelphiWmiClassCodeSupported[i]])
+       CbDelphiCodewmiClass.Items.AddObject(ListWmiCodeName[DelphiWmiClassCodeSupported[i]],TObject(DelphiWmiClassCodeSupported[i]));
+   finally
+      CbDelphiCodewmiClass.Items.EndUpdate;
+   end;
 
- CbDelphiCodeWmiEvent.Items.Clear;
- CbDelphiCodeWmiEvent.Items.BeginUpdate;
- try
-   for i := 0 to DelphiMaxTypesEventsCodeGen-1 do
-     CbDelphiCodeWmiEvent.Items.AddObject(ListWmiCodeName[DelphiWmiEventCodeSupported[i]],TObject(DelphiWmiEventCodeSupported[i]));
- finally
-    CbDelphiCodeWmiEvent.Items.EndUpdate;
- end;
+   CbDelphiCodeWmiEvent.Items.Clear;
+   CbDelphiCodeWmiEvent.Items.BeginUpdate;
+   try
+     for i := 0 to DelphiMaxTypesEventsCodeGen-1 do
+       CbDelphiCodeWmiEvent.Items.AddObject(ListWmiCodeName[DelphiWmiEventCodeSupported[i]],TObject(DelphiWmiEventCodeSupported[i]));
+   finally
+      CbDelphiCodeWmiEvent.Items.EndUpdate;
+   end;
 
- CbDelphiCodeWmiMethod.Items.Clear;
- CbDelphiCodeWmiMethod.Items.BeginUpdate;
- try
-   for i := 0 to DelphiMaxTypesMethodCodeGen-1 do
-     CbDelphiCodeWmiMethod.Items.AddObject(ListWmiCodeName[DelphiWmiMethodCodeSupported[i]],TObject(DelphiWmiMethodCodeSupported[i]));
- finally
-    CbDelphiCodeWmiMethod.Items.EndUpdate;
- end;
+   CbDelphiCodeWmiMethod.Items.Clear;
+   CbDelphiCodeWmiMethod.Items.BeginUpdate;
+   try
+     for i := 0 to DelphiMaxTypesMethodCodeGen-1 do
+       CbDelphiCodeWmiMethod.Items.AddObject(ListWmiCodeName[DelphiWmiMethodCodeSupported[i]],TObject(DelphiWmiMethodCodeSupported[i]));
+   finally
+      CbDelphiCodeWmiMethod.Items.EndUpdate;
+   end;
 end;
 
 procedure TFrmSettings.LoadFixedWidthFonts;
@@ -418,13 +448,16 @@ begin
 end;
 
 procedure TFrmSettings.BtnSelFolderThemesClick(Sender: TObject);
+var
+  Directory: string;
 begin
-  if DirectoryExists(EditOutputFolder.Text) then
-    JvBrowseForFolderDialog1.Directory := EditOutputFolder.Text;
+  Directory:='';
+  if SysUtils.DirectoryExists(EditOutputFolder.Text) then
+   Directory := EditOutputFolder.Text;
 
-  if JvBrowseForFolderDialog1.Execute then
-    EditOutputFolder.Text := JvBrowseForFolderDialog1.Directory;
-
+  //sdNewFolder, sdShowEdit, sdShowShares, sdNewUI, sdShowFiles,    sdValidateDir
+  if SelectDirectory('Select directory',Directory,Directory,[sdNewFolder, sdNewUI, sdShowEdit, sdValidateDir, sdShowShares], nil) then
+   EditOutputFolder.Text := Directory;
 end;
 
 procedure TFrmSettings.ButtonApplyClick(Sender: TObject);
@@ -440,6 +473,7 @@ begin
     FSettings.DelphiWmiEventCodeGenMode     := Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]);
     FSettings.DelphiWmiMethodCodeGenMode    := Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]);
     FSettings.OutputFolder                  := EditOutputFolder.Text;
+    FSettings.VCLStyle                      := ComboBoxVCLStyle.Text;
     WriteSettings(FSettings);
     Close();
   end;
@@ -449,8 +483,6 @@ procedure TFrmSettings.ButtonCancelClick(Sender: TObject);
 begin
   Close();
 end;
-
-
 
 procedure LoadCurrentTheme(Form: TForm;const ThemeName:string);
 var
@@ -468,8 +500,6 @@ begin
    end;
 end;
 
-
-
 procedure LoadCurrentThemeFont(Form: TForm;const FontName:string;FontSize:Word);
 var
  i        : Integer;
@@ -481,7 +511,6 @@ begin
     TSynEdit(Form.Components[i]).Font.Size:=FontSize;
    end;
 end;
-
 
 procedure TFrmSettings.CbDelphiCodeWmiClassChange(Sender: TObject);
 begin
@@ -509,11 +538,17 @@ begin
 end;
 
 
+procedure TFrmSettings.ComboBoxVCLStyleChange(Sender: TObject);
+begin
+  LoadVCLStyle(ComboBoxVCLStyle.Text);
+end;
+
 procedure TFrmSettings.FormCreate(Sender: TObject);
 begin
   FSettings:=TSettings.Create;
   DummyFrm:=Self;
   LoadFixedWidthFonts;
+  LoadStyles;
   LoadThemes;
   LoadCodeGenData;
 end;
@@ -528,7 +563,8 @@ var
   i  : integer;
 begin
   ReadSettings(FSettings);
-  ComboBoxTheme.ItemIndex := ComboBoxTheme.Items.IndexOf(FSettings.CurrentTheme);
+  ComboBoxTheme.ItemIndex    := ComboBoxTheme.Items.IndexOf(FSettings.CurrentTheme);
+  ComboBoxVCLStyle.ItemIndex := ComboBoxVCLStyle.Items.IndexOf(FSettings.VCLStyle);
   ComboBoxFont.ItemIndex  := ComboBoxFont.Items.IndexOf(FSettings.FontName);
   UpDown1.Position        := FSettings.FontSize;
 
@@ -563,11 +599,34 @@ begin
   EditOutputFolder.Text              := FSettings.OutputFolder;
 end;
 
-function GetThemeNameFromFile(const FileName:string): string;
+
+procedure TFrmSettings.LoadStyles;
+var
+  Style   : string;
 begin
-   Result:=Copy(ExtractFileName(FileName), 1, Pos('.theme', ExtractFileName(FileName)) - 1);
+  try
+    ComboBoxVCLStyle.Items.BeginUpdate;
+    ComboBoxVCLStyle.Items.Clear;
+    //ComboBoxVCLStyle.Items.Add('Windows');
+    for Style in TStyleManager.StyleNames do
+      ComboBoxVCLStyle.Items.Add(Style);
+  finally
+    ComboBoxVCLStyle.Items.EndUpdate;
+  end;
 end;
 
+procedure RegisterVCLStyles;
+var
+  Style   : string;
+begin
+  for Style in TDirectory.GetFiles(ExtractFilePath(ParamStr(0))+'\Styles', '*.vsf') do
+    RegisterVCLStyle(Style);
+end;
+
+function GetThemeNameFromFile(const FileName:string): string;
+begin
+  Result:=Copy(ExtractFileName(FileName), 1, Pos('.theme', ExtractFileName(FileName)) - 1);
+end;
 
 procedure TFrmSettings.LoadThemes;
 var
@@ -582,6 +641,9 @@ begin
     ComboBoxTheme.Items.EndUpdate;
   end;
 end;
+
+initialization
+ RegisterVCLStyles;
 
 
 end.

@@ -144,7 +144,8 @@ procedure TFrmWMITree.FormCreate(Sender: TObject);
     dImage.Parent := PanelLegend;
     dImage.Top  := 5;
     dImage.Left := (delta - 1) * 100 + 10;
-    ImageList1.GetBitmap(index, dImage.Picture.Bitmap);
+    //ImageList1.GetBitmap(index, dImage.Picture.Bitmap);
+    ImageList1.GetIcon(index, dImage.Picture.Icon);
 
     dLabel      := TLabel.Create(Self);
     dLabel.Parent := PanelLegend;
