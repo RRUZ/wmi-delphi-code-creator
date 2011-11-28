@@ -40,6 +40,10 @@ function  GetTempDirectory: string;
 
 implementation
 
+Uses
+ Vcl.Controls,
+ Vcl.Dialogs;
+
 function GetTempDirectory: string;
 var
   lpBuffer: array[0..MAX_PATH] of Char;
@@ -61,17 +65,17 @@ end;
 
 procedure MsgWarning(const Msg: string);
 begin
-  Application.MessageBox(PChar(Msg), 'Warning', MB_OK + MB_ICONWARNING);
+  MessageDlg(Msg, mtWarning ,[mbOK], 0);
 end;
 
 procedure MsgInformation(const Msg: string);
 begin
-  Application.MessageBox(PChar(Msg), 'Information', MB_OK + MB_ICONINFORMATION);
+  MessageDlg(Msg,  mtInformation ,[mbOK], 0);
 end;
 
 function  MsgQuestion(const Msg: string):Boolean;
 begin
-  Result:= Application.MessageBox(PChar(Msg), 'Information', MB_YESNO + MB_ICONINFORMATION)=IDYES;
+  Result:= MessageDlg(Msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes;
 end;
 
 

@@ -244,6 +244,7 @@ var
 implementation
 
 uses
+  Rtti,
   uXE2Patches,
   VCl.Themes,
   ComObj,
@@ -2132,8 +2133,10 @@ begin
   EditValueMethodParam.SetFocus;
 end;
 
+
 initialization
-   TCustomStyleEngine.RegisterStyleHook(TCustomSynEdit, TMemoStyleHook);
-   //TCustomStyleEngine.UnRegisterStyleHook(TCustomTabControl, TTabControlStyleHook);
-   TCustomStyleEngine.RegisterStyleHook(TCustomTabControl, TMyTabControlStyleHook);
+   TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TMemoStyleHook);
+   TStyleManager.Engine.UnRegisterStyleHook(TCustomTabControl, TTabControlStyleHook);
+   TStyleManager.Engine.RegisterStyleHook(TCustomTabControl, TMyTabControlStyleHook);
+
 end.
