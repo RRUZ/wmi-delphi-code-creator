@@ -462,7 +462,8 @@ end;
 
 procedure TFrmSettings.ButtonApplyClick(Sender: TObject);
 begin
-  if Application.MessageBox(PChar(Format('Do you want save the changes ?%s', [''])), 'Confirmation', MB_YESNO + MB_ICONQUESTION) = idYes then
+  //if Application.MessageBox(PChar(Format('Do you want save the changes ?%s', [''])), 'Confirmation', MB_YESNO + MB_ICONQUESTION) = idYes then
+  if MessageDlg('Do you want save the changes ?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
     FSettings.CurrentTheme := ComboBoxTheme.Text;
     FSettings.FontName     := ComboBoxFont.Text;

@@ -109,7 +109,7 @@ begin
   MemoCopyRights.Lines.Add(
     'SynEdit http://synedit.svn.sourceforge.net/viewvc/synedit/ all rights reserved.');
   MemoCopyRights.Lines.Add(
-    'AsyncCalls 2.97 Copyright © 2008-2011 Andreas Hausladen all rights reserved.');
+    'AsyncCalls 2.98 Copyright © 2008-2011 Andreas Hausladen all rights reserved.');
   MemoCopyRights.Lines.Add('http://andy.jgknet.de/blog/?page_id=100');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('');
