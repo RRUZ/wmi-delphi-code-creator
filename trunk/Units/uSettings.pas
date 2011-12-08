@@ -165,7 +165,7 @@ begin
    if TStyleManager.IsValidStyle(StyleFileName) then
      TStyleManager.LoadFromFile(StyleFileName)
    else
-     ShowMessage('the Style is not valid');
+     MsgWarning('the Style is not valid');
 end;
 
 procedure LoadVCLStyle(Const StyleName:String);
@@ -434,7 +434,7 @@ end;
 
 procedure TFrmSettings.ButtonGetMoreClick(Sender: TObject);
 begin
-  ShellExecute(self.WindowHandle,'open','http://theroadtodelphi.wordpress.com/delphi-ide-theme-editor/',nil,nil, SW_SHOWNORMAL);
+  ShellExecute(Self.WindowHandle,'open','http://theroadtodelphi.wordpress.com/delphi-ide-theme-editor/',nil,nil, SW_SHOWNORMAL);
 end;
 
 procedure TFrmSettings.BtnDeleteCacheClick(Sender: TObject);
@@ -444,7 +444,7 @@ begin
   for FileName in IOUtils.TDirectory.GetFiles(ExtractFilePath(ParamStr(0))+'cache','*.wmic') do
     DeleteFile(FileName);
 
-  ShowMessage('The cache was deleted');
+  MsgInformation('The cache was deleted');
 end;
 
 procedure TFrmSettings.BtnSelFolderThemesClick(Sender: TObject);

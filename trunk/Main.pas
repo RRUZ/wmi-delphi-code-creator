@@ -18,8 +18,6 @@
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
-
-
 unit Main;
 
 interface
@@ -38,7 +36,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, SynEditHighlighter, SynHighlighterPas,
-  SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmi_Metadata,
+  SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmi_Metadata,uWmiDatabase,
   Menus, Buttons, uComboBox, uWmiClassTree, SynHighlighterCpp, uSynEditPopupEdit;
 
 const
@@ -50,6 +48,7 @@ type
   TProgressBar = class(ComCtrls.TProgressBar)
     procedure CreateParams(var Params: TCreateParams); override;
   end;
+
 
   TFrmMain = class(TForm)
     PanelMain: TPanel;
@@ -191,6 +190,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
+    FrmWmiDatabase: TFrmWmiDatabase;
     FDataLoaded: boolean;
     FItem:      TListitem;
     FrmWMIExplorer  : TFrmWMITree;
@@ -229,7 +229,7 @@ type
     procedure SaveWMIClassesToCache(const namespace: string; List: TStrings);
     procedure SaveWMIClassesMethodsToCache(const namespace: string; List: TStrings);
 
-
+    procedure SetLog(const Log :string);
   public
     procedure SetMsg(const Msg: string);
     procedure LoadWmiClasses(const Namespace: string);
@@ -237,6 +237,7 @@ type
     procedure GenerateConsoleCode(WmiMetaClassInfo : TWMiClassMetaData);
     procedure GetValuesWmiProperties(const Namespace, WmiClass: string);
   end;
+
 
 var
   FrmMain: TFrmMain;
@@ -265,7 +266,6 @@ uses
   uWmiOxygenCode,
   uWmiFPCCode,
   uWmiBorlandCppCode,
-  uWmiDatabase,
   uMisc;
 
 const
@@ -478,12 +478,12 @@ procedure TFrmMain.FormCreate(Sender: TObject);
 var
   i:   TSourceLanguages;
   ProgressBarStyle: integer;
-  Frm: TFrmWmiDatabase;
 begin
   ReportMemoryLeaksOnShutdown:=DebugHook<>0;
   Settings :=TSettings.Create;
   SetToolBar;
 
+  SetLog('Reading settings');
   ReadSettings(Settings);
   LoadVCLStyle(Settings.VCLStyle);
   LoadCurrentTheme(Self,Settings.CurrentTheme);
@@ -509,11 +509,13 @@ begin
   ComboBoxLanguageSel.ItemIndex := 0;
 
 
-  Frm := TFrmWmiDatabase.Create(Self);
-  Frm.Parent := TabSheetWmiDatabase;
-  Frm.BorderStyle := bsNone;
-  Frm.Align := alClient;
-  Frm.Show;
+  FrmWmiDatabase := TFrmWmiDatabase.Create(Self);
+  FrmWmiDatabase.Parent := TabSheetWmiDatabase;
+  FrmWmiDatabase.BorderStyle := bsNone;
+  FrmWmiDatabase.Align := alClient;
+  FrmWmiDatabase.Status:=SetMsg;
+  FrmWmiDatabase.Log   :=SetLog;
+  FrmWmiDatabase.Show;
 
   FrmWMIExplorer := TFrmWMITree.Create(Self);
   FrmWMIExplorer.Parent := TabSheetWmiExplorer;
@@ -580,6 +582,8 @@ var
 
 begin
   if not Assigned(WmiMetaClassInfo) then Exit;
+
+  SetLog(Format('Generating code for %s:%s',[WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
   //Object Pascal console Code
   Props := TStringList.Create;
@@ -695,6 +699,8 @@ var
 begin
   if (ComboBoxClassesMethods.Text = '') or (ComboBoxMethods.Text = '') then
     exit;
+
+  SetLog(Format('Generating code for %s:%s',[WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
   Namespace := ComboBoxNamespaceMethods.Text;
   WmiClass  := ComboBoxClassesMethods.Text;
@@ -821,6 +827,8 @@ begin
   WmiEvent  := ComboBoxEvents.Text;
   WmiTargetInstance := ComboBoxTargetInstance.Text;
 
+  SetLog(Format('Generating code for %s:%s',[Namespace, WmiEvent]));
+
   if not TryStrToInt(EditEventWait.Text, PollSeconds) then
     PollSeconds := 0;
 
@@ -916,35 +924,20 @@ end;
 
 procedure TFrmMain.GetValuesWmiProperties(const Namespace, WmiClass: string);
 var
-  Frm: TFrmWmiVwProps;
-  i:   integer;
-
+  Props: TStringList;
+  i    : Integer;
 begin
   if (ListViewProperties.Items.Count > 0) and (WmiClass <> '') and (Namespace <> '') then
   begin
-    ButtonGetValues.Enabled := False;
-    Frm := TFrmWmiVwProps.Create(Self);
-    ProgressBarWmi.Visible := True;
-    Self.Enabled := False;
-    SetMsg('Loading values...Wait');
-
+    Props:=TStringList.Create;
     try
-      Frm.WmiClass     := WmiClass;
-      Frm.WmiNamespace := Namespace;
-      Frm.Caption      := 'Properties Values for the class ' + WmiClass;
-
       for i := 0 to ListViewProperties.Items.Count - 1 do
         if ListViewProperties.Items[i].Checked then
-          Frm.Wmiproperties.Add(ListViewProperties.Items[i].Caption);
+          Props.Add(ListViewProperties.Items[i].Caption);
 
-      Frm.LoadValues;
-      Frm.Show();
-
+      ListValuesWmiProperties(Namespace, WmiClass, Props);
     finally
-      SetMsg('');
-      ProgressBarWmi.Visible := False;
-      ButtonGetValues.Enabled := True;
-      Self.Enabled := True;
+     Props.Free;
     end;
   end;
 end;
@@ -1206,7 +1199,7 @@ begin
         except
           on E: EOleSysError do
             if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-              MemoLog.Lines.Add(
+              SetLog(
                 Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
             else
               raise;
@@ -1371,7 +1364,7 @@ begin
         on E: EOleSysError do
 
           if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-            MemoLog.Lines.Add(
+            SetLog(
               Format('Access denied  %s %s  Code : %x', ['GetListWMINameSpaces', E.Message, E.ErrorCode]))
           else
             raise;
@@ -1556,9 +1549,15 @@ begin
   SendMessage(MemoConsole.Handle, EM_SCROLLCARET, 0, 0);
 end;
 
+procedure TFrmMain.SetLog(const Log: string);
+begin
+ MemoLog.Lines.Add(Log);
+end;
+
 procedure TFrmMain.SetMsg(const Msg: string);
 begin
   StatusBar1.Panels[0].Text := Msg;
+  StatusBar1.Update;
 end;
 
 procedure TFrmMain.SetToolBar;
@@ -1867,6 +1866,11 @@ end;
 procedure TFrmMain.PageControlMainChange(Sender: TObject);
 begin
   SetToolBar;
+  if PageControlMain.ActivePage = TabSheetWmiDatabase then
+  begin
+   FrmWmiDatabase.NameSpaces.Clear;
+   FrmWmiDatabase.NameSpaces.AddStrings(ComboBoxNameSpaces.Items);
+  end;
 end;
 
 procedure TFrmMain.RadioButtonIntrinsicClick(Sender: TObject);
