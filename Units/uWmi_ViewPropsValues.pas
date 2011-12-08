@@ -106,6 +106,8 @@ type
     procedure LoadValues; cdecl;
   end;
 
+  procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList);
+
 implementation
 
 uses
@@ -116,6 +118,32 @@ uses
   uListView_Helper, uPropValueList;
 
 {$R *.dfm}
+
+
+procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList);
+var
+  Frm: TFrmWmiVwProps;
+begin
+
+  if (WmiClass <> '') and (Namespace <> '') then
+  begin
+    Frm := TFrmWmiVwProps.Create(nil);
+    Frm.WmiClass     := WmiClass;
+    Frm.WmiNamespace := Namespace;
+    Frm.Caption      := 'Properties Values for the class ' + WmiClass;
+
+    if (Properties=nil) or (Properties.Count=0) then
+     GetListWmiClassProperties(NameSpace,WmiClass, Frm.Wmiproperties)
+    else
+    begin
+     GetListWmiClassProperties(NameSpace,WmiClass, Properties);
+     Frm.Wmiproperties.AddStrings(Properties);
+    end;
+
+    Frm.LoadValues;
+    Frm.Show();
+  end;
+end;
 
 procedure TFrmWmiVwProps.BtnUrlClick(Sender: TObject);
 begin

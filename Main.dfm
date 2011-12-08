@@ -28,6 +28,7 @@ object FrmMain: TFrmMain
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
+    ExplicitTop = 24
     object PageControlMain: TPageControl
       Left = 5
       Top = 5
@@ -39,8 +40,6 @@ object FrmMain: TFrmMain
       MultiLine = True
       TabOrder = 0
       OnChange = PageControlMainChange
-      ExplicitLeft = 10
-      ExplicitTop = 4
       object TabSheetCodeGen: TTabSheet
         Caption = 'Code Generation'
         ImageIndex = 30
@@ -158,18 +157,11 @@ object FrmMain: TFrmMain
                   ScrollBars = ssVertical
                   TabOrder = 2
                 end
-                object ProgressBarWmi: TProgressBar
-                  Left = 60
-                  Top = 335
-                  Width = 150
-                  Height = 17
-                  TabOrder = 6
-                end
                 object ListViewProperties: TListView
                   Left = 7
                   Top = 192
                   Width = 295
-                  Height = 183
+                  Height = 175
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -207,6 +199,13 @@ object FrmMain: TFrmMain
                   Images = ImageList1
                   TabOrder = 3
                   OnClick = ButtonGetValuesClick
+                end
+                object ProgressBarWmi: TProgressBar
+                  Left = 116
+                  Top = 295
+                  Width = 150
+                  Height = 17
+                  TabOrder = 6
                 end
               end
               object PanelCode: TPanel
@@ -350,7 +349,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 120
+                  Height = 112
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -400,7 +399,7 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 342
+                  Top = 334
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
@@ -553,7 +552,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 172
+                  Height = 164
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -580,7 +579,6 @@ object FrmMain: TFrmMain
                   TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewEventsCondsClick
-                  ExplicitHeight = 190
                 end
                 object EditValueEvent: TEdit
                   Left = 88
@@ -654,14 +652,13 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 354
+                  Top = 346
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 9
                   OnClick = ButtonGenerateEventCodeClick
-                  ExplicitTop = 372
                 end
                 object RadioButtonIntrinsic: TRadioButton
                   Left = 5
@@ -693,8 +690,6 @@ object FrmMain: TFrmMain
                 BevelOuter = bvNone
                 BorderWidth = 5
                 TabOrder = 1
-                ExplicitWidth = 571
-                ExplicitHeight = 415
                 object PageControl3: TPageControl
                   Left = 5
                   Top = 5
@@ -703,19 +698,13 @@ object FrmMain: TFrmMain
                   ActivePage = TabSheetWmiEventCode
                   Align = alClient
                   TabOrder = 0
-                  ExplicitWidth = 561
-                  ExplicitHeight = 405
                   object TabSheetWmiEventCode: TTabSheet
                     Caption = 'Delphi Code'
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object SynEditWMIEventCode: TSynEdit
                       Left = 0
                       Top = 0
-                      Width = 553
-                      Height = 377
+                      Width = 543
+                      Height = 367
                       Align = alClient
                       Color = 4598550
                       ActiveLineColor = clBlue
@@ -1009,7 +998,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800A00110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800B00110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000

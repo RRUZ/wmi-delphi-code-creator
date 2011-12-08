@@ -28,6 +28,9 @@ uses
   Dialogs, DB, DBClient, Grids, DBGrids, StdCtrls, Buttons, ExtCtrls;
 
 type
+  TProcLog    = procedure (const  Log : string) of object;
+  TProcStatus = procedure (const  Msg : string) of object;
+
   TFrmWmiDatabase = class(TForm)
     DataSource1: TDataSource;
     ClientDataSetWmi: TClientDataSet;
@@ -53,8 +56,6 @@ type
     ButtonBuildWmiDatabase: TButton;
     ButtonSaveBdd: TButton;
     ButtonDelBdd: TButton;
-    procedure DBGridWMIDrawColumnCell(Sender: TObject; const Rect: TRect;
-      DataCol: integer; Column: TColumn; State: TGridDrawState);
     procedure ButtonSearchWmiDatabaseClick(Sender: TObject);
     procedure ComboBoxSearchChange(Sender: TObject);
     procedure ComboBoxSearchExit(Sender: TObject);
@@ -67,12 +68,16 @@ type
   private
     FDatabaseFile: string;
     FHistoryFile:  string;
+    FNameSpaces: TStringList;
     procedure BuildWmiDatabase;
     procedure SearchDatabase(Value: string);
     procedure SaveWmiDatabase;
     procedure DeleteWmiDatabase;
     procedure CreateWmiDatabaseStructure;
   public
+    Log   : TProcLog;
+    Status: TProcLog;
+    property NameSpaces : TStringList read FNameSpaces Write FNameSpaces;
   end;
 
 implementation
@@ -80,10 +85,10 @@ implementation
 {$R *.dfm}
 
 uses
-  Main,
   ComObj,
   MidasLib,
   uWmi_Metadata,
+  uWmi_ViewPropsValues,
   AsyncCalls,
   uMisc;
 
@@ -134,33 +139,33 @@ var
   Value: string;
 begin
   ClientDataSetWmi.DisableControls;
-  FrmMain.ProgressBarWmi.Visible := True;
+  //FrmMain.ProgressBarWmi.Visible := True;
   try
-    for i := 0 to FrmMain.ComboBoxNameSpaces.Items.Count - 1 do
+    for i := 0 to NameSpaces.Count - 1 do
     begin
-      FrmMain.SetMsg('Scanning namespace ' + FrmMain.ComboBoxNameSpaces.Items[i]);
+      Status('Scanning namespace ' + FNameSpaces[i]);
 
       Classes := TStringList.Create;
       try
         if RadioButtonAll.Checked then
-          GetListWmiClasses(FrmMain.ComboBoxNameSpaces.Items[i], Classes)
+          GetListWmiClasses(FNameSpaces[i], Classes)
         else
         if RadioButtonDynamic.Checked then
-          GetListWmiDynamicClasses(FrmMain.ComboBoxNameSpaces.Items[i], Classes);
+          GetListWmiDynamicClasses(FNameSpaces[i], Classes);
 
         for j := 0 to Classes.Count - 1 do
         begin
-          FrmMain.SetMsg('Scanning Class ' + Classes[j]);
+          Status('Scanning Class ' + Classes[j]);
 
           try
             Value := GetWmiClassDescription(
-              FrmMain.ComboBoxNameSpaces.Items[i], Classes[j]);
+              FNameSpaces[i], Classes[j]);
           except
             on E: EOleSysError do
             begin
-              FrmMain.MemoLog.Lines.Add(
+              Log(
                 Format('%s - namespace %s class %s  - message : %s',
-                ['GetWmiClassDescription', FrmMain.ComboBoxNameSpaces.Items[i], Classes[j], E.Message]));
+                ['GetWmiClassDescription', FNameSpaces[i], Classes[j], E.Message]));
               Value := '';
             end;
           end;
@@ -169,7 +174,7 @@ begin
           begin
             ClientDataSetWmi.Append;
             ClientDataSetWmi.Fields[0].AsString :=
-              FrmMain.ComboBoxNameSpaces.Items[i]; //namespace
+              FNameSpaces[i]; //namespace
             ClientDataSetWmi.Fields[1].AsString := Classes[j];
             //class
             ClientDataSetWmi.Fields[2].AsString := Classes[j];
@@ -188,13 +193,13 @@ begin
 
               try
                 GetListWmiClassProperties(
-                  FrmMain.ComboBoxNameSpaces.Items[i], Classes[j], Props);
+                  FNameSpaces[i], Classes[j], Props);
               except
                 on E: EOleSysError do
                 begin
-                  FrmMain.MemoLog.Lines.Add(
+                  Log(
                     Format('%s - namespace %s class %s  - message : %s',
-                    ['GetListWmiClassProperties', FrmMain.ComboBoxNameSpaces.Items[i], Classes[j], E.Message]));
+                    ['GetListWmiClassProperties', FNameSpaces[i], Classes[j], E.Message]));
                 end;
               end;
 
@@ -204,13 +209,13 @@ begin
 
                 try
                   Value :=
-                    GetWmiPropertyDescription(FrmMain.ComboBoxNameSpaces.Items[i], Classes[j], Props[k]);
+                    GetWmiPropertyDescription(FNameSpaces[i], Classes[j], Props[k]);
                 except
                   on E: EOleSysError do
                   begin
-                    FrmMain.MemoLog.Lines.Add(
+                    Log(
                       Format('%s - namespace %s class %s  property %s - message : %s',
-                      ['GetWmiPropertyDescription', FrmMain.ComboBoxNameSpaces.Items[i],
+                      ['GetWmiPropertyDescription', FNameSpaces[i],
                       Classes[j], Props[k], E.Message]));
                     Value := '';
                   end;
@@ -221,7 +226,7 @@ begin
                 begin
                   ClientDataSetWmi.Append;
                   ClientDataSetWmi.Fields[0].AsString :=
-                    FrmMain.ComboBoxNameSpaces.Items[i]; //namespace
+                    FNameSpaces[i]; //namespace
                   ClientDataSetWmi.Fields[1].AsString := Classes[j];
                   //class
                   ClientDataSetWmi.Fields[2].AsString := Props[k];
@@ -245,13 +250,13 @@ begin
 
               try
                 GetListWmiClassMethods(
-                  FrmMain.ComboBoxNameSpaces.Items[i], Classes[j], Methods);
+                  FNameSpaces[i], Classes[j], Methods);
               except
                 on E: EOleSysError do
                 begin
-                  FrmMain.MemoLog.Lines.Add(
+                  Log(
                     Format('%s - namespace %s class %s  - message : %s',
-                    ['GetListWmiClassMethods', FrmMain.ComboBoxNameSpaces.Items[i], Classes[j], E.Message]));
+                    ['GetListWmiClassMethods', FNameSpaces[i], Classes[j], E.Message]));
                 end;
               end;
 
@@ -260,13 +265,13 @@ begin
 
                 try
                   Value :=
-                    GetWmiMethodDescription(FrmMain.ComboBoxNameSpaces.Items[i], Classes[j], Methods[k]);
+                    GetWmiMethodDescription(FNameSpaces[i], Classes[j], Methods[k]);
                 except
                   on E: EOleSysError do
                   begin
-                    FrmMain.MemoLog.Lines.Add(
+                    Log(
                       Format('%s - namespace %s class %s  property %s - message : %s',
-                      ['GetWmiMethodDescription', FrmMain.ComboBoxNameSpaces.Items[i],
+                      ['GetWmiMethodDescription', FNameSpaces[i],
                       Classes[j], Methods[k], E.Message]));
                     Value := '';
                   end;
@@ -276,8 +281,7 @@ begin
                 if Value <> '' then
                 begin
                   ClientDataSetWmi.Append;
-                  ClientDataSetWmi.Fields[0].AsString :=
-                    FrmMain.ComboBoxNameSpaces.Items[i]; //namespace
+                  ClientDataSetWmi.Fields[0].AsString := FNameSpaces[i]; //namespace
                   ClientDataSetWmi.Fields[1].AsString := Classes[j];
                   //class
                   ClientDataSetWmi.Fields[2].AsString := Methods[k];
@@ -303,8 +307,7 @@ begin
     ClientDataSetWmi.Open;
   finally
     ClientDataSetWmi.EnableControls;
-    FrmMain.ProgressBarWmi.Visible := False;
-    FrmMain.SetMsg('');
+    Status('');
   end;
 
 end;
@@ -343,7 +346,7 @@ begin
 
   end;
 
-  FrmMain.MemoLog.Lines.Add(FormatDateTime('hh:nn:ss.zzz', Now - d));
+  Log(FormatDateTime('hh:nn:ss.zzz', Now - d));
   DBGridWMI.Enabled      := True;
   ComboBoxSearch.Enabled := True;
   ButtonSearchWmiDatabase.Enabled := True;
@@ -405,35 +408,7 @@ end;
 procedure TFrmWmiDatabase.DBGridWMIDblClick(Sender: TObject);
 begin
   if ClientDataSetWmi.Active then
-    FrmMain.GetValuesWmiProperties(ClientDataSetWmi.FieldByName('Namespace').AsString, ClientDataSetWmi.FieldByName('Class').AsString);
-end;
-
-procedure TFrmWmiDatabase.DBGridWMIDrawColumnCell(Sender: TObject;
-  const Rect: TRect; DataCol: integer; Column: TColumn; State: TGridDrawState);
-var
-  DbGrid: TDBGrid;
- // Row:    integer;
-begin
-
-  DbGrid := Sender as TDBGrid;
-{  Row    := DbGrid.DataSource.DataSet.RecNo;
-
-  if (gdSelected in State) then
-  begin
-    with DbGrid.Canvas do
-    begin
-      Brush.Color := clHighlight;
-      Font.Style  := Font.Style + [fsBold];
-      Font.Color  := clHighlightText;
-    end;
-  end
-  else
-  if Odd(Row) then
-    DbGrid.Canvas.Brush.Color := clWindow
-  else
-    DbGrid.Canvas.Brush.Color := clBtnFace;
-}
-  DbGrid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+    ListValuesWmiProperties(ClientDataSetWmi.FieldByName('Namespace').AsString, ClientDataSetWmi.FieldByName('Class').AsString, nil);
 end;
 
 procedure TFrmWmiDatabase.DeleteWmiDatabase;
@@ -458,6 +433,7 @@ end;
 
 procedure TFrmWmiDatabase.FormCreate(Sender: TObject);
 begin
+  FNameSpaces   := TStringList.Create;
   FDatabaseFile := ExtractFilePath(Application.ExeName) + WmiDatabaseName;
   FHistoryFile  := ExtractFilePath(Application.ExeName) + 'WmiFiltersHistory.txt';
   if FileExists(FHistoryFile) then
@@ -469,25 +445,20 @@ end;
 procedure TFrmWmiDatabase.FormDestroy(Sender: TObject);
 begin
   ComboBoxSearch.Items.SaveToFile(FHistoryFile);
+  FNameSpaces.Free;
 end;
 
 procedure TFrmWmiDatabase.SaveWmiDatabase;
 begin
-
   if ClientDataSetWmi.Active then
   begin
     if FileExists(FDatabaseFile) then
       if not MsgQuestion('Do you want overwrite the database stored in the disk?') then
         exit;
 
-    FrmMain.SetMsg('Storing WMI Database');
-    try
       DeleteFile(FDatabaseFile);
       ClientDataSetWmi.SaveToFile(FDatabaseFile, dfXMLUTF8);
       MsgInformation(Format('The WMI Database has been stored to %s', [FDatabaseFile]));
-    finally
-      FrmMain.SetMsg('');
-    end;
   end;
 end;
 
@@ -532,7 +503,7 @@ begin
       ClientDataSetWmi.Filtered := True;
 
       SetGridColumnWidths(DBGridWMI);
-      FrmMain.SetMsg('Filter ' + ClientDataSetWmi.Filter);
+      Status('Filter ' + ClientDataSetWmi.Filter);
     finally
       ClientDataSetWmi.EnableControls;
     end;
