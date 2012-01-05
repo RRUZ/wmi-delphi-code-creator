@@ -154,6 +154,7 @@ function GetIndexClosestColor(AColor:TColor) : Integer;
 {$ENDIF}
 
 function GetDelphiVersionMappedColor(AColor:TColor;DelphiVersion:TDelphiVersions) : TColor;
+function GetDelphiInstallPath(DelphiComp: TDelphiVersions):string;
 
 {
 
@@ -329,5 +330,27 @@ begin
   end;
 end;
 
+function GetDelphiInstallPath(DelphiComp: TDelphiVersions):string;
+var
+  FileName: string;
+  Found: boolean;
+  Item: TListItem;
+begin
+  Found := RegKeyExists(DelphiRegPaths[DelphiComp], HKEY_CURRENT_USER);
+  if Found then
+    Found := RegReadStr(DelphiRegPaths[DelphiComp], 'App', FileName,
+      HKEY_CURRENT_USER) and
+      FileExists(FileName);
+
+  if not Found then
+  begin
+    Found := RegKeyExists(DelphiRegPaths[DelphiComp], HKEY_LOCAL_MACHINE);
+    if Found then
+      Found := RegReadStr(DelphiRegPaths[DelphiComp], 'App', FileName,
+        HKEY_LOCAL_MACHINE) and FileExists(FileName);
+  end;
+
+  Result:=ExtractFilePath(FileName);
+end;
 
 end.

@@ -38,7 +38,9 @@ uses
   uSynEditPopupEdit in 'Units\uSynEditPopupEdit.pas',
   Vcl.Themes,
   Vcl.Styles,
-  uXE2Patches in 'Units\uXE2Patches.pas';
+  uXE2Patches in 'Units\uXE2Patches.pas',
+  uVCLStyleUtils in 'Units\uVCLStyleUtils.pas',
+  uCodeEditor in 'Units\uCodeEditor.pas' {FrmCodeEditor};
 
 {$R *.res}
 
@@ -46,6 +48,5 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TFrmMain, FrmMain);
-
   Application.Run;
 end.

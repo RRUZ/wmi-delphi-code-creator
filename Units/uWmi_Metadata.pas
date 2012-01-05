@@ -1908,7 +1908,7 @@ begin
 
        //get data of in params
         Parameters:= colItem.InParameters;
-        if not VarIsNull(Parameters) then
+        if not VarIsNull(Parameters) and not VarIsClear(Parameters) then
         begin
           try
             Parameters:= Parameters.Properties_;
@@ -1937,7 +1937,7 @@ begin
 
        //get data of out params
         Parameters:= colItem.OutParameters;
-        if not VarIsNull(Parameters) then
+        if not VarIsNull(Parameters) and not VarIsClear(Parameters) then
         begin
           try
             Parameters:= Parameters.Properties_;

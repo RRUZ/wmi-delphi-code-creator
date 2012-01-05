@@ -37,7 +37,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmi_Metadata,uWmiDatabase,
-  Menus, Buttons, uComboBox, uWmiClassTree, SynHighlighterCpp, uSynEditPopupEdit;
+  Menus, Buttons, uComboBox, uWmiClassTree, SynHighlighterCpp, uSynEditPopupEdit,
+  uCodeEditor;
 
 const
   UM_EDITPARAMVALUE = WM_USER + 111;
@@ -61,7 +62,6 @@ type
     SynPasSyn1: TSynPasSyn;
     PanelMetaWmiInfo: TPanel;
     PanelCode: TPanel;
-    SynEditWMIClassCode: TSynEdit;
     LabelProperties: TLabel;
     LabelClasses: TLabel;
     ComboBoxClasses: TComboBox;
@@ -70,12 +70,7 @@ type
     Splitter1: TSplitter;
     CheckBoxSelAllProps: TCheckBox;
     ToolBar1:  TToolBar;
-    ToolButtonRun: TToolButton;
-    ToolButtonSave: TToolButton;
-    SaveDialog1: TSaveDialog;
     ToolButtonSearch: TToolButton;
-    PageControlCode: TPageControl;
-    TabSheetWmiClassCode: TTabSheet;
     ToolButtonAbout: TToolButton;
     ToolButton4: TToolButton;
     MemoClassDescr: TMemo;
@@ -93,15 +88,9 @@ type
     ListViewMethodsParams: TListView;
     Label6:    TLabel;
     EditValueMethodParam: TEdit;
-    PopupMenu1: TPopupMenu;
-    CompileCode1: TMenuItem;
-    Run1:      TMenuItem;
-    OpeninDelphi1: TMenuItem;
     PanelMethodInfo: TPanel;
     Splitter5: TSplitter;
-    Panel3:    TPanel;
-    PageControl1: TPageControl;
-    TabSheetWmiMethodCode: TTabSheet;
+    PanelMethodCode: TPanel;
     ListViewProperties: TListView;
     MemoMethodDescr: TMemo;
     TabSheetCodeGen: TTabSheet;
@@ -121,9 +110,7 @@ type
     ComboBoxEvents: TComboBox;
     ComboBoxTargetInstance: TComboBox;
     Splitter6: TSplitter;
-    Panel5:    TPanel;
-    PageControl3: TPageControl;
-    TabSheetWmiEventCode: TTabSheet;
+    PanelEventCode: TPanel;
     ToolButtonGetValues: TToolButton;
     Label3:    TLabel;
     EditEventWait: TEdit;
@@ -131,8 +118,6 @@ type
     ButtonGetValues: TButton;
     ButtonGenerateCodeInvoker: TButton;
     ButtonGenerateEventCode: TButton;
-    SynEditWMIMethodCode: TSynEdit;
-    SynEditWMIEventCode: TSynEdit;
     PanelLanguageSet: TPanel;
     ComboBoxLanguageSel: TComboBox;
     Label8:    TLabel;
@@ -148,16 +133,12 @@ type
     ToolButtonSettings: TToolButton;
     TabSheetTreeClasses: TTabSheet;
     SynCppSyn1: TSynCppSyn;
-    PopupMenuSyn: TPopupMenu;
-    item11: TMenuItem;
-    Item21: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure ComboBoxNameSpacesChange(Sender: TObject);
     procedure ComboBoxClassesChange(Sender: TObject);
     procedure ListBoxPropertiesClick(Sender: TObject);
     procedure CheckBoxSelAllPropsClick(Sender: TObject);
-    procedure ToolButtonSaveClick(Sender: TObject);
     procedure ButtonGetValuesClick(Sender: TObject);
     procedure ToolButtonOnlineClick(Sender: TObject);
     procedure ToolButtonAboutClick(Sender: TObject);
@@ -166,14 +147,12 @@ type
     procedure ToolButtonSearchClick(Sender: TObject);
     procedure ComboBoxNamespacesEventsChange(Sender: TObject);
     procedure ComboBoxEventsChange(Sender: TObject);
-    procedure ToolButtonRunClick(Sender: TObject);
     procedure ComboBoxTargetInstanceChange(Sender: TObject);
     procedure ComboBoxNamespaceMethodsChange(Sender: TObject);
     procedure ComboBoxClassesMethodsChange(Sender: TObject);
     procedure ComboBoxMethodsChange(Sender: TObject);
     procedure ListViewMethodsParamsClick(Sender: TObject);
     procedure EditValueMethodParamExit(Sender: TObject);
-    procedure OpeninDelphi1Click(Sender: TObject);
     procedure ButtonGenerateCodeInvokerClick(Sender: TObject);
     procedure PageControlMainChange(Sender: TObject);
     procedure EditValueEventExit(Sender: TObject);
@@ -195,6 +174,11 @@ type
     FItem:      TListitem;
     FrmWMIExplorer  : TFrmWMITree;
     FrmWmiClassTree : TFrmWmiClassTree;
+
+    FrmCodeEditor         : TFrmCodeEditor;
+    FrmCodeEditorMethod   : TFrmCodeEditor;
+    FrmCodeEditorEvent    : TFrmCodeEditor;
+
     Settings : TSettings;
 
     procedure UMEditValueParam(var msg: TMessage); message UM_EDITPARAMVALUE;
@@ -247,6 +231,7 @@ implementation
 uses
   Rtti,
   uXE2Patches,
+  uVCLStyleUtils,
   VCl.Themes,
   ComObj,
   ShellApi,
@@ -341,23 +326,33 @@ end;
 
 procedure TFrmMain.ComboBoxLanguageSelChange(Sender: TObject);
 begin
-
+{
   if TSourceLanguages(ComboBoxLanguageSel.ItemIndex)=Lng_BorlandCpp then
   begin
-    SynEditWMIClassCode.Highlighter:=SynCppSyn1;
-    SynEditWMIMethodCode.Highlighter:=SynCppSyn1;
+    //SynEditWMIClassCode.Highlighter:=SynCppSyn1;
+    //SynEditWMIMethodCode.Highlighter:=SynCppSyn1;
   end
   else
   begin
-    SynEditWMIClassCode.Highlighter:=SynPasSyn1;
-    SynEditWMIMethodCode.Highlighter:=SynPasSyn1;
+    //SynEditWMIClassCode.Highlighter:=SynPasSyn1;
+    //SynEditWMIMethodCode.Highlighter:=SynPasSyn1;
   end;
 
   LoadCurrentTheme(Self,Settings.CurrentTheme);
+   }
+  //TabSheetWmiClassCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
+  //TabSheetWmiMethodCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
+  //TabSheetWmiEventCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
 
-  TabSheetWmiClassCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
-  TabSheetWmiMethodCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
-  TabSheetWmiEventCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
+
+  if Assigned(FrmCodeEditor) then
+   FrmCodeEditor.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
+
+  if Assigned(FrmCodeEditorMethod) then
+   FrmCodeEditorMethod.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
+
+  if Assigned(FrmCodeEditorEvent) then
+   FrmCodeEditorEvent.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
 
   if ComboBoxClasses.ItemIndex>=0 then
     GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
@@ -486,8 +481,6 @@ begin
   SetLog('Reading settings');
   ReadSettings(Settings);
   LoadVCLStyle(Settings.VCLStyle);
-  LoadCurrentTheme(Self,Settings.CurrentTheme);
-  LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
 
   MemoConsole.Color:=Settings.BackGroundColor;
   MemoConsole.Font.Color:=Settings.ForeGroundColor;
@@ -507,7 +500,6 @@ begin
   for i := Low(TSourceLanguages) to High(TSourceLanguages) do
     ComboBoxLanguageSel.Items.AddObject(ListSourceLanguages[i], TObject(i));
   ComboBoxLanguageSel.ItemIndex := 0;
-
 
   FrmWmiDatabase := TFrmWmiDatabase.Create(Self);
   FrmWmiDatabase.Parent := TabSheetWmiDatabase;
@@ -536,6 +528,31 @@ begin
   FrmWmiClassTree.BorderStyle := bsNone;
   FrmWmiClassTree.Align := alClient;
   FrmWmiClassTree.Show;
+
+  FrmCodeEditor  := TFrmCodeEditor.Create(Self);
+  FrmCodeEditor.Parent := PanelCode;
+  FrmCodeEditor.Show;
+  FrmCodeEditor.Settings:=Settings;
+  FrmCodeEditor.Console:=MemoConsole;
+  FrmCodeEditor.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
+
+
+  FrmCodeEditorMethod  := TFrmCodeEditor.Create(Self);
+  FrmCodeEditorMethod.Parent := PanelMethodCode;
+  FrmCodeEditorMethod.Show;
+  FrmCodeEditorMethod.Settings:=Settings;
+  FrmCodeEditorMethod.Console:=MemoConsole;
+  FrmCodeEditorMethod.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
+
+  FrmCodeEditorEvent  := TFrmCodeEditor.Create(Self);
+  FrmCodeEditorEvent.Parent := PanelEventCode;
+  FrmCodeEditorEvent.Show;
+  FrmCodeEditorEvent.Settings:=Settings;
+  FrmCodeEditorEvent.Console:=MemoConsole;
+  FrmCodeEditorEvent.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
+
+  LoadCurrentTheme(Self,Settings.CurrentTheme);
+  LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
 end;
 
 
@@ -563,7 +580,6 @@ begin
     TWMiClassMetaData(ComboBoxEvents.Items.Objects[i]).Free;
     ComboBoxEvents.Items.Objects[i]:=nil;
    end;
-
 
   FrmWMIExplorer.Free;
   FrmWmiClassTree.Free;
@@ -604,7 +620,6 @@ begin
         inc(j);
       end;
 
-
     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
       Lng_Delphi:
                   begin
@@ -614,8 +629,10 @@ begin
                       DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                       DelphiWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       DelphiWmiCodeGenerator.GenerateCode(Props);
-                      SynEditWMIClassCode.Lines.Clear;
-                      SynEditWMIClassCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
+                      //SynEditWMIClassCode.Lines.Clear;
+                      //FormatDelphiCode(MemoLog.Lines, DelphiWmiCodeGenerator.OutPutCode, Settings.Formatter);
+                      //SynEditWMIClassCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
+                      FrmCodeEditor.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
                     finally
                       DelphiWmiCodeGenerator.Free;
                     end;
@@ -630,8 +647,9 @@ begin
                       FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                       FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       FPCWmiCodeGenerator.GenerateCode(Props);
-                      SynEditWMIClassCode.Lines.Clear;
-                      SynEditWMIClassCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                      //SynEditWMIClassCode.Lines.Clear;
+                      //SynEditWMIClassCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                      FrmCodeEditor.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
                     finally
                       FPCWmiCodeGenerator.Free;
                     end;
@@ -646,8 +664,9 @@ begin
                       OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                       OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       OxygenWmiCodeGenerator.GenerateCode(Props);
-                      SynEditWMIClassCode.Lines.Clear;
-                      SynEditWMIClassCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                      //SynEditWMIClassCode.Lines.Clear;
+                      //SynEditWMIClassCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                      FrmCodeEditor.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
                     finally
                       OxygenWmiCodeGenerator.Free;
                     end;
@@ -661,13 +680,13 @@ begin
                       CppWmiCodeGenerator.UseHelperFunctions:=false;//Settings.DelphiWmiClassHelperFuncts;
                       CppWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       CppWmiCodeGenerator.GenerateCode(Props);
-                      SynEditWMIClassCode.Lines.Clear;
-                      SynEditWMIClassCode.Lines.AddStrings(CppWmiCodeGenerator.OutPutCode);
+                      //SynEditWMIClassCode.Lines.Clear;
+                      //SynEditWMIClassCode.Lines.AddStrings(CppWmiCodeGenerator.OutPutCode);
+                      FrmCodeEditor.SourceCode:=CppWmiCodeGenerator.OutPutCode;
                     finally
                       CppWmiCodeGenerator.Free;
                     end;
                   end;
-
 
       {
       Lng_Oxygen: GenerateOxygenWmiConsoleCode(
@@ -675,9 +694,11 @@ begin
       }
     end;
 
+    {
     SynEditWMIClassCode.SelStart  := SynEditWMIClassCode.GetTextLen;
     SynEditWMIClassCode.SelLength := 0;
     SendMessage(SynEditWMIClassCode.Handle, EM_SCROLLCARET, 0, 0);
+    }
   finally
     Props.Free;
   end;
@@ -734,8 +755,9 @@ begin
                     DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     DelphiWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     DelphiWmiCodeGenerator.GenerateCode(Params, Values);
-                    SynEditWMIMethodCode.Lines.Clear;
-                    SynEditWMIMethodCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
+                    //SynEditWMIMethodCode.Lines.Clear;
+                    //SynEditWMIMethodCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
+                    FrmCodeEditorMethod.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
                   finally
                     DelphiWmiCodeGenerator.Free;
                   end;
@@ -751,8 +773,9 @@ begin
                     BorlandCppWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     BorlandCppWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     BorlandCppWmiCodeGenerator.GenerateCode(Params, Values);
-                    SynEditWMIMethodCode.Lines.Clear;
-                    SynEditWMIMethodCode.Lines.AddStrings(BorlandCppWmiCodeGenerator.OutPutCode);
+                    //SynEditWMIMethodCode.Lines.Clear;
+                    //SynEditWMIMethodCode.Lines.AddStrings(BorlandCppWmiCodeGenerator.OutPutCode);
+                    FrmCodeEditorMethod.SourceCode:=BorlandCppWmiCodeGenerator.OutPutCode;
                   finally
                     BorlandCppWmiCodeGenerator.Free;
                   end;
@@ -768,8 +791,9 @@ begin
                     FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     FPCWmiCodeGenerator.GenerateCode(Params, Values);
-                    SynEditWMIMethodCode.Lines.Clear;
-                    SynEditWMIMethodCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                    //SynEditWMIMethodCode.Lines.Clear;
+                    //SynEditWMIMethodCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                    FrmCodeEditorMethod.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
                   finally
                     FPCWmiCodeGenerator.Free;
                   end;
@@ -785,8 +809,9 @@ begin
                     OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     OxygenWmiCodeGenerator.GenerateCode(Params, Values);
-                    SynEditWMIMethodCode.Lines.Clear;
-                    SynEditWMIMethodCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                    //SynEditWMIMethodCode.Lines.Clear;
+                    //SynEditWMIMethodCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                    FrmCodeEditorMethod.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
                   finally
                     OxygenWmiCodeGenerator.Free;
                   end;
@@ -794,9 +819,9 @@ begin
     end;
 
 
-    SynEditWMIMethodCode.SelStart  := SynEditWMIMethodCode.GetTextLen;
-    SynEditWMIMethodCode.SelLength := 0;
-    SendMessage(SynEditWMIMethodCode.Handle, EM_SCROLLCARET, 0, 0);
+    //SynEditWMIMethodCode.SelStart  := SynEditWMIMethodCode.GetTextLen;
+    //SynEditWMIMethodCode.SelLength := 0;
+    //SendMessage(SynEditWMIMethodCode.Handle, EM_SCROLLCARET, 0, 0);
   finally
     Params.Free;
     Values.Free;
@@ -868,8 +893,9 @@ begin
                       DelphiWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       //RadioButtonIntrinsic.Checked
                       DelphiWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      SynEditWMIEventCode.Lines.Clear;
-                      SynEditWMIEventCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
+                      //SynEditWMIEventCode.Lines.Clear;
+                      //SynEditWMIEventCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
+                      FrmCodeEditorEvent.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
                    finally
                       DelphiWmiCodeGenerator.Free;
                    end;
@@ -885,8 +911,9 @@ begin
                       FPCWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       //RadioButtonIntrinsic.Checked
                       FPCWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      SynEditWMIEventCode.Lines.Clear;
-                      SynEditWMIEventCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                      //SynEditWMIEventCode.Lines.Clear;
+                      //SynEditWMIEventCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
+                      FrmCodeEditorEvent.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
                    finally
                       FPCWmiCodeGenerator.Free;
                    end;
@@ -901,18 +928,20 @@ begin
                       OxygenWmiCodeGenerator.PollSeconds          := PollSeconds;
                       OxygenWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       OxygenWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      SynEditWMIEventCode.Lines.Clear;
-                      SynEditWMIEventCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                      //SynEditWMIEventCode.Lines.Clear;
+                      //SynEditWMIEventCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
+                      FrmCodeEditorEvent.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
                    finally
                       OxygenWmiCodeGenerator.Free;
                    end;
                  end;
 
     end;
-
+       {
     SynEditWMIEventCode.SelStart  := SynEditWMIEventCode.GetTextLen;
     SynEditWMIEventCode.SelLength := 0;
     SendMessage(SynEditWMIEventCode.Handle, EM_SCROLLCARET, 0, 0);
+    }
   finally
     Conds.Free;
     Params.Free;
@@ -1603,266 +1632,6 @@ begin
   GetValuesWmiProperties(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
 end;
 
-procedure TFrmMain.ToolButtonRunClick(Sender: TObject);
-var
-  Frm: TFrmSelCompilerVer;
-  item: TListItem;
-  FileName: string;
-  CompilerName: string;
-  Ct: TCompilerType;
-begin
-  Frm := TFrmSelCompilerVer.Create(Self);
-  try
-    Ct := ListCompilerLanguages[TSourceLanguages(
-      ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
-    Frm.ShowCompiler := True;
-    Frm.CompilerType := Ct;
-    Frm.LoadInstalledVersions;
-    if Frm.ListViewIDEs.Items.Count = 0 then
-      MsgWarning(Format('Not exist a %s compiler installed in this system',
-        [ListCompilerType[Ct]]))
-    else
-    if Frm.ShowModal = mrOk then
-    begin
-      item := Frm.ListViewIDEs.Selected;
-      if Assigned(item) then
-      begin
-        Ct := TCompilerType(integer(item.Data));
-        case Ct of
-          Ct_Delphi:
-          begin
-            CompilerName := item.SubItems[1];
-            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
-            FileName     :=
-              FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.dpr';
-
-            if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
-              SynEditWMIClassCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditWMIEventCode.Lines.SaveToFile(FileName);
-
-            if CreateDelphiProject(
-              ExtractFilePath(FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +'Delphi') then
-              CompileAndRunDelphiCode(MemoConsole.Lines,CompilerName, FileName, TComponent(Sender).Tag = 1);
-
-            ScrollMemoConsole;
-          end;
-
-          Ct_BorlandCpp:
-          begin
-            CompilerName := item.SubItems[1];
-            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
-            FileName     :=
-              FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.cpp';
-
-            if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
-              SynEditWMIClassCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditWMIEventCode.Lines.SaveToFile(FileName);
-
-              {
-            if CreateDelphiProject(
-              ExtractFilePath(FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +'Delphi') then
-              }
-              CompileAndRunBorlandCppCode(MemoConsole.Lines,CompilerName, FileName, TComponent(Sender).Tag = 1);
-
-            ScrollMemoConsole;
-          end;
-
-
-          Ct_Lazarus_FPC:
-          begin
-            CompilerName := item.SubItems[1];
-            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
-            FileName     :=
-              FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.lpr';
-
-            if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
-              SynEditWMIClassCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditWMIEventCode.Lines.SaveToFile(FileName);
-
-            if CreateLazarusProject(
-              ExtractFileName(FileName), ExtractFilePath(FileName), IncludeTrailingPathDelimiter(
-              ExtractFilePath(ParamStr(0))) + 'Lazarus\TemplateConsole.lpi') then
-              CompileAndRunFPCCode(MemoConsole.Lines,CompilerName, FileName,
-                TComponent(Sender).Tag = 1);
-
-             ScrollMemoConsole;
-          end;
-
-          Ct_Oxygene:
-          begin
-            CompilerName := item.SubItems[1];
-            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
-            FileName     := FileName + 'Program.pas';
-
-            if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
-              SynEditWMIClassCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditWMIEventCode.Lines.SaveToFile(FileName);
-
-            if CreateOxygeneProject(
-              ExtractFileName(FileName), ExtractFilePath(FileName), IncludeTrailingPathDelimiter(
-              ExtractFilePath(ParamStr(0))) + 'Oxygene\VS2008\GetWMI_Info.oxygene', FileName) then
-              CompileAndRunOxygenCode(MemoConsole.Lines,CompilerName, FileName,
-                TComponent(Sender).Tag = 1);
-
-             ScrollMemoConsole;
-          end;
-        end;
-
-      end;
-    end;
-  finally
-    Frm.Free;
-  end;
-end;
-
-procedure TFrmMain.OpeninDelphi1Click(Sender: TObject);
-var
-  Frm: TFrmSelCompilerVer;
-  item: TListItem;
-  FileName: string;
-  IdeName: string;
-  Ct: TCompilerType;
-begin
-  Frm := TFrmSelCompilerVer.Create(Self);
-  try
-    Ct := ListCompilerLanguages[TSourceLanguages(
-      ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
-    Frm.CompilerType := Ct;
-    Frm.Show64BitsCompiler:=False;
-    Frm.LoadInstalledVersions;
-    if Frm.ListViewIDEs.Items.Count = 0 then
-      MsgWarning('Does not exist a Object Pascal IDEs installed in this system')
-    else
-    if Frm.ShowModal = mrOk then
-    begin
-      item := Frm.ListViewIDEs.Selected;
-      if Assigned(item) then
-      begin
-        Ct      := TCompilerType(integer(item.Data));
-        IdeName := item.SubItems[0];
-        FileName := IncludeTrailingPathDelimiter(Settings.OutputFolder);
-
-        case ct of
-          Ct_Delphi:
-          begin
-            FileName :=
-              FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.dpr';
-            if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
-              SynEditWMIClassCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditWMIEventCode.Lines.SaveToFile(FileName);
-              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
-          end;
-
-          Ct_BorlandCpp:
-          begin
-            FileName :=
-              FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.cpp';
-            if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
-              SynEditWMIClassCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditWMIEventCode.Lines.SaveToFile(FileName);
-              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
-          end;
-
-          Ct_Lazarus_FPC:
-          begin
-            FileName :=
-              FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.lpr';
-            if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
-              SynEditWMIClassCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditWMIEventCode.Lines.SaveToFile(FileName);
-
-            if CreateLazarusProject(
-              ExtractFileName(FileName), ExtractFilePath(FileName), IncludeTrailingPathDelimiter(
-              ExtractFilePath(ParamStr(0))) + 'Lazarus\TemplateConsole.lpi') then
-              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
-          end;
-
-          Ct_Oxygene:
-          begin
-            FileName := FileName + 'Program.pas';
-
-            if PageControlCodeGen.ActivePage =
-              TabSheetWmiClasses then
-              SynEditWMIClassCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetMethods then
-              SynEditWMIMethodCode.Lines.SaveToFile(FileName)
-            else
-            if PageControlCodeGen.ActivePage = TabSheetEvents then
-              SynEditWMIEventCode.Lines.SaveToFile(FileName);
-
-            if StartsText('Monodevelop', item.Caption) and
-              CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
-              FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
-              'Oxygene\Monodevelop\GetWMI_Info.oxygene', FileName) then
-            begin
-              FileName := ChangeFileExt(FileName, '.sln');
-              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
-            end
-            else
-            if (Pos('2008', item.Caption) > 0) and
-              CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
-              FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
-              'Oxygene\VS2008\GetWMI_Info.oxygene', FileName) then
-            begin
-              FileName := ChangeFileExt(FileName, '.sln');
-              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
-            end
-            else
-            if (Pos('2010', item.Caption) > 0) and
-              CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
-              FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
-              'Oxygene\VS2010\GetWMI_Info.oxygene', FileName) then
-            begin
-              FileName := ChangeFileExt(FileName, '.sln');
-              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
-            end;
-
-          end;
-
-        end;
-      end;
-    end;
-  finally
-    Frm.Free;
-  end;
-end;
-
 procedure TFrmMain.PageControlMainChange(Sender: TObject);
 begin
   SetToolBar;
@@ -1876,103 +1645,6 @@ end;
 procedure TFrmMain.RadioButtonIntrinsicClick(Sender: TObject);
 begin
   LoadWmiEvents(ComboBoxNamespacesEvents.Text);
-end;
-
-procedure TFrmMain.ToolButtonSaveClick(Sender: TObject);
-begin
-  if PageControlCodeGen.ActivePage = TabSheetWmiClasses then
-  begin
-    if PageControlCode.ActivePage = TabSheetWmiClassCode then
-    begin
-     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
-      Lng_Delphi     :
-                  begin
-                    SaveDialog1.FileName := 'GetWMI_Info.dpr';
-                    SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
-                  end;
-      Lng_FPC        :
-                  begin
-                    SaveDialog1.FileName := 'GetWMI_Info.pas';
-                    SaveDialog1.Filter   := 'Lazarus Source Code files|*.pas';
-                  end;
-      Lng_Oxygen     :
-                  begin
-                    SaveDialog1.FileName := 'GetWMI_Info.pas';
-                    SaveDialog1.Filter   := 'Oxygen Source Code files|*.pas';
-                  end;
-      Lng_BorlandCpp :
-                  begin
-                    SaveDialog1.FileName := 'GetWMI_Info.cpp';
-                    SaveDialog1.Filter   := 'C++ Source Code files|*.pas';
-                  end;
-     end;
-
-      if SaveDialog1.Execute then
-        SynEditWMIClassCode.Lines.SaveToFile(SaveDialog1.FileName);
-    end;
-  end
-  else
-  if PageControlCodeGen.ActivePage = TabSheetMethods then
-  begin
-
-     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
-      Lng_Delphi     :
-                  begin
-                    SaveDialog1.FileName := 'InvokeWMI_Method.dpr';
-                    SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
-                  end;
-      Lng_FPC        :
-                  begin
-                    SaveDialog1.FileName := 'InvokeWMI_Method.pas';
-                    SaveDialog1.Filter   := 'Lazarus Source Code files|*.pas';
-                  end;
-      Lng_Oxygen     :
-                  begin
-                    SaveDialog1.FileName := 'InvokeWMI_Method.pas';
-                    SaveDialog1.Filter   := 'Oxygen Source Code files|*.pas';
-                  end;
-      Lng_BorlandCpp :
-                  begin
-                    SaveDialog1.FileName := 'InvokeWMI_Method.cpp';
-                    SaveDialog1.Filter   := 'C++ Source Code files|*.pas';
-                  end;
-     end;
-
-
-    if SaveDialog1.Execute then
-      SynEditWMIMethodCode.Lines.SaveToFile(SaveDialog1.FileName);
-  end
-  else
-  if PageControlCodeGen.ActivePage = TabSheetEvents then
-  begin
-
-     case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
-      Lng_Delphi     :
-                  begin
-                    SaveDialog1.FileName := 'EventWMI_Method.dpr';
-                    SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
-                  end;
-      Lng_FPC        :
-                  begin
-                    SaveDialog1.FileName := 'EventWMI_Method.pas';
-                    SaveDialog1.Filter   := 'Lazarus Source Code files|*.pas';
-                  end;
-      Lng_Oxygen     :
-                  begin
-                    SaveDialog1.FileName := 'EventWMI_Method.pas';
-                    SaveDialog1.Filter   := 'Oxygen Source Code files|*.pas';
-                  end;
-      Lng_BorlandCpp :
-                  begin
-                    SaveDialog1.FileName := 'EventWMI_Method.cpp';
-                    SaveDialog1.Filter   := 'C++ Source Code files|*.pas';
-                  end;
-     end;
-
-    if SaveDialog1.Execute then
-      SynEditWMIEventCode.Lines.SaveToFile(SaveDialog1.FileName);
-  end;
-
 end;
 
 procedure TFrmMain.ToolButtonSearchClick(Sender: TObject);
@@ -2139,8 +1811,8 @@ end;
 
 
 initialization
-   TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TMemoStyleHook);
+   if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then
+     TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TScrollingStyleHook);
    TStyleManager.Engine.UnRegisterStyleHook(TCustomTabControl, TTabControlStyleHook);
    TStyleManager.Engine.RegisterStyleHook(TCustomTabControl, TMyTabControlStyleHook);
-
 end.
