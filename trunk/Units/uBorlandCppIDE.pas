@@ -28,6 +28,7 @@ Uses
 
 function  CreateBorlandCppiProject(const DestPath, SourcePath: string): boolean;
 procedure CompileAndRunBorlandCppCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
+procedure FormatBorlandCppCode(Console, DelphiCode:TStrings; const FormatterPath:string);
 
 implementation
 
@@ -36,6 +37,20 @@ uses
   Windows,
   ShellApi,
   uMisc;
+
+procedure FormatBorlandCppCode(Console, DelphiCode:TStrings; const FormatterPath:string);
+var
+  TempFile : string;
+begin
+  Console.Add('');
+  if FileExists(FormatterPath) then
+  begin
+   TempFile:=IncludeTrailingPathDelimiter(GetTempDirectory)+FormatDateTime('hhnnss.zzz',Now)+'.cpp';
+   DelphiCode.SaveToFile(TempFile);
+   CaptureConsoleOutput(Format('"%s" -cpp "%s"', [FormatterPath,TempFile]), Console);
+   DelphiCode.LoadFromFile(TempFile);
+  end;
+end;
 
 
 procedure CompileAndRunBorlandCppCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);

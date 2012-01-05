@@ -29,6 +29,8 @@ Uses
 
 function  CreateDelphiProject(const DestPath, SourcePath: string): boolean;
 procedure CompileAndRunDelphiCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
+procedure FormatDelphiCode(Console, DelphiCode:TStrings; const FormatterPath:string);
+
 
 implementation
 
@@ -55,6 +57,21 @@ begin
       MsgWarning(Format('Could not find %s', [ExeFile]));
   end;
 end;
+
+procedure FormatDelphiCode(Console, DelphiCode:TStrings; const FormatterPath:string);
+var
+  TempFile : string;
+begin
+  Console.Add('');
+  if FileExists(FormatterPath) then
+  begin
+   TempFile:=IncludeTrailingPathDelimiter(GetTempDirectory)+FormatDateTime('hhnnss.zzz',Now)+'.pas';
+   DelphiCode.SaveToFile(TempFile);
+   CaptureConsoleOutput(Format('"%s" -delphi "%s"', [FormatterPath,TempFile]), Console);
+   DelphiCode.LoadFromFile(TempFile);
+  end;
+end;
+
 
 
 function CopyDir(const fromDir, toDir: string): boolean;

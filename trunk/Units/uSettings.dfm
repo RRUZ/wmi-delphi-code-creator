@@ -36,10 +36,6 @@ object FrmSettings: TFrmSettings
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -49,7 +45,7 @@ object FrmSettings: TFrmSettings
         end
         object Label7: TLabel
           Left = 16
-          Top = 108
+          Top = 236
           Width = 264
           Height = 87
           AutoSize = False
@@ -59,6 +55,13 @@ object FrmSettings: TFrmSettings
             'option after your rebuild the WMI repository or when you install' +
             ' new WMI providers in the system'
           WordWrap = True
+        end
+        object Label10: TLabel
+          Left = 16
+          Top = 56
+          Width = 78
+          Height = 13
+          Caption = 'Sorce Formatter'
         end
         object EditOutputFolder: TEdit
           Left = 16
@@ -78,21 +81,25 @@ object FrmSettings: TFrmSettings
         end
         object BtnDeleteCache: TButton
           Left = 16
-          Top = 77
+          Top = 205
           Width = 264
           Height = 25
           Caption = 'Delete Cache'
           TabOrder = 2
           OnClick = BtnDeleteCacheClick
         end
+        object CbFormatter: TComboBox
+          Left = 16
+          Top = 70
+          Width = 281
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 3
+        end
       end
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 35
@@ -179,10 +186,6 @@ object FrmSettings: TFrmSettings
       end
       object TabSheet1: TTabSheet
         Caption = 'Theme Settings'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label1: TLabel
           Left = 11
           Top = 8

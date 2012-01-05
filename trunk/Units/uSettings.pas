@@ -42,6 +42,7 @@ type
     FLastWmiNameSpace: string;
     FLastWmiClass: string;
     FVCLStyle: string;
+    FFormatter: string;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -60,6 +61,7 @@ type
     property LastWmiNameSpace : string read FLastWmiNameSpace Write FLastWmiNameSpace;
     property LastWmiClass : string read FLastWmiClass Write FLastWmiClass;
     property VCLStyle : string read FVCLStyle Write FVCLStyle;
+    property Formatter : string read FFormatter write FFormatter;
   end;
 
 
@@ -99,6 +101,8 @@ type
     Label7: TLabel;
     ComboBoxVCLStyle: TComboBox;
     Label9: TLabel;
+    CbFormatter: TComboBox;
+    Label10: TLabel;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -120,15 +124,21 @@ type
     procedure LoadThemes;
     procedure LoadStyles;
     procedure LoadCodeGenData;
+    procedure LoadFormatters;
 
   public
     property Settings: TSettings Read FSettings Write FSettings;
     property Form: TForm Read FForm Write FForm;
     procedure LoadSettings;
   end;
-
+  {
   procedure LoadCurrentTheme(Form: TForm;const ThemeName:string);
   procedure LoadCurrentThemeFont(Form: TForm;const FontName:string;FontSize:Word);
+  }
+  procedure LoadCurrentTheme(Component: TComponent;const ThemeName:string);
+  procedure LoadCurrentThemeFont(Component: TComponent;const FontName:string;FontSize:Word);
+
+
   procedure LoadVCLStyle(Const StyleName:String);
   procedure ReadSettings(var Settings: TSettings);
   procedure WriteSettings(const Settings: TSettings);
@@ -353,6 +363,7 @@ begin
     Settings.LastWmiNameSpace              := iniFile.ReadString('Global', 'LastWmiNameSpace', 'root\CIMV2');
     Settings.LastWmiClass                  := iniFile.ReadString('Global', 'LastWmiClass', 'Win32_OperatingSystem');
     Settings.VCLStyle                      := iniFile.ReadString('Global', 'VCLStyle', 'Windows');
+    Settings.Formatter                     := iniFile.ReadString('Global', 'Formatter', '');
   finally
     iniFile.Free;
   end;
@@ -376,6 +387,7 @@ begin
     iniFile.WriteString('Global', 'LastWmiNameSpace', Settings.LastWmiNameSpace);
     iniFile.WriteString('Global', 'LastWmiClass', Settings.LastWmiClass);
     iniFile.WriteString('Global', 'VCLStyle', Settings.VCLStyle);
+    iniFile.WriteString('Global', 'Formatter', Settings.Formatter);
   finally
     iniFile.Free;
   end;
@@ -431,6 +443,18 @@ begin
 end;
 
 
+procedure TFrmSettings.LoadFormatters;
+Var
+  DelphiComp     : TDelphiVersions;
+  FormatterPath  : string;
+begin
+ for DelphiComp := Delphi2010 to DelphiXE2 do
+ begin
+   FormatterPath:=GetDelphiInstallPath(DelphiComp)+'Formatter.exe';
+   if FileExists(FormatterPath) then
+    CbFormatter.Items.Add(FormatterPath);
+ end;
+end;
 
 procedure TFrmSettings.ButtonGetMoreClick(Sender: TObject);
 begin
@@ -475,6 +499,7 @@ begin
     FSettings.DelphiWmiMethodCodeGenMode    := Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]);
     FSettings.OutputFolder                  := EditOutputFolder.Text;
     FSettings.VCLStyle                      := ComboBoxVCLStyle.Text;
+    FSettings.Formatter                     := CbFormatter.Text;
     WriteSettings(FSettings);
     Close();
   end;
@@ -485,6 +510,7 @@ begin
   Close();
 end;
 
+{
 procedure LoadCurrentTheme(Form: TForm;const ThemeName:string);
 var
  FileName : string;
@@ -501,6 +527,7 @@ begin
    end;
 end;
 
+
 procedure LoadCurrentThemeFont(Form: TForm;const FontName:string;FontSize:Word);
 var
  i        : Integer;
@@ -512,6 +539,44 @@ begin
     TSynEdit(Form.Components[i]).Font.Size:=FontSize;
    end;
 end;
+}
+
+procedure LoadCurrentTheme(Component: TComponent;const ThemeName:string);
+var
+ FileName : string;
+ i        : Integer;
+ FCurrentTheme : TIDETheme;
+begin
+  FileName:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))+'\Themes')+ThemeName+sThemesExt;
+  LoadThemeFromXMLFile(FCurrentTheme, FileName);
+  for i := 0 to Component.ComponentCount-1 do
+   if Component.Components[i] is TSynEdit then
+   begin
+     RefreshSynPasHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
+     RefreshSynCppHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
+   end {
+   else
+   if Component.Components[i] is TComponent then
+      LoadCurrentTheme(Component.Components[i], ThemeName);   }
+end;
+
+
+
+procedure LoadCurrentThemeFont(Component: TComponent;const FontName:string;FontSize:Word);
+var
+ i        : Integer;
+begin
+  for i := 0 to Component.ComponentCount-1 do
+   if Component.Components[i] is TSynEdit then
+   begin
+    TSynEdit(Component.Components[i]).Font.Name:=FontName;
+    TSynEdit(Component.Components[i]).Font.Size:=FontSize;
+   end  {
+   else
+   if Component.Components[i] is TComponent then
+      LoadCurrentThemeFont(Component.Components[i], FontName, FontSize);    }
+end;
+
 
 procedure TFrmSettings.CbDelphiCodeWmiClassChange(Sender: TObject);
 begin
@@ -552,6 +617,7 @@ begin
   LoadStyles;
   LoadThemes;
   LoadCodeGenData;
+  LoadFormatters;
 end;
 
 procedure TFrmSettings.FormDestroy(Sender: TObject);
@@ -566,7 +632,8 @@ begin
   ReadSettings(FSettings);
   ComboBoxTheme.ItemIndex    := ComboBoxTheme.Items.IndexOf(FSettings.CurrentTheme);
   ComboBoxVCLStyle.ItemIndex := ComboBoxVCLStyle.Items.IndexOf(FSettings.VCLStyle);
-  ComboBoxFont.ItemIndex  := ComboBoxFont.Items.IndexOf(FSettings.FontName);
+  ComboBoxFont.ItemIndex     := ComboBoxFont.Items.IndexOf(FSettings.FontName);
+  CbFormatter.ItemIndex     := CbFormatter.Items.IndexOf(FSettings.Formatter);
   UpDown1.Position        := FSettings.FontSize;
 
   for i := 0 to DelphiMaxTypesClassCodeGen-1 do
