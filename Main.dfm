@@ -28,8 +28,6 @@ object FrmMain: TFrmMain
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
-    ExplicitTop = 30
-    ExplicitHeight = 682
     object PageControlMain: TPageControl
       Left = 5
       Top = 5
@@ -41,11 +39,9 @@ object FrmMain: TFrmMain
       MultiLine = True
       TabOrder = 0
       OnChange = PageControlMainChange
-      ExplicitHeight = 672
       object TabSheetCodeGen: TTabSheet
         Caption = 'Code Generation'
         ImageIndex = 30
-        ExplicitHeight = 643
         object PanelCodeGen: TPanel
           Left = 0
           Top = 0
@@ -55,7 +51,6 @@ object FrmMain: TFrmMain
           BevelOuter = bvNone
           BevelWidth = 5
           TabOrder = 0
-          ExplicitHeight = 643
           object Splitter4: TSplitter
             Left = 0
             Top = 483
@@ -77,11 +72,9 @@ object FrmMain: TFrmMain
             Images = ImageList1
             MultiLine = True
             TabOrder = 1
-            ExplicitHeight = 434
             object TabSheetWmiClasses: TTabSheet
               Caption = 'WMI Classes'
               ImageIndex = 40
-              ExplicitHeight = 405
               object Splitter1: TSplitter
                 Left = 308
                 Top = 0
@@ -98,7 +91,6 @@ object FrmMain: TFrmMain
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
-                ExplicitHeight = 405
                 DesignSize = (
                   308
                   413)
@@ -195,7 +187,6 @@ object FrmMain: TFrmMain
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
-                  ExplicitHeight = 163
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -225,13 +216,11 @@ object FrmMain: TFrmMain
                 BevelOuter = bvNone
                 BorderWidth = 5
                 TabOrder = 1
-                ExplicitHeight = 405
               end
             end
             object TabSheetMethods: TTabSheet
               Caption = 'Execute a WMI method'
               ImageIndex = 41
-              ExplicitHeight = 405
               object Splitter5: TSplitter
                 Left = 393
                 Top = 0
@@ -248,7 +237,6 @@ object FrmMain: TFrmMain
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
-                ExplicitHeight = 405
                 DesignSize = (
                   393
                   413)
@@ -349,7 +337,6 @@ object FrmMain: TFrmMain
                   TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewMethodsParamsClick
-                  ExplicitHeight = 100
                 end
                 object MemoMethodDescr: TMemo
                   Left = 11
@@ -379,7 +366,6 @@ object FrmMain: TFrmMain
                   Caption = 'Generate Code'
                   TabOrder = 8
                   OnClick = ButtonGenerateCodeInvokerClick
-                  ExplicitTop = 322
                 end
                 object ComboBoxPaths: TComboBox
                   Left = 103
@@ -410,13 +396,11 @@ object FrmMain: TFrmMain
                 BevelOuter = bvNone
                 BorderWidth = 5
                 TabOrder = 1
-                ExplicitHeight = 405
               end
             end
             object TabSheetEvents: TTabSheet
               Caption = 'Receive a WMI Event'
               ImageIndex = 45
-              ExplicitHeight = 405
               object Splitter6: TSplitter
                 Left = 416
                 Top = 0
@@ -433,7 +417,6 @@ object FrmMain: TFrmMain
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
-                ExplicitHeight = 405
                 DesignSize = (
                   416
                   413)
@@ -490,7 +473,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 160
+                  Height = 158
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -517,7 +500,6 @@ object FrmMain: TFrmMain
                   TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewEventsCondsClick
-                  ExplicitHeight = 152
                 end
                 object EditValueEvent: TEdit
                   Left = 88
@@ -591,14 +573,13 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 342
+                  Top = 340
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 9
                   OnClick = ButtonGenerateEventCodeClick
-                  ExplicitTop = 334
                 end
                 object RadioButtonIntrinsic: TRadioButton
                   Left = 5
@@ -630,7 +611,6 @@ object FrmMain: TFrmMain
                 BevelOuter = bvNone
                 BorderWidth = 5
                 TabOrder = 1
-                ExplicitHeight = 405
               end
             end
           end
@@ -643,7 +623,6 @@ object FrmMain: TFrmMain
             BevelOuter = bvNone
             BorderWidth = 5
             TabOrder = 2
-            ExplicitTop = 480
             object PageControl2: TPageControl
               Left = 5
               Top = 5
@@ -705,22 +684,18 @@ object FrmMain: TFrmMain
       object TabSheetWmiExplorer: TTabSheet
         Caption = 'Wmi Explorer'
         ImageIndex = 29
-        ExplicitHeight = 643
       end
       object TabSheetTreeClasses: TTabSheet
         Caption = 'WMI Classes Tree'
         ImageIndex = 43
-        ExplicitHeight = 643
       end
       object TabSheetWmiDatabase: TTabSheet
         Caption = 'WMI Database'
         ImageIndex = 31
-        ExplicitHeight = 643
       end
       object TabSheet6: TTabSheet
         Caption = 'Log'
         ImageIndex = 28
-        ExplicitHeight = 643
         object MemoLog: TMemo
           Left = 0
           Top = 0
@@ -735,7 +710,6 @@ object FrmMain: TFrmMain
           Font.Style = []
           ParentFont = False
           TabOrder = 0
-          ExplicitHeight = 643
         end
       end
     end
@@ -765,7 +739,7 @@ object FrmMain: TFrmMain
     Width = 1008
     Height = 22
     AutoSize = True
-    ButtonWidth = 116
+    ButtonWidth = 108
     Caption = 'ToolBarMain'
     Color = clBtnFace
     DrawingStyle = dsGradient
@@ -784,7 +758,7 @@ object FrmMain: TFrmMain
       OnClick = ToolButtonSearchClick
     end
     object ToolButtonGetValues: TToolButton
-      Left = 66
+      Left = 64
       Top = 0
       AutoSize = True
       Caption = 'Get Values'
@@ -792,7 +766,7 @@ object FrmMain: TFrmMain
       OnClick = ToolButtonGetValuesClick
     end
     object ToolButtonOnline: TToolButton
-      Left = 152
+      Left = 146
       Top = 0
       AutoSize = True
       Caption = 'Online Class Info'
@@ -800,7 +774,7 @@ object FrmMain: TFrmMain
       OnClick = ToolButtonOnlineClick
     end
     object ToolButtonSettings: TToolButton
-      Left = 272
+      Left = 258
       Top = 0
       AutoSize = True
       Caption = 'Settings'
@@ -808,7 +782,7 @@ object FrmMain: TFrmMain
       OnClick = ToolButtonSettingsClick
     end
     object ToolButton4: TToolButton
-      Left = 345
+      Left = 328
       Top = 0
       Width = 8
       Caption = 'ToolButton4'
@@ -816,7 +790,7 @@ object FrmMain: TFrmMain
       Style = tbsSeparator
     end
     object ToolButtonAbout: TToolButton
-      Left = 353
+      Left = 336
       Top = 0
       AutoSize = True
       Caption = 'About'
@@ -858,7 +832,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800C80110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800CC0110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
