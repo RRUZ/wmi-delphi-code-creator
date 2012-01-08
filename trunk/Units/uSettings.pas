@@ -103,6 +103,7 @@ type
     Label9: TLabel;
     CbFormatter: TComboBox;
     Label10: TLabel;
+    ImageVCLStyle: TImage;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -125,7 +126,7 @@ type
     procedure LoadStyles;
     procedure LoadCodeGenData;
     procedure LoadFormatters;
-
+    procedure DrawSeletedVCLStyle;
   public
     property Settings: TSettings Read FSettings Write FSettings;
     property Form: TForm Read FForm Write FForm;
@@ -162,7 +163,7 @@ uses
   uWmiGenCode,
   Vcl.Styles,
   Vcl.Themes,
-  uMisc;
+  uMisc, uVCLStyleUtils;
 
 const
   sThemesExt  ='.theme.xml';
@@ -202,6 +203,7 @@ end;
 
 
 { TSettings }
+
 
 function TSettings.GetBackGroundColor: TColor;
 var
@@ -502,6 +504,7 @@ begin
     FSettings.Formatter                     := CbFormatter.Text;
     WriteSettings(FSettings);
     Close();
+    LoadVCLStyle(ComboBoxVCLStyle.Text);
   end;
 end;
 
@@ -606,7 +609,39 @@ end;
 
 procedure TFrmSettings.ComboBoxVCLStyleChange(Sender: TObject);
 begin
-  LoadVCLStyle(ComboBoxVCLStyle.Text);
+  //LoadVCLStyle(ComboBoxVCLStyle.Text);
+  DrawSeletedVCLStyle;
+end;
+
+procedure TFrmSettings.DrawSeletedVCLStyle;
+var
+  StyleName : string;
+  LBitmap   : TBitmap;
+  LStyle    : TCustomStyleExt;
+  SourceInfo: TSourceInfo;
+begin
+   ImageVCLStyle.Picture:=nil;
+
+   StyleName:=ComboBoxVCLStyle.Text;
+   if (StyleName<>'') and (CompareText('Windows',StyleName)<>0) then
+   begin
+    LBitmap:=TBitmap.Create;
+    try
+       LBitmap.PixelFormat:=pf32bit;
+       LBitmap.Width :=ImageVCLStyle.ClientRect.Width;
+       LBitmap.Height:=ImageVCLStyle.ClientRect.Height;
+       SourceInfo:=TStyleManager.StyleSourceInfo[StyleName];
+       LStyle:=TCustomStyleExt.Create(TStream(SourceInfo.Data));
+       try
+         DrawSampleWindow(LStyle, LBitmap.Canvas, ImageVCLStyle.ClientRect, StyleName);
+         ImageVCLStyle.Picture.Assign(LBitmap);
+       finally
+         LStyle.Free;
+       end;
+    finally
+      LBitmap.Free;
+    end;
+   end;
 end;
 
 procedure TFrmSettings.FormCreate(Sender: TObject);
@@ -632,6 +667,8 @@ begin
   ReadSettings(FSettings);
   ComboBoxTheme.ItemIndex    := ComboBoxTheme.Items.IndexOf(FSettings.CurrentTheme);
   ComboBoxVCLStyle.ItemIndex := ComboBoxVCLStyle.Items.IndexOf(FSettings.VCLStyle);
+  DrawSeletedVCLStyle;
+
   ComboBoxFont.ItemIndex     := ComboBoxFont.Items.IndexOf(FSettings.FontName);
   CbFormatter.ItemIndex     := CbFormatter.Items.IndexOf(FSettings.Formatter);
   UpDown1.Position        := FSettings.FontSize;

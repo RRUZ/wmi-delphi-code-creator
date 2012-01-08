@@ -100,6 +100,10 @@ object FrmSettings: TFrmSettings
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 35
@@ -214,6 +218,12 @@ object FrmSettings: TFrmSettings
           Height = 13
           Caption = 'VCL Style'
         end
+        object ImageVCLStyle: TImage
+          Left = 11
+          Top = 143
+          Width = 256
+          Height = 138
+        end
         object ComboBoxTheme: TComboBox
           Left = 11
           Top = 27
@@ -265,7 +275,7 @@ object FrmSettings: TFrmSettings
         object ComboBoxVCLStyle: TComboBox
           Left = 11
           Top = 116
-          Width = 202
+          Width = 254
           Height = 21
           Style = csDropDownList
           TabOrder = 5
