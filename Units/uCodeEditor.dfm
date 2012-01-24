@@ -12,6 +12,7 @@ object FrmCodeEditor: TFrmCodeEditor
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object PageControlCode: TPageControl
@@ -26,9 +27,9 @@ object FrmCodeEditor: TFrmCodeEditor
       Caption = 'Code'
       object SynEditCode: TSynEdit
         Left = 0
-        Top = 26
+        Top = 67
         Width = 640
-        Height = 421
+        Height = 380
         Align = alClient
         Color = 4598550
         ActiveLineColor = clBlue
@@ -52,7 +53,7 @@ object FrmCodeEditor: TFrmCodeEditor
       end
       object ActionToolBar1: TActionToolBar
         Left = 0
-        Top = 0
+        Top = 41
         Width = 640
         Height = 26
         ActionManager = ActionManager1
@@ -68,7 +69,34 @@ object FrmCodeEditor: TFrmCodeEditor
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
         Spacing = 0
+      end
+      object PanelLanguageSet: TPanel
+        Left = 0
+        Top = 0
+        Width = 640
+        Height = 41
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 2
+        object Label8: TLabel
+          Left = 5
+          Top = 14
+          Width = 47
+          Height = 13
+          Caption = 'Language'
+        end
+        object ComboBoxLanguageSel: TComboBox
+          Left = 64
+          Top = 14
+          Width = 220
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 0
+          OnChange = ComboBoxLanguageSelChange
+        end
       end
     end
   end
@@ -192,7 +220,7 @@ object FrmCodeEditor: TFrmCodeEditor
     Left = 432
     Top = 152
     Bitmap = {
-      494C010109001800140010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010109001800200010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       00000000000000000000000000000000000000000003000000100000001A0000
       001A0000001A0000001A00000017000000110000000B00000007000000070000

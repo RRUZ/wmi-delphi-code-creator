@@ -64,22 +64,25 @@ object FrmMain: TFrmMain
           end
           object PageControlCodeGen: TPageControl
             Left = 0
-            Top = 41
+            Top = 0
             Width = 990
-            Height = 442
+            Height = 483
             ActivePage = TabSheetWmiClasses
             Align = alClient
             Images = ImageList1
             MultiLine = True
-            TabOrder = 1
+            TabOrder = 0
+            ExplicitTop = 41
+            ExplicitHeight = 442
             object TabSheetWmiClasses: TTabSheet
               Caption = 'WMI Classes'
               ImageIndex = 40
+              ExplicitHeight = 413
               object Splitter1: TSplitter
                 Left = 308
                 Top = 0
                 Width = 5
-                Height = 413
+                Height = 454
                 ExplicitLeft = 289
                 ExplicitHeight = 704
               end
@@ -87,13 +90,14 @@ object FrmMain: TFrmMain
                 Left = 0
                 Top = 0
                 Width = 308
-                Height = 413
+                Height = 454
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
+                ExplicitHeight = 413
                 DesignSize = (
                   308
-                  413)
+                  454)
                 object LabelProperties: TLabel
                   Left = 9
                   Top = 142
@@ -160,7 +164,7 @@ object FrmMain: TFrmMain
                   Left = 7
                   Top = 192
                   Width = 295
-                  Height = 171
+                  Height = 212
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -182,11 +186,13 @@ object FrmMain: TFrmMain
                       WidthType = (
                         -1)
                     end>
+                  HideSelection = False
                   ReadOnly = True
                   RowSelect = True
                   TabOrder = 5
                   ViewStyle = vsReport
                   OnClick = ListBoxPropertiesClick
+                  ExplicitHeight = 171
                 end
                 object ButtonGetValues: TButton
                   Left = 128
@@ -211,21 +217,23 @@ object FrmMain: TFrmMain
                 Left = 313
                 Top = 0
                 Width = 669
-                Height = 413
+                Height = 454
                 Align = alClient
                 BevelOuter = bvNone
                 BorderWidth = 5
                 TabOrder = 1
+                ExplicitHeight = 413
               end
             end
             object TabSheetMethods: TTabSheet
               Caption = 'Execute a WMI method'
               ImageIndex = 41
+              ExplicitHeight = 413
               object Splitter5: TSplitter
                 Left = 393
                 Top = 0
                 Width = 5
-                Height = 413
+                Height = 454
                 ExplicitLeft = 405
                 ExplicitHeight = 473
               end
@@ -233,13 +241,14 @@ object FrmMain: TFrmMain
                 Left = 0
                 Top = 0
                 Width = 393
-                Height = 413
+                Height = 454
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
+                ExplicitHeight = 413
                 DesignSize = (
                   393
-                  413)
+                  454)
                 object Label4: TLabel
                   Left = 11
                   Top = 18
@@ -309,7 +318,7 @@ object FrmMain: TFrmMain
                   Left = 11
                   Top = 216
                   Width = 368
-                  Height = 108
+                  Height = 149
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -333,10 +342,12 @@ object FrmMain: TFrmMain
                       Caption = 'Description'
                       Width = 250
                     end>
+                  HideSelection = False
                   ReadOnly = True
                   TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewMethodsParamsClick
+                  ExplicitHeight = 108
                 end
                 object MemoMethodDescr: TMemo
                   Left = 11
@@ -359,13 +370,14 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateCodeInvoker: TButton
                   Left = 248
-                  Top = 330
+                  Top = 371
                   Width = 130
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 8
                   OnClick = ButtonGenerateCodeInvokerClick
+                  ExplicitTop = 330
                 end
                 object ComboBoxPaths: TComboBox
                   Left = 103
@@ -391,35 +403,37 @@ object FrmMain: TFrmMain
                 Left = 398
                 Top = 0
                 Width = 584
-                Height = 413
+                Height = 454
                 Align = alClient
                 BevelOuter = bvNone
                 BorderWidth = 5
                 TabOrder = 1
+                ExplicitHeight = 413
               end
             end
             object TabSheetEvents: TTabSheet
               Caption = 'Receive a WMI Event'
               ImageIndex = 45
+              ExplicitHeight = 413
               object Splitter6: TSplitter
                 Left = 416
                 Top = 0
                 Width = 5
-                Height = 413
+                Height = 454
                 ExplicitLeft = 402
-                ExplicitHeight = 454
               end
               object Panel1: TPanel
                 Left = 0
                 Top = 0
                 Width = 416
-                Height = 413
+                Height = 454
                 Align = alLeft
                 BevelOuter = bvNone
                 TabOrder = 0
+                ExplicitHeight = 413
                 DesignSize = (
                   416
-                  413)
+                  454)
                 object LabelEventsConds: TLabel
                   Left = 5
                   Top = 157
@@ -473,7 +487,7 @@ object FrmMain: TFrmMain
                   Left = 5
                   Top = 176
                   Width = 405
-                  Height = 158
+                  Height = 193
                   Anchors = [akLeft, akTop, akRight, akBottom]
                   Checkboxes = True
                   Columns = <
@@ -496,10 +510,12 @@ object FrmMain: TFrmMain
                     item
                       Caption = 'Description'
                     end>
+                  HideSelection = False
                   ReadOnly = True
                   TabOrder = 6
                   ViewStyle = vsReport
                   OnClick = ListViewEventsCondsClick
+                  ExplicitHeight = 152
                 end
                 object EditValueEvent: TEdit
                   Left = 88
@@ -573,13 +589,14 @@ object FrmMain: TFrmMain
                 end
                 object ButtonGenerateEventCode: TButton
                   Left = 288
-                  Top = 340
+                  Top = 375
                   Width = 122
                   Height = 25
                   Anchors = [akLeft, akBottom]
                   Caption = 'Generate Code'
                   TabOrder = 9
                   OnClick = ButtonGenerateEventCodeClick
+                  ExplicitTop = 334
                 end
                 object RadioButtonIntrinsic: TRadioButton
                   Left = 5
@@ -606,11 +623,12 @@ object FrmMain: TFrmMain
                 Left = 421
                 Top = 0
                 Width = 561
-                Height = 413
+                Height = 454
                 Align = alClient
                 BevelOuter = bvNone
                 BorderWidth = 5
                 TabOrder = 1
+                ExplicitHeight = 413
               end
             end
           end
@@ -622,7 +640,7 @@ object FrmMain: TFrmMain
             Align = alBottom
             BevelOuter = bvNone
             BorderWidth = 5
-            TabOrder = 2
+            TabOrder = 1
             object PageControl2: TPageControl
               Left = 5
               Top = 5
@@ -652,31 +670,6 @@ object FrmMain: TFrmMain
                   TabOrder = 0
                 end
               end
-            end
-          end
-          object PanelLanguageSet: TPanel
-            Left = 0
-            Top = 0
-            Width = 990
-            Height = 41
-            Align = alTop
-            BevelOuter = bvNone
-            TabOrder = 0
-            object Label8: TLabel
-              Left = 5
-              Top = 14
-              Width = 47
-              Height = 13
-              Caption = 'Language'
-            end
-            object ComboBoxLanguageSel: TComboBox
-              Left = 64
-              Top = 14
-              Width = 220
-              Height = 21
-              Style = csDropDownList
-              TabOrder = 0
-              OnChange = ComboBoxLanguageSelChange
             end
           end
         end
@@ -832,7 +825,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800CC0110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800D80110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000

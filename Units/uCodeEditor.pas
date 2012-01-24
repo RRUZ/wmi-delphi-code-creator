@@ -28,9 +28,11 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, Vcl.ComCtrls, Vcl.ImgList,
   Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ActnCtrls, uSelectCompilerVersion,
   uSettings,Vcl.StdCtrls,  Vcl.ToolWin, SynHighlighterPas, SynEditHighlighter,
-  SynHighlighterCpp, Vcl.ActnMenus;
+  SynHighlighterCpp, Vcl.ActnMenus, Vcl.ExtCtrls;
 
 type
+  //TProcWMiCodeGen = procedure (WmiMetaClassInfo : TWMiClassMetaData) of object;
+  TProcWMiCodeGen = procedure of object;
   TFrmCodeEditor = class(TForm)
     PageControlCode: TPageControl;
     TabSheetWmiClassCode: TTabSheet;
@@ -46,25 +48,33 @@ type
     ActionOpenIDE: TAction;
     SaveDialog1: TSaveDialog;
     ActionToolBar1: TActionToolBar;
+    PanelLanguageSet: TPanel;
+    Label8: TLabel;
+    ComboBoxLanguageSel: TComboBox;
     procedure ActionRunExecute(Sender: TObject);
     procedure ActionFormatExecute(Sender: TObject);
     procedure ActionFormatUpdate(Sender: TObject);
     procedure ActionOpenIDEExecute(Sender: TObject);
     procedure ActionSaveExecute(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure ComboBoxLanguageSelChange(Sender: TObject);
   private
     FCompilerType: TCompilerType;
     FSettings: TSettings;
     FConsole: TMemo;
+    FCodeGenerator: TProcWMiCodeGen;
     procedure ScrollMemo(Memo : TMemo);overload;
     procedure ScrollMemo(Memo : TSynEdit);overload;
     function GetSourceCode: TStrings;
     procedure SetSourceCode(const Value: TStrings);
     procedure SetCompilerType(const Value: TCompilerType);
+    procedure GenerateCode;
   public
     property CompilerType : TCompilerType read FCompilerType write SetCompilerType;
     property Settings : TSettings read FSettings write FSettings;
     property Console : TMemo read FConsole write FConsole;
     property SourceCode : TStrings read GetSourceCode write SetSourceCode;
+    property CodeGenerator : TProcWMiCodeGen read FCodeGenerator write FCodeGenerator;
   end;
 
 
@@ -72,6 +82,7 @@ implementation
 
 uses
  ShellApi,
+ uWmiGenCode,
  uDelphiIDE,
  uLazarusIDE,
  uBorlandCppIDE,
@@ -81,6 +92,12 @@ uses
  uMisc;
 
 {$R *.dfm}
+
+procedure TFrmCodeEditor.GenerateCode;
+begin
+  if Assigned(FCodeGenerator) then
+    FCodeGenerator();
+end;
 
 function TFrmCodeEditor.GetSourceCode: TStrings;
 begin
@@ -349,5 +366,24 @@ begin
 end;
 
 
+
+procedure TFrmCodeEditor.ComboBoxLanguageSelChange(Sender: TObject);
+begin
+   CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
+   GenerateCode;
+end;
+
+procedure TFrmCodeEditor.FormCreate(Sender: TObject);
+var
+  i : TSourceLanguages;
+begin
+  FCodeGenerator :=nil;
+
+  for i := Low(TSourceLanguages) to High(TSourceLanguages) do
+    ComboBoxLanguageSel.Items.AddObject(ListSourceLanguages[i], TObject(i));
+  ComboBoxLanguageSel.ItemIndex := 0;
+
+  GenerateCode;
+end;
 
 end.
