@@ -118,9 +118,6 @@ type
     ButtonGetValues: TButton;
     ButtonGenerateCodeInvoker: TButton;
     ButtonGenerateEventCode: TButton;
-    PanelLanguageSet: TPanel;
-    ComboBoxLanguageSel: TComboBox;
-    Label8:    TLabel;
     ComboBoxPaths: TComboBox;
     CheckBoxPath: TCheckBox;
     TabSheetWmiDatabase: TTabSheet;
@@ -160,7 +157,6 @@ type
     procedure ListViewEventsCondsClick(Sender: TObject);
     procedure ToolButtonGetValuesClick(Sender: TObject);
     procedure ButtonGenerateEventCodeClick(Sender: TObject);
-    procedure ComboBoxLanguageSelChange(Sender: TObject);
     procedure ComboBoxPathsChange(Sender: TObject);
     procedure CheckBoxPathClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -214,6 +210,8 @@ type
     procedure SaveWMIClassesMethodsToCache(const namespace: string; List: TStrings);
 
     procedure SetLog(const Log :string);
+
+    procedure GenerateCode;
   public
     procedure SetMsg(const Msg: string);
     procedure LoadWmiClasses(const Namespace: string);
@@ -262,9 +260,6 @@ const
   PBM_SETMARQUEE = (WM_USER + 10);
 
   WmiTableType_Class = 1;
-
-  ListCompilerLanguages: array[TSourceLanguages] of
-    TCompilerType = (Ct_Delphi, Ct_Lazarus_FPC, Ct_Oxygene, Ct_BorlandCpp);
 
 
 
@@ -322,44 +317,6 @@ end;
 procedure TFrmMain.ComboBoxEventsChange(Sender: TObject);
 begin
   LoadEventsInfo;
-end;
-
-procedure TFrmMain.ComboBoxLanguageSelChange(Sender: TObject);
-begin
-{
-  if TSourceLanguages(ComboBoxLanguageSel.ItemIndex)=Lng_BorlandCpp then
-  begin
-    //SynEditWMIClassCode.Highlighter:=SynCppSyn1;
-    //SynEditWMIMethodCode.Highlighter:=SynCppSyn1;
-  end
-  else
-  begin
-    //SynEditWMIClassCode.Highlighter:=SynPasSyn1;
-    //SynEditWMIMethodCode.Highlighter:=SynPasSyn1;
-  end;
-
-  LoadCurrentTheme(Self,Settings.CurrentTheme);
-   }
-  //TabSheetWmiClassCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
-  //TabSheetWmiMethodCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
-  //TabSheetWmiEventCode.Caption:=Format('%s Code',[ComboBoxLanguageSel.Text]);
-
-
-  if Assigned(FrmCodeEditor) then
-   FrmCodeEditor.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
-
-  if Assigned(FrmCodeEditorMethod) then
-   FrmCodeEditorMethod.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
-
-  if Assigned(FrmCodeEditorEvent) then
-   FrmCodeEditorEvent.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
-
-  if ComboBoxClasses.ItemIndex>=0 then
-    GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
-  if ComboBoxClassesMethods.ItemIndex>=0 then
-    GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
-  if ComboBoxEvents.ItemIndex>=0 then
-    GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
 end;
 
 procedure TFrmMain.ComboBoxMethodsChange(Sender: TObject);
@@ -471,7 +428,6 @@ end;
 
 procedure TFrmMain.FormCreate(Sender: TObject);
 var
-  i:   TSourceLanguages;
   ProgressBarStyle: integer;
 begin
   ReportMemoryLeaksOnShutdown:=DebugHook<>0;
@@ -496,10 +452,6 @@ begin
   ProgressBarStyle      := ProgressBarStyle - WS_EX_STATICEDGE;
   SetWindowLong(ProgressBarWmi.Handle, GWL_EXSTYLE, ProgressBarStyle);
   ProgressBarWmi.Perform(PBM_SETMARQUEE, 1, 100);
-
-  for i := Low(TSourceLanguages) to High(TSourceLanguages) do
-    ComboBoxLanguageSel.Items.AddObject(ListSourceLanguages[i], TObject(i));
-  ComboBoxLanguageSel.ItemIndex := 0;
 
   FrmWmiDatabase := TFrmWmiDatabase.Create(Self);
   FrmWmiDatabase.Parent := TabSheetWmiDatabase;
@@ -530,26 +482,29 @@ begin
   FrmWmiClassTree.Show;
 
   FrmCodeEditor  := TFrmCodeEditor.Create(Self);
+  FrmCodeEditor.CodeGenerator:=GenerateCode;
   FrmCodeEditor.Parent := PanelCode;
   FrmCodeEditor.Show;
   FrmCodeEditor.Settings:=Settings;
   FrmCodeEditor.Console:=MemoConsole;
-  FrmCodeEditor.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
+  FrmCodeEditor.CompilerType:=Ct_Delphi;
 
 
   FrmCodeEditorMethod  := TFrmCodeEditor.Create(Self);
+  FrmCodeEditorMethod.CodeGenerator:=GenerateCode;
   FrmCodeEditorMethod.Parent := PanelMethodCode;
   FrmCodeEditorMethod.Show;
   FrmCodeEditorMethod.Settings:=Settings;
   FrmCodeEditorMethod.Console:=MemoConsole;
-  FrmCodeEditorMethod.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
+  FrmCodeEditorMethod.CompilerType:=Ct_Delphi;
 
   FrmCodeEditorEvent  := TFrmCodeEditor.Create(Self);
+  FrmCodeEditorEvent.CodeGenerator:=GenerateCode;
   FrmCodeEditorEvent.Parent := PanelEventCode;
   FrmCodeEditorEvent.Show;
   FrmCodeEditorEvent.Settings:=Settings;
   FrmCodeEditorEvent.Console:=MemoConsole;
-  FrmCodeEditorEvent.CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
+  FrmCodeEditorEvent.CompilerType:=Ct_Delphi;
 
   LoadCurrentTheme(Self,Settings.CurrentTheme);
   LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
@@ -586,6 +541,23 @@ begin
   Settings.Free;
 end;
 
+procedure TFrmMain.GenerateCode;
+begin
+
+  if PageControlCodeGen.ActivePage=TabSheetWmiClasses then
+   if ComboBoxClasses.ItemIndex>=0 then
+     GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
+
+  if PageControlCodeGen.ActivePage=TabSheetMethods then
+    if ComboBoxClassesMethods.ItemIndex>=0 then
+      GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
+
+  if PageControlCodeGen.ActivePage=TabSheetEvents then
+    if ComboBoxEvents.ItemIndex>=0 then
+      GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
+
+end;
+
 procedure TFrmMain.GenerateConsoleCode(WmiMetaClassInfo : TWMiClassMetaData);
 var
   i,j:     integer;
@@ -620,8 +592,8 @@ begin
         inc(j);
       end;
 
-    case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
-      Lng_Delphi:
+    case FrmCodeEditor.CompilerType of
+      Ct_Delphi:
                   begin
                     DelphiWmiCodeGenerator:=TDelphiWmiClassCodeGenerator.Create;
                     try
@@ -629,9 +601,6 @@ begin
                       DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                       DelphiWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       DelphiWmiCodeGenerator.GenerateCode(Props);
-                      //SynEditWMIClassCode.Lines.Clear;
-                      //FormatDelphiCode(MemoLog.Lines, DelphiWmiCodeGenerator.OutPutCode, Settings.Formatter);
-                      //SynEditWMIClassCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
                       FrmCodeEditor.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
                     finally
                       DelphiWmiCodeGenerator.Free;
@@ -639,7 +608,7 @@ begin
                   end;
 
 
-      Lng_FPC:
+      Ct_Lazarus_FPC:
                   begin
                     FPCWmiCodeGenerator:=TFPCWmiClassCodeGenerator.Create;
                     try
@@ -647,8 +616,6 @@ begin
                       FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                       FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       FPCWmiCodeGenerator.GenerateCode(Props);
-                      //SynEditWMIClassCode.Lines.Clear;
-                      //SynEditWMIClassCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
                       FrmCodeEditor.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
                     finally
                       FPCWmiCodeGenerator.Free;
@@ -656,7 +623,7 @@ begin
                   end;
 
 
-      Lng_Oxygen:
+      Ct_Oxygene:
                   begin
                     OxygenWmiCodeGenerator:=TOxygenWmiClassCodeGenerator.Create;
                     try
@@ -664,15 +631,13 @@ begin
                       OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                       OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       OxygenWmiCodeGenerator.GenerateCode(Props);
-                      //SynEditWMIClassCode.Lines.Clear;
-                      //SynEditWMIClassCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
                       FrmCodeEditor.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
                     finally
                       OxygenWmiCodeGenerator.Free;
                     end;
                   end;
 
-      Lng_BorlandCpp:
+      Ct_BorlandCpp:
                   begin
                     CppWmiCodeGenerator:=TBorlandCppWmiClassCodeGenerator.Create;
                     try
@@ -680,25 +645,14 @@ begin
                       CppWmiCodeGenerator.UseHelperFunctions:=false;//Settings.DelphiWmiClassHelperFuncts;
                       CppWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       CppWmiCodeGenerator.GenerateCode(Props);
-                      //SynEditWMIClassCode.Lines.Clear;
-                      //SynEditWMIClassCode.Lines.AddStrings(CppWmiCodeGenerator.OutPutCode);
                       FrmCodeEditor.SourceCode:=CppWmiCodeGenerator.OutPutCode;
                     finally
                       CppWmiCodeGenerator.Free;
                     end;
                   end;
 
-      {
-      Lng_Oxygen: GenerateOxygenWmiConsoleCode(
-          SynEditDelphiCode.Lines, Props, Namespace, WmiClass, Settings.DelphiWmiClassHelperFuncts);
-      }
     end;
 
-    {
-    SynEditWMIClassCode.SelStart  := SynEditWMIClassCode.GetTextLen;
-    SynEditWMIClassCode.SelLength := 0;
-    SendMessage(SynEditWMIClassCode.Handle, EM_SCROLLCARET, 0, 0);
-    }
   finally
     Props.Free;
   end;
@@ -744,8 +698,8 @@ begin
 
     Params.CommaText := Str;
 
-    case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
-      Lng_Delphi:
+    case FrmCodeEditorMethod.CompilerType of
+      Ct_Delphi:
                  begin
                   DelphiWmiCodeGenerator :=TDelphiWmiMethodCodeGenerator.Create;
                   try
@@ -755,15 +709,13 @@ begin
                     DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     DelphiWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     DelphiWmiCodeGenerator.GenerateCode(Params, Values);
-                    //SynEditWMIMethodCode.Lines.Clear;
-                    //SynEditWMIMethodCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
                     FrmCodeEditorMethod.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
                   finally
                     DelphiWmiCodeGenerator.Free;
                   end;
                  end;
 
-      Lng_BorlandCpp:
+      Ct_BorlandCpp:
                  begin
                   BorlandCppWmiCodeGenerator :=TBorlandCppWmiMethodCodeGenerator.Create;
                   try
@@ -773,15 +725,13 @@ begin
                     BorlandCppWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     BorlandCppWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     BorlandCppWmiCodeGenerator.GenerateCode(Params, Values);
-                    //SynEditWMIMethodCode.Lines.Clear;
-                    //SynEditWMIMethodCode.Lines.AddStrings(BorlandCppWmiCodeGenerator.OutPutCode);
                     FrmCodeEditorMethod.SourceCode:=BorlandCppWmiCodeGenerator.OutPutCode;
                   finally
                     BorlandCppWmiCodeGenerator.Free;
                   end;
                  end;
 
-      Lng_FPC:
+      Ct_Lazarus_FPC:
                  begin
                   FPCWmiCodeGenerator :=TFPCWmiMethodCodeGenerator.Create;
                   try
@@ -791,15 +741,13 @@ begin
                     FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     FPCWmiCodeGenerator.GenerateCode(Params, Values);
-                    //SynEditWMIMethodCode.Lines.Clear;
-                    //SynEditWMIMethodCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
                     FrmCodeEditorMethod.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
                   finally
                     FPCWmiCodeGenerator.Free;
                   end;
                  end;
 
-      Lng_Oxygen:
+      Ct_Oxygene:
                  begin
                   OxygenWmiCodeGenerator :=TOxygenWmiMethodCodeGenerator.Create;
                   try
@@ -809,8 +757,6 @@ begin
                     OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
                     OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     OxygenWmiCodeGenerator.GenerateCode(Params, Values);
-                    //SynEditWMIMethodCode.Lines.Clear;
-                    //SynEditWMIMethodCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
                     FrmCodeEditorMethod.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
                   finally
                     OxygenWmiCodeGenerator.Free;
@@ -819,9 +765,6 @@ begin
     end;
 
 
-    //SynEditWMIMethodCode.SelStart  := SynEditWMIMethodCode.GetTextLen;
-    //SynEditWMIMethodCode.SelLength := 0;
-    //SendMessage(SynEditWMIMethodCode.Handle, EM_SCROLLCARET, 0, 0);
   finally
     Params.Free;
     Values.Free;
@@ -880,10 +823,9 @@ begin
 
     Params.CommaText := Str;
 
-    case TSourceLanguages(ComboBoxLanguageSel.ItemIndex) of
+    case FrmCodeEditorEvent.CompilerType  of
 
-
-      Lng_Delphi:
+      Ct_Delphi:
                  begin
                    DelphiWmiCodeGenerator := TDelphiWmiEventCodeGenerator.Create;
                    try
@@ -891,17 +833,14 @@ begin
                       DelphiWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
                       DelphiWmiCodeGenerator.PollSeconds          := PollSeconds;
                       DelphiWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
-                      //RadioButtonIntrinsic.Checked
                       DelphiWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      //SynEditWMIEventCode.Lines.Clear;
-                      //SynEditWMIEventCode.Lines.AddStrings(DelphiWmiCodeGenerator.OutPutCode);
                       FrmCodeEditorEvent.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
                    finally
                       DelphiWmiCodeGenerator.Free;
                    end;
                  end;
 
-      Lng_FPC:
+      Ct_Lazarus_FPC:
                  begin
                    FPCWmiCodeGenerator := TFPCWmiEventCodeGenerator.Create;
                    try
@@ -909,17 +848,14 @@ begin
                       FPCWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
                       FPCWmiCodeGenerator.PollSeconds          := PollSeconds;
                       FPCWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
-                      //RadioButtonIntrinsic.Checked
                       FPCWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      //SynEditWMIEventCode.Lines.Clear;
-                      //SynEditWMIEventCode.Lines.AddStrings(FPCWmiCodeGenerator.OutPutCode);
                       FrmCodeEditorEvent.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
                    finally
                       FPCWmiCodeGenerator.Free;
                    end;
                  end;
 
-      Lng_Oxygen:
+      Ct_Oxygene:
                  begin
                    OxygenWmiCodeGenerator := TOxygenWmiEventCodeGenerator.Create;
                    try
@@ -928,8 +864,6 @@ begin
                       OxygenWmiCodeGenerator.PollSeconds          := PollSeconds;
                       OxygenWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       OxygenWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      //SynEditWMIEventCode.Lines.Clear;
-                      //SynEditWMIEventCode.Lines.AddStrings(OxygenWmiCodeGenerator.OutPutCode);
                       FrmCodeEditorEvent.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
                    finally
                       OxygenWmiCodeGenerator.Free;
@@ -937,11 +871,7 @@ begin
                  end;
 
     end;
-       {
-    SynEditWMIEventCode.SelStart  := SynEditWMIEventCode.GetTextLen;
-    SynEditWMIEventCode.SelLength := 0;
-    SendMessage(SynEditWMIEventCode.Handle, EM_SCROLLCARET, 0, 0);
-    }
+
   finally
     Conds.Free;
     Params.Free;
@@ -1811,8 +1741,11 @@ end;
 
 
 initialization
+
    if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then
      TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TScrollingStyleHook);
+
    TStyleManager.Engine.UnRegisterStyleHook(TCustomTabControl, TTabControlStyleHook);
    TStyleManager.Engine.RegisterStyleHook(TCustomTabControl, TMyTabControlStyleHook);
+
 end.

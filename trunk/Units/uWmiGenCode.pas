@@ -24,10 +24,12 @@ unit uWmiGenCode;
 interface
 
 uses
+  uSelectCompilerVersion,
   uWmi_Metadata,
   Classes;
 
 type
+
   TSourceLanguages = (Lng_Delphi, Lng_FPC, Lng_Oxygen, Lng_BorlandCpp);
   TWmiCode        =  (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
 
@@ -69,6 +71,10 @@ const
   sTagWmiMethodName  = '[WMIMETHOD]';
   sTagWmiMethodDescr = '[WMIMETHODDESC]';
   sTagWmiPath        = '[WMIPATH]';
+
+  ListCompilerLanguages: array[TSourceLanguages] of
+    TCompilerType = (Ct_Delphi, Ct_Lazarus_FPC, Ct_Oxygene, Ct_BorlandCpp);
+
 
   sTemplateTemplateFuncts = 'TemplateHelperFunctions.pas';
 
