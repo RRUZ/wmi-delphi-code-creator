@@ -161,9 +161,10 @@ uses
   IniFiles,
   uWmiDelphiCode,
   uWmiGenCode,
+  Vcl.Styles.Ext,
   Vcl.Styles,
   Vcl.Themes,
-  uMisc, uVCLStyleUtils;
+  uMisc;
 
 const
   sThemesExt  ='.theme.xml';
@@ -749,6 +750,5 @@ end;
 
 initialization
  RegisterVCLStyles;
-
 
 end.
