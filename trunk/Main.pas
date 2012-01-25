@@ -195,7 +195,6 @@ type
     procedure LoadParametersMethodInfo(WmiMetaClassInfo : TWMiClassMetaData);
 
     procedure SetToolBar;
-    procedure ScrollMemoConsole;
 
     function ExistWmiNameSpaceCache: boolean;
     procedure LoadWMINameSpacesFromCache(List: TStrings);
@@ -229,7 +228,7 @@ implementation
 uses
   Rtti,
   uXE2Patches,
-  uVCLStyleUtils,
+  Vcl.Styles.Ext,
   VCl.Themes,
   ComObj,
   ShellApi,
@@ -1499,13 +1498,6 @@ end;
 procedure TFrmMain.SaveWMINameSpacesToCache(List: TStrings);
 begin
   List.SaveToFile(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
-end;
-
-procedure TFrmMain.ScrollMemoConsole;
-begin
-  MemoConsole.SelStart  := MemoConsole.GetTextLen;
-  MemoConsole.SelLength := 0;
-  SendMessage(MemoConsole.Handle, EM_SCROLLCARET, 0, 0);
 end;
 
 procedure TFrmMain.SetLog(const Log: string);

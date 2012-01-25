@@ -334,7 +334,6 @@ function GetDelphiInstallPath(DelphiComp: TDelphiVersions):string;
 var
   FileName: string;
   Found: boolean;
-  Item: TListItem;
 begin
   Found := RegKeyExists(DelphiRegPaths[DelphiComp], HKEY_CURRENT_USER);
   if Found then
@@ -346,8 +345,8 @@ begin
   begin
     Found := RegKeyExists(DelphiRegPaths[DelphiComp], HKEY_LOCAL_MACHINE);
     if Found then
-      Found := RegReadStr(DelphiRegPaths[DelphiComp], 'App', FileName,
-        HKEY_LOCAL_MACHINE) and FileExists(FileName);
+       RegReadStr(DelphiRegPaths[DelphiComp], 'App', FileName,
+        HKEY_LOCAL_MACHINE);
   end;
 
   Result:=ExtractFilePath(FileName);
