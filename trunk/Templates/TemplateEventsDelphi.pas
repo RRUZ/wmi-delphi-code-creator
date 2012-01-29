@@ -17,6 +17,9 @@ program GetWMI_Info;
 
 uses
   Windows,
+  {$IF CompilerVersion > 18.5}
+  Forms,
+  {$IFEND}
   SysUtils,
   ActiveX,
   ComObj,
@@ -36,7 +39,7 @@ type
     Destructor Destroy;override;
   end;
   
-//detect when a key was pressed in the console window
+//Detect when a key was pressed in the console window
 function KeyPressed:Boolean;
 var
   lpNumberOfEvents     : DWORD;
@@ -118,7 +121,15 @@ begin
     AsyncEvent:=TWmiAsyncEvent.Create;
     try
       AsyncEvent.Start;
-      while not KeyPressed do  ;
+      //The next loop is only necessary in this sample console sample app
+      //In VCL forms Apps you don't need use a loop
+      while not KeyPressed do
+      begin
+          {$IF CompilerVersion > 18.5}
+          Sleep(100);
+          Application.ProcessMessages;
+          {$IFEND}
+      end;
     finally
       AsyncEvent.Free;
     end;

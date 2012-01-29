@@ -37,7 +37,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmi_Metadata,uWmiDatabase,
-  Menus, Buttons, uComboBox, uWmiClassTree, SynHighlighterCpp, uSynEditPopupEdit,
+  Menus, Buttons, uComboBox, uWmiClassTree, SynHighlighterCpp,
   uCodeEditor;
 
 const
@@ -182,8 +182,8 @@ type
     procedure UMEditEventCond(var msg: TMessage); message UM_EDITEVENTCOND;
 
     procedure LoadWmiMetaData;
-    procedure LoadWmiEvents(const Namespace: string);
-    procedure LoadWmiMethods(const Namespace: string);
+    procedure LoadWmiEvents(const Namespace: string; FirstTime : Boolean=False);
+    procedure LoadWmiMethods(const Namespace: string; FirstTime : Boolean=False);
 
     procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
 
@@ -191,8 +191,9 @@ type
     procedure GenerateEventCode(WmiMetaClassInfo : TWMiClassMetaData);
 
     procedure LoadEventsInfo;
-    procedure LoadMethodInfo;
+    procedure LoadMethodInfo(FirstTime : Boolean=False);
     procedure LoadParametersMethodInfo(WmiMetaClassInfo : TWMiClassMetaData);
+    procedure LoadTargetInstanceProps;
 
     procedure SetToolBar;
 
@@ -347,6 +348,11 @@ begin
 end;
 
 procedure TFrmMain.ComboBoxTargetInstanceChange(Sender: TObject);
+begin
+  LoadTargetInstanceProps;
+end;
+
+procedure TFrmMain.LoadTargetInstanceProps;
 var
   i:    integer;
   Item: TListItem;
@@ -356,7 +362,7 @@ begin
   ListVieweventsConds.Items.BeginUpdate;
   try
     for i := ListVieweventsConds.Items.Count - 1 downto 0 do
-      if AnsiStartsStr(wbemTargetInstance, ListVieweventsConds.Items[i].Caption) then
+      if StartsStr(wbemTargetInstance, ListVieweventsConds.Items[i].Caption) then
         ListVieweventsConds.Items.Delete(i);
 
     if ComboBoxTargetInstance.Text <> '' then
@@ -422,6 +428,17 @@ procedure TFrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Settings.LastWmiNameSpace:=ComboBoxNameSpaces.Text;
   Settings.LastWmiClass:=ComboBoxClasses.Text;
+
+  Settings.LastWmiNameSpaceMethods:=ComboBoxNamespaceMethods.Text;
+  Settings.LastWmiClassesMethods  :=ComboBoxClassesMethods.Text;
+  Settings.LastWmiMethod          :=ComboBoxMethods.Text;
+
+  Settings.LastWmiNameSpaceEvents:=ComboBoxNamespacesEvents.Text;
+  Settings.LastWmiEvent:=ComboBoxEvents.Text;
+  Settings.LastWmiEventIntrinsic:=RadioButtonIntrinsic.Checked;
+  if RadioButtonIntrinsic.Checked then
+   Settings.LastWmiEventTargetInstance:=ComboBoxTargetInstance.Text;
+
   WriteSettings(Settings);
 end;
 
@@ -807,7 +824,7 @@ begin
 
     for i := 0 to ListViewEventsConds.Items.Count - 1 do
       if (ListViewEventsConds.Items[i].Checked) then
-        PropsOut.Add(ListViewEventsConds.Items[i].Caption);
+        PropsOut.AddObject(ListViewEventsConds.Items[i].Caption, ListViewEventsConds.Items[i].Data);
 
     Str := '';
     for i := 0 to ListViewEventsConds.Items.Count - 1 do
@@ -987,10 +1004,13 @@ begin
   AutoResizeColumn(ListViewEventsConds.Column[1]);
   AutoResizeColumn(ListViewEventsConds.Column[2]);
 
-  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
+  if ComboBoxTargetInstance.Text<>'' then
+   LoadTargetInstanceProps
+  else
+   GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
 end;
 
-procedure TFrmMain.LoadMethodInfo;
+procedure TFrmMain.LoadMethodInfo(FirstTime : Boolean=False);
 Var
   WmiMetaClassInfo : TWMiClassMetaData;
   i                : Integer;
@@ -1039,7 +1059,17 @@ begin
     ComboBoxMethods.Items.EndUpdate;
   end;
 
+
+
   if ComboBoxMethods.Items.Count > 0 then
+    if FirstTime then
+    begin
+      if Settings.LastWmiMethod<>'' then
+        ComboBoxMethods.ItemIndex := ComboBoxMethods.Items.IndexOf(Settings.LastWmiMethod)
+      else
+        ComboBoxMethods.ItemIndex := 0;
+    end
+    else
     ComboBoxMethods.ItemIndex := 0
   else
     ComboBoxMethods.ItemIndex := -1;
@@ -1215,12 +1245,13 @@ begin
   List.LoadFromFile(FileName);
 end;
 
-procedure TFrmMain.LoadWmiEvents(const Namespace: string);
+procedure TFrmMain.LoadWmiEvents(const Namespace: string;FirstTime : Boolean=False);
 var
   i : Integer;
 begin
   ComboBoxEvents.Items.BeginUpdate;
   try
+    RadioButtonIntrinsic.Checked:=FirstTime and Settings.LastWmiEventIntrinsic;
 
     for i := 0 to ComboBoxEvents.Items.Count-1 do
      if ComboBoxEvents.Items.Objects[i]<>nil then
@@ -1251,6 +1282,7 @@ begin
   end;
 
 
+
   ComboBoxTargetInstance.Items.BeginUpdate;
   try
 
@@ -1269,8 +1301,32 @@ begin
   end;
 
 
+  if ComboBoxTargetInstance.Items.Count > 0 then
+  begin
+    if FirstTime then
+    begin
+      if Settings.LastWmiEventTargetInstance<>'' then
+        ComboBoxTargetInstance.ItemIndex := ComboBoxTargetInstance.Items.IndexOf(Settings.LastWmiEventTargetInstance)
+      else
+        ComboBoxTargetInstance.ItemIndex := 0;
+    end
+    else
+    ComboBoxTargetInstance.ItemIndex := 0;
+  end;
+
+
   if ComboBoxEvents.Items.Count > 0 then
+  begin
+    if FirstTime then
+    begin
+      if Settings.LastWmiEvent<>'' then
+        ComboBoxEvents.ItemIndex := ComboBoxEvents.Items.IndexOf(Settings.LastWmiEvent)
+      else
+        ComboBoxEvents.ItemIndex := 0;
+    end
+    else
     ComboBoxEvents.ItemIndex := 0;
+  end;
 
   LoadEventsInfo;
 end;
@@ -1288,7 +1344,7 @@ begin
   Frm := TFrmAbout.Create(Self);
   try
 
-    if (DebugHook=0) and (CompareText(Settings.VCLStyle,'Windows')=0) then
+    if (DebugHook=0) and (SameText(Settings.VCLStyle,'Windows')) then
     Frm.Show;
 
     SetMsg('Loading Namespaces');
@@ -1382,11 +1438,19 @@ begin
 
     LoadClassInfo;
 
-    ComboBoxNamespacesEvents.ItemIndex := 0;
-    LoadWmiEvents(ComboBoxNamespacesEvents.Text);
+    if Settings.LastWmiNameSpaceEvents<>'' then
+      ComboBoxNamespacesEvents.ItemIndex := ComboBoxNamespacesEvents.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
+    else
+      ComboBoxNamespacesEvents.ItemIndex := 0;
 
-    ComboBoxNamespaceMethods.ItemIndex := 0;
-    LoadWmiMethods(ComboBoxNamespaceMethods.Text);
+    LoadWmiEvents(ComboBoxNamespacesEvents.Text, True);
+
+    if Settings.LastWmiNameSpaceMethods<>'' then
+      ComboBoxNamespaceMethods.ItemIndex := ComboBoxNamespaceMethods.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
+    else
+      ComboBoxNamespaceMethods.ItemIndex := 0;
+
+    LoadWmiMethods(ComboBoxNamespaceMethods.Text, True);
 
     SetMsg('');
   finally
@@ -1396,7 +1460,7 @@ begin
   end;
 end;
 
-procedure TFrmMain.LoadWmiMethods(const Namespace: string);
+procedure TFrmMain.LoadWmiMethods(const Namespace: string; FirstTime : Boolean=False);
 var
   i  : Integer;
 begin
@@ -1426,11 +1490,21 @@ begin
       LoadWMIClassesMethodsFromCache(Namespace, ComboBoxClassesMethods.Items);
 
     if ComboBoxClassesMethods.Items.Count > 0 then
+    begin
+      if FirstTime then
+      begin
+        if Settings.LastWmiClassesMethods<>'' then
+          ComboBoxClassesMethods.ItemIndex := ComboBoxClassesMethods.Items.IndexOf(Settings.LastWmiClassesMethods)
+        else
+          ComboBoxClassesMethods.ItemIndex := 0;
+      end
+      else
       ComboBoxClassesMethods.ItemIndex := 0
+    end
     else
       ComboBoxClassesMethods.ItemIndex := -1;
 
-    LoadMethodInfo;
+    LoadMethodInfo(FirstTime);
   finally
     SetMsg('');
   end;

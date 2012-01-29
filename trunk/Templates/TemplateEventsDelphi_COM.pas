@@ -17,6 +17,9 @@ program GetWMI_Info;
 
 uses
   Windows,
+  {$IF CompilerVersion > 18.5}
+  Forms,
+  {$IFEND}
   Variants,
   SysUtils,
   ActiveX,
@@ -186,7 +189,15 @@ begin
             if Succeeded(FWbemServices.ExecNotificationQueryAsync('WQL', WQL, WBEM_FLAG_SEND_STATUS, nil, StubSink)) then
             begin
               Writeln('Listening events...Press any key to exit');
-               while not KeyPressed do ;
+              //The next loop is only necessary in this sample console sample app
+              //In VCL forms Apps you don't need use a loop
+              while not KeyPressed do
+              begin
+                  {$IF CompilerVersion > 18.5}
+                  Sleep(100);
+                  Application.ProcessMessages;
+                  {$IFEND}
+              end;
               FWbemServices.CancelAsyncCall(StubSink);
             end;
           finally
@@ -221,4 +232,4 @@ begin
  end;  
   Readln;
   
-end.    
+end.
