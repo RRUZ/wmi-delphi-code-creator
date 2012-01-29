@@ -28,7 +28,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, Vcl.ComCtrls, Vcl.ImgList,
   Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ActnCtrls, uSelectCompilerVersion,
   uSettings,Vcl.StdCtrls,  Vcl.ToolWin, SynHighlighterPas, SynEditHighlighter,
-  SynHighlighterCpp, Vcl.ActnMenus, Vcl.ExtCtrls;
+  SynHighlighterCpp, Vcl.ActnMenus, Vcl.ExtCtrls, uSynEditPopupEdit;
 
 type
   //TProcWMiCodeGen = procedure (WmiMetaClassInfo : TWMiClassMetaData) of object;

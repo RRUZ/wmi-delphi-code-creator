@@ -43,6 +43,13 @@ type
     FLastWmiClass: string;
     FVCLStyle: string;
     FFormatter: string;
+    FLastWmiNameSpaceEvents: string;
+    FLastWmiNameSpaceMethods: string;
+    FLastWmiEvent: string;
+    FLastWmiEventTargetInstance: string;
+    FLastWmiEventIntrinsic: Boolean;
+    FLastWmiClassesMethods: string;
+    FLastWmiMethod: string;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -60,6 +67,16 @@ type
     property ForeGroundColor : TColor read GetForeGroundColor;
     property LastWmiNameSpace : string read FLastWmiNameSpace Write FLastWmiNameSpace;
     property LastWmiClass : string read FLastWmiClass Write FLastWmiClass;
+
+    property LastWmiNameSpaceMethods : string read FLastWmiNameSpaceMethods  Write FLastWmiNameSpaceMethods;
+    property LastWmiClassesMethods   : string read FLastWmiClassesMethods Write FLastWmiClassesMethods;
+    property LastWmiMethod           : string read FLastWmiMethod Write FLastWmiMethod;
+
+    property LastWmiNameSpaceEvents : string read FLastWmiNameSpaceEvents Write FLastWmiNameSpaceEvents;
+    property LastWmiEvent : string read FLastWmiEvent Write FLastWmiEvent;
+    property LastWmiEventTargetInstance : string read FLastWmiEventTargetInstance Write FLastWmiEventTargetInstance;
+    property LastWmiEventIntrinsic : Boolean read FLastWmiEventIntrinsic Write FLastWmiEventIntrinsic;
+
     property VCLStyle : string read FVCLStyle Write FVCLStyle;
     property Formatter : string read FFormatter write FFormatter;
   end;
@@ -365,6 +382,15 @@ begin
     Settings.DelphiWmiMethodCodeGenMode    := iniFile.ReadInteger('Global', 'DelphiWmiMethodCodeGenMode', integer(WmiCode_Scripting));
     Settings.LastWmiNameSpace              := iniFile.ReadString('Global', 'LastWmiNameSpace', 'root\CIMV2');
     Settings.LastWmiClass                  := iniFile.ReadString('Global', 'LastWmiClass', 'Win32_OperatingSystem');
+
+    Settings.LastWmiNameSpaceMethods       := iniFile.ReadString('Global', 'LastWmiNameSpaceMethods', 'root\CIMV2');
+    Settings.LastWmiClassesMethods         := iniFile.ReadString('Global', 'LastWmiClassesMethods', '');
+    Settings.LastWmiMethod                 := iniFile.ReadString('Global', 'LastWmiMethod', '');
+
+    Settings.LastWmiNameSpaceEvents        := iniFile.ReadString('Global', 'LastWmiNameSpaceEvents', 'root\CIMV2');
+    Settings.LastWmiEvent                  := iniFile.ReadString('Global', 'LastWmiEvent', '');
+    Settings.LastWmiEventTargetInstance    := iniFile.ReadString('Global', 'LastWmiEventTargetInstance', '');
+    Settings.LastWmiEventIntrinsic         := iniFile.ReadBool('Global', 'LastWmiEventIntrinsic', True);
     Settings.VCLStyle                      := iniFile.ReadString('Global', 'VCLStyle', 'Windows');
     Settings.Formatter                     := iniFile.ReadString('Global', 'Formatter', '');
   finally
@@ -389,6 +415,13 @@ begin
     iniFile.WriteInteger('Global', 'DelphiWmiMethodCodeGenMode', Settings.DelphiWmiMethodCodeGenMode);
     iniFile.WriteString('Global', 'LastWmiNameSpace', Settings.LastWmiNameSpace);
     iniFile.WriteString('Global', 'LastWmiClass', Settings.LastWmiClass);
+    iniFile.WriteString('Global', 'LastWmiNameSpaceMethods', Settings.LastWmiNameSpaceMethods);
+    iniFile.WriteString('Global', 'LastWmiClassesMethods', Settings.LastWmiClassesMethods);
+    iniFile.WriteString('Global', 'LastWmiMethod', Settings.LastWmiMethod);
+    iniFile.WriteString('Global', 'LastWmiNameSpaceEvents', Settings.LastWmiNameSpaceEvents);
+    iniFile.WriteString('Global', 'LastWmiEvent', Settings.LastWmiEvent);
+    iniFile.WriteString('Global', 'LastWmiEventTargetInstance', Settings.LastWmiEventTargetInstance);
+    iniFile.WriteBool('Global', 'LastWmiEventIntrinsic', Settings.LastWmiEventIntrinsic);
     iniFile.WriteString('Global', 'VCLStyle', Settings.VCLStyle);
     iniFile.WriteString('Global', 'Formatter', Settings.Formatter);
   finally

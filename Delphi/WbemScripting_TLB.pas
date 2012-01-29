@@ -41,12 +41,13 @@ unit WbemScripting_TLB;
 // in order to prevent accidental use from within the object inspector. You   
 // may enable them by defining LIVE_SERVER_AT_DESIGN_TIME or by selectively   
 // removing them from the $IFDEF blocks. However, such items must still be    
-// programmatically created via a method of the appropriate CoClass before    
+// programmatically created via a method of the appropriate CoClass before
 // they can be used.                                                          
 {$TYPEDADDRESS OFF} // Unit must be compiled without type-checked pointers. 
 {$WARN SYMBOL_PLATFORM OFF}
 {$WRITEABLECONST ON}
 {$VARPROPSETTER ON}
+{$ALIGN 4}
 interface
 
 uses Windows, ActiveX, Classes, Variants, OleServer;
@@ -507,7 +508,7 @@ type
     procedure GetAsync(const objWbemSink: IDispatch; const strObjectPath: WideString; 
                        iFlags: Integer; const objWbemNamedValueSet: IDispatch; 
                        const objWbemAsyncContext: IDispatch); safecall;
-    procedure Delete(const strObjectPath: WideString; iFlags: Integer; 
+    procedure Delete(const strObjectPath: WideString; iFlags: Integer;
                      const objWbemNamedValueSet: IDispatch); safecall;
     procedure DeleteAsync(const objWbemSink: IDispatch; const strObjectPath: WideString; 
                           iFlags: Integer; const objWbemNamedValueSet: IDispatch; 
@@ -549,7 +550,7 @@ type
     procedure ReferencesToAsync(const objWbemSink: IDispatch; const strObjectPath: WideString; 
                                 const strResultClass: WideString; const strRole: WideString; 
                                 bClassesOnly: WordBool; bSchemaOnly: WordBool; 
-                                const strRequiredQualifier: WideString; iFlags: Integer; 
+                                const strRequiredQualifier: WideString; iFlags: Integer;
                                 const objWbemNamedValueSet: IDispatch; 
                                 const objWbemAsyncContext: IDispatch); safecall;
     function ExecNotificationQuery(const strQuery: WideString; const strQueryLanguage: WideString; 
@@ -633,7 +634,7 @@ type
                                          const strQueryLanguage: WideString; iFlags: Integer; 
                                          const objWbemNamedValueSet: IDispatch; 
                                          const objWbemAsyncContext: IDispatch); dispid 16;
-    function ExecMethod(const strObjectPath: WideString; const strMethodName: WideString; 
+    function ExecMethod(const strObjectPath: WideString; const strMethodName: WideString;
                         const objWbemInParameters: IDispatch; iFlags: Integer; 
                         const objWbemNamedValueSet: IDispatch): ISWbemObject; dispid 17;
     procedure ExecMethodAsync(const objWbemSink: IDispatch; const strObjectPath: WideString; 
@@ -675,7 +676,7 @@ type
     procedure AssociatorsAsync_(const objWbemSink: IDispatch; const strAssocClass: WideString; 
                                 const strResultClass: WideString; const strResultRole: WideString; 
                                 const strRole: WideString; bClassesOnly: WordBool; 
-                                bSchemaOnly: WordBool; const strRequiredAssocQualifier: WideString; 
+                                bSchemaOnly: WordBool; const strRequiredAssocQualifier: WideString;
                                 const strRequiredQualifier: WideString; iFlags: Integer; 
                                 const objWbemNamedValueSet: IDispatch; 
                                 const objWbemAsyncContext: IDispatch); safecall;
@@ -759,7 +760,7 @@ type
                                const objWbemAsyncContext: IDispatch); dispid 12;
     function ExecMethod_(const strMethodName: WideString; const objWbemInParameters: IDispatch; 
                          iFlags: Integer; const objWbemNamedValueSet: IDispatch): ISWbemObject; dispid 13;
-    procedure ExecMethodAsync_(const objWbemSink: IDispatch; const strMethodName: WideString; 
+    procedure ExecMethodAsync_(const objWbemSink: IDispatch; const strMethodName: WideString;
                                const objWbemInParameters: IDispatch; iFlags: Integer; 
                                const objWbemNamedValueSet: IDispatch; 
                                const objWbemAsyncContext: IDispatch); dispid 14;
@@ -1263,7 +1264,7 @@ type
   ISWbemLocator = interface(IDispatch)
     ['{76A6415B-CB41-11D1-8B02-00600806D9B6}']
     function ConnectServer(const strServer: WideString; const strNamespace: WideString; 
-                           const strUser: WideString; const strPassword: WideString; 
+                           const strUser: WideString; const strPassword: WideString;
                            const strLocale: WideString; const strAuthority: WideString; 
                            iSecurityFlags: Integer; const objWbemNamedValueSet: IDispatch): ISWbemServices; safecall;
     function Get_Security_: ISWbemSecurity; safecall;
@@ -1305,7 +1306,7 @@ type
                         const objWbemNamedValueSet: IDispatch; const objWbemAsyncContext: IDispatch); dispid 2;
     procedure Delete_(iFlags: Integer; const objWbemNamedValueSet: IDispatch); dispid 3;
     procedure DeleteAsync_(const objWbemSink: IDispatch; iFlags: Integer; 
-                           const objWbemNamedValueSet: IDispatch; 
+                           const objWbemNamedValueSet: IDispatch;
                            const objWbemAsyncContext: IDispatch); dispid 4;
     function Instances_(iFlags: Integer; const objWbemNamedValueSet: IDispatch): ISWbemObjectSet; dispid 5;
     procedure InstancesAsync_(const objWbemSink: IDispatch; iFlags: Integer; 
@@ -1431,7 +1432,7 @@ type
                           const objWbemAsyncContext: IDispatch); dispid 4;
     function InstancesOf(const strClass: WideString; iFlags: Integer; 
                          const objWbemNamedValueSet: IDispatch): ISWbemObjectSet; dispid 5;
-    procedure InstancesOfAsync(const objWbemSink: IDispatch; const strClass: WideString; 
+    procedure InstancesOfAsync(const objWbemSink: IDispatch; const strClass: WideString;
                                iFlags: Integer; const objWbemNamedValueSet: IDispatch; 
                                const objWbemAsyncContext: IDispatch); dispid 6;
     function SubclassesOf(const strSuperclass: WideString; iFlags: Integer; 
@@ -1473,7 +1474,7 @@ type
                                    iFlags: Integer; const objWbemNamedValueSet: IDispatch): ISWbemEventSource; dispid 15;
     procedure ExecNotificationQueryAsync(const objWbemSink: IDispatch; const strQuery: WideString; 
                                          const strQueryLanguage: WideString; iFlags: Integer; 
-                                         const objWbemNamedValueSet: IDispatch; 
+                                         const objWbemNamedValueSet: IDispatch;
                                          const objWbemAsyncContext: IDispatch); dispid 16;
     function ExecMethod(const strObjectPath: WideString; const strMethodName: WideString; 
                         const objWbemInParameters: IDispatch; iFlags: Integer; 
@@ -1767,7 +1768,7 @@ type
 // Help String      : Used to obtain Namespace connections
 // Default Interface: ISWbemLocator
 // Def. Intf. DISP? : No
-// Event   Interface: 
+// Event   Interface:
 // TypeFlags        : (2) CanCreate
 // *********************************************************************//
 {$IFDEF LIVE_SERVER_AT_DESIGN_TIME}
@@ -2103,7 +2104,7 @@ type
     procedure AssociatorsAsync_(const objWbemSink: IDispatch; const strAssocClass: WideString; 
                                 const strResultClass: WideString; const strResultRole: WideString; 
                                 const strRole: WideString; bClassesOnly: WordBool; 
-                                bSchemaOnly: WordBool; const strRequiredAssocQualifier: WideString; 
+                                bSchemaOnly: WordBool; const strRequiredAssocQualifier: WideString;
                                 const strRequiredQualifier: WideString; iFlags: Integer; 
                                 const objWbemNamedValueSet: IDispatch; 
                                 const objWbemAsyncContext: IDispatch);
@@ -2439,7 +2440,7 @@ type
 // The Class CoSWbemRefresher provides a Create and CreateRemote method to          
 // create instances of the default interface ISWbemRefresher exposed by              
 // the CoClass SWbemRefresher. The functions are intended to be used by             
-// clients wishing to automate the CoClass objects exposed by the         
+// clients wishing to automate the CoClass objects exposed by the
 // server of this typelibrary.                                            
 // *********************************************************************//
   CoSWbemRefresher = class
@@ -2523,7 +2524,7 @@ type
 // *********************************************************************//
 // The Class CoSWbemServices provides a Create and CreateRemote method to          
 // create instances of the default interface ISWbemServices exposed by              
-// the CoClass SWbemServices. The functions are intended to be used by             
+// the CoClass SWbemServices. The functions are intended to be used by
 // clients wishing to automate the CoClass objects exposed by the         
 // server of this typelibrary.                                            
 // *********************************************************************//
@@ -2607,7 +2608,7 @@ type
 // *********************************************************************//
 // The Class CoSWbemQualifierSet provides a Create and CreateRemote method to          
 // create instances of the default interface ISWbemQualifierSet exposed by              
-// the CoClass SWbemQualifierSet. The functions are intended to be used by             
+// the CoClass SWbemQualifierSet. The functions are intended to be used by
 // clients wishing to automate the CoClass objects exposed by the         
 // server of this typelibrary.                                            
 // *********************************************************************//
@@ -2691,7 +2692,7 @@ type
 // *********************************************************************//
 // The Class CoSWbemPrivilege provides a Create and CreateRemote method to          
 // create instances of the default interface ISWbemPrivilege exposed by              
-// the CoClass SWbemPrivilege. The functions are intended to be used by             
+// the CoClass SWbemPrivilege. The functions are intended to be used by
 // clients wishing to automate the CoClass objects exposed by the         
 // server of this typelibrary.                                            
 // *********************************************************************//

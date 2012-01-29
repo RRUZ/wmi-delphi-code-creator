@@ -103,7 +103,8 @@ var
   sValue:  string;
   Wql:     string;
   i, Len:  integer;
-  Props:   TStrings;
+  Props   :TStrings;
+  CimType :Integer;
 begin
 
   if UseHelperFunctions then
@@ -148,7 +149,30 @@ begin
                               Props := TStringList.Create;
                               try
                                 for i := 0 to PropsOut.Count - 1 do
-                                  Props.Add(Format('  Writeln(Format(''%-' + IntToStr(Len) +'s : %%s '',[PropVal.%s]));', [PropsOut[i], PropsOut[i]]));
+                                begin
+                                  //Props.Add(Format('  Writeln(Format(''%-' + IntToStr(Len) +'s : %%s '',[PropVal.%s]));', [PropsOut[i], PropsOut[i]]));
+
+                                  CimType:=Integer(PropsOut.Objects[i]);
+                                  case CimType of
+
+                                      wbemCimtypeSint8,
+                                      wbemCimtypeUint8,
+                                      wbemCimtypeSint16,
+                                      wbemCimtypeUint16,
+                                      wbemCimtypeSint32,
+                                      wbemCimtypeUint32,
+                                      wbemCimtypeSint64,
+                                      wbemCimtypeUint64    : Props.Add(Format('  Writeln(Format(''%-' + IntToStr(Len) +'s : %%d '',[Integer(PropVal.%s)]));', [PropsOut[i], PropsOut[i]]));
+                                      wbemCimtypeReal32    : Props.Add(Format('  Writeln(Format(''%-' + IntToStr(Len) +'s : %%n '',[Double(PropVal.%s)]));', [PropsOut[i], PropsOut[i]]));
+                                      wbemCimtypeReal64    : Props.Add(Format('  Writeln(Format(''%-' + IntToStr(Len) +'s : %%n '',[Double(PropVal.%s)]));', [PropsOut[i], PropsOut[i]]));
+                                      wbemCimtypeBoolean,
+                                      wbemCimtypeDatetime,
+                                      wbemCimtypeString,
+                                      wbemCimtypeChar16    : Props.Add(Format('  Writeln(Format(''%-' + IntToStr(Len) +'s : %%s '',[String(PropVal.%s)]));', [PropsOut[i], PropsOut[i]]));
+                                  end;
+                                end;
+
+
 
                                 StrCode := StringReplace(StrCode, sTagDelphiEventsOut, Props.Text, [rfReplaceAll]);
                               finally
@@ -233,7 +257,7 @@ begin
                                 Props.Add('        begin');
                                 Props.Add('          sValue:=pVal;');
                                 Props.Add('          VarClear(pVal);');
-                                Props.Add(Format('          Writeln(Format(''%s %%s'',[sValue]));',[sValue]));
+                                Props.Add(Format('          Writeln(Format(''%s %%s'',[String(sValue)]));',[sValue]));
                                 Props.Add('        end;');
                                 Props.Add('');
                                end;
