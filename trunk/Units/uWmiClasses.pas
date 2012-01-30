@@ -23,11 +23,11 @@ unit uWmiClasses;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls, uWmi_Metadata, uCodeEditor, uSettings, uWmiTree, uComboBox;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, uMisc,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls, uWmi_Metadata, uCodeEditor, uSettings, uComboBox,
+  Vcl.ImgList;
 
 type
-  TWmiProcClassesLog = procedure (const Msg : string) of object;
   TFrmWmiClasses = class(TForm)
     PanelMetaWmiInfo: TPanel;
     LabelProperties: TLabel;
@@ -41,6 +41,7 @@ type
     ButtonGetValues: TButton;
     Splitter1: TSplitter;
     PanelCode: TPanel;
+    ImageList1: TImageList;
     procedure ComboBoxNameSpacesChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxClassesChange(Sender: TObject);
@@ -48,10 +49,9 @@ type
     procedure ListViewPropertiesClick(Sender: TObject);
     procedure CheckBoxSelAllPropsClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormDestroy(Sender: TObject);
   private
-    FSetMsg: TWmiProcClassesLog;
-    FSetLog: TWmiProcClassesLog;
+    FSetMsg: TProcLog;
+    FSetLog: TProcLog;
     FrmCodeEditor         : TFrmCodeEditor;
     FSettings: TSettings;
     FConsole: TMemo;
@@ -60,9 +60,8 @@ type
     procedure SetSettings(const Value: TSettings);
     procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
   public
-    FrmWMIExplorer  : TFrmWMITree;
-    property SetMsg : TWmiProcClassesLog read FSetMsg Write FSetMsg;
-    property SetLog : TWmiProcClassesLog read FSetLog Write FSetLog;
+    property SetMsg : TProcLog read FSetMsg Write FSetMsg;
+    property SetLog : TProcLog read FSetLog Write FSetLog;
     property Settings : TSettings read FSettings Write SetSettings;
     property Console : TMemo read FConsole write SetConsole;
 
@@ -83,7 +82,6 @@ uses
   Winapi.CommCtrl,
   System.Win.ComObj,
   uWmi_ViewPropsValues,
-  uMisc,
   StrUtils,
   uSelectCompilerVersion,
   uWmiGenCode,
@@ -137,27 +135,10 @@ begin
   FrmCodeEditor.CompilerType:=Ct_Delphi;
 end;
 
-procedure TFrmWmiClasses.FormDestroy(Sender: TObject);
-{
-var
- i : Integer;
-}
-begin
- {
-  for i := 0 to ComboBoxClasses.Items.Count-1 do
-   if ComboBoxClasses.Items.Objects[i]<>nil then
-   begin
-    TWMiClassMetaData(ComboBoxClasses.Items.Objects[i]).Free;
-    ComboBoxClasses.Items.Objects[i]:=nil;
-   end;
-}
-end;
-
 procedure TFrmWmiClasses.GenerateCode;
 begin
    if ComboBoxClasses.ItemIndex>=0 then
      GenerateConsoleCode(CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNameSpaces.Text, ComboBoxClasses.Text));
-     //GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
 end;
 
 procedure TFrmWmiClasses.GenerateConsoleCode(
@@ -295,17 +276,7 @@ var
 begin
   if ComboBoxClasses.ItemIndex=-1 then exit;
 
-  //ProgressBarWmi.Visible := True;
   try
-    {
-    if ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]=nil then
-    begin
-      WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
-      ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]:= WmiMetaClassInfo;
-    end
-    else
-      WmiMetaClassInfo:=TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
-    }
     WmiMetaClassInfo:=CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
 
     if Assigned(WmiMetaClassInfo) then
@@ -316,105 +287,55 @@ begin
         MemoClassDescr.Text := 'Class without description available';
 
       LoadWmiProperties(WmiMetaClassInfo);
-      //FrmWMIExplorer.LoadClassInfo(WmiMetaClassInfo);
     end;
   finally
     SetMsg('');
-    //ProgressBarWmi.Visible := False;
   end;
 end;
 
 procedure TFrmWmiClasses.LoadWmiClasses(const Namespace: string);
 var
-  //Node: TTreeNode;
-  //NodeC: TTreeNode;
   FClasses: TStringList;
-  //i: integer;
 begin
   SetMsg(Format('Loading Classes of %s', [Namespace]));
-  //Node := FindTextTreeView(Namespace, FrmWMIExplorer.TreeViewWmiClasses);
-  //if Assigned(Node) then
-  if 11=11 then
-  begin
-            {
-    for i := 0 to ComboBoxClasses.Items.Count-1 do
-     if ComboBoxClasses.Items.Objects[i]<>nil then
-     begin
-      TWMiClassMetaData(ComboBoxClasses.Items.Objects[i]).Free;
-      ComboBoxClasses.Items.Objects[i]:=nil;
-     end;
-         
-    if Assigned(Node.Data) then
-    begin
-      FClasses := TStringList(Node.Data);
-      ComboBoxClasses.Items.BeginUpdate;
-      try
-        ComboBoxClasses.Items.Clear;
-        ComboBoxClasses.Items.AddStrings(FClasses);
-        LabelClasses.Caption := Format('Classes (%d)', [FClasses.Count]);
-      finally
-        ComboBoxClasses.Items.EndUpdate;
-      end;
-    end
-    else
-      }
-    begin
-      FClasses := TStringList.Create;
-      try
-        FClasses.Sorted := True;
-        FClasses.BeginUpdate;
-        try
-          try
-            if not ExistWmiClassesCache(Namespace) then
-            begin
-              GetListWmiClasses(Namespace, FClasses, [], ['abstract'], True);
-              SaveWMIClassesToCache(Namespace, FClasses);
-            end
-            else
-              LoadWMIClassesFromCache(Namespace, FClasses);
-          except
-            on E: EOleSysError do
-              if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-                SetLog(
-                  Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
-              else
-                raise;
-          end;
 
-        finally
-          FClasses.EndUpdate;
-        end;
-
-        ComboBoxClasses.Items.BeginUpdate;
-        try
-          ComboBoxClasses.Items.Clear;
-          ComboBoxClasses.Items.AddStrings(FClasses);
-          LabelClasses.Caption := Format('Classes (%d)', [FClasses.Count]);
-        finally
-          ComboBoxClasses.Items.EndUpdate;
-        end;
-      finally
-        FClasses.Free;//New ¡¡¡ Added without FrmWMIExplorer
-      end;
-
-             {
-      FrmWMIExplorer.TreeViewWmiClasses.Items.BeginUpdate;
-      Node.Data := FClasses;
+  FClasses := TStringList.Create;
+  try
+    FClasses.Sorted := True;
+    FClasses.BeginUpdate;
+    try
       try
-        for i := 0 to FClasses.Count - 1 do
+        if not ExistWmiClassesCache(Namespace) then
         begin
-          NodeC := FrmWMIExplorer.TreeViewWmiClasses.Items.AddChild(Node, FClasses[i]);
-          NodeC.ImageIndex := ClassImageIndex;
-          NodeC.SelectedIndex := ClassImageIndex;
-        end;
-      finally
-        FrmWMIExplorer.TreeViewWmiClasses.Items.EndUpdate;
+          GetListWmiClasses(Namespace, FClasses, [], ['abstract'], True);
+          SaveWMIClassesToCache(Namespace, FClasses);
+        end
+        else
+          LoadWMIClassesFromCache(Namespace, FClasses);
+      except
+        on E: EOleSysError do
+          if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
+            SetLog(
+              Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
+          else
+            raise;
       end;
-         }
+
+    finally
+      FClasses.EndUpdate;
     end;
-  end
-  else
-    MsgWarning(Namespace + ' not found');
+
+    ComboBoxClasses.Items.BeginUpdate;
+    try
+      ComboBoxClasses.Items.Clear;
+      ComboBoxClasses.Items.AddStrings(FClasses);
+      LabelClasses.Caption := Format('Classes (%d)', [FClasses.Count]);
+    finally
+      ComboBoxClasses.Items.EndUpdate;
+    end;
+  finally
+    FClasses.Free;//New ¡¡¡ Added without FrmWMIExplorer
+  end;
 
   SetMsg('');
 end;
@@ -423,7 +344,6 @@ end;
 procedure TFrmWmiClasses.LoadWmiProperties(WmiMetaClassInfo: TWMiClassMetaData);
 var
   i:     integer;
-  //Props: TStringList;
   item:  TListItem;
 begin
   //StatusBar1.SimpleText := Format('Loading Properties of %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]);

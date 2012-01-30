@@ -75,6 +75,8 @@ object FrmMain: TFrmMain
             object TabSheetWmiClasses: TTabSheet
               Caption = 'WMI Classes'
               ImageIndex = 40
+              ExplicitLeft = 5
+              ExplicitTop = 28
             end
             object TabSheetMethods: TTabSheet
               Caption = 'Execute a WMI method'

@@ -23,7 +23,7 @@ unit uWmiMethods;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, uMisc,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls, uWmi_Metadata, uCodeEditor, uSettings, uComboBox;
 
 const
@@ -31,7 +31,6 @@ const
 
 
 type
-  TWmiProcMethodLog = procedure (const Msg : string) of object;
   TFrmWmiMethods = class(TForm)
     PanelMethodInfo: TPanel;
     Label4: TLabel;
@@ -60,8 +59,8 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private
-    FSetMsg: TWmiProcMethodLog;
-    FSetLog: TWmiProcMethodLog;
+    FSetMsg: TProcLog;
+    FSetLog: TProcLog;
     FSettings: TSettings;
     FConsole: TMemo;
     FrmCodeEditorMethod   : TFrmCodeEditor;
@@ -75,8 +74,8 @@ type
     procedure GenerateCode;
   public
     procedure LoadWmiMethods(const Namespace: string; FirstTime : Boolean=False);
-    property SetMsg : TWmiProcMethodLog read FSetMsg Write FSetMsg;
-    property SetLog : TWmiProcMethodLog read FSetLog Write FSetLog;
+    property SetMsg : TProcLog read FSetMsg Write FSetMsg;
+    property SetLog : TProcLog read FSetLog Write FSetLog;
     property Settings : TSettings read FSettings Write SetSettings;
     property Console : TMemo read FConsole write SetConsole;
   end;
