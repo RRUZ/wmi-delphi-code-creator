@@ -38,12 +38,10 @@ uses
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmi_Metadata,uWmiDatabase,
   Menus, Buttons, uComboBox, uWmiClassTree, SynHighlighterCpp,
-  uCodeEditor;
+  uCodeEditor, uWmiEvents;
 
 const
   UM_EDITPARAMVALUE = WM_USER + 111;
-  UM_EDITEVENTVALUE = WM_USER + 112;
-  UM_EDITEVENTCOND  = WM_USER + 113;
 
 type
   TProgressBar = class(ComCtrls.TProgressBar)
@@ -57,7 +55,6 @@ type
     TabSheetWmiClasses: TTabSheet;
     TabSheetWmiExplorer: TTabSheet;
     TabSheetMethods: TTabSheet;
-    TabSheetEvents: TTabSheet;
     StatusBar1: TStatusBar;
     SynPasSyn1: TSynPasSyn;
     PanelMetaWmiInfo: TPanel;
@@ -98,38 +95,19 @@ type
     PageControlCodeGen: TPageControl;
     PanelConsole: TPanel;
     Splitter4: TSplitter;
-    Panel1:    TPanel;
-    ListViewEventsConds: TListView;
-    EditValueEvent: TEdit;
-    ComboBoxCond: TComboBox;
-    LabelEventsConds: TLabel;
-    LabelTargetInstance: TLabel;
-    LabelEvents: TLabel;
-    Label2:    TLabel;
-    ComboBoxNamespacesEvents: TComboBox;
-    ComboBoxEvents: TComboBox;
-    ComboBoxTargetInstance: TComboBox;
-    Splitter6: TSplitter;
-    PanelEventCode: TPanel;
     ToolButtonGetValues: TToolButton;
-    Label3:    TLabel;
-    EditEventWait: TEdit;
-    Label5:    TLabel;
     ButtonGetValues: TButton;
     ButtonGenerateCodeInvoker: TButton;
-    ButtonGenerateEventCode: TButton;
     ComboBoxPaths: TComboBox;
     CheckBoxPath: TCheckBox;
     TabSheetWmiDatabase: TTabSheet;
-    RadioButtonIntrinsic: TRadioButton;
-    RadioButtonExtrinsic: TRadioButton;
-    Label7:    TLabel;
     ImageList1: TImageList;
     PageControl2: TPageControl;
     TabSheet3: TTabSheet;
     ToolButtonSettings: TToolButton;
     TabSheetTreeClasses: TTabSheet;
     SynCppSyn1: TSynCppSyn;
+    TabSheetEvents: TTabSheet;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure ComboBoxNameSpacesChange(Sender: TObject);
@@ -142,9 +120,6 @@ type
     procedure StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel;
       const Rect: TRect);
     procedure ToolButtonSearchClick(Sender: TObject);
-    procedure ComboBoxNamespacesEventsChange(Sender: TObject);
-    procedure ComboBoxEventsChange(Sender: TObject);
-    procedure ComboBoxTargetInstanceChange(Sender: TObject);
     procedure ComboBoxNamespaceMethodsChange(Sender: TObject);
     procedure ComboBoxClassesMethodsChange(Sender: TObject);
     procedure ComboBoxMethodsChange(Sender: TObject);
@@ -152,15 +127,10 @@ type
     procedure EditValueMethodParamExit(Sender: TObject);
     procedure ButtonGenerateCodeInvokerClick(Sender: TObject);
     procedure PageControlMainChange(Sender: TObject);
-    procedure EditValueEventExit(Sender: TObject);
-    procedure ComboBoxCondExit(Sender: TObject);
-    procedure ListViewEventsCondsClick(Sender: TObject);
     procedure ToolButtonGetValuesClick(Sender: TObject);
-    procedure ButtonGenerateEventCodeClick(Sender: TObject);
     procedure ComboBoxPathsChange(Sender: TObject);
     procedure CheckBoxPathClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure RadioButtonIntrinsicClick(Sender: TObject);
     procedure ToolButtonSettingsClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
@@ -173,44 +143,23 @@ type
 
     FrmCodeEditor         : TFrmCodeEditor;
     FrmCodeEditorMethod   : TFrmCodeEditor;
-    FrmCodeEditorEvent    : TFrmCodeEditor;
 
+    FrmWmiEvents          : TFrmWmiEvents;
     Settings : TSettings;
 
     procedure UMEditValueParam(var msg: TMessage); message UM_EDITPARAMVALUE;
-    procedure UMEditEventValue(var msg: TMessage); message UM_EDITEVENTVALUE;
-    procedure UMEditEventCond(var msg: TMessage); message UM_EDITEVENTCOND;
 
     procedure LoadWmiMetaData;
-    procedure LoadWmiEvents(const Namespace: string; FirstTime : Boolean=False);
     procedure LoadWmiMethods(const Namespace: string; FirstTime : Boolean=False);
 
     procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
-
     procedure GenerateMethodInvoker(WmiMetaClassInfo : TWMiClassMetaData);
-    procedure GenerateEventCode(WmiMetaClassInfo : TWMiClassMetaData);
 
-    procedure LoadEventsInfo;
     procedure LoadMethodInfo(FirstTime : Boolean=False);
     procedure LoadParametersMethodInfo(WmiMetaClassInfo : TWMiClassMetaData);
-    procedure LoadTargetInstanceProps;
 
     procedure SetToolBar;
-
-    function ExistWmiNameSpaceCache: boolean;
-    procedure LoadWMINameSpacesFromCache(List: TStrings);
-    procedure SaveWMINameSpacesToCache(List: TStrings);
-
-    function ExistWmiClassesCache(const namespace: string): boolean;
-    function ExistWmiClassesMethodsCache(const namespace: string): boolean;
-    procedure LoadWMIClassesFromCache(const namespace: string; List: TStrings);
-    procedure LoadWMIClassesMethodsFromCache(const namespace: string; List: TStrings);
-
-    procedure SaveWMIClassesToCache(const namespace: string; List: TStrings);
-    procedure SaveWMIClassesMethodsToCache(const namespace: string; List: TStrings);
-
     procedure SetLog(const Log :string);
-
     procedure GenerateCode;
   public
     procedure SetMsg(const Msg: string);
@@ -254,14 +203,8 @@ uses
 const
   VALUE_METHODPARAM_COLUMN = 2;
   COND_EVENTPARAM_COLUMN   = 2;
-  VALUE_EVENTPARAM_COLUMN  = 3;
-
   PBS_MARQUEE    = $08;
   PBM_SETMARQUEE = (WM_USER + 10);
-
-  WmiTableType_Class = 1;
-
-
 
 {$R *.dfm}
 
@@ -277,11 +220,6 @@ end;
 procedure TFrmMain.ButtonGenerateCodeInvokerClick(Sender: TObject);
 begin
   GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
-end;
-
-procedure TFrmMain.ButtonGenerateEventCodeClick(Sender: TObject);
-begin
-  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
 end;
 
 procedure TFrmMain.ButtonGetValuesClick(Sender: TObject);
@@ -314,11 +252,6 @@ begin
   LoadMethodInfo;
 end;
 
-procedure TFrmMain.ComboBoxEventsChange(Sender: TObject);
-begin
-  LoadEventsInfo;
-end;
-
 procedure TFrmMain.ComboBoxMethodsChange(Sender: TObject);
 begin
   LoadParametersMethodInfo(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
@@ -337,85 +270,9 @@ begin
   LoadClassInfo;
 end;
 
-procedure TFrmMain.ComboBoxNamespacesEventsChange(Sender: TObject);
-begin
-  LoadWmiEvents(ComboBoxNamespacesEvents.Text);
-end;
-
 procedure TFrmMain.ComboBoxPathsChange(Sender: TObject);
 begin
   GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
-end;
-
-procedure TFrmMain.ComboBoxTargetInstanceChange(Sender: TObject);
-begin
-  LoadTargetInstanceProps;
-end;
-
-procedure TFrmMain.LoadTargetInstanceProps;
-var
-  i:    integer;
-  Item: TListItem;
-  WmiMetaClassInfo : TWMiClassMetaData;
-begin
-
-  ListVieweventsConds.Items.BeginUpdate;
-  try
-    for i := ListVieweventsConds.Items.Count - 1 downto 0 do
-      if StartsStr(wbemTargetInstance, ListVieweventsConds.Items[i].Caption) then
-        ListVieweventsConds.Items.Delete(i);
-
-    if ComboBoxTargetInstance.Text <> '' then
-    begin
-      WmiMetaClassInfo := TWMiClassMetaData.Create(ComboBoxNamespacesEvents.Text, ComboBoxTargetInstance.Text);
-      try
-        for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
-        begin
-          Item := ListVieweventsConds.Items.Add;
-          Item.Caption := Format('%s.%s', [wbemTargetInstance, WmiMetaClassInfo.Properties[i].Name]);
-          Item.Data:=Pointer(WmiMetaClassInfo.Properties[i].CimType);
-          Item.SubItems.Add(WmiMetaClassInfo.Properties[i].&Type);
-          Item.SubItems.Add('');
-          Item.SubItems.Add(GetDefaultValueWmiType(WmiMetaClassInfo.Properties[i].&Type));
-          Item.SubItems.Add(WmiMetaClassInfo.Properties[i].Description);
-        end;
-      finally
-        WmiMetaClassInfo.Free;
-      end;
-    end;
-
-  finally
-    ListVieweventsConds.Items.EndUpdate;
-  end;
-
-  AutoResizeColumns([ListViewEventsConds.Column[0], ListViewEventsConds.Column[1],
-    ListViewEventsConds.Column[2]]);
-
-  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
-end;
-
-
-function TFrmMain.ExistWmiClassesCache(const namespace: string): boolean;
-var
-  FileName: string;
-begin
-  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '.wmic';
-  Result   := FileExists(FileName);
-end;
-
-function TFrmMain.ExistWmiClassesMethodsCache(const namespace: string): boolean;
-var
-  FileName: string;
-begin
-  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '_ClassMethods.wmic';
-  Result   := FileExists(FileName);
-end;
-
-function TFrmMain.ExistWmiNameSpaceCache: boolean;
-begin
-  Result := FileExists(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
 end;
 
 procedure TFrmMain.FormActivate(Sender: TObject);
@@ -426,6 +283,8 @@ end;
 
 procedure TFrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  FrmWmiEvents.Close();
+
   Settings.LastWmiNameSpace:=ComboBoxNameSpaces.Text;
   Settings.LastWmiClass:=ComboBoxClasses.Text;
 
@@ -433,11 +292,6 @@ begin
   Settings.LastWmiClassesMethods  :=ComboBoxClassesMethods.Text;
   Settings.LastWmiMethod          :=ComboBoxMethods.Text;
 
-  Settings.LastWmiNameSpaceEvents:=ComboBoxNamespacesEvents.Text;
-  Settings.LastWmiEvent:=ComboBoxEvents.Text;
-  Settings.LastWmiEventIntrinsic:=RadioButtonIntrinsic.Checked;
-  if RadioButtonIntrinsic.Checked then
-   Settings.LastWmiEventTargetInstance:=ComboBoxTargetInstance.Text;
 
   WriteSettings(Settings);
 end;
@@ -514,13 +368,15 @@ begin
   FrmCodeEditorMethod.Console:=MemoConsole;
   FrmCodeEditorMethod.CompilerType:=Ct_Delphi;
 
-  FrmCodeEditorEvent  := TFrmCodeEditor.Create(Self);
-  FrmCodeEditorEvent.CodeGenerator:=GenerateCode;
-  FrmCodeEditorEvent.Parent := PanelEventCode;
-  FrmCodeEditorEvent.Show;
-  FrmCodeEditorEvent.Settings:=Settings;
-  FrmCodeEditorEvent.Console:=MemoConsole;
-  FrmCodeEditorEvent.CompilerType:=Ct_Delphi;
+  FrmWmiEvents  := TFrmWmiEvents.Create(Self);
+  FrmWmiEvents.Parent := TabSheetEvents;
+  FrmWmiEvents.Align  := alClient;
+  FrmWmiEvents.Settings:=Settings;
+  FrmWmiEvents.SetLog:=SetLog;
+  FrmWmiEvents.Console:=MemoConsole;
+  FrmWmiEvents.Show;
+  //FrmWmiEvents.CompilerType:=Ct_Delphi;
+  //FrmWmiEvents.CodeGenerator:=GenerateCode;
 
   LoadCurrentTheme(Self,Settings.CurrentTheme);
   LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
@@ -545,13 +401,8 @@ begin
     ComboBoxClassesMethods.Items.Objects[i]:=nil;
    end;
 
-  for i := 0 to ComboBoxEvents.Items.Count-1 do
-   if ComboBoxEvents.Items.Objects[i]<>nil then
-   begin
-    TWMiClassMetaData(ComboBoxEvents.Items.Objects[i]).Free;
-    ComboBoxEvents.Items.Objects[i]:=nil;
-   end;
 
+  FrmWmiEvents.Free;
   FrmWMIExplorer.Free;
   FrmWmiClassTree.Free;
   Settings.Free;
@@ -568,10 +419,11 @@ begin
     if ComboBoxClassesMethods.ItemIndex>=0 then
       GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
 
+      {
   if PageControlCodeGen.ActivePage=TabSheetEvents then
     if ComboBoxEvents.ItemIndex>=0 then
       GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
-
+       }
 end;
 
 procedure TFrmMain.GenerateConsoleCode(WmiMetaClassInfo : TWMiClassMetaData);
@@ -787,115 +639,6 @@ begin
   end;
 end;
 
-procedure TFrmMain.GenerateEventCode;
-var
-  Namespace: string;
-  WmiTargetInstance: string;
-  WmiEvent: string;
-  PollSeconds: integer;
-  i:      integer;
-  Params: TStringList;
-  Values: TStringList;
-  Conds:  TStringList;
-  Str:    string;
-  PropsOut: TStringList;
-  DelphiWmiCodeGenerator : TDelphiWmiEventCodeGenerator;
-  FPCWmiCodeGenerator : TFPCWmiEventCodeGenerator;
-  OxygenWmiCodeGenerator : TOxygenWmiEventCodeGenerator;
-
-begin
-  if (ComboBoxNamespacesEvents.Text = '') or (ComboBoxEvents.Text = '') then
-    exit;
-
-  Namespace := ComboBoxNamespacesEvents.Text;
-  WmiEvent  := ComboBoxEvents.Text;
-  WmiTargetInstance := ComboBoxTargetInstance.Text;
-
-  SetLog(Format('Generating code for %s:%s',[Namespace, WmiEvent]));
-
-  if not TryStrToInt(EditEventWait.Text, PollSeconds) then
-    PollSeconds := 0;
-
-  Params   := TStringList.Create;
-  Values   := TStringList.Create;
-  Conds    := TStringList.Create;
-  PropsOut := TStringList.Create;
-  try
-
-    for i := 0 to ListViewEventsConds.Items.Count - 1 do
-      if (ListViewEventsConds.Items[i].Checked) then
-        PropsOut.AddObject(ListViewEventsConds.Items[i].Caption, ListViewEventsConds.Items[i].Data);
-
-    Str := '';
-    for i := 0 to ListViewEventsConds.Items.Count - 1 do
-      if (ListViewEventsConds.Items[i].Checked) and
-        (ListViewEventsConds.Items[i].SubItems[1] <> '') then
-      begin
-        Str := Str + Format('%s=%s, ', [ListViewEventsConds.Items[i].Caption,
-          ListViewEventsConds.Items[i].SubItems[0]]); //name + type
-        Values.Add(ListViewEventsConds.Items[i].SubItems[2]);
-        Conds.Add(ListViewEventsConds.Items[i].SubItems[1]);
-      end;
-
-    Params.CommaText := Str;
-
-    case FrmCodeEditorEvent.CompilerType  of
-
-      Ct_Delphi:
-                 begin
-                   DelphiWmiCodeGenerator := TDelphiWmiEventCodeGenerator.Create;
-                   try
-                      DelphiWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                      DelphiWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
-                      DelphiWmiCodeGenerator.PollSeconds          := PollSeconds;
-                      DelphiWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
-                      DelphiWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      FrmCodeEditorEvent.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
-                   finally
-                      DelphiWmiCodeGenerator.Free;
-                   end;
-                 end;
-
-      Ct_Lazarus_FPC:
-                 begin
-                   FPCWmiCodeGenerator := TFPCWmiEventCodeGenerator.Create;
-                   try
-                      FPCWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                      FPCWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
-                      FPCWmiCodeGenerator.PollSeconds          := PollSeconds;
-                      FPCWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
-                      FPCWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      FrmCodeEditorEvent.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
-                   finally
-                      FPCWmiCodeGenerator.Free;
-                   end;
-                 end;
-
-      Ct_Oxygene:
-                 begin
-                   OxygenWmiCodeGenerator := TOxygenWmiEventCodeGenerator.Create;
-                   try
-                      OxygenWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                      OxygenWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
-                      OxygenWmiCodeGenerator.PollSeconds          := PollSeconds;
-                      OxygenWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
-                      OxygenWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      FrmCodeEditorEvent.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
-                   finally
-                      OxygenWmiCodeGenerator.Free;
-                   end;
-                 end;
-
-    end;
-
-  finally
-    Conds.Free;
-    Params.Free;
-    Values.Free;
-    PropsOut.Free;
-  end;
-end;
-
 
 procedure TFrmMain.GetValuesWmiProperties(const Namespace, WmiClass: string);
 var
@@ -954,60 +697,6 @@ begin
     SetMsg('');
     ProgressBarWmi.Visible := False;
   end;
-end;
-
-procedure TFrmMain.LoadEventsInfo;
-var
-  Item: TListItem;
-  i:    integer;
-  WmiMetaClassInfo : TWMiClassMetaData;
-begin
-  StatusBar1.SimpleText := Format('Loading Properties of %s:%s', [ComboBoxNamespacesEvents.Text, ComboBoxEvents.Text]);
-  //ListVieweventsConds
-  ListVieweventsConds.Items.BeginUpdate;
-  try
-    ListVieweventsConds.Items.Clear;
-
-    if ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]=nil then
-    begin
-      WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNamespacesEvents.Text, ComboBoxEvents.Text);
-      ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]:= WmiMetaClassInfo;
-    end
-    else
-      WmiMetaClassInfo:=TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]);
-
-
-    //GetListWmiClassPropertiesTypes(NameSpace, EventClass, List);
-    LabelEventsConds.Caption :=
-      Format('%d Properties of %s:%s', [WmiMetaClassInfo.PropertiesCount, WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]);
-
-    for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
-    begin
-      Item := ListVieweventsConds.Items.Add;
-      Item.Checked := False;
-      Item.Caption := WmiMetaClassInfo.Properties[i].Name;
-      item.Data    := Pointer(WmiMetaClassInfo.Properties[i].CimType);
-      Item.SubItems.Add(WmiMetaClassInfo.Properties[i].&Type);
-      Item.SubItems.Add('');
-      Item.SubItems.Add(GetDefaultValueWmiType(WmiMetaClassInfo.Properties[i].&Type));
-      Item.SubItems.Add(WmiMetaClassInfo.Properties[i].Description);
-    end;
-  finally
-    ListVieweventsConds.Items.EndUpdate;
-    SetMsg('');
-  end;
-  {
-  if CheckBoxSelAllProps.Checked then
-  ListBoxProperties.SelectAll;
-  }
-  AutoResizeColumn(ListViewEventsConds.Column[0]);
-  AutoResizeColumn(ListViewEventsConds.Column[1]);
-  AutoResizeColumn(ListViewEventsConds.Column[2]);
-
-  if ComboBoxTargetInstance.Text<>'' then
-   LoadTargetInstanceProps
-  else
-   GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
 end;
 
 procedure TFrmMain.LoadMethodInfo(FirstTime : Boolean=False);
@@ -1226,110 +915,7 @@ begin
   SetMsg('');
 end;
 
-procedure TFrmMain.LoadWMIClassesFromCache(const namespace: string; List: TStrings);
-var
-  FileName: string;
-begin
-  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '.wmic';
-  List.LoadFromFile(FileName);
-end;
 
-procedure TFrmMain.LoadWMIClassesMethodsFromCache(const namespace: string;
-  List: TStrings);
-var
-  FileName: string;
-begin
-  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '_ClassMethods.wmic';
-  List.LoadFromFile(FileName);
-end;
-
-procedure TFrmMain.LoadWmiEvents(const Namespace: string;FirstTime : Boolean=False);
-var
-  i : Integer;
-begin
-  ComboBoxEvents.Items.BeginUpdate;
-  try
-    RadioButtonIntrinsic.Checked:=FirstTime and Settings.LastWmiEventIntrinsic;
-
-    for i := 0 to ComboBoxEvents.Items.Count-1 do
-     if ComboBoxEvents.Items.Objects[i]<>nil then
-     begin
-      TWMiClassMetaData(ComboBoxEvents.Items.Objects[i]).Free;
-      ComboBoxEvents.Items.Objects[i]:=nil;
-     end;
-
-
-    ComboBoxEvents.Items.Clear;
-
-    if RadioButtonIntrinsic.Checked then
-    begin
-      GetListIntrinsicWmiEvents(Namespace, ComboBoxEvents.Items);
-      ComboBoxTargetInstance.Visible := True;
-      LabelTargetInstance.Visible    := True;
-    end
-    else
-    begin
-      GetListExtrinsicWmiEvents(Namespace, ComboBoxEvents.Items);
-      ComboBoxTargetInstance.Visible := False;
-      LabelTargetInstance.Visible    := False;
-    end;
-
-    LabelEvents.Caption := Format('Events (%d)', [ComboBoxEvents.Items.Count]);
-  finally
-    ComboBoxEvents.Items.EndUpdate;
-  end;
-
-
-
-  ComboBoxTargetInstance.Items.BeginUpdate;
-  try
-
-    if ExistWmiClassesCache(Namespace) then
-      LoadWMIClassesFromCache(Namespace, ComboBoxTargetInstance.Items)
-    else
-    begin
-      //GetListWmiDynamicAndStaticClasses(Namespace,ComboBoxTargetInstance.Items);
-      GetListWmiClasses(Namespace, ComboBoxTargetInstance.Items, [], ['abstract'], True);
-      SaveWMIClassesToCache(Namespace, ComboBoxTargetInstance.Items);
-    end;
-
-    ComboBoxTargetInstance.Items.Insert(0, '');
-  finally
-    ComboBoxTargetInstance.Items.EndUpdate;
-  end;
-
-
-  if ComboBoxTargetInstance.Items.Count > 0 then
-  begin
-    if FirstTime then
-    begin
-      if Settings.LastWmiEventTargetInstance<>'' then
-        ComboBoxTargetInstance.ItemIndex := ComboBoxTargetInstance.Items.IndexOf(Settings.LastWmiEventTargetInstance)
-      else
-        ComboBoxTargetInstance.ItemIndex := 0;
-    end
-    else
-    ComboBoxTargetInstance.ItemIndex := 0;
-  end;
-
-
-  if ComboBoxEvents.Items.Count > 0 then
-  begin
-    if FirstTime then
-    begin
-      if Settings.LastWmiEvent<>'' then
-        ComboBoxEvents.ItemIndex := ComboBoxEvents.Items.IndexOf(Settings.LastWmiEvent)
-      else
-        ComboBoxEvents.ItemIndex := 0;
-    end
-    else
-    ComboBoxEvents.ItemIndex := 0;
-  end;
-
-  LoadEventsInfo;
-end;
 
 procedure TFrmMain.LoadWmiMetaData;
 var
@@ -1397,11 +983,11 @@ begin
       ComboBoxNameSpaces.Items.EndUpdate;
     end;
 
-    ComboBoxNamespacesEvents.Items.BeginUpdate;
+    FrmWmiEvents.ComboBoxNamespacesEvents.Items.BeginUpdate;
     try
-      ComboBoxNamespacesEvents.Items.AddStrings(FNameSpaces);
+      FrmWmiEvents.ComboBoxNamespacesEvents.Items.AddStrings(FNameSpaces);
     finally
-      ComboBoxNamespacesEvents.Items.EndUpdate;
+      FrmWmiEvents.ComboBoxNamespacesEvents.Items.EndUpdate;
     end;
 
     ComboBoxNamespaceMethods.Items.BeginUpdate;
@@ -1439,11 +1025,11 @@ begin
     LoadClassInfo;
 
     if Settings.LastWmiNameSpaceEvents<>'' then
-      ComboBoxNamespacesEvents.ItemIndex := ComboBoxNamespacesEvents.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
+      FrmWmiEvents.ComboBoxNamespacesEvents.ItemIndex := FrmWmiEvents.ComboBoxNamespacesEvents.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
     else
-      ComboBoxNamespacesEvents.ItemIndex := 0;
+      FrmWmiEvents.ComboBoxNamespacesEvents.ItemIndex := 0;
 
-    LoadWmiEvents(ComboBoxNamespacesEvents.Text, True);
+    FrmWmiEvents.LoadWmiEvents(FrmWmiEvents.ComboBoxNamespacesEvents.Text, True);
 
     if Settings.LastWmiNameSpaceMethods<>'' then
       ComboBoxNamespaceMethods.ItemIndex := ComboBoxNamespaceMethods.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
@@ -1510,10 +1096,6 @@ begin
   end;
 end;
 
-procedure TFrmMain.LoadWMINameSpacesFromCache(List: TStrings);
-begin
-  List.LoadFromFile(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
-end;
 
 procedure TFrmMain.LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
 var
@@ -1550,29 +1132,7 @@ begin
 end;
 
 
-procedure TFrmMain.SaveWMIClassesMethodsToCache(const namespace: string;
-  List: TStrings);
-var
-  FileName: string;
-begin
-  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '_ClassMethods.wmic';
-  List.SaveToFile(FileName);
-end;
 
-procedure TFrmMain.SaveWMIClassesToCache(const namespace: string; List: TStrings);
-var
-  FileName: string;
-begin
-  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '.wmic';
-  List.SaveToFile(FileName);
-end;
-
-procedure TFrmMain.SaveWMINameSpacesToCache(List: TStrings);
-begin
-  List.SaveToFile(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
-end;
 
 procedure TFrmMain.SetLog(const Log: string);
 begin
@@ -1638,11 +1198,6 @@ begin
   end;
 end;
 
-procedure TFrmMain.RadioButtonIntrinsicClick(Sender: TObject);
-begin
-  LoadWmiEvents(ComboBoxNamespacesEvents.Text);
-end;
-
 procedure TFrmMain.ToolButtonSearchClick(Sender: TObject);
 begin
   PageControlMain.ActivePage := TabSheetWmiExplorer;
@@ -1665,28 +1220,6 @@ begin
 end;
 
 
-procedure TFrmMain.ComboBoxCondExit(Sender: TObject);
-begin
-  if Assigned(FItem) then
-  begin
-    FItem.SubItems[COND_EVENTPARAM_COLUMN - 1] := TComboBox(Sender).Text;
-    FItem := nil;
-  end;
-  PostMessage(handle, WM_NEXTDLGCTL, ListViewEventsConds.Handle, 1);
-  TComboBox(Sender).Visible := True;
-end;
-
-procedure TFrmMain.EditValueEventExit(Sender: TObject);
-begin
-  if Assigned(FItem) then
-  begin
-    FItem.SubItems[VALUE_EVENTPARAM_COLUMN - 1] := TEdit(Sender).Text;
-    FItem := nil;
-  end;
-  PostMessage(handle, WM_NEXTDLGCTL, ListViewEventsConds.Handle, 1);
-  TEdit(Sender).Visible := True;
-end;
-
 procedure TFrmMain.EditValueMethodParamExit(Sender: TObject);
 begin
   if Assigned(FItem) then
@@ -1698,31 +1231,6 @@ begin
   TEdit(Sender).Visible := True;
 
   GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
-end;
-
-procedure TFrmMain.ListViewEventsCondsClick(Sender: TObject);
-var
-  pt: TPoint;
-  HitTestInfo: TLVHitTestInfo;
-begin
-  EditValueEvent.Visible := False;
-  ComboBoxCond.Visible   := False;
-
-  pt := TListView(Sender).ScreenToClient(Mouse.CursorPos);
-  FillChar(HitTestInfo, SizeOf(HitTestInfo), 0);
-  HitTestInfo.pt := pt;
-
-  if (-1 <> TListView(Sender).Perform(LVM_SUBITEMHITTEST, 0,
-    lparam(@HitTestInfo))) and
-    (HitTestInfo.iSubItem = VALUE_EVENTPARAM_COLUMN) then
-    PostMessage(Self.Handle, UM_EDITEVENTVALUE, HitTestInfo.iItem, 0)
-  else
-  if (-1 <> TListView(Sender).Perform(LVM_SUBITEMHITTEST, 0,
-    lparam(@HitTestInfo))) and
-    (HitTestInfo.iSubItem = COND_EVENTPARAM_COLUMN) then
-    PostMessage(Self.Handle, UM_EDITEVENTCOND, HitTestInfo.iItem, 0);
-
-  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
 end;
 
 procedure TFrmMain.ListViewMethodsParamsClick(Sender: TObject);
@@ -1745,47 +1253,6 @@ begin
 end;
 
 
-procedure TFrmMain.UMEditEventCond(var msg: TMessage);
-var
-  SubItemRect: TRect;
-begin
-  ComboBoxCond.Visible := True;
-  ComboBoxCond.BringToFront;
-
-  SubItemRect.Top  := COND_EVENTPARAM_COLUMN;
-  SubItemRect.Left := LVIR_BOUNDS;
-  ListViewEventsConds.Perform(LVM_GETSUBITEMRECT, msg.wparam, lparam(@SubItemRect));
-  MapWindowPoints(ListViewEventsConds.Handle, ComboBoxCond.Parent.Handle,
-    SubItemRect, 2);
-  FItem := ListViewEventsConds.Items[msg.wparam];
-
-  try
-    ComboBoxCond.ItemIndex :=
-      ComboBoxCond.Items.IndexOf(Fitem.Subitems[COND_EVENTPARAM_COLUMN - 1]);
-  except
-    ComboBoxCond.ItemIndex := 0;
-  end;
-
-  ComboBoxCond.BoundsRect := SubItemRect;
-  ComboBoxCond.SetFocus;
-end;
-
-procedure TFrmMain.UMEditEventValue(var msg: TMessage);
-var
-  SubItemRect: TRect;
-begin
-  EditValueEvent.Visible := True;
-  EditValueEvent.BringToFront;
-  SubItemRect.Top  := VALUE_EVENTPARAM_COLUMN;
-  SubItemRect.Left := LVIR_BOUNDS;
-  ListViewEventsConds.Perform(LVM_GETSUBITEMRECT, msg.wparam, lparam(@SubItemRect));
-  MapWindowPoints(ListViewEventsConds.Handle, EditValueEvent.Parent.Handle,
-    SubItemRect, 2);
-  FItem := ListViewEventsConds.Items[msg.wparam];
-  EditValueEvent.Text := Fitem.Subitems[VALUE_EVENTPARAM_COLUMN - 1];
-  EditValueEvent.BoundsRect := SubItemRect;
-  EditValueEvent.SetFocus;
-end;
 
 procedure TFrmMain.UMEditValueParam(var msg: TMessage);
 var
@@ -1808,10 +1275,10 @@ end;
 
 initialization
 
-   if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then
-     TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TScrollingStyleHook);
+if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then
+ TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TScrollingStyleHook);
 
-   TStyleManager.Engine.UnRegisterStyleHook(TCustomTabControl, TTabControlStyleHook);
-   TStyleManager.Engine.RegisterStyleHook(TCustomTabControl, TMyTabControlStyleHook);
+TStyleManager.Engine.UnRegisterStyleHook(TCustomTabControl, TTabControlStyleHook);
+TStyleManager.Engine.RegisterStyleHook(TCustomTabControl, TMyTabControlStyleHook);
 
 end.
