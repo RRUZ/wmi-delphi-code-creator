@@ -43,7 +43,8 @@ uses
   Vcl.Styles.Ext in 'Units\Vcl.Styles.Ext.pas',
   uWmiEvents in 'Units\uWmiEvents.pas' {FrmWmiEvents},
   uWmiMethods in 'Units\uWmiMethods.pas' {FrmWmiMethods},
-  uWmiClasses in 'Units\uWmiClasses.pas' {FrmWmiClasses};
+  uWmiClasses in 'Units\uWmiClasses.pas' {FrmWmiClasses},
+  uGlobals in 'Units\uGlobals.pas';
 
 {$R *.res}
 

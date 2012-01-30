@@ -14,7 +14,7 @@
 { The Original Code is uWmiEvents.pas.                                                             }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011 Rodrigo Ruz V.                         }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -63,7 +63,6 @@ type
     procedure ButtonGenerateEventCodeClick(Sender: TObject);
     procedure ComboBoxCondExit(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormDestroy(Sender: TObject);
   private
     FItem:      TListitem;
     FrmCodeEditorEvent  : TFrmCodeEditor;
@@ -90,6 +89,7 @@ implementation
 {$R *.dfm}
 
 uses
+  uGlobals,
   Winapi.CommCtrl,
   StrUtils,
   uSelectCompilerVersion,
@@ -106,7 +106,7 @@ const
 
 procedure TFrmWmiEvents.ButtonGenerateEventCodeClick(Sender: TObject);
 begin
-  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
+  GenerateCode;
 end;
 
 procedure TFrmWmiEvents.ComboBoxCondExit(Sender: TObject);
@@ -154,23 +154,10 @@ begin
   FrmCodeEditorEvent.CompilerType:=Ct_Delphi;
 end;
 
-procedure TFrmWmiEvents.FormDestroy(Sender: TObject);
-var
-  i : integer;
-begin
-  for i := 0 to ComboBoxEvents.Items.Count-1 do
-   if ComboBoxEvents.Items.Objects[i]<>nil then
-   begin
-    TWMiClassMetaData(ComboBoxEvents.Items.Objects[i]).Free;
-    ComboBoxEvents.Items.Objects[i]:=nil;
-   end;
-
-end;
-
 procedure TFrmWmiEvents.GenerateCode;
 begin
  if ComboBoxEvents.ItemIndex>=0 then
-  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
+  GenerateEventCode(CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNamespacesEvents.Text , ComboBoxEvents.Text));
 end;
 
 procedure TFrmWmiEvents.GenerateEventCode(WmiMetaClassInfo: TWMiClassMetaData);
@@ -305,7 +292,7 @@ begin
     (HitTestInfo.iSubItem = COND_EVENTPARAM_COLUMN) then
     PostMessage(Self.Handle, UM_EDITEVENTCOND, HitTestInfo.iItem, 0);
 
-  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
+  GenerateCode;
 end;
 
 procedure TFrmWmiEvents.LoadEventsInfo;
@@ -319,15 +306,7 @@ begin
   ListVieweventsConds.Items.BeginUpdate;
   try
     ListVieweventsConds.Items.Clear;
-
-    if ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]=nil then
-    begin
-      WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNamespacesEvents.Text, ComboBoxEvents.Text);
-      ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]:= WmiMetaClassInfo;
-    end
-    else
-      WmiMetaClassInfo:=TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]);
-
+    WmiMetaClassInfo:=CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNamespacesEvents.Text , ComboBoxEvents.Text);
 
     //GetListWmiClassPropertiesTypes(NameSpace, EventClass, List);
     LabelEventsConds.Caption :=
@@ -359,7 +338,7 @@ begin
   if ComboBoxTargetInstance.Text<>'' then
    LoadTargetInstanceProps
   else
-   GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
+   GenerateCode;
 end;
 
 
@@ -378,23 +357,18 @@ begin
 
     if ComboBoxTargetInstance.Text <> '' then
     begin
-      WmiMetaClassInfo := TWMiClassMetaData.Create(ComboBoxNamespacesEvents.Text, ComboBoxTargetInstance.Text);
-      try
-        for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
-        begin
-          Item := ListVieweventsConds.Items.Add;
-          Item.Caption := Format('%s.%s', [wbemTargetInstance, WmiMetaClassInfo.Properties[i].Name]);
-          Item.Data:=Pointer(WmiMetaClassInfo.Properties[i].CimType);
-          Item.SubItems.Add(WmiMetaClassInfo.Properties[i].&Type);
-          Item.SubItems.Add('');
-          Item.SubItems.Add(GetDefaultValueWmiType(WmiMetaClassInfo.Properties[i].&Type));
-          Item.SubItems.Add(WmiMetaClassInfo.Properties[i].Description);
-        end;
-      finally
-        WmiMetaClassInfo.Free;
+      WmiMetaClassInfo := CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNamespacesEvents.Text , ComboBoxTargetInstance.Text);
+      for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
+      begin
+        Item := ListVieweventsConds.Items.Add;
+        Item.Caption := Format('%s.%s', [wbemTargetInstance, WmiMetaClassInfo.Properties[i].Name]);
+        Item.Data:=Pointer(WmiMetaClassInfo.Properties[i].CimType);
+        Item.SubItems.Add(WmiMetaClassInfo.Properties[i].&Type);
+        Item.SubItems.Add('');
+        Item.SubItems.Add(GetDefaultValueWmiType(WmiMetaClassInfo.Properties[i].&Type));
+        Item.SubItems.Add(WmiMetaClassInfo.Properties[i].Description);
       end;
     end;
-
   finally
     ListVieweventsConds.Items.EndUpdate;
   end;
@@ -402,25 +376,15 @@ begin
   AutoResizeColumns([ListViewEventsConds.Column[0], ListViewEventsConds.Column[1],
     ListViewEventsConds.Column[2]]);
 
-  GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
+  GenerateCode;
 end;
 
 procedure TFrmWmiEvents.LoadWmiEvents(const Namespace: string; FirstTime: Boolean);
-var
-  i : Integer;
 begin
   ComboBoxEvents.Items.BeginUpdate;
   try
     if FirstTime then
-    RadioButtonIntrinsic.Checked:=Settings.LastWmiEventIntrinsic;
-
-    for i := 0 to ComboBoxEvents.Items.Count-1 do
-     if ComboBoxEvents.Items.Objects[i]<>nil then
-     begin
-      TWMiClassMetaData(ComboBoxEvents.Items.Objects[i]).Free;
-      ComboBoxEvents.Items.Objects[i]:=nil;
-     end;
-
+      RadioButtonIntrinsic.Checked:=Settings.LastWmiEventIntrinsic;
 
     ComboBoxEvents.Items.Clear;
 
@@ -443,7 +407,6 @@ begin
   end;
 
 
-
   ComboBoxTargetInstance.Items.BeginUpdate;
   try
 
@@ -451,7 +414,6 @@ begin
       LoadWMIClassesFromCache(Namespace, ComboBoxTargetInstance.Items)
     else
     begin
-      //GetListWmiDynamicAndStaticClasses(Namespace,ComboBoxTargetInstance.Items);
       GetListWmiClasses(Namespace, ComboBoxTargetInstance.Items, [], ['abstract'], True);
       SaveWMIClassesToCache(Namespace, ComboBoxTargetInstance.Items);
     end;
@@ -460,7 +422,6 @@ begin
   finally
     ComboBoxTargetInstance.Items.EndUpdate;
   end;
-
 
   if ComboBoxTargetInstance.Items.Count > 0 then
   begin
@@ -474,7 +435,6 @@ begin
     else
     ComboBoxTargetInstance.ItemIndex := 0;
   end;
-
 
   if ComboBoxEvents.Items.Count > 0 then
   begin
