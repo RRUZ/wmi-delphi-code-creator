@@ -14,7 +14,7 @@
 { The Original Code is uMisc.pas.                                                                  }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011 Rodrigo Ruz V.                         }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -30,6 +30,9 @@ uses
  Forms,
  Windows,
  Classes;
+
+type
+  TProcLog    = procedure (const  Log : string) of object;
 
 procedure CaptureConsoleOutput(const lpCommandLine: string; OutPutList: TStrings);
 procedure MsgWarning(const Msg: string);

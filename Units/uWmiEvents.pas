@@ -24,7 +24,7 @@ unit uWmiEvents;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, uMisc,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls, uCodeEditor, uSettings, uWmi_Metadata, uComboBox;
 
 const
@@ -32,7 +32,6 @@ const
   UM_EDITEVENTCOND  = WM_USER + 113;
 
 type
-  TWmiProcEventLog = procedure (const Msg : string) of object;
   TFrmWmiEvents = class(TForm)
     Panel1: TPanel;
     LabelEventsConds: TLabel;
@@ -67,7 +66,7 @@ type
     FItem:      TListitem;
     FrmCodeEditorEvent  : TFrmCodeEditor;
     FSettings : TSettings;
-    FSetLog: TWmiProcEventLog;
+    FSetLog: TProcLog;
     FConsole: TMemo;
     procedure UMEditEventValue(var msg: TMessage); message UM_EDITEVENTVALUE;
     procedure UMEditEventCond(var msg: TMessage); message UM_EDITEVENTCOND;
@@ -80,7 +79,7 @@ type
   public
     procedure LoadWmiEvents(const Namespace: string; FirstTime : Boolean=False);
     property Settings : TSettings read FSettings Write SetSettings;
-    property SetLog : TWmiProcEventLog read FSetLog Write FSetLog;
+    property SetLog : TProcLog read FSetLog Write FSetLog;
     property Console : TMemo read FConsole write SetConsole;
   end;
 

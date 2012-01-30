@@ -14,7 +14,7 @@
 { The Original Code is uWmiTree.pas.                                                               }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011 Rodrigo Ruz V.                         }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -25,8 +25,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, SynEditHighlighter, ImgList, uWmi_Metadata,
-  OleCtrls, SHDocVw, SynEdit, ComCtrls, StdCtrls, ExtCtrls;
+  Dialogs, SynEditHighlighter, ImgList, uWmi_Metadata, uMisc,
+  XMLDoc,  XMLIntf, OleCtrls, SHDocVw, SynEdit, ComCtrls, StdCtrls, ExtCtrls;
 
 const
   NamespaceImageIndex = 0;
@@ -66,11 +66,15 @@ type
     procedure FindDialog1Find(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
+    FSetMsg: TProcLog;
+    FSetLog: TProcLog;
     procedure FreeTreeClasses;
     procedure LoadXMLWMIClass(const Xml: string);
+    procedure DOMShow(ATree: TTreeView; Anode: IXMLNode; TNode: TTreeNode);
   public
-    { Public declarations }
     procedure LoadClassInfo(WmiMetaClassInfo : TWMiClassMetaData);
+    property SetMsg : TProcLog read FSetMsg Write FSetMsg;
+    property SetLog : TProcLog read FSetLog Write FSetLog;
   end;
 
 function FindTextTreeView(const AText: string;
@@ -79,11 +83,11 @@ function FindTextTreeView(const AText: string;
 implementation
 
 uses
-  XMLDoc,
-  XMLIntf,
+  uSettings,
+  uGlobals,
+  ComObj,
   StrUtils,
-  Main,
-  uMisc;
+  Main;
 
 {$R *.dfm}
 
@@ -193,11 +197,11 @@ var
   NodeQ: TTreeNode;
   Xml: string;
 begin
-  FrmMain.ProgressBarWmi.Visible := True;
+  //FrmMain.ProgressBarWmi.Visible := True;
   try
     if Assigned(WmiMetaClassInfo)  then
     begin
-      FrmMain.SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
+      SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
       WebBrowserWmi.Navigate(Format(UrlWmiHelp, [WmiMetaClassInfo.WmiClass]));
       MemoWmiMOF.Lines.Text := WmiMetaClassInfo.WmiClassMOF;
@@ -287,12 +291,12 @@ begin
     end;
 
   finally
-    FrmMain.SetMsg('');
-    FrmMain.ProgressBarWmi.Visible := False;
+    SetMsg('');
+    //FrmMain.ProgressBarWmi.Visible := False;
   end;
 end;
 
-procedure DOMShow(ATree: TTreeView; Anode: IXMLNode; TNode: TTreeNode);
+procedure TFrmWMITree.DOMShow(ATree: TTreeView; Anode: IXMLNode; TNode: TTreeNode);
 var
   I:      integer;
   NTNode: TTreeNode;
@@ -300,7 +304,6 @@ var
   AttrNode: IXMLNode;
   sValue: string;
 begin
-
   if not (Anode.NodeType = ntElement) then
     Exit;
 
@@ -349,9 +352,7 @@ begin
       end;
     except
       on E: Exception do
-        //MsgError(Format('A error ocurred parsing the WMI XML Definition %s',[e.Message]));
-        FrmMain.MemoLog.Lines.Add(
-          Format('A error ocurred parsing the WMI XML Definition %s', [e.Message]));
+        SetLog(Format('A error ocurred parsing the WMI XML Definition %s', [e.Message]));
     end;
   finally
     oXmlDoc := nil;
@@ -360,16 +361,20 @@ end;
 
 procedure TFrmWMITree.TreeViewWmiClassesChange(Sender: TObject; xNode: TTreeNode);
 var
-  Node:   TTreeNode;
+  Node :   TTreeNode;
+  NodeC:   TTreeNode;
   WMiClassMetaData : TWMiClassMetaData;
+  i : integer;
+  FClasses: TStringList;
 begin
   //MemoDescr.Lines.Clear;
   Node := TreeViewWmiClasses.Selected;
-  With FrmMain.FrmWmiClasses do
+  //With FrmMain.FrmWmiClasses do
   begin
     if Assigned(Node) and (Node.Level = LevelNameSpace) and (Node.Count = 0) then
     begin
       PanelClassInfo.Height := 0;
+      {
       ComboBoxNameSpaces.ItemIndex :=
         ComboBoxNameSpaces.Items.IndexOf(Node.Text);
       LoadWmiClasses(ComboBoxNameSpaces.Text);
@@ -377,20 +382,69 @@ begin
       ComboBoxClasses.ItemIndex := 0;
       LoadClassInfo;
       GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
+      }
+
+      FClasses := TStringList.Create;
+      try
+        FClasses.Sorted := True;
+        FClasses.BeginUpdate;
+        try
+          try
+            if not ExistWmiClassesCache(Node.Text) then
+            begin
+              GetListWmiClasses(Node.Text, FClasses, [], ['abstract'], True);
+              SaveWMIClassesToCache(Node.Text , FClasses);
+            end
+            else
+              LoadWMIClassesFromCache(Node.Text, FClasses);
+          except
+            on E: EOleSysError do
+              if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
+                SetLog(Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
+              else
+                raise;
+          end;
+
+        finally
+          FClasses.EndUpdate;
+        end;
+
+        TreeViewWmiClasses.Items.BeginUpdate;
+        try
+          for i := 0 to FClasses.Count - 1 do
+          begin
+            NodeC := TreeViewWmiClasses.Items.AddChild(Node, FClasses[i]);
+            NodeC.ImageIndex := ClassImageIndex;
+            NodeC.SelectedIndex := ClassImageIndex;
+          end;
+        finally
+          TreeViewWmiClasses.Items.EndUpdate;
+        end;
+
+
+      finally
+        FClasses.Free;
+      end;
+
+
+
+
     end
     else
     if Assigned(Node) and (Node.Level = LevelClass) and (Assigned(Node.Parent)) then
     begin
       PanelClassInfo.Height := 220;
+      {
       ComboBoxNameSpaces.ItemIndex :=
         ComboBoxNameSpaces.Items.IndexOf(Node.Parent.Text);
       LoadWmiClasses(ComboBoxNameSpaces.Text);
       ComboBoxClasses.ItemIndex := ComboBoxClasses.Items.IndexOf(Node.Text);
       ComboBoxClassesChange(ComboBoxClasses);
-      WMiClassMetaData:=TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
+      }
+      WMiClassMetaData:= CachedWMIWmiNameSpaces.GetWmiClass(Node.Parent.Text, Node.Text); //TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
       MemoDescr.Lines.Text :=WMiClassMetaData.DescriptionEx;
-      Self.LoadClassInfo(WMiClassMetaData);
-      GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
+      LoadClassInfo(WMiClassMetaData);
+      //GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
     end
     else
     if Assigned(Node) and (Node.Level = LevelPropertyMethod) then

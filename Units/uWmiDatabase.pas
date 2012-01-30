@@ -14,7 +14,7 @@
 { The Original Code is uWmiDatabase.pas.                                                           }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011 Rodrigo Ruz V.                         }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -25,11 +25,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, DB, DBClient, Grids, DBGrids, StdCtrls, Buttons, ExtCtrls;
+  Dialogs, DB, DBClient, Grids, DBGrids, StdCtrls, Buttons, ExtCtrls, uMisc;
 
 type
-  TProcLog    = procedure (const  Log : string) of object;
-  TProcStatus = procedure (const  Msg : string) of object;
 
   TFrmWmiDatabase = class(TForm)
     DataSource1: TDataSource;
@@ -69,14 +67,16 @@ type
     FDatabaseFile: string;
     FHistoryFile:  string;
     FNameSpaces: TStringList;
+    FStatus: TProcLog;
+    FLog: TProcLog;
     procedure BuildWmiDatabase;
     procedure SearchDatabase(Value: string);
     procedure SaveWmiDatabase;
     procedure DeleteWmiDatabase;
     procedure CreateWmiDatabaseStructure;
   public
-    Log   : TProcLog;
-    Status: TProcLog;
+    property Log   : TProcLog read FLog write FLog;
+    property Status: TProcLog read FStatus write FStatus;
     property NameSpaces : TStringList read FNameSpaces Write FNameSpaces;
   end;
 
@@ -89,8 +89,7 @@ uses
   MidasLib,
   uWmi_Metadata,
   uWmi_ViewPropsValues,
-  AsyncCalls,
-  uMisc;
+  AsyncCalls;
 
 const
   MaxHistory      = 50;

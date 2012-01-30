@@ -194,6 +194,8 @@ begin
   FrmWMIExplorer.MemoWmiMOF.Font.Color:=MemoConsole.Font.Color;
   FrmWMIExplorer.MemoQualifiers.Color:=Settings.BackGroundColor;
   FrmWMIExplorer.MemoQualifiers.Font.Color:=MemoConsole.Font.Color;
+  FrmWMIExplorer.SetMsg:=SetMsg;
+  FrmWMIExplorer.SetLog:=SetLog;
 
   FrmWMIExplorer.Show;
 
@@ -211,7 +213,6 @@ begin
   FrmWmiClasses.Console:=MemoConsole;
   FrmWmiClasses.SetLog:=SetLog;
   FrmWmiClasses.SetMsg:=SetMsg;
-  FrmWmiClasses.FrmWMIExplorer:=FrmWMIExplorer;
   //FrmWmiClasses.CompilerType:=Ct_Delphi;
 
   FrmWmiMethods  := TFrmWmiMethods.Create(Self);
