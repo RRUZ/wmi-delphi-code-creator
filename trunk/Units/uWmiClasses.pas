@@ -1,3 +1,23 @@
+{**************************************************************************************************}
+{                                                                                                  }
+{ Unit uWmiClasses                                                                                 }
+{ unit for the WMI Delphi Code Creator                                                             }
+{                                                                                                  }
+{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
+{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
+{ License at http://www.mozilla.org/MPL/                                                           }
+{                                                                                                  }
+{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
+{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
+{ and limitations under the License.                                                               }
+{                                                                                                  }
+{ The Original Code is uWmiClasses.pas.                                                            }
+{                                                                                                  }
+{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
+{ All Rights Reserved.                                                                             }
+{                                                                                                  }
+{**************************************************************************************************}
 unit uWmiClasses;
 
 interface
@@ -59,6 +79,7 @@ implementation
 {$R *.dfm}
 
 uses
+  uGlobals,
   Winapi.CommCtrl,
   System.Win.ComObj,
   uWmi_ViewPropsValues,
@@ -84,7 +105,7 @@ begin
   for i := 0 to ListViewProperties.Items.Count - 1 do
     ListViewProperties.Items[i].Checked := CheckBoxSelAllProps.Checked;
 
-  GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
+  GenerateCode;
 end;
 
 procedure TFrmWmiClasses.ComboBoxClassesChange(Sender: TObject);
@@ -117,23 +138,26 @@ begin
 end;
 
 procedure TFrmWmiClasses.FormDestroy(Sender: TObject);
+{
 var
  i : Integer;
+}
 begin
+ {
   for i := 0 to ComboBoxClasses.Items.Count-1 do
    if ComboBoxClasses.Items.Objects[i]<>nil then
    begin
     TWMiClassMetaData(ComboBoxClasses.Items.Objects[i]).Free;
     ComboBoxClasses.Items.Objects[i]:=nil;
    end;
-
+}
 end;
 
 procedure TFrmWmiClasses.GenerateCode;
 begin
    if ComboBoxClasses.ItemIndex>=0 then
-     GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
-
+     GenerateConsoleCode(CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNameSpaces.Text, ComboBoxClasses.Text));
+     //GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
 end;
 
 procedure TFrmWmiClasses.GenerateConsoleCode(
@@ -262,8 +286,7 @@ end;
 procedure TFrmWmiClasses.ListViewPropertiesClick(Sender: TObject);
 begin
   CheckBoxSelAllProps.Checked := False;
-  GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
-
+  GenerateCode;
 end;
 
 procedure TFrmWmiClasses.LoadClassInfo;
@@ -274,6 +297,7 @@ begin
 
   //ProgressBarWmi.Visible := True;
   try
+    {
     if ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]=nil then
     begin
       WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
@@ -281,6 +305,8 @@ begin
     end
     else
       WmiMetaClassInfo:=TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
+    }
+    WmiMetaClassInfo:=CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
 
     if Assigned(WmiMetaClassInfo) then
     begin
@@ -300,24 +326,24 @@ end;
 
 procedure TFrmWmiClasses.LoadWmiClasses(const Namespace: string);
 var
-  Node: TTreeNode;
-  NodeC: TTreeNode;
+  //Node: TTreeNode;
+  //NodeC: TTreeNode;
   FClasses: TStringList;
-  i: integer;
+  //i: integer;
 begin
   SetMsg(Format('Loading Classes of %s', [Namespace]));
-  Node := FindTextTreeView(Namespace, FrmWMIExplorer.TreeViewWmiClasses);
-  if Assigned(Node) then
+  //Node := FindTextTreeView(Namespace, FrmWMIExplorer.TreeViewWmiClasses);
+  //if Assigned(Node) then
+  if 11=11 then
   begin
-
+            {
     for i := 0 to ComboBoxClasses.Items.Count-1 do
      if ComboBoxClasses.Items.Objects[i]<>nil then
      begin
       TWMiClassMetaData(ComboBoxClasses.Items.Objects[i]).Free;
       ComboBoxClasses.Items.Objects[i]:=nil;
      end;
-
-
+         
     if Assigned(Node.Data) then
     begin
       FClasses := TStringList(Node.Data);
@@ -331,45 +357,47 @@ begin
       end;
     end
     else
+      }
     begin
       FClasses := TStringList.Create;
-      FClasses.Sorted := True;
-      FClasses.BeginUpdate;
-
       try
-
+        FClasses.Sorted := True;
+        FClasses.BeginUpdate;
         try
-          if not ExistWmiClassesCache(Namespace) then
-          begin
-            GetListWmiClasses(Namespace, FClasses, [], ['abstract'], True);
-            SaveWMIClassesToCache(Namespace, FClasses);
-          end
-          else
-            LoadWMIClassesFromCache(Namespace, FClasses);
-
-        except
-          on E: EOleSysError do
-            if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-              SetLog(
-                Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
+          try
+            if not ExistWmiClassesCache(Namespace) then
+            begin
+              GetListWmiClasses(Namespace, FClasses, [], ['abstract'], True);
+              SaveWMIClassesToCache(Namespace, FClasses);
+            end
             else
-              raise;
+              LoadWMIClassesFromCache(Namespace, FClasses);
+          except
+            on E: EOleSysError do
+              if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
+                SetLog(
+                  Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
+              else
+                raise;
+          end;
+
+        finally
+          FClasses.EndUpdate;
         end;
 
+        ComboBoxClasses.Items.BeginUpdate;
+        try
+          ComboBoxClasses.Items.Clear;
+          ComboBoxClasses.Items.AddStrings(FClasses);
+          LabelClasses.Caption := Format('Classes (%d)', [FClasses.Count]);
+        finally
+          ComboBoxClasses.Items.EndUpdate;
+        end;
       finally
-        FClasses.EndUpdate;
+        FClasses.Free;//New ¡¡¡ Added without FrmWMIExplorer
       end;
 
-      ComboBoxClasses.Items.BeginUpdate;
-      try
-        ComboBoxClasses.Items.Clear;
-        ComboBoxClasses.Items.AddStrings(FClasses);
-        LabelClasses.Caption := Format('Classes (%d)', [FClasses.Count]);
-      finally
-        ComboBoxClasses.Items.EndUpdate;
-      end;
-
-
+             {
       FrmWMIExplorer.TreeViewWmiClasses.Items.BeginUpdate;
       Node.Data := FClasses;
       try
@@ -382,7 +410,7 @@ begin
       finally
         FrmWMIExplorer.TreeViewWmiClasses.Items.EndUpdate;
       end;
-
+         }
     end;
   end
   else
@@ -423,7 +451,7 @@ begin
   for i := 0 to ListViewProperties.Columns.Count - 1 do
     AutoResizeColumn(ListViewProperties.Column[i]);
 
-  GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
+  GenerateCode;
 end;
 
 procedure TFrmWmiClasses.SetConsole(const Value: TMemo);

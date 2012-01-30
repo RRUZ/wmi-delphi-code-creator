@@ -14,7 +14,7 @@
 { The Original Code is uWmiMethods.pas.                                                            }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011 Rodrigo Ruz V.                         }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -59,7 +59,6 @@ type
     procedure EditValueMethodParamExit(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
   private
     FSetMsg: TWmiProcMethodLog;
     FSetLog: TWmiProcMethodLog;
@@ -88,6 +87,7 @@ implementation
 {$R *.dfm}
 
 uses
+  uGlobals,
   Winapi.CommCtrl,
   StrUtils,
   uSelectCompilerVersion,
@@ -105,7 +105,7 @@ const
 
 procedure TFrmWmiMethods.ButtonGenerateCodeInvokerClick(Sender: TObject);
 begin
-  GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
+  GenerateCode;
 end;
 
 procedure TFrmWmiMethods.CheckBoxPathClick(Sender: TObject);
@@ -121,7 +121,7 @@ end;
 procedure TFrmWmiMethods.ComboBoxMethodsChange(Sender: TObject);
 begin
   LoadParametersMethodInfo(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
-  GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
+  GenerateCode;
 end;
 
 procedure TFrmWmiMethods.ComboBoxNamespaceMethodsChange(Sender: TObject);
@@ -131,7 +131,7 @@ end;
 
 procedure TFrmWmiMethods.ComboBoxPathsChange(Sender: TObject);
 begin
-  GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
+  GenerateCode;
 end;
 
 procedure TFrmWmiMethods.EditValueMethodParamExit(Sender: TObject);
@@ -166,23 +166,10 @@ begin
   FrmCodeEditorMethod.CompilerType:=Ct_Delphi;
 end;
 
-procedure TFrmWmiMethods.FormDestroy(Sender: TObject);
-var
-  i : integer;
-begin
-  for i := 0 to ComboBoxClassesMethods.Items.Count-1 do
-   if ComboBoxClassesMethods.Items.Objects[i]<>nil then
-   begin
-    TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[i]).Free;
-    ComboBoxClassesMethods.Items.Objects[i]:=nil;
-   end;
-
-end;
-
 procedure TFrmWmiMethods.GenerateCode;
 begin
     if ComboBoxClassesMethods.ItemIndex>=0 then
-      GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
+      GenerateMethodInvoker(CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNamespaceMethods.Text,ComboBoxClassesMethods.Text));
 end;
 
 procedure TFrmWmiMethods.GenerateMethodInvoker(
@@ -298,6 +285,7 @@ begin
     Values.Free;
   end;
 end;
+
 procedure TFrmWmiMethods.ListViewMethodsParamsClick(Sender: TObject);
 var
   pt: TPoint;
@@ -314,8 +302,9 @@ begin
     (HitTestInfo.iSubItem = VALUE_METHODPARAM_COLUMN) then
     PostMessage(Self.Handle, UM_EDITPARAMVALUE, HitTestInfo.iItem, 0);
 
-  GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
+  GenerateCode;
 end;
+
 procedure TFrmWmiMethods.LoadMethodInfo(FirstTime: Boolean);
 Var
   WmiMetaClassInfo : TWMiClassMetaData;
@@ -326,27 +315,11 @@ begin
   ComboBoxMethods.Items.BeginUpdate;
   try
     ComboBoxMethods.Items.Clear;
-
-    if ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]=nil then
-    begin
-      WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text);
-      ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]:= WmiMetaClassInfo;
-    end
-    else
-      WmiMetaClassInfo:=TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]);
-
+    WmiMetaClassInfo:=CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNamespaceMethods.Text,ComboBoxClassesMethods.Text);
 
     if ComboBoxClassesMethods.Text <> '' then
     begin
 
-      {
-      if Settings.ShowImplementedMethods then
-        GetListWmiClassImplementedMethods(ComboBoxNamespaceMethods.Text,
-          ComboBoxClassesMethods.Text, ComboBoxMethods.Items)
-      else
-        GetListWmiClassMethods(ComboBoxNamespaceMethods.Text,
-          ComboBoxClassesMethods.Text, ComboBoxMethods.Items);
-      }
       if Settings.ShowImplementedMethods then
         for i:= 0 to WmiMetaClassInfo.MethodsCount-1 do
         begin
@@ -365,8 +338,6 @@ begin
     ComboBoxMethods.Items.EndUpdate;
   end;
 
-
-
   if ComboBoxMethods.Items.Count > 0 then
     if FirstTime then
     begin
@@ -381,7 +352,7 @@ begin
     ComboBoxMethods.ItemIndex := -1;
 
   LoadParametersMethodInfo(WmiMetaClassInfo);
-  GenerateMethodInvoker(WmiMetaClassInfo);
+  GenerateCode;
 end;
 
 procedure TFrmWmiMethods.LoadParametersMethodInfo(
@@ -399,7 +370,7 @@ begin
     if (ComboBoxClassesMethods.Text <> '') and (ComboBoxMethods.Text <> '') then
     begin
       for i:=0 to WmiMetaClassInfo.MethodsCount-1 do
-       if CompareText(WmiMetaClassInfo.Methods[i].Name,ComboBoxMethods.Text)=0 then
+       if SameText(WmiMetaClassInfo.Methods[i].Name,ComboBoxMethods.Text) then
        begin
          Index:=i;
          break;
@@ -418,8 +389,6 @@ begin
 
       if MemoMethodDescr.Text = '' then
         MemoMethodDescr.Text := 'Method without description available';
-
-      //GetListWmiMethodInParameters(ComboBoxNamespaceMethods.Text,  ComboBoxClassesMethods.Text, ComboBoxMethods.Text, ParamsList, ParamsTypes, ParamsDescr);
     end;
 
     if Index>=0 then
@@ -442,19 +411,9 @@ end;
 
 procedure TFrmWmiMethods.LoadWmiMethods(const Namespace: string;
   FirstTime: Boolean);
-var
-  i  : Integer;
 begin
   SetMsg(Format('Loading classes with methods in %s', [Namespace]));
   try
-
-    for i := 0 to ComboBoxClassesMethods.Items.Count-1 do
-     if ComboBoxClassesMethods.Items.Objects[i]<>nil then
-     begin
-      TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[i]).Free;
-      ComboBoxClassesMethods.Items.Objects[i]:=nil;
-     end;
-
     if not ExistWmiClassesMethodsCache(Namespace) then
     begin
       ComboBoxClassesMethods.Items.BeginUpdate;
