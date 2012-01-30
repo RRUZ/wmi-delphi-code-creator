@@ -41,7 +41,8 @@ uses
   uXE2Patches in 'Units\uXE2Patches.pas',
   uCodeEditor in 'Units\uCodeEditor.pas' {FrmCodeEditor},
   Vcl.Styles.Ext in 'Units\Vcl.Styles.Ext.pas',
-  uWmiEvents in 'Units\uWmiEvents.pas' {FrmWmiEvents};
+  uWmiEvents in 'Units\uWmiEvents.pas' {FrmWmiEvents},
+  uWmiMethods in 'Units\uWmiMethods.pas' {FrmWmiMethods};
 
 {$R *.res}
 

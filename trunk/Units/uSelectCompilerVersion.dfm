@@ -67,6 +67,7 @@ object FrmSelCompilerVer: TFrmSelCompilerVer
         WidthType = (
           -1)
       end>
+    HideSelection = False
     ReadOnly = True
     RowSelect = True
     SmallImages = ImageList1
