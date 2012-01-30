@@ -42,7 +42,8 @@ uses
   uCodeEditor in 'Units\uCodeEditor.pas' {FrmCodeEditor},
   Vcl.Styles.Ext in 'Units\Vcl.Styles.Ext.pas',
   uWmiEvents in 'Units\uWmiEvents.pas' {FrmWmiEvents},
-  uWmiMethods in 'Units\uWmiMethods.pas' {FrmWmiMethods};
+  uWmiMethods in 'Units\uWmiMethods.pas' {FrmWmiMethods},
+  uWmiClasses in 'Units\uWmiClasses.pas' {FrmWmiClasses};
 
 {$R *.res}
 
