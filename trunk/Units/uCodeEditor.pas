@@ -115,7 +115,7 @@ end;
 procedure TFrmCodeEditor.ScrollMemo(Memo: TSynEdit);
 begin
   Memo.SelStart  := Memo.GetTextLen;
-  Memo.SelLength := 0;
+  Memo.SelLength := 1;
   SendMessage(Memo.Handle, EM_SCROLLCARET, 0, 0);
 end;
 
@@ -133,8 +133,13 @@ end;
 
 procedure TFrmCodeEditor.SetSourceCode(const Value: TStrings);
 begin
- SynEditCode.Lines.Clear;
- SynEditCode.Lines.AddStrings(Value);
+ SynEditCode.Lines.BeginUpdate;
+ try
+   SynEditCode.Lines.Clear;
+   SynEditCode.Lines.AddStrings(Value);
+ finally
+  SynEditCode.Lines.EndUpdate;
+ end;
  ScrollMemo(SynEditCode);
 end;
 

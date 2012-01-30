@@ -200,13 +200,6 @@ object FrmMain: TFrmMain
                   TabOrder = 3
                   OnClick = ButtonGetValuesClick
                 end
-                object ProgressBarWmi: TProgressBar
-                  Left = 116
-                  Top = 295
-                  Width = 150
-                  Height = 17
-                  TabOrder = 6
-                end
               end
               object PanelCode: TPanel
                 Left = 313
@@ -403,217 +396,10 @@ object FrmMain: TFrmMain
             object TabSheetEvents: TTabSheet
               Caption = 'Receive a WMI Event'
               ImageIndex = 45
-              object Splitter6: TSplitter
-                Left = 416
-                Top = 0
-                Width = 5
-                Height = 454
-                ExplicitLeft = 402
-              end
-              object Panel1: TPanel
-                Left = 0
-                Top = 0
-                Width = 416
-                Height = 454
-                Align = alLeft
-                BevelOuter = bvNone
-                TabOrder = 0
-                DesignSize = (
-                  416
-                  454)
-                object LabelEventsConds: TLabel
-                  Left = 5
-                  Top = 157
-                  Width = 50
-                  Height = 13
-                  Caption = 'Conditions'
-                end
-                object LabelTargetInstance: TLabel
-                  Left = 5
-                  Top = 103
-                  Width = 77
-                  Height = 13
-                  Caption = 'Target Instance'
-                end
-                object LabelEvents: TLabel
-                  Left = 5
-                  Top = 76
-                  Width = 33
-                  Height = 13
-                  Caption = 'Events'
-                end
-                object Label2: TLabel
-                  Left = 5
-                  Top = 6
-                  Width = 60
-                  Height = 13
-                  Caption = 'Namespaces'
-                end
-                object Label3: TLabel
-                  Left = 5
-                  Top = 133
-                  Width = 73
-                  Height = 13
-                  Caption = 'Poll event each'
-                end
-                object Label5: TLabel
-                  Left = 151
-                  Top = 131
-                  Width = 40
-                  Height = 13
-                  Caption = 'Seconds'
-                end
-                object Label7: TLabel
-                  Left = 5
-                  Top = 29
-                  Width = 68
-                  Height = 13
-                  Caption = 'Type of Event'
-                end
-                object ListViewEventsConds: TListView
-                  Left = 5
-                  Top = 176
-                  Width = 405
-                  Height = 185
-                  Anchors = [akLeft, akTop, akRight, akBottom]
-                  Checkboxes = True
-                  Columns = <
-                    item
-                      Caption = 'Property'
-                      Width = 150
-                    end
-                    item
-                      Caption = 'Type'
-                      Width = 60
-                    end
-                    item
-                      Caption = 'Condition'
-                      Width = 150
-                    end
-                    item
-                      Caption = 'Value'
-                      Width = 60
-                    end
-                    item
-                      Caption = 'Description'
-                    end>
-                  HideSelection = False
-                  ReadOnly = True
-                  TabOrder = 6
-                  ViewStyle = vsReport
-                  OnClick = ListViewEventsCondsClick
-                end
-                object EditValueEvent: TEdit
-                  Left = 88
-                  Top = 235
-                  Width = 145
-                  Height = 21
-                  TabOrder = 8
-                  Visible = False
-                  OnExit = EditValueEventExit
-                end
-                object ComboBoxCond: TComboBox
-                  Left = 88
-                  Top = 208
-                  Width = 145
-                  Height = 21
-                  Style = csDropDownList
-                  ItemIndex = 0
-                  TabOrder = 7
-                  Text = '='
-                  Visible = False
-                  OnExit = ComboBoxCondExit
-                  Items.Strings = (
-                    '='
-                    '>'
-                    '<'
-                    '<>'
-                    'ISA')
-                end
-                object ComboBoxNamespacesEvents: TComboBox
-                  Left = 97
-                  Top = 6
-                  Width = 313
-                  Height = 21
-                  Style = csDropDownList
-                  Anchors = [akLeft, akTop, akRight]
-                  DropDownCount = 20
-                  TabOrder = 0
-                  OnChange = ComboBoxNamespacesEventsChange
-                end
-                object ComboBoxEvents: TComboBox
-                  Left = 97
-                  Top = 76
-                  Width = 313
-                  Height = 21
-                  Style = csDropDownList
-                  Anchors = [akLeft, akTop, akRight]
-                  DropDownCount = 20
-                  Sorted = True
-                  TabOrder = 3
-                  OnChange = ComboBoxEventsChange
-                end
-                object ComboBoxTargetInstance: TComboBox
-                  Left = 97
-                  Top = 103
-                  Width = 313
-                  Height = 21
-                  Style = csDropDownList
-                  Anchors = [akLeft, akTop, akRight]
-                  DropDownCount = 20
-                  Sorted = True
-                  TabOrder = 4
-                  OnChange = ComboBoxTargetInstanceChange
-                end
-                object EditEventWait: TEdit
-                  Left = 97
-                  Top = 130
-                  Width = 48
-                  Height = 21
-                  TabOrder = 5
-                  Text = '1'
-                end
-                object ButtonGenerateEventCode: TButton
-                  Left = 288
-                  Top = 367
-                  Width = 122
-                  Height = 25
-                  Anchors = [akLeft, akBottom]
-                  Caption = 'Generate Code'
-                  TabOrder = 9
-                  OnClick = ButtonGenerateEventCodeClick
-                end
-                object RadioButtonIntrinsic: TRadioButton
-                  Left = 5
-                  Top = 48
-                  Width = 113
-                  Height = 17
-                  Caption = 'Intrinsic'
-                  Checked = True
-                  TabOrder = 1
-                  TabStop = True
-                  OnClick = RadioButtonIntrinsicClick
-                end
-                object RadioButtonExtrinsic: TRadioButton
-                  Left = 127
-                  Top = 48
-                  Width = 113
-                  Height = 17
-                  Caption = 'Extrinsic'
-                  TabOrder = 2
-                  OnClick = RadioButtonIntrinsicClick
-                end
-              end
-              object PanelEventCode: TPanel
-                Left = 421
-                Top = 0
-                Width = 561
-                Height = 454
-                Align = alClient
-                BevelOuter = bvNone
-                BorderWidth = 5
-                TabOrder = 1
-              end
+              ExplicitLeft = 5
+              ExplicitTop = 23
+              ExplicitWidth = 0
+              ExplicitHeight = 0
             end
           end
           object PanelConsole: TPanel
@@ -775,6 +561,13 @@ object FrmMain: TFrmMain
       OnClick = ToolButtonAboutClick
     end
   end
+  object ProgressBarWmi: TProgressBar
+    Left = 76
+    Top = 639
+    Width = 150
+    Height = 17
+    TabOrder = 3
+  end
   object SynPasSyn1: TSynPasSyn
     AsmAttri.Background = 4598550
     AsmAttri.Foreground = clGreen
@@ -809,7 +602,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800E80110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800F00110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
