@@ -186,6 +186,10 @@
 				<Form>FrmWmiMethods</Form>
 				<FormType>dfm</FormType>
 			</DCCReference>
+			<DCCReference Include="Units\uWmiClasses.pas">
+				<Form>FrmWmiClasses</Form>
+				<FormType>dfm</FormType>
+			</DCCReference>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
@@ -211,7 +215,7 @@
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">1</VersionInfo>
 						<VersionInfo Name="Release">2</VersionInfo>
-						<VersionInfo Name="Build">183</VersionInfo>
+						<VersionInfo Name="Build">185</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -223,7 +227,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription"/>
-						<VersionInfoKeys Name="FileVersion">1.1.2.183</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.1.2.185</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright"/>
 						<VersionInfoKeys Name="LegalTrademarks"/>
@@ -253,7 +257,7 @@
 
 <!-- EurekaLog First Line
 [Exception Log]
-EurekaLog Version=6103
+EurekaLog Version=6104
 Activate=0
 Activate Handle=1
 Save Log File=1

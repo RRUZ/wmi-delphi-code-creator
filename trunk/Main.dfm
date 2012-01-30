@@ -75,142 +75,6 @@ object FrmMain: TFrmMain
             object TabSheetWmiClasses: TTabSheet
               Caption = 'WMI Classes'
               ImageIndex = 40
-              object Splitter1: TSplitter
-                Left = 308
-                Top = 0
-                Width = 5
-                Height = 454
-                ExplicitLeft = 289
-                ExplicitHeight = 704
-              end
-              object PanelMetaWmiInfo: TPanel
-                Left = 0
-                Top = 0
-                Width = 308
-                Height = 454
-                Align = alLeft
-                BevelOuter = bvNone
-                TabOrder = 0
-                DesignSize = (
-                  308
-                  454)
-                object LabelProperties: TLabel
-                  Left = 9
-                  Top = 142
-                  Width = 49
-                  Height = 13
-                  Caption = 'Properties'
-                end
-                object LabelClasses: TLabel
-                  Left = 9
-                  Top = 35
-                  Width = 36
-                  Height = 13
-                  Caption = 'Classes'
-                end
-                object LabelNamespace: TLabel
-                  Left = 9
-                  Top = 5
-                  Width = 60
-                  Height = 13
-                  Caption = 'Namespaces'
-                end
-                object ComboBoxClasses: TComboBox
-                  Left = 101
-                  Top = 32
-                  Width = 201
-                  Height = 21
-                  Style = csDropDownList
-                  Anchors = [akLeft, akTop, akRight]
-                  DropDownCount = 20
-                  TabOrder = 1
-                  OnChange = ComboBoxClassesChange
-                end
-                object ComboBoxNameSpaces: TComboBox
-                  Left = 101
-                  Top = 5
-                  Width = 200
-                  Height = 21
-                  Style = csDropDownList
-                  Anchors = [akLeft, akTop, akRight]
-                  DropDownCount = 20
-                  TabOrder = 0
-                  OnChange = ComboBoxNameSpacesChange
-                end
-                object CheckBoxSelAllProps: TCheckBox
-                  Left = 9
-                  Top = 169
-                  Width = 114
-                  Height = 17
-                  Caption = 'Select all Properties'
-                  TabOrder = 4
-                  OnClick = CheckBoxSelAllPropsClick
-                end
-                object MemoClassDescr: TMemo
-                  Left = 9
-                  Top = 59
-                  Width = 293
-                  Height = 73
-                  Anchors = [akLeft, akTop, akRight]
-                  ReadOnly = True
-                  ScrollBars = ssVertical
-                  TabOrder = 2
-                end
-                object ListViewProperties: TListView
-                  Left = 7
-                  Top = 192
-                  Width = 295
-                  Height = 212
-                  Anchors = [akLeft, akTop, akRight, akBottom]
-                  Checkboxes = True
-                  Columns = <
-                    item
-                      Caption = 'Property'
-                      Width = -1
-                      WidthType = (
-                        -1)
-                    end
-                    item
-                      Caption = 'Type'
-                      Width = -1
-                      WidthType = (
-                        -1)
-                    end
-                    item
-                      Caption = 'Description'
-                      Width = -1
-                      WidthType = (
-                        -1)
-                    end>
-                  HideSelection = False
-                  ReadOnly = True
-                  RowSelect = True
-                  TabOrder = 5
-                  ViewStyle = vsReport
-                  OnClick = ListBoxPropertiesClick
-                end
-                object ButtonGetValues: TButton
-                  Left = 128
-                  Top = 161
-                  Width = 174
-                  Height = 25
-                  Caption = 'Get Properties Values'
-                  ImageIndex = 15
-                  Images = ImageList1
-                  TabOrder = 3
-                  OnClick = ButtonGetValuesClick
-                end
-              end
-              object PanelCode: TPanel
-                Left = 313
-                Top = 0
-                Width = 669
-                Height = 454
-                Align = alClient
-                BevelOuter = bvNone
-                BorderWidth = 5
-                TabOrder = 1
-              end
             end
             object TabSheetMethods: TTabSheet
               Caption = 'Execute a WMI method'
@@ -219,10 +83,6 @@ object FrmMain: TFrmMain
             object TabSheetEvents: TTabSheet
               Caption = 'Receive a WMI Event'
               ImageIndex = 45
-              ExplicitLeft = 5
-              ExplicitTop = 23
-              ExplicitWidth = 0
-              ExplicitHeight = 0
             end
           end
           object PanelConsole: TPanel
@@ -397,7 +257,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800F00110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F007800F40110001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000

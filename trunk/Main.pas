@@ -37,9 +37,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls,
   SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmi_Metadata,uWmiDatabase,
-  Menus, Buttons, uComboBox, uWmiClassTree,
-  uCodeEditor, uWmiEvents, uWmiMethods;
-
+  Menus, Buttons, uWmiClassTree, uWmiEvents, uWmiMethods, uWmiClasses, Generics.Collections;
 
 type
   TProgressBar = class(ComCtrls.TProgressBar)
@@ -54,33 +52,21 @@ type
     TabSheetWmiExplorer: TTabSheet;
     TabSheetMethods: TTabSheet;
     StatusBar1: TStatusBar;
-    PanelMetaWmiInfo: TPanel;
-    PanelCode: TPanel;
-    LabelProperties: TLabel;
-    LabelClasses: TLabel;
-    ComboBoxClasses: TComboBox;
-    ComboBoxNameSpaces: TComboBox;
-    LabelNamespace: TLabel;
-    Splitter1: TSplitter;
-    CheckBoxSelAllProps: TCheckBox;
     ToolBar1:  TToolBar;
     ToolButtonSearch: TToolButton;
     ToolButtonAbout: TToolButton;
     ToolButton4: TToolButton;
-    MemoClassDescr: TMemo;
     ToolButtonOnline: TToolButton;
     TabSheet6: TTabSheet;
     MemoLog:   TMemo;
     ProgressBarWmi: TProgressBar;
     MemoConsole: TMemo;
-    ListViewProperties: TListView;
     TabSheetCodeGen: TTabSheet;
     PanelCodeGen: TPanel;
     PageControlCodeGen: TPageControl;
     PanelConsole: TPanel;
     Splitter4: TSplitter;
     ToolButtonGetValues: TToolButton;
-    ButtonGetValues: TButton;
     TabSheetWmiDatabase: TTabSheet;
     ImageList1: TImageList;
     PageControl2: TPageControl;
@@ -90,11 +76,6 @@ type
     TabSheetEvents: TTabSheet;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
-    procedure ComboBoxNameSpacesChange(Sender: TObject);
-    procedure ComboBoxClassesChange(Sender: TObject);
-    procedure ListBoxPropertiesClick(Sender: TObject);
-    procedure CheckBoxSelAllPropsClick(Sender: TObject);
-    procedure ButtonGetValuesClick(Sender: TObject);
     procedure ToolButtonOnlineClick(Sender: TObject);
     procedure ToolButtonAboutClick(Sender: TObject);
     procedure StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel;
@@ -106,29 +87,20 @@ type
     procedure ToolButtonSettingsClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
-    { Private declarations }
     FrmWmiDatabase: TFrmWmiDatabase;
     FDataLoaded: boolean;
-    FItem:      TListitem;
     FrmWMIExplorer  : TFrmWMITree;
     FrmWmiClassTree : TFrmWmiClassTree;
 
-    FrmCodeEditor         : TFrmCodeEditor;
     FrmWmiEvents          : TFrmWmiEvents;
     FrmWmiMethods         : TFrmWmiMethods;
 
     Settings : TSettings;
     procedure LoadWmiMetaData;
-    procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
-    procedure SetToolBar;
     procedure SetLog(const Log :string);
-    procedure GenerateCode;
   public
+    FrmWmiClasses         : TFrmWmiClasses;
     procedure SetMsg(const Msg: string);
-    procedure LoadWmiClasses(const Namespace: string);
-    procedure LoadClassInfo;
-    procedure GenerateConsoleCode(WmiMetaClassInfo : TWMiClassMetaData);
-    procedure GetValuesWmiProperties(const Namespace, WmiClass: string);
   end;
 
 
@@ -138,28 +110,13 @@ var
 implementation
 
 uses
-  Rtti,
   uXE2Patches,
   Vcl.Styles.Ext,
   VCl.Themes,
-  ComObj,
   ShellApi,
   CommCtrl,
-  StrUtils,
+  ComObj,
   uWmi_About,
-  uSelectCompilerVersion,
-  uWmi_ViewPropsValues,
-  uListView_Helper,
-  uDelphiIDE,
-  uBorlandCppIDE,
-  uLazarusIDE,
-  uDelphiPrismIDE,
-  uDelphiPrismHelper,
-  uWmiGenCode,
-  uWmiDelphiCode,
-  uWmiOxygenCode,
-  uWmiFPCCode,
-  uWmiBorlandCppCode,
   uMisc;
 
 const
@@ -177,33 +134,6 @@ begin
   Params.Style := Params.Style or PBS_MARQUEE;
 end;
 
-procedure TFrmMain.ButtonGetValuesClick(Sender: TObject);
-begin
-  GetValuesWmiProperties(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
-end;
-
-procedure TFrmMain.CheckBoxSelAllPropsClick(Sender: TObject);
-var
-  i: integer;
-begin
-  for i := 0 to ListViewProperties.Items.Count - 1 do
-    ListViewProperties.Items[i].Checked := CheckBoxSelAllProps.Checked;
-
-  GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
-end;
-
-procedure TFrmMain.ComboBoxClassesChange(Sender: TObject);
-begin
-  LoadClassInfo;
-end;
-
-procedure TFrmMain.ComboBoxNameSpacesChange(Sender: TObject);
-begin
-  LoadWmiClasses(TComboBox(Sender).Text);
-  ComboBoxClasses.ItemIndex := 0;
-  LoadClassInfo;
-end;
-
 procedure TFrmMain.FormActivate(Sender: TObject);
 begin
   if not FDataLoaded then
@@ -214,9 +144,7 @@ procedure TFrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   FrmWmiEvents.Close();
   FrmWmiMethods.Close();
-
-  Settings.LastWmiNameSpace:=ComboBoxNameSpaces.Text;
-  Settings.LastWmiClass:=ComboBoxClasses.Text;
+  FrmWmiClasses.Close();
 
 
   WriteSettings(Settings);
@@ -228,8 +156,6 @@ var
 begin
   ReportMemoryLeaksOnShutdown:=DebugHook<>0;
   Settings :=TSettings.Create;
-  SetToolBar;
-
   SetLog('Reading settings');
   ReadSettings(Settings);
   LoadVCLStyle(Settings.VCLStyle);
@@ -276,14 +202,17 @@ begin
   FrmWmiClassTree.Align := alClient;
   FrmWmiClassTree.Show;
 
-  FrmCodeEditor  := TFrmCodeEditor.Create(Self);
-  FrmCodeEditor.CodeGenerator:=GenerateCode;
-  FrmCodeEditor.Parent := PanelCode;
-  FrmCodeEditor.Show;
-  FrmCodeEditor.Settings:=Settings;
-  FrmCodeEditor.Console:=MemoConsole;
-  FrmCodeEditor.CompilerType:=Ct_Delphi;
-
+  FrmWmiClasses  := TFrmWmiClasses.Create(Self);
+  //FrmWmiClasses.CodeGenerator:=GenerateCode;
+  FrmWmiClasses.Parent := TabSheetWmiClasses;
+  FrmWmiClasses.Align  := alClient;
+  FrmWmiClasses.Show;
+  FrmWmiClasses.Settings:=Settings;
+  FrmWmiClasses.Console:=MemoConsole;
+  FrmWmiClasses.SetLog:=SetLog;
+  FrmWmiClasses.SetMsg:=SetMsg;
+  FrmWmiClasses.FrmWMIExplorer:=FrmWMIExplorer;
+  //FrmWmiClasses.CompilerType:=Ct_Delphi;
 
   FrmWmiMethods  := TFrmWmiMethods.Create(Self);
   //FrmCodeEditorMethod.CodeGenerator:=GenerateCode;
@@ -312,18 +241,8 @@ end;
 
 
 procedure TFrmMain.FormDestroy(Sender: TObject);
-var
- i : Integer;
 begin
-  for i := 0 to ComboBoxClasses.Items.Count-1 do
-   if ComboBoxClasses.Items.Objects[i]<>nil then
-   begin
-    TWMiClassMetaData(ComboBoxClasses.Items.Objects[i]).Free;
-    ComboBoxClasses.Items.Objects[i]:=nil;
-   end;
-
-
-
+  FrmWmiClasses.Free;
   FrmWmiEvents.Free;
   FrmWmiMethods.Free;
 
@@ -331,282 +250,6 @@ begin
   FrmWmiClassTree.Free;
   Settings.Free;
 end;
-
-procedure TFrmMain.GenerateCode;
-begin
-
-  if PageControlCodeGen.ActivePage=TabSheetWmiClasses then
-   if ComboBoxClasses.ItemIndex>=0 then
-     GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
-
-      {
-  if PageControlCodeGen.ActivePage=TabSheetMethods then
-    if ComboBoxClassesMethods.ItemIndex>=0 then
-      GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
-
-
-  if PageControlCodeGen.ActivePage=TabSheetEvents then
-    if ComboBoxEvents.ItemIndex>=0 then
-      GenerateEventCode(TWMiClassMetaData(ComboBoxEvents.Items.Objects[ComboBoxEvents.ItemIndex]));
-       }
-end;
-
-procedure TFrmMain.GenerateConsoleCode(WmiMetaClassInfo : TWMiClassMetaData);
-var
-  i,j:     integer;
-  Props: TStrings;
-  Str:  string;
-  DelphiWmiCodeGenerator : TDelphiWmiClassCodeGenerator;
-  FPCWmiCodeGenerator    : TFPCWmiClassCodeGenerator;
-  OxygenWmiCodeGenerator : TOxygenWmiClassCodeGenerator;
-  CppWmiCodeGenerator    : TBorlandCppWmiClassCodeGenerator;
-
-begin
-  if not Assigned(WmiMetaClassInfo) then Exit;
-
-  SetLog(Format('Generating code for %s:%s',[WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
-
-  //Object Pascal console Code
-  Props := TStringList.Create;
-  try
-    Str := '';
-    for i := 0 to ListViewProperties.Items.Count - 1 do
-      if ListViewProperties.Items[i].Checked then
-        Str := Str + Format('%s=%s, ', [ListViewProperties.Items[i].Caption,
-          ListViewProperties.Items[i].SubItems[0]]);
-
-    Props.CommaText := Str;
-
-    j:=0;
-    for i := 0 to ListViewProperties.Items.Count - 1 do
-      if ListViewProperties.Items[i].Checked then
-      begin
-        Props.Objects[j]:=ListViewProperties.Items[i].Data;//CimType
-        inc(j);
-      end;
-
-    case FrmCodeEditor.CompilerType of
-      Ct_Delphi:
-                  begin
-                    DelphiWmiCodeGenerator:=TDelphiWmiClassCodeGenerator.Create;
-                    try
-                      DelphiWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      DelphiWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
-                      DelphiWmiCodeGenerator.GenerateCode(Props);
-                      FrmCodeEditor.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
-                    finally
-                      DelphiWmiCodeGenerator.Free;
-                    end;
-                  end;
-
-
-      Ct_Lazarus_FPC:
-                  begin
-                    FPCWmiCodeGenerator:=TFPCWmiClassCodeGenerator.Create;
-                    try
-                      FPCWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
-                      FPCWmiCodeGenerator.GenerateCode(Props);
-                      FrmCodeEditor.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
-                    finally
-                      FPCWmiCodeGenerator.Free;
-                    end;
-                  end;
-
-
-      Ct_Oxygene:
-                  begin
-                    OxygenWmiCodeGenerator:=TOxygenWmiClassCodeGenerator.Create;
-                    try
-                      OxygenWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
-                      OxygenWmiCodeGenerator.GenerateCode(Props);
-                      FrmCodeEditor.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
-                    finally
-                      OxygenWmiCodeGenerator.Free;
-                    end;
-                  end;
-
-      Ct_BorlandCpp:
-                  begin
-                    CppWmiCodeGenerator:=TBorlandCppWmiClassCodeGenerator.Create;
-                    try
-                      CppWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      CppWmiCodeGenerator.UseHelperFunctions:=false;//Settings.DelphiWmiClassHelperFuncts;
-                      CppWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
-                      CppWmiCodeGenerator.GenerateCode(Props);
-                      FrmCodeEditor.SourceCode:=CppWmiCodeGenerator.OutPutCode;
-                    finally
-                      CppWmiCodeGenerator.Free;
-                    end;
-                  end;
-
-    end;
-
-  finally
-    Props.Free;
-  end;
-end;
-
-
-procedure TFrmMain.GetValuesWmiProperties(const Namespace, WmiClass: string);
-var
-  Props: TStringList;
-  i    : Integer;
-begin
-  if (ListViewProperties.Items.Count > 0) and (WmiClass <> '') and (Namespace <> '') then
-  begin
-    Props:=TStringList.Create;
-    try
-      for i := 0 to ListViewProperties.Items.Count - 1 do
-        if ListViewProperties.Items[i].Checked then
-          Props.Add(ListViewProperties.Items[i].Caption);
-
-      ListValuesWmiProperties(Namespace, WmiClass, Props);
-    finally
-     Props.Free;
-    end;
-  end;
-end;
-
-procedure TFrmMain.ListBoxPropertiesClick(Sender: TObject);
-begin
-  CheckBoxSelAllProps.Checked := False;
-  GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
-end;
-
-procedure TFrmMain.LoadClassInfo;
-var
-  WmiMetaClassInfo : TWMiClassMetaData;
-begin
-  if ComboBoxClasses.ItemIndex=-1 then exit;
-
-  ProgressBarWmi.Visible := True;
-  try
-    if ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]=nil then
-    begin
-      WmiMetaClassInfo:=TWMiClassMetaData.Create(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
-      ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]:= WmiMetaClassInfo;
-    end
-    else
-      WmiMetaClassInfo:=TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
-
-    if Assigned(WmiMetaClassInfo) then
-    begin
-      SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
-      MemoClassDescr.Text :=  WmiMetaClassInfo.Description; //GetWmiClassDescription(Namespace, WmiClass);
-      if MemoClassDescr.Text = '' then
-        MemoClassDescr.Text := 'Class without description available';
-
-      //LoadWmiProperties(Namespace, WmiClass);
-      LoadWmiProperties(WmiMetaClassInfo);
-      FrmWMIExplorer.LoadClassInfo(WmiMetaClassInfo);
-    end;
-  finally
-    SetMsg('');
-    ProgressBarWmi.Visible := False;
-  end;
-end;
-
-
-
-procedure TFrmMain.LoadWmiClasses(const Namespace: string);
-var
-  Node: TTreeNode;
-  NodeC: TTreeNode;
-  FClasses: TStringList;
-  i: integer;
-begin
-  SetMsg(Format('Loading Classes of %s', [Namespace]));
-  Node := FindTextTreeView(Namespace, FrmWMIExplorer.TreeViewWmiClasses);
-  if Assigned(Node) then
-  begin
-
-    for i := 0 to ComboBoxClasses.Items.Count-1 do
-     if ComboBoxClasses.Items.Objects[i]<>nil then
-     begin
-      TWMiClassMetaData(ComboBoxClasses.Items.Objects[i]).Free;
-      ComboBoxClasses.Items.Objects[i]:=nil;
-     end;
-
-
-    if Assigned(Node.Data) then
-    begin
-      FClasses := TStringList(Node.Data);
-      ComboBoxClasses.Items.BeginUpdate;
-      try
-        ComboBoxClasses.Items.Clear;
-        ComboBoxClasses.Items.AddStrings(FClasses);
-        LabelClasses.Caption := Format('Classes (%d)', [FClasses.Count]);
-      finally
-        ComboBoxClasses.Items.EndUpdate;
-      end;
-    end
-    else
-    begin
-      FClasses := TStringList.Create;
-      FClasses.Sorted := True;
-      FClasses.BeginUpdate;
-
-      try
-
-        try
-          if not ExistWmiClassesCache(Namespace) then
-          begin
-            //GetListWmiDynamicAndStaticClasses(Namespace,FClasses);
-            //GetListWmiClasses(Namespace,FClasses,['dynamic','static'],['abstract'],False);
-            GetListWmiClasses(Namespace, FClasses, [], ['abstract'], True);
-            SaveWMIClassesToCache(Namespace, FClasses);
-          end
-          else
-            LoadWMIClassesFromCache(Namespace, FClasses);
-
-        except
-          on E: EOleSysError do
-            if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-              SetLog(
-                Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
-            else
-              raise;
-        end;
-
-      finally
-        FClasses.EndUpdate;
-      end;
-
-      ComboBoxClasses.Items.BeginUpdate;
-      try
-        ComboBoxClasses.Items.Clear;
-        ComboBoxClasses.Items.AddStrings(FClasses);
-        LabelClasses.Caption := Format('Classes (%d)', [FClasses.Count]);
-      finally
-        ComboBoxClasses.Items.EndUpdate;
-      end;
-
-      FrmWMIExplorer.TreeViewWmiClasses.Items.BeginUpdate;
-      Node.Data := FClasses;
-      try
-        for i := 0 to FClasses.Count - 1 do
-        begin
-          NodeC := FrmWMIExplorer.TreeViewWmiClasses.Items.AddChild(Node, FClasses[i]);
-          NodeC.ImageIndex := ClassImageIndex;
-          NodeC.SelectedIndex := ClassImageIndex;
-        end;
-      finally
-        FrmWMIExplorer.TreeViewWmiClasses.Items.EndUpdate;
-      end;
-    end;
-  end
-  else
-    MsgWarning(Namespace + ' not found');
-
-  SetMsg('');
-end;
-
-
 
 procedure TFrmMain.LoadWmiMetaData;
 var
@@ -650,7 +293,7 @@ begin
            while AsyncMultiSync([GWmiNamespaces], True, 100) = WAIT_TIMEOUT do
              Application.ProcessMessages;
                   }
-        LabelNamespace.Caption := Format('Namespaces (%d)', [FNameSpaces.Count]);
+        FrmWmiClasses.LabelNamespace.Caption := Format('Namespaces (%d)', [FNameSpaces.Count]);
       except
         on E: EOleSysError do
 
@@ -667,11 +310,11 @@ begin
       ProgressBarWmi.Visible := False;
     end;
 
-    ComboBoxNameSpaces.Items.BeginUpdate;
+    FrmWmiClasses.ComboBoxNameSpaces.Items.BeginUpdate;
     try
-      ComboBoxNameSpaces.Items.AddStrings(FNameSpaces);
+      FrmWmiClasses.ComboBoxNameSpaces.Items.AddStrings(FNameSpaces);
     finally
-      ComboBoxNameSpaces.Items.EndUpdate;
+      FrmWmiClasses.ComboBoxNameSpaces.Items.EndUpdate;
     end;
 
     FrmWmiEvents.ComboBoxNamespacesEvents.Items.BeginUpdate;
@@ -702,18 +345,18 @@ begin
     end;
 
     if Settings.LastWmiNameSpace<>'' then
-      ComboBoxNameSpaces.ItemIndex := ComboBoxNameSpaces.Items.IndexOf(Settings.LastWmiNameSpace)
+      FrmWmiClasses.ComboBoxNameSpaces.ItemIndex := FrmWmiClasses.ComboBoxNameSpaces.Items.IndexOf(Settings.LastWmiNameSpace)
     else
-      ComboBoxNameSpaces.ItemIndex := 0;
+      FrmWmiClasses.ComboBoxNameSpaces.ItemIndex := 0;
 
-    LoadWmiClasses(ComboBoxNameSpaces.Text);
+    FrmWmiClasses.LoadWmiClasses(FrmWmiClasses.ComboBoxNameSpaces.Text);
     if Settings.LastWmiClass<>'' then
-      ComboBoxClasses.ItemIndex := ComboBoxClasses.Items.IndexOf(Settings.LastWmiClass)
+      FrmWmiClasses.ComboBoxClasses.ItemIndex := FrmWmiClasses.ComboBoxClasses.Items.IndexOf(Settings.LastWmiClass)
     else
-      ComboBoxClasses.ItemIndex := 0;
+      FrmWmiClasses.ComboBoxClasses.ItemIndex := 0;
 
 
-    LoadClassInfo;
+    FrmWmiClasses.LoadClassInfo;
 
     if Settings.LastWmiNameSpaceEvents<>'' then
       FrmWmiEvents.ComboBoxNamespacesEvents.ItemIndex := FrmWmiEvents.ComboBoxNamespacesEvents.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
@@ -737,42 +380,6 @@ begin
   end;
 end;
 
-
-procedure TFrmMain.LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
-var
-  i:     integer;
-  //Props: TStringList;
-  item:  TListItem;
-begin
-  StatusBar1.SimpleText := Format('Loading Properties of %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]);
-  ListViewProperties.Items.BeginUpdate;
-  try
-    ListViewProperties.Items.Clear;
-
-    for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
-    begin
-      item := ListViewProperties.Items.Add;
-      item.Caption := WmiMetaClassInfo.Properties[i].Name;
-      item.SubItems.Add(WmiMetaClassInfo.Properties[i].&Type);
-      item.SubItems.Add(WmiMetaClassInfo.Properties[i].Description);
-      item.Checked := CheckBoxSelAllProps.Checked;
-      item.Data    := Pointer(WmiMetaClassInfo.Properties[i].CimType); //Cimtype
-    end;
-
-    LabelProperties.Caption := Format('%d Properties of %s:%s',
-      [ListViewProperties.Items.Count, WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]);
-  finally
-    ListViewProperties.Items.EndUpdate;
-  end;
-  SetMsg('');
-
-  for i := 0 to ListViewProperties.Columns.Count - 1 do
-    AutoResizeColumn(ListViewProperties.Column[i]);
-
-  GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
-end;
-
-
 procedure TFrmMain.SetLog(const Log: string);
 begin
  MemoLog.Lines.Add(Log);
@@ -782,16 +389,6 @@ procedure TFrmMain.SetMsg(const Msg: string);
 begin
   StatusBar1.Panels[0].Text := Msg;
   StatusBar1.Update;
-end;
-
-procedure TFrmMain.SetToolBar;
-begin
-  {
-  ToolButtonRun.Enabled    := (PageControlMain.ActivePage = TabSheetCodeGen);
-  ToolButtonSave.Enabled   := (PageControlMain.ActivePage = TabSheetCodeGen);
-  ToolButtonSearch.Enabled := (PageControlMain.ActivePage = TabSheetWmiExplorer);
-  ToolButtonGetValues.Enabled := (PageControlMain.ActivePage = TabSheetWmiExplorer);
-  }
 end;
 
 procedure TFrmMain.StatusBar1DrawPanel(StatusBar: TStatusBar;
@@ -806,7 +403,7 @@ end;
 
 procedure TFrmMain.ToolButtonOnlineClick(Sender: TObject);
 begin
-  ShellExecute(Handle, 'open', PChar(Format(UrlWmiHelp, [ComboBoxClasses.Text])), nil,
+  ShellExecute(Handle, 'open', PChar(Format(UrlWmiHelp, [FrmWmiClasses.ComboBoxClasses.Text])), nil,
     nil, SW_SHOW);
 end;
 
@@ -824,16 +421,15 @@ end;
 
 procedure TFrmMain.ToolButtonGetValuesClick(Sender: TObject);
 begin
-  GetValuesWmiProperties(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
+  FrmWmiClasses.GetValuesWmiProperties(FrmWmiClasses.ComboBoxNameSpaces.Text, FrmWmiClasses.ComboBoxClasses.Text);
 end;
 
 procedure TFrmMain.PageControlMainChange(Sender: TObject);
 begin
-  SetToolBar;
   if PageControlMain.ActivePage = TabSheetWmiDatabase then
   begin
    FrmWmiDatabase.NameSpaces.Clear;
-   FrmWmiDatabase.NameSpaces.AddStrings(ComboBoxNameSpaces.Items);
+   FrmWmiDatabase.NameSpaces.AddStrings(FrmWmiClasses.ComboBoxNameSpaces.Items);
   end;
 end;
 
@@ -857,7 +453,6 @@ begin
     ReadSettings(Settings);
   end;
 end;
-
 
 initialization
 

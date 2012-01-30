@@ -365,56 +365,59 @@ var
 begin
   //MemoDescr.Lines.Clear;
   Node := TreeViewWmiClasses.Selected;
-  if Assigned(Node) and (Node.Level = LevelNameSpace) and (Node.Count = 0) then
+  With FrmMain.FrmWmiClasses do
   begin
-    PanelClassInfo.Height := 0;
-    FrmMain.ComboBoxNameSpaces.ItemIndex :=
-      FrmMain.ComboBoxNameSpaces.Items.IndexOf(Node.Text);
-    FrmMain.LoadWmiClasses(FrmMain.ComboBoxNameSpaces.Text);
-
-    FrmMain.ComboBoxClasses.ItemIndex := 0;
-    FrmMain.LoadClassInfo;
-    FrmMain.GenerateConsoleCode(TWMiClassMetaData(FrmMain.ComboBoxClasses.Items.Objects[FrmMain.ComboBoxClasses.ItemIndex]));
-  end
-  else
-  if Assigned(Node) and (Node.Level = LevelClass) and (Assigned(Node.Parent)) then
-  begin
-    PanelClassInfo.Height := 220;
-    FrmMain.ComboBoxNameSpaces.ItemIndex :=
-      FrmMain.ComboBoxNameSpaces.Items.IndexOf(Node.Parent.Text);
-    FrmMain.LoadWmiClasses(FrmMain.ComboBoxNameSpaces.Text);
-    FrmMain.ComboBoxClasses.ItemIndex := FrmMain.ComboBoxClasses.Items.IndexOf(Node.Text);
-    FrmMain.ComboBoxClassesChange(FrmMain.ComboBoxClasses);
-    WMiClassMetaData:=TWMiClassMetaData(FrmMain.ComboBoxClasses.Items.Objects[FrmMain.ComboBoxClasses.ItemIndex]);
-    MemoDescr.Lines.Text :=WMiClassMetaData.DescriptionEx;
-    LoadClassInfo(WMiClassMetaData);
-    FrmMain.GenerateConsoleCode(TWMiClassMetaData(FrmMain.ComboBoxClasses.Items.Objects[FrmMain.ComboBoxClasses.ItemIndex]));
-  end
-  else
-  if Assigned(Node) and (Node.Level = LevelPropertyMethod) then
-  begin
-    {
-    //'Property %s : %s'
-    if StartsText('Property', Node.Text) then
+    if Assigned(Node) and (Node.Level = LevelNameSpace) and (Node.Count = 0) then
     begin
-      sValue := StringReplace(Node.Text, 'Property ', '', [rfReplaceAll]);
-      sValue := Trim(Copy(sValue, 1, Pos(':', sValue) - 1));
-      MemoDescr.Lines.Text := GetWmiPropertyDescription(Node.Parent.Parent.Text, Node.Parent.Text, sValue);
+      PanelClassInfo.Height := 0;
+      ComboBoxNameSpaces.ItemIndex :=
+        ComboBoxNameSpaces.Items.IndexOf(Node.Text);
+      LoadWmiClasses(ComboBoxNameSpaces.Text);
+
+      ComboBoxClasses.ItemIndex := 0;
+      LoadClassInfo;
+      GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
     end
     else
-    if StartsText('Method', Node.Text) then
+    if Assigned(Node) and (Node.Level = LevelClass) and (Assigned(Node.Parent)) then
     begin
-      sValue := Trim(StringReplace(Node.Text, 'Method', '', [rfReplaceAll]));
-      MemoDescr.Lines.Text := GetWmiMethodDescription(
-        Node.Parent.Parent.Text, Node.Parent.Text, sValue);
-    end;
-    }
-  end
-  else
-  if Assigned(Node) and (Node.Level = LevelNameSpace) then
-    PanelClassInfo.Height := 0
-  else
-    PanelClassInfo.Height := 220;
+      PanelClassInfo.Height := 220;
+      ComboBoxNameSpaces.ItemIndex :=
+        ComboBoxNameSpaces.Items.IndexOf(Node.Parent.Text);
+      LoadWmiClasses(ComboBoxNameSpaces.Text);
+      ComboBoxClasses.ItemIndex := ComboBoxClasses.Items.IndexOf(Node.Text);
+      ComboBoxClassesChange(ComboBoxClasses);
+      WMiClassMetaData:=TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
+      MemoDescr.Lines.Text :=WMiClassMetaData.DescriptionEx;
+      Self.LoadClassInfo(WMiClassMetaData);
+      GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
+    end
+    else
+    if Assigned(Node) and (Node.Level = LevelPropertyMethod) then
+    begin
+      {
+      //'Property %s : %s'
+      if StartsText('Property', Node.Text) then
+      begin
+        sValue := StringReplace(Node.Text, 'Property ', '', [rfReplaceAll]);
+        sValue := Trim(Copy(sValue, 1, Pos(':', sValue) - 1));
+        MemoDescr.Lines.Text := GetWmiPropertyDescription(Node.Parent.Parent.Text, Node.Parent.Text, sValue);
+      end
+      else
+      if StartsText('Method', Node.Text) then
+      begin
+        sValue := Trim(StringReplace(Node.Text, 'Method', '', [rfReplaceAll]));
+        MemoDescr.Lines.Text := GetWmiMethodDescription(
+          Node.Parent.Parent.Text, Node.Parent.Text, sValue);
+      end;
+      }
+    end
+    else
+    if Assigned(Node) and (Node.Level = LevelNameSpace) then
+      PanelClassInfo.Height := 0
+    else
+      PanelClassInfo.Height := 220;
+  end;
 end;
 
 end.

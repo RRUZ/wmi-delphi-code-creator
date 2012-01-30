@@ -25,7 +25,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls, uCodeEditor, uSettings, uWmi_Metadata;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls, uCodeEditor, uSettings, uWmi_Metadata, uComboBox;
 
 const
   UM_EDITEVENTVALUE = WM_USER + 112;
