@@ -111,12 +111,9 @@ begin
   SendMessage(Memo.Handle, EM_SCROLLCARET, 0, 0);
 end;
 
-
 procedure TFrmCodeEditor.ScrollMemo(Memo: TSynEdit);
 begin
   Memo.SelStart  := Memo.GetTextLen;
-  Memo.SelLength := 1;
-  SendMessage(Memo.Handle, EM_SCROLLCARET, 0, 0);
 end;
 
 procedure TFrmCodeEditor.SetCompilerType(const Value: TCompilerType);
