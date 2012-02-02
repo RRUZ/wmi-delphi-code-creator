@@ -174,6 +174,7 @@ type
   procedure SaveWMIClassesToCache(const namespace: string; List: TStrings);
   procedure SaveWMIClassesMethodsToCache(const namespace: string; List: TStrings);
 
+  function GetWMICFolderCache : string;
 
 
 implementation
@@ -181,9 +182,12 @@ implementation
 {$R *.dfm}
 
 uses
+  ShlObj,
   ShellAPI,
   GraphUtil,
+  {$WARN SYMBOL_PLATFORM OFF}
   FileCtrl,
+  {$WARN SYMBOL_PLATFORM ON}
   uDelphiVersions,
   SynHighlighterPas,
   SynHighlighterCpp,
@@ -204,12 +208,35 @@ const
 Var
   DummyFrm : TFrmSettings;
 
+function GetSpecialFolder(const CSIDL: integer) : string;
+var
+  lpszPath : PWideChar;
+begin
+    lpszPath := StrAlloc(MAX_PATH);
+    try
+       ZeroMemory(lpszPath, MAX_PATH);
+      if SHGetSpecialFolderPath(0, lpszPath, CSIDL, False)  then
+        Result := lpszPath
+      else
+        Result := '';
+    finally
+      StrDispose(lpszPath);
+    end;
+end;
+
+function GetWMICFolderCache : string;
+begin
+ Result:=IncludeTrailingPathDelimiter(GetSpecialFolder(CSIDL_APPDATA))+ 'WDCC\Cache\';
+ //C:\Users\Dexter\AppData\Roaming\WDCC\Cache
+ SysUtils.ForceDirectories(Result);
+end;
+
 function ExistWmiClassesCache(const namespace: string): boolean;
 var
   FileName: string;
 begin
   FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '.wmic';
+  FileName := GetWMICFolderCache + FileName + '.wmic';
   Result   := FileExists(FileName);
 end;
 
@@ -218,18 +245,18 @@ var
   FileName: string;
 begin
   FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '_ClassMethods.wmic';
+  FileName := GetWMICFolderCache + FileName + '_ClassMethods.wmic';
   Result   := FileExists(FileName);
 end;
 
 function ExistWmiNameSpaceCache: boolean;
 begin
-  Result := FileExists(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
+  Result :=FileExists(GetWMICFolderCache+ 'Namespaces.wmic');
 end;
 
 procedure LoadWMINameSpacesFromCache(List: TStrings);
 begin
-  List.LoadFromFile(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
+  List.LoadFromFile(GetWMICFolderCache + 'Namespaces.wmic');
 end;
 
 procedure LoadWMIClassesFromCache(const namespace: string; List: TStrings);
@@ -237,7 +264,7 @@ var
   FileName: string;
 begin
   FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '.wmic';
+  FileName := GetWMICFolderCache + FileName + '.wmic';
   List.LoadFromFile(FileName);
 end;
 
@@ -247,7 +274,7 @@ var
   FileName: string;
 begin
   FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '_ClassMethods.wmic';
+  FileName := GetWMICFolderCache + FileName + '_ClassMethods.wmic';
   List.LoadFromFile(FileName);
 end;
 
@@ -257,7 +284,7 @@ var
   FileName: string;
 begin
   FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '_ClassMethods.wmic';
+  FileName := GetWMICFolderCache + FileName + '_ClassMethods.wmic';
   List.SaveToFile(FileName);
 end;
 
@@ -266,13 +293,13 @@ var
   FileName: string;
 begin
   FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
-  FileName := ExtractFilePath(ParamStr(0)) + '\Cache\' + FileName + '.wmic';
+  FileName := GetWMICFolderCache + FileName + '.wmic';
   List.SaveToFile(FileName);
 end;
 
 procedure SaveWMINameSpacesToCache(List: TStrings);
 begin
-  List.SaveToFile(ExtractFilePath(ParamStr(0)) + '\Cache\Namespaces.wmic');
+  List.SaveToFile(GetWMICFolderCache + 'Namespaces.wmic');
 end;
 
 
@@ -457,7 +484,7 @@ procedure ReadSettings(var Settings: TSettings);
 var
   iniFile: TIniFile;
 begin
-  iniFile := TIniFile.Create(ExtractFilePath(ParamStr(0)) + 'Settings.ini');
+  iniFile := TIniFile.Create(GetWMICFolderCache + 'Settings.ini');
   try
     Settings.CurrentTheme := iniFile.ReadString('Global', 'CurrentTheme', 'deep-blue');
     Settings.FontName     := iniFile.ReadString('Global', 'FontName', 'Consolas');
@@ -490,7 +517,7 @@ procedure WriteSettings(const Settings: TSettings);
 var
   iniFile: TIniFile;
 begin
-  iniFile := TIniFile.Create(ExtractFilePath(ParamStr(0)) + 'Settings.ini');
+  iniFile := TIniFile.Create(GetWMICFolderCache + 'Settings.ini');
   try
     iniFile.WriteString('Global', 'CurrentTheme', Settings.CurrentTheme);
     iniFile.WriteString('Global', 'FontName', Settings.FontName);
@@ -589,7 +616,7 @@ procedure TFrmSettings.BtnDeleteCacheClick(Sender: TObject);
 Var
  FileName  : string;
 begin
-  for FileName in IOUtils.TDirectory.GetFiles(ExtractFilePath(ParamStr(0))+'cache','*.wmic') do
+  for FileName in IOUtils.TDirectory.GetFiles(GetWMICFolderCache,'*.wmic') do
     DeleteFile(FileName);
 
   MsgInformation('The cache was deleted');

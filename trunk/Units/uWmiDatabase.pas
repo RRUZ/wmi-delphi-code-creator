@@ -89,7 +89,7 @@ uses
   MidasLib,
   uWmi_Metadata,
   uWmi_ViewPropsValues,
-  AsyncCalls;
+  AsyncCalls, uSettings;
 
 const
   MaxHistory      = 50;
@@ -434,7 +434,7 @@ procedure TFrmWmiDatabase.FormCreate(Sender: TObject);
 begin
   FNameSpaces   := TStringList.Create;
   FDatabaseFile := ExtractFilePath(Application.ExeName) + WmiDatabaseName;
-  FHistoryFile  := ExtractFilePath(Application.ExeName) + 'WmiFiltersHistory.txt';
+  FHistoryFile  := GetWMICFolderCache + 'WmiFiltersHistory.txt';
   if FileExists(FHistoryFile) then
     ComboBoxSearch.Items.LoadFromFile(FHistoryFile);
 

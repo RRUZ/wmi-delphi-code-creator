@@ -25,6 +25,9 @@ interface
 
 //TODO
 {
+  move cache locations to commnon app data
+  disable run as admin requirement
+
   Fix disabled icons
   Remote machine support
   Improve source code
