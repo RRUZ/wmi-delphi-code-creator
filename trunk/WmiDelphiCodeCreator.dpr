@@ -48,9 +48,26 @@ uses
 
 {$R *.res}
 
+procedure UpdateApp;
+var
+  Frm: TFrmCheckUpdate;
+begin
+  Frm := TFrmCheckUpdate.Create(nil);
+  try
+    Frm.CheckExternal:=True;
+    if Frm.UpdateAvailable then
+      Frm.ExecuteUpdater;
+  finally
+    Frm.Free;
+  end;
+end;
+
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TFrmMain, FrmMain);
+  if FrmMain.Settings.CheckForUpdates then
+   UpdateApp;
+
   Application.Run;
 end.
