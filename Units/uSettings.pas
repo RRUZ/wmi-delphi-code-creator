@@ -50,6 +50,7 @@ type
     FLastWmiEventIntrinsic: Boolean;
     FLastWmiClassesMethods: string;
     FLastWmiMethod: string;
+    FCheckForUpdates: Boolean;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -79,6 +80,8 @@ type
 
     property VCLStyle : string read FVCLStyle Write FVCLStyle;
     property Formatter : string read FFormatter write FFormatter;
+
+    property CheckForUpdates : Boolean read FCheckForUpdates write FCheckForUpdates;
   end;
 
 
@@ -121,6 +124,7 @@ type
     CbFormatter: TComboBox;
     Label10: TLabel;
     ImageVCLStyle: TImage;
+    CheckBoxUpdates: TCheckBox;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -185,9 +189,9 @@ uses
   ShlObj,
   ShellAPI,
   GraphUtil,
-  {$WARN SYMBOL_PLATFORM OFF}
-  FileCtrl,
-  {$WARN SYMBOL_PLATFORM ON}
+  {$WARN UNIT_PLATFORM OFF}
+  Vcl.FileCtrl,
+  {$WARN UNIT_PLATFORM ON}
   uDelphiVersions,
   SynHighlighterPas,
   SynHighlighterCpp,
@@ -508,6 +512,7 @@ begin
     Settings.LastWmiEventIntrinsic         := iniFile.ReadBool('Global', 'LastWmiEventIntrinsic', True);
     Settings.VCLStyle                      := iniFile.ReadString('Global', 'VCLStyle', 'Windows');
     Settings.Formatter                     := iniFile.ReadString('Global', 'Formatter', '');
+    Settings.CheckForUpdates               := iniFile.ReadBool('Global', 'CheckForUpdates', True);
   finally
     iniFile.Free;
   end;
@@ -539,6 +544,7 @@ begin
     iniFile.WriteBool('Global', 'LastWmiEventIntrinsic', Settings.LastWmiEventIntrinsic);
     iniFile.WriteString('Global', 'VCLStyle', Settings.VCLStyle);
     iniFile.WriteString('Global', 'Formatter', Settings.Formatter);
+    iniFile.WriteBool('Global', 'CheckForUpdates', Settings.CheckForUpdates);
   finally
     iniFile.Free;
   end;
@@ -651,6 +657,7 @@ begin
     FSettings.OutputFolder                  := EditOutputFolder.Text;
     FSettings.VCLStyle                      := ComboBoxVCLStyle.Text;
     FSettings.Formatter                     := CbFormatter.Text;
+    FSettings.CheckForUpdates               := CheckBoxUpdates.Checked;
     WriteSettings(FSettings);
     Close();
     LoadVCLStyle(ComboBoxVCLStyle.Text);
@@ -851,6 +858,8 @@ begin
   CheckBoxHelper.Checked    := FSettings.FDelphiWmiClassHelperFuncts;
   CheckBoxShowImplMethods.Checked    := FSettings.FShowImplementedMethods;
   EditOutputFolder.Text              := FSettings.OutputFolder;
+
+  CheckBoxUpdates.Checked            := FSettings.CheckForUpdates;
 end;
 
 

@@ -107,13 +107,14 @@ type
 
     FrmWmiEvents          : TFrmWmiEvents;
     FrmWmiMethods         : TFrmWmiMethods;
+    FSettings: TSettings;
 
-    Settings : TSettings;
     procedure LoadWmiMetaData;
     procedure SetLog(const Log :string);
   public
     FrmWmiClasses         : TFrmWmiClasses;
     procedure SetMsg(const Msg: string);
+    property Settings : TSettings read FSettings;
   end;
 
 
@@ -140,6 +141,7 @@ const
 
 {$R ManAdmin.RES}
 
+
 { TProgressBar }
 procedure TProgressBar.CreateParams(var Params: TCreateParams);
 begin
@@ -158,8 +160,6 @@ begin
   FrmWmiEvents.Close();
   FrmWmiMethods.Close();
   FrmWmiClasses.Close();
-
-
   WriteSettings(Settings);
 end;
 
@@ -167,10 +167,14 @@ procedure TFrmMain.FormCreate(Sender: TObject);
 var
   ProgressBarStyle: integer;
 begin
+  {$WARN SYMBOL_PLATFORM OFF}
   ReportMemoryLeaksOnShutdown:=DebugHook<>0;
-  Settings :=TSettings.Create;
+  {$WARN SYMBOL_PLATFORM ON}
+
+
+  FSettings :=TSettings.Create;
   SetLog('Reading settings');
-  ReadSettings(Settings);
+  ReadSettings(FSettings);
   LoadVCLStyle(Settings.VCLStyle);
 
   MemoConsole.Color:=Settings.BackGroundColor;
@@ -278,8 +282,10 @@ begin
   Frm := TFrmAbout.Create(Self);
   try
 
+    {$WARN SYMBOL_PLATFORM OFF}
     if (DebugHook=0) and (SameText(Settings.VCLStyle,'Windows')) then
     Frm.Show;
+    {$WARN SYMBOL_PLATFORM ON}
 
     SetMsg('Loading Namespaces');
     ProgressBarWmi.Visible := True;
@@ -426,11 +432,7 @@ var
   Frm: TFrmAbout;
 begin
   Frm := TFrmAbout.Create(nil);
-  try
-    Frm.ShowModal();
-  finally
-    //Frm.Free;
-  end;
+  Frm.ShowModal();
 end;
 
 procedure TFrmMain.ToolButtonGetValuesClick(Sender: TObject);
@@ -464,7 +466,7 @@ begin
     Frm.ShowModal();
   finally
     Frm.Free;
-    ReadSettings(Settings);
+    ReadSettings(FSettings);
   end;
 end;
 
