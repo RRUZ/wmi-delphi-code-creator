@@ -224,6 +224,27 @@ var
   XmlDoc : OleVariant;
   Node   : OleVariant;
 begin
+{
+  XmlDoc       := CreateOleObject('Msxml2.XMLHTTP.3.0');
+  try
+    SetMsg('Getting version info');
+    XmlDoc.open('GET', sRemoteVersionFile, false);
+    XmlDoc.send();
+    XmlVersionInfo:=XmlDoc.responseXML.xml;
+
+     Node:=XmlDoc.responseXML.selectSingleNode(sXPathVersionNumber);
+     if not VarIsClear(Node) then FRemoteVersion:=Node.Text;
+
+     Node:=XmlDoc.responseXML.selectSingleNode(sXPathUrlInstaller);
+     if not VarIsClear(Node) then FUrlInstaller:=Node.Text;
+
+     Node:=XmlDoc.responseXML.selectSingleNode(sXPathInstallerFileName);
+     if not VarIsClear(Node) then FInstallerFileName:=Node.Text;
+  finally
+   XmlDoc    :=Unassigned;
+  end;
+}
+
   XmlDoc       := CreateOleObject('Msxml2.DOMDocument.6.0');
   XmlDoc.Async := False;
   try
@@ -245,6 +266,7 @@ begin
   finally
    XmlDoc    :=Unassigned;
   end;
+
 end;
 
 procedure TFrmCheckUpdate.SetMsg(const Msg: string);
@@ -260,10 +282,10 @@ begin
  try
    if FRemoteVersion='' then
      ReadRemoteInfo;
-
+          {
    if DebugHook<>0 then
      Result:=True
-   else
+   else  }
      Result:=(FRemoteVersion>FLocalVersion);
  except on E : Exception do
    begin

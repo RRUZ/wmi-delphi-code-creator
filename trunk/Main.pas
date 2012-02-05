@@ -25,9 +25,7 @@ interface
 
 //TODO
 {
-  move cache locations to commnon app data
   disable run as admin requirement
-
   Fix disabled icons
   Remote machine support
   Improve source code
@@ -128,10 +126,8 @@ uses
   Vcl.Styles.Ext,
   VCl.Themes,
   ShellApi,
-  CommCtrl,
   ComObj,
-  uWmi_About,
-  uMisc;
+  uWmi_About;
 
 const
   PBS_MARQUEE    = $08;
@@ -196,7 +192,7 @@ begin
   FrmWmiDatabase.Parent := TabSheetWmiDatabase;
   FrmWmiDatabase.BorderStyle := bsNone;
   FrmWmiDatabase.Align := alClient;
-  FrmWmiDatabase.Status:=SetMsg;
+  //FrmWmiDatabase.Status:=SetMsg;
   FrmWmiDatabase.Log   :=SetLog;
   FrmWmiDatabase.Show;
 
@@ -443,10 +439,7 @@ end;
 procedure TFrmMain.PageControlMainChange(Sender: TObject);
 begin
   if PageControlMain.ActivePage = TabSheetWmiDatabase then
-  begin
-   FrmWmiDatabase.NameSpaces.Clear;
-   FrmWmiDatabase.NameSpaces.AddStrings(FrmWmiClasses.ComboBoxNameSpaces.Items);
-  end;
+   FrmWmiDatabase.NameSpaces:=FrmWmiClasses.ComboBoxNameSpaces.Items;
 end;
 
 procedure TFrmMain.ToolButtonSearchClick(Sender: TObject);

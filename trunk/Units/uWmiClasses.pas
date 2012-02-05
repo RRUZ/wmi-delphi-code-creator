@@ -138,7 +138,7 @@ end;
 procedure TFrmWmiClasses.GenerateCode;
 begin
    if ComboBoxClasses.ItemIndex>=0 then
-     GenerateConsoleCode(CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNameSpaces.Text, ComboBoxClasses.Text));
+     GenerateConsoleCode(CachedWMIClasses.GetWmiClass(ComboBoxNameSpaces.Text, ComboBoxClasses.Text));
 end;
 
 procedure TFrmWmiClasses.GenerateConsoleCode(
@@ -277,7 +277,7 @@ begin
   if ComboBoxClasses.ItemIndex=-1 then exit;
 
   try
-    WmiMetaClassInfo:=CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
+    WmiMetaClassInfo:=CachedWMIClasses.GetWmiClass(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
 
     if Assigned(WmiMetaClassInfo) then
     begin
