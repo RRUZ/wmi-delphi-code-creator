@@ -28,21 +28,21 @@ uses
  Generics.Collections;
 
 type
- TWmiNameSpacesList = TObjectList<TWMiClassMetaData>;
+ TWmiClassesList = TObjectList<TWMiClassMetaData>;
 
- TWmiNameSpaceDictionary = TDictionary<string, TWmiNameSpacesList>;
- TCachedWMIWmiNameSpaces=class
+ TWmiClassesDictionary = TDictionary<string, TWmiClassesList>;
+ TCachedWMIClasses=class
   strict private
-    class var FRegisteredNameSpaces: TWmiNameSpaceDictionary;
+    class var FRegisteredNameSpaces: TWmiClassesDictionary;
     class destructor Destroy;
     class function RegisterWmiClass(const NameSpace, WmiClass: string): TWMiClassMetaData;
   public
-    class property RegisteredNameSpaces: TWmiNameSpaceDictionary read FRegisteredNameSpaces;
+    class property RegisteredNameSpaces: TWmiClassesDictionary read FRegisteredNameSpaces;
     class function GetWmiClass(const NameSpace, WmiClass: string) : TWMiClassMetaData;
  end;
 
 var
-  CachedWMIWmiNameSpaces : TCachedWMIWmiNameSpaces;
+  CachedWMIClasses : TCachedWMIClasses;
 
 implementation
 
@@ -51,35 +51,35 @@ uses
 
 
 { TCachedWMIWmiNameSpaces }
-class destructor TCachedWMIWmiNameSpaces.Destroy;
+class destructor TCachedWMIClasses.Destroy;
 var
-  LItem: TPair<string, TWmiNameSpacesList>;
+  LItem: TPair<string, TWmiClassesList>;
 begin
   for LItem in FRegisteredNameSpaces do
     LItem.Value.Free;
   FreeAndNil(FRegisteredNameSpaces);
 end;
 
-class function TCachedWMIWmiNameSpaces.GetWmiClass(
+class function TCachedWMIClasses.GetWmiClass(
   const NameSpace, WmiClass: string): TWMiClassMetaData;
 begin
   Result:=RegisterWmiClass(NameSpace, WmiClass);
 end;
 
-class function TCachedWMIWmiNameSpaces.RegisterWmiClass(const NameSpace,
+class function TCachedWMIClasses.RegisterWmiClass(const NameSpace,
   WmiClass: string) : TWMiClassMetaData;
 var
-  List : TWmiNameSpacesList;
+  List : TWmiClassesList;
   Found: Boolean;
   WmiC : TWMiClassMetaData;
 begin
   Result:=nil;
   if FRegisteredNameSpaces = nil then
-    FRegisteredNameSpaces := TWmiNameSpaceDictionary.Create;
+    FRegisteredNameSpaces := TWmiClassesDictionary.Create;
 
   if not FRegisteredNameSpaces.ContainsKey(NameSpace) then
   begin
-    List := TWmiNameSpacesList.Create;
+    List := TWmiClassesList.Create;
     Result:=TWMiClassMetaData.Create(NameSpace, WmiClass);
     List.Add(Result);
     FRegisteredNameSpaces.Add(NameSpace, List);
@@ -107,8 +107,8 @@ begin
 end;
 
 initialization
-  CachedWMIWmiNameSpaces:=TCachedWMIWmiNameSpaces.Create;
+  CachedWMIClasses:=TCachedWMIClasses.Create;
 finalization
-  CachedWMIWmiNameSpaces.Free;
+  CachedWMIClasses.Free;
 
 end.

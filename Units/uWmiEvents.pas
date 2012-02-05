@@ -156,7 +156,7 @@ end;
 procedure TFrmWmiEvents.GenerateCode;
 begin
  if ComboBoxEvents.ItemIndex>=0 then
-  GenerateEventCode(CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNamespacesEvents.Text , ComboBoxEvents.Text));
+  GenerateEventCode(CachedWMIClasses.GetWmiClass(ComboBoxNamespacesEvents.Text , ComboBoxEvents.Text));
 end;
 
 procedure TFrmWmiEvents.GenerateEventCode(WmiMetaClassInfo: TWMiClassMetaData);
@@ -305,7 +305,7 @@ begin
   ListVieweventsConds.Items.BeginUpdate;
   try
     ListVieweventsConds.Items.Clear;
-    WmiMetaClassInfo:=CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNamespacesEvents.Text , ComboBoxEvents.Text);
+    WmiMetaClassInfo:=CachedWMIClasses.GetWmiClass(ComboBoxNamespacesEvents.Text , ComboBoxEvents.Text);
 
     //GetListWmiClassPropertiesTypes(NameSpace, EventClass, List);
     LabelEventsConds.Caption :=
@@ -356,7 +356,7 @@ begin
 
     if ComboBoxTargetInstance.Text <> '' then
     begin
-      WmiMetaClassInfo := CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNamespacesEvents.Text , ComboBoxTargetInstance.Text);
+      WmiMetaClassInfo := CachedWMIClasses.GetWmiClass(ComboBoxNamespacesEvents.Text , ComboBoxTargetInstance.Text);
       for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
       begin
         Item := ListVieweventsConds.Items.Add;

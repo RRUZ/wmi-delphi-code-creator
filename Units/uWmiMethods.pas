@@ -168,7 +168,7 @@ end;
 procedure TFrmWmiMethods.GenerateCode;
 begin
     if ComboBoxClassesMethods.ItemIndex>=0 then
-      GenerateMethodInvoker(CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNamespaceMethods.Text,ComboBoxClassesMethods.Text));
+      GenerateMethodInvoker(CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text,ComboBoxClassesMethods.Text));
 end;
 
 procedure TFrmWmiMethods.GenerateMethodInvoker(
@@ -314,7 +314,7 @@ begin
   ComboBoxMethods.Items.BeginUpdate;
   try
     ComboBoxMethods.Items.Clear;
-    WmiMetaClassInfo:=CachedWMIWmiNameSpaces.GetWmiClass(ComboBoxNamespaceMethods.Text,ComboBoxClassesMethods.Text);
+    WmiMetaClassInfo:=CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text,ComboBoxClassesMethods.Text);
 
     if ComboBoxClassesMethods.Text <> '' then
     begin

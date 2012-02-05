@@ -25,14 +25,15 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, DB, DBClient, Grids, DBGrids, StdCtrls, Buttons, ExtCtrls, uMisc;
+  Dialogs, DB, DBClient, Grids, DBGrids, StdCtrls, Buttons, ExtCtrls, uMisc,
+  Vcl.ComCtrls;
 
 type
 
   TFrmWmiDatabase = class(TForm)
     DataSource1: TDataSource;
     ClientDataSetWmi: TClientDataSet;
-    Panel2:    TPanel;
+    PanelMain: TPanel;
     Label7:    TLabel;
     GroupBoxTypes: TGroupBox;
     RadioButtonDynamic: TRadioButton;
@@ -54,6 +55,12 @@ type
     ButtonBuildWmiDatabase: TButton;
     ButtonSaveBdd: TButton;
     ButtonDelBdd: TButton;
+    ProgressBarNamespaces: TProgressBar;
+    ProgressBarClasses: TProgressBar;
+    PanelStatus: TPanel;
+    Label1: TLabel;
+    Label2: TLabel;
+    LabelMsg: TLabel;
     procedure ButtonSearchWmiDatabaseClick(Sender: TObject);
     procedure ComboBoxSearchChange(Sender: TObject);
     procedure ComboBoxSearchExit(Sender: TObject);
@@ -66,18 +73,18 @@ type
   private
     FDatabaseFile: string;
     FHistoryFile:  string;
-    FNameSpaces: TStringList;
-    FStatus: TProcLog;
+    FNameSpaces: TStrings;
     FLog: TProcLog;
     procedure BuildWmiDatabase;
     procedure SearchDatabase(Value: string);
     procedure SaveWmiDatabase;
     procedure DeleteWmiDatabase;
     procedure CreateWmiDatabaseStructure;
+    procedure Status(const Msg: string);
+    procedure SetNameSpaces(const Value: TStrings);
   public
     property Log   : TProcLog read FLog write FLog;
-    property Status: TProcLog read FStatus write FStatus;
-    property NameSpaces : TStringList read FNameSpaces Write FNameSpaces;
+    property NameSpaces : TStrings read FNameSpaces Write SetNameSpaces;
   end;
 
 implementation
@@ -89,7 +96,8 @@ uses
   MidasLib,
   uWmi_Metadata,
   uWmi_ViewPropsValues,
-  AsyncCalls, uSettings;
+  AsyncCalls,
+  uSettings;
 
 const
   MaxHistory      = 50;
@@ -98,137 +106,98 @@ const
 
 procedure SetGridColumnWidths(DbGrid: TDBGrid);
 const
-  DEFBORDER = 10;
+  BorderWidth = 10;
 var
-  temp, n: integer;
-  lmax:    array [0..30] of integer;
+  LWidth, Index: integer;
+  ColsWidth:    array [0..9] of integer;
 begin
   with DbGrid do
   begin
     Canvas.Font := Font;
-    for n := 0 to Columns.Count - 1 do
-      lmax[n] := Canvas.TextWidth(Fields[n].FieldName) + DEFBORDER;
-    DbGrid.DataSource.DataSet.First;
-    while not DbGrid.DataSource.DataSet.EOF do
+    for Index := 0 to Columns.Count - 1 do
+      ColsWidth[Index] := Canvas.TextWidth(Fields[Index].FieldName) + BorderWidth;
+    DataSource.DataSet.First;
+    while not DataSource.DataSet.Eof do
     begin
-      for n := 0 to Columns.Count - 1 do
+      for Index := 0 to Columns.Count - 1 do
       begin
-        temp := Canvas.TextWidth(trim(Columns[n].Field.DisplayText)) + DEFBORDER;
-        if temp > lmax[n] then
-          lmax[n] := temp;
-      end; {for}
-      DbGrid.DataSource.DataSet.Next;
+        LWidth := Canvas.TextWidth(trim(Columns[Index].Field.DisplayText)) + BorderWidth;
+        if LWidth > ColsWidth[Index] then
+          ColsWidth[Index] := LWidth;
+      end;
+      DataSource.DataSet.Next;
     end;
-    DbGrid.DataSource.DataSet.First;
-    for n := 0 to Columns.Count - 1 do
-      if lmax[n] > 0 then
-        Columns[n].Width := lmax[n];
+    DataSource.DataSet.First;
+    for Index := 0 to Columns.Count - 1 do
+      if ColsWidth[Index] > 0 then
+        Columns[Index].Width := ColsWidth[Index];
   end;
-end; {SetGridColumnWidths  }
+end;
 
 
 procedure TFrmWmiDatabase.BuildWmiDatabase;
 var
-  i:     integer;
-  j:     integer;
-  k:     integer;
+  NameSpaceIndex:     integer;
+  ClassesIndex:     integer;
+  k      : integer;
   Classes: TStringList;
-  Props: TStringList;
-  Methods: TStringList;
-  Value: string;
+  Value  : string;
+  WMIMetaData : TWMiClassMetaData;
 begin
   ClientDataSetWmi.DisableControls;
-  //FrmMain.ProgressBarWmi.Visible := True;
+  ProgressBarClasses.Position:=0;
+  ProgressBarNamespaces.Max:=NameSpaces.Count;
   try
-    for i := 0 to NameSpaces.Count - 1 do
+    for NameSpaceIndex := 0 to NameSpaces.Count - 1 do
     begin
-      Status('Scanning namespace ' + FNameSpaces[i]);
+      ProgressBarNamespaces.Position:=NameSpaceIndex+1;
+      Status('Scanning namespace ' + FNameSpaces[NameSpaceIndex]);
 
       Classes := TStringList.Create;
       try
         if RadioButtonAll.Checked then
-          GetListWmiClasses(FNameSpaces[i], Classes)
+          GetListWmiClasses(FNameSpaces[NameSpaceIndex], Classes)
         else
         if RadioButtonDynamic.Checked then
-          GetListWmiDynamicClasses(FNameSpaces[i], Classes);
+          GetListWmiDynamicClasses(FNameSpaces[NameSpaceIndex], Classes);
 
-        for j := 0 to Classes.Count - 1 do
+        ProgressBarClasses.Max:=Classes.Count;
+        for ClassesIndex := 0 to Classes.Count - 1 do
         begin
-          Status('Scanning Class ' + Classes[j]);
-
+          WMIMetaData:=TWMiClassMetaData.Create(FNameSpaces[NameSpaceIndex], Classes[ClassesIndex]);
+          ProgressBarClasses.Position:=ClassesIndex+1;
           try
-            Value := GetWmiClassDescription(
-              FNameSpaces[i], Classes[j]);
-          except
-            on E: EOleSysError do
+            Status(Format('%s Scanning Class %s',[FNameSpaces[NameSpaceIndex], Classes[ClassesIndex]]));
+            Value:=WMIMetaData.Description;
+
+            if Value <> '' then
             begin
-              Log(
-                Format('%s - namespace %s class %s  - message : %s',
-                ['GetWmiClassDescription', FNameSpaces[i], Classes[j], E.Message]));
-              Value := '';
+              ClientDataSetWmi.Append;
+              ClientDataSetWmi.Fields[0].AsString :=
+                FNameSpaces[NameSpaceIndex]; //namespace
+              ClientDataSetWmi.Fields[1].AsString := Classes[ClassesIndex];
+              //class
+              ClientDataSetWmi.Fields[2].AsString := Classes[ClassesIndex];
+              //name
+              //ClientDataSetWmi.Fields[3].AsInteger:= WmiTableType_Class;          //type
+              ClientDataSetWmi.Fields[3].AsString := 'Class';          //type
+              ClientDataSetWmi.Fields[4].AsString := Value;          //value
+              ClientDataSetWmi.Post;
             end;
-          end;
 
-          if Value <> '' then
-          begin
-            ClientDataSetWmi.Append;
-            ClientDataSetWmi.Fields[0].AsString :=
-              FNameSpaces[i]; //namespace
-            ClientDataSetWmi.Fields[1].AsString := Classes[j];
-            //class
-            ClientDataSetWmi.Fields[2].AsString := Classes[j];
-            //name
-            //ClientDataSetWmi.Fields[3].AsInteger:= WmiTableType_Class;          //type
-            ClientDataSetWmi.Fields[3].AsString := 'Class';          //type
-            ClientDataSetWmi.Fields[4].AsString := Value;          //value
-            ClientDataSetWmi.Post;
-          end;
-
-
-          if CheckBoxProperties.Checked then
-          begin
-            Props := TStringList.Create;
-            try
-
-              try
-                GetListWmiClassProperties(
-                  FNameSpaces[i], Classes[j], Props);
-              except
-                on E: EOleSysError do
-                begin
-                  Log(
-                    Format('%s - namespace %s class %s  - message : %s',
-                    ['GetListWmiClassProperties', FNameSpaces[i], Classes[j], E.Message]));
-                end;
-              end;
-
-
-              for k := 0 to Props.Count - 1 do
+            if CheckBoxProperties.Checked then
+            begin
+              for k := 0 to WMIMetaData.PropertiesCount - 1 do
               begin
-
-                try
-                  Value :=
-                    GetWmiPropertyDescription(FNameSpaces[i], Classes[j], Props[k]);
-                except
-                  on E: EOleSysError do
-                  begin
-                    Log(
-                      Format('%s - namespace %s class %s  property %s - message : %s',
-                      ['GetWmiPropertyDescription', FNameSpaces[i],
-                      Classes[j], Props[k], E.Message]));
-                    Value := '';
-                  end;
-                end;
-
-
+                Value:=WMIMetaData.Properties[k].Description;
                 if Value <> '' then
                 begin
                   ClientDataSetWmi.Append;
                   ClientDataSetWmi.Fields[0].AsString :=
-                    FNameSpaces[i]; //namespace
-                  ClientDataSetWmi.Fields[1].AsString := Classes[j];
+                    FNameSpaces[NameSpaceIndex]; //namespace
+                  ClientDataSetWmi.Fields[1].AsString := Classes[ClassesIndex];
                   //class
-                  ClientDataSetWmi.Fields[2].AsString := Props[k];
+                  ClientDataSetWmi.Fields[2].AsString := WMIMetaData.Properties[k].Name;
                   //name
                   //ClientDataSetWmi.Fields[3].AsInteger:= WmiTableType_Class;          //type
                   ClientDataSetWmi.Fields[3].AsString := 'Property';          //type
@@ -236,54 +205,21 @@ begin
                   ClientDataSetWmi.Post;
                 end;
               end;
-            finally
-              Props.Free;
             end;
-          end;
 
 
-          if CheckBoxMethods.Checked then
-          begin
-            Methods := TStringList.Create;
-            try
-
-              try
-                GetListWmiClassMethods(
-                  FNameSpaces[i], Classes[j], Methods);
-              except
-                on E: EOleSysError do
-                begin
-                  Log(
-                    Format('%s - namespace %s class %s  - message : %s',
-                    ['GetListWmiClassMethods', FNameSpaces[i], Classes[j], E.Message]));
-                end;
-              end;
-
-              for k := 0 to Methods.Count - 1 do
+            if CheckBoxMethods.Checked then
+            begin
+              for k := 0 to WMIMetaData.MethodsCount - 1 do
               begin
-
-                try
-                  Value :=
-                    GetWmiMethodDescription(FNameSpaces[i], Classes[j], Methods[k]);
-                except
-                  on E: EOleSysError do
-                  begin
-                    Log(
-                      Format('%s - namespace %s class %s  property %s - message : %s',
-                      ['GetWmiMethodDescription', FNameSpaces[i],
-                      Classes[j], Methods[k], E.Message]));
-                    Value := '';
-                  end;
-                end;
-
-
+                Value:=WMIMetaData.Methods[k].Description;
                 if Value <> '' then
                 begin
                   ClientDataSetWmi.Append;
-                  ClientDataSetWmi.Fields[0].AsString := FNameSpaces[i]; //namespace
-                  ClientDataSetWmi.Fields[1].AsString := Classes[j];
+                  ClientDataSetWmi.Fields[0].AsString := FNameSpaces[NameSpaceIndex]; //namespace
+                  ClientDataSetWmi.Fields[1].AsString := Classes[ClassesIndex];
                   //class
-                  ClientDataSetWmi.Fields[2].AsString := Methods[k];
+                  ClientDataSetWmi.Fields[2].AsString := WMIMetaData.Methods[k].Name;
                   //name
                   //ClientDataSetWmi.Fields[3].AsInteger:= WmiTableType_Class;          //type
                   ClientDataSetWmi.Fields[3].AsString := 'Method';          //type
@@ -291,9 +227,9 @@ begin
                   ClientDataSetWmi.Post;
                 end;
               end;
-            finally
-              Methods.Free;
             end;
+          finally
+             WMIMetaData.Free;
           end;
         end;
       finally
@@ -334,6 +270,7 @@ begin
   end
   else
   begin
+    PanelStatus.Height:=90;
     AsyncCall := LocalAsyncCall(@Dummy);
     while AsyncMultiSync([AsyncCall], True, 1) = WAIT_TIMEOUT do
       Application.ProcessMessages;
@@ -343,6 +280,7 @@ begin
     if MsgQuestion('Do you want store the database in the disk?') then
       SaveWmiDatabase;
 
+    PanelStatus.Height:=0;
   end;
 
   Log(FormatDateTime('hh:nn:ss.zzz', Now - d));
@@ -432,8 +370,9 @@ end;
 
 procedure TFrmWmiDatabase.FormCreate(Sender: TObject);
 begin
+  PanelStatus.Height:=0;
   FNameSpaces   := TStringList.Create;
-  FDatabaseFile := ExtractFilePath(Application.ExeName) + WmiDatabaseName;
+  FDatabaseFile := GetWMICFolderCache + WmiDatabaseName;
   FHistoryFile  := GetWMICFolderCache + 'WmiFiltersHistory.txt';
   if FileExists(FHistoryFile) then
     ComboBoxSearch.Items.LoadFromFile(FHistoryFile);
@@ -516,6 +455,18 @@ begin
       ClientDataSetWmi.EnableControls;
     end;
   end;
+end;
+
+procedure TFrmWmiDatabase.SetNameSpaces(const Value: TStrings);
+begin
+  FNameSpaces.Clear;
+  FNameSpaces.AddStrings(Value);
+end;
+
+procedure TFrmWmiDatabase.Status(const Msg: string);
+begin
+  LabelMsg.Caption:=Msg;
+  LabelMsg.Update;
 end;
 
 end.

@@ -1,9 +1,10 @@
 object FrmWmiDatabase: TFrmWmiDatabase
   Left = 420
   Top = 155
+  BorderStyle = bsNone
   Caption = 'FrmWmiDatabase'
-  ClientHeight = 582
-  ClientWidth = 1071
+  ClientHeight = 639
+  ClientWidth = 1087
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,14 +17,16 @@ object FrmWmiDatabase: TFrmWmiDatabase
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel2: TPanel
+  object PanelMain: TPanel
     Left = 0
     Top = 0
-    Width = 1071
+    Width = 1087
     Height = 97
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitLeft = -24
+    ExplicitTop = -6
     object Label7: TLabel
       Left = 11
       Top = 51
@@ -114,7 +117,7 @@ object FrmWmiDatabase: TFrmWmiDatabase
       end
       object CheckBoxMethods: TCheckBox
         Left = 78
-        Top = 16
+        Top = 17
         Width = 60
         Height = 18
         Caption = 'Methods'
@@ -214,8 +217,8 @@ object FrmWmiDatabase: TFrmWmiDatabase
   object DBGridWMI: TDBGrid
     Left = 0
     Top = 97
-    Width = 1071
-    Height = 485
+    Width = 1087
+    Height = 452
     Align = alClient
     DataSource = DataSource1
     Enabled = False
@@ -228,6 +231,51 @@ object FrmWmiDatabase: TFrmWmiDatabase
     TitleFont.Name = 'Tahoma'
     TitleFont.Style = []
     OnDblClick = DBGridWMIDblClick
+  end
+  object PanelStatus: TPanel
+    Left = 0
+    Top = 549
+    Width = 1087
+    Height = 90
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 2
+    ExplicitTop = 552
+    object Label1: TLabel
+      Left = 11
+      Top = 6
+      Width = 79
+      Height = 13
+      Caption = 'Overall Progress'
+    end
+    object Label2: TLabel
+      Left = 11
+      Top = 32
+      Width = 69
+      Height = 13
+      Caption = 'Local Progress'
+    end
+    object LabelMsg: TLabel
+      Left = 11
+      Top = 64
+      Width = 44
+      Height = 13
+      Caption = 'LabelMsg'
+    end
+    object ProgressBarNamespaces: TProgressBar
+      Left = 105
+      Top = 6
+      Width = 193
+      Height = 17
+      TabOrder = 0
+    end
+    object ProgressBarClasses: TProgressBar
+      Left = 106
+      Top = 29
+      Width = 193
+      Height = 17
+      TabOrder = 1
+    end
   end
   object DataSource1: TDataSource
     DataSet = ClientDataSetWmi

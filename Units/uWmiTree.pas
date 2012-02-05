@@ -441,7 +441,7 @@ begin
       ComboBoxClasses.ItemIndex := ComboBoxClasses.Items.IndexOf(Node.Text);
       ComboBoxClassesChange(ComboBoxClasses);
       }
-      WMiClassMetaData:= CachedWMIWmiNameSpaces.GetWmiClass(Node.Parent.Text, Node.Text); //TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
+      WMiClassMetaData:= CachedWMIClasses.GetWmiClass(Node.Parent.Text, Node.Text); //TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
       MemoDescr.Lines.Text :=WMiClassMetaData.DescriptionEx;
       LoadClassInfo(WMiClassMetaData);
       //GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
