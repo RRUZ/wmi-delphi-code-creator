@@ -38,7 +38,7 @@ const
 type
   TOxygenWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
   public
-    procedure GenerateCode(Props: TStrings);reintroduce; overload;
+    procedure GenerateCode(Props: TStrings);override;//reintroduce; overload;
   end;
 
   TOxygenWmiEventCodeGenerator=class(TOxygenWmiClassCodeGenerator)

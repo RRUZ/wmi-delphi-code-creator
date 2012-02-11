@@ -38,7 +38,7 @@ const
 type
   TDelphiWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
   public
-    procedure GenerateCode(Props: TStrings);reintroduce; overload;
+    procedure GenerateCode(Props: TStrings);override;
   end;
 
   TDelphiWmiEventCodeGenerator=class(TDelphiWmiClassCodeGenerator)

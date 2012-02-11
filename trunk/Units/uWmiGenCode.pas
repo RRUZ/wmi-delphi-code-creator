@@ -50,7 +50,7 @@ type
     property OutPutCode : TStrings read FOutPutCode;
     property WMiClassMetaData : TWMiClassMetaData read FWMiClassMetaData write FWMiClassMetaData;
     property TemplateCode : string read FTemplateCode write FTemplateCode;
-    procedure GenerateCode;virtual;
+    procedure GenerateCode(Props: TStrings);virtual;
     constructor Create;
     destructor Destroy; override;
   end;
@@ -137,7 +137,7 @@ begin
 end;
 
 
-procedure TWmiCodeGenerator.GenerateCode;
+procedure TWmiCodeGenerator.GenerateCode(Props: TStrings);
 begin
  //Common Code
 
