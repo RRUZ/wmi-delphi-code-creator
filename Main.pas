@@ -170,8 +170,16 @@ begin
 
   FSettings :=TSettings.Create;
   SetLog('Reading settings');
+
   ReadSettings(FSettings);
   LoadVCLStyle(Settings.VCLStyle);
+
+
+  if FSettings.DisableVClStylesNC then
+  begin
+   TStyleManager.Engine.RegisterStyleHook(TForm, TFormStyleHookNC);
+   //GlassFrame.Enabled:=True;
+  end;
 
   MemoConsole.Color:=Settings.BackGroundColor;
   MemoConsole.Font.Color:=Settings.ForeGroundColor;
@@ -470,5 +478,6 @@ if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then
 
 TStyleManager.Engine.UnRegisterStyleHook(TCustomTabControl, TTabControlStyleHook);
 TStyleManager.Engine.RegisterStyleHook(TCustomTabControl, TMyTabControlStyleHook);
+
 
 end.

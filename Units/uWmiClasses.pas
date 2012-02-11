@@ -147,11 +147,7 @@ var
   i,j:     integer;
   Props: TStrings;
   Str:  string;
-  DelphiWmiCodeGenerator : TDelphiWmiClassCodeGenerator;
-  FPCWmiCodeGenerator    : TFPCWmiClassCodeGenerator;
-  OxygenWmiCodeGenerator : TOxygenWmiClassCodeGenerator;
-  CppWmiCodeGenerator    : TBorlandCppWmiClassCodeGenerator;
-
+  WmiCodeGenerator       : TWmiClassCodeGenerator;
 begin
   if not Assigned(WmiMetaClassInfo) then Exit;
 
@@ -179,59 +175,59 @@ begin
     case FrmCodeEditor.CompilerType of
       Ct_Delphi:
                   begin
-                    DelphiWmiCodeGenerator:=TDelphiWmiClassCodeGenerator.Create;
+                    WmiCodeGenerator:=TDelphiWmiClassCodeGenerator.Create;
                     try
-                      DelphiWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      DelphiWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
-                      DelphiWmiCodeGenerator.GenerateCode(Props);
-                      FrmCodeEditor.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
+                      WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
+                      WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Props);
+                      FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
-                      DelphiWmiCodeGenerator.Free;
+                      WmiCodeGenerator.Free;
                     end;
                   end;
 
 
       Ct_Lazarus_FPC:
                   begin
-                    FPCWmiCodeGenerator:=TFPCWmiClassCodeGenerator.Create;
+                    WmiCodeGenerator:=TFPCWmiClassCodeGenerator.Create;
                     try
-                      FPCWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
-                      FPCWmiCodeGenerator.GenerateCode(Props);
-                      FrmCodeEditor.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
+                      WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
+                      WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Props);
+                      FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
-                      FPCWmiCodeGenerator.Free;
+                      WmiCodeGenerator.Free;
                     end;
                   end;
 
 
       Ct_Oxygene:
                   begin
-                    OxygenWmiCodeGenerator:=TOxygenWmiClassCodeGenerator.Create;
+                    WmiCodeGenerator:=TOxygenWmiClassCodeGenerator.Create;
                     try
-                      OxygenWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
-                      OxygenWmiCodeGenerator.GenerateCode(Props);
-                      FrmCodeEditor.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
+                      WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
+                      WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Props);
+                      FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
-                      OxygenWmiCodeGenerator.Free;
+                      WmiCodeGenerator.Free;
                     end;
                   end;
 
       Ct_BorlandCpp:
                   begin
-                    CppWmiCodeGenerator:=TBorlandCppWmiClassCodeGenerator.Create;
+                    WmiCodeGenerator:=TBorlandCppWmiClassCodeGenerator.Create;
                     try
-                      CppWmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      CppWmiCodeGenerator.UseHelperFunctions:=false;
-                      CppWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
-                      CppWmiCodeGenerator.GenerateCode(Props);
-                      FrmCodeEditor.SourceCode:=CppWmiCodeGenerator.OutPutCode;
+                      WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
+                      WmiCodeGenerator.UseHelperFunctions:=false;
+                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Props);
+                      FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
-                      CppWmiCodeGenerator.Free;
+                      WmiCodeGenerator.Free;
                     end;
                   end;
 

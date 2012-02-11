@@ -39,7 +39,7 @@ const
 type
   TFPCWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
   public
-    procedure GenerateCode(Props: TStrings);reintroduce; overload;
+    procedure GenerateCode(Props: TStrings);override;//reintroduce; overload;
   end;
 
   TFPCWmiEventCodeGenerator=class(TFPCWmiClassCodeGenerator)

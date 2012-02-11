@@ -25,7 +25,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox;
+  Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
+  SynEditHighlighter, SynHighlighterPas;
 
 type
   TSettings = class
@@ -51,6 +52,7 @@ type
     FLastWmiClassesMethods: string;
     FLastWmiMethod: string;
     FCheckForUpdates: Boolean;
+    FDisableVClStylesNC: Boolean;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -79,6 +81,8 @@ type
     property LastWmiEventIntrinsic : Boolean read FLastWmiEventIntrinsic Write FLastWmiEventIntrinsic;
 
     property VCLStyle : string read FVCLStyle Write FVCLStyle;
+    property DisableVClStylesNC : Boolean read FDisableVClStylesNC write FDisableVClStylesNC;
+
     property Formatter : string read FFormatter write FFormatter;
 
     property CheckForUpdates : Boolean read FCheckForUpdates write FCheckForUpdates;
@@ -92,14 +96,6 @@ type
     PageControl1: TPageControl;
     TabSheet1: TTabSheet;
     ButtonCancel: TButton;
-    Label1: TLabel;
-    ComboBoxTheme: TComboBox;
-    EditFontSize: TEdit;
-    UpDown1: TUpDown;
-    ComboBoxFont: TComboBox;
-    Label2: TLabel;
-    Label3: TLabel;
-    ButtonGetMore: TButton;
     TabSheet2: TTabSheet;
     Label4: TLabel;
     CbDelphiCodeWmiClass: TComboBox;
@@ -125,6 +121,18 @@ type
     Label10: TLabel;
     ImageVCLStyle: TImage;
     CheckBoxUpdates: TCheckBox;
+    CheckBoxDisableVClStylesNC: TCheckBox;
+    TabSheet5: TTabSheet;
+    ComboBoxTheme: TComboBox;
+    Label1: TLabel;
+    ButtonGetMore: TButton;
+    ComboBoxFont: TComboBox;
+    Label2: TLabel;
+    Label3: TLabel;
+    EditFontSize: TEdit;
+    UpDown1: TUpDown;
+    SynEditCode: TSynEdit;
+    SynPasSyn1: TSynPasSyn;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -138,6 +146,7 @@ type
     procedure CbDelphiCodeWmiMethodChange(Sender: TObject);
     procedure BtnDeleteCacheClick(Sender: TObject);
     procedure ComboBoxVCLStyleChange(Sender: TObject);
+    procedure CheckBoxDisableVClStylesNCClick(Sender: TObject);
   private
     FSettings: TSettings;
     //FCurrentTheme:  TIDETheme;
@@ -193,9 +202,9 @@ uses
   Vcl.FileCtrl,
   {$WARN UNIT_PLATFORM ON}
   uDelphiVersions,
-  SynHighlighterPas,
+  //SynHighlighterPas,
   SynHighlighterCpp,
-  SynEditHighlighter,
+  //SynEditHighlighter,
   StrUtils,
   IOUtils,
   IniFiles,
@@ -513,6 +522,7 @@ begin
     Settings.VCLStyle                      := iniFile.ReadString('Global', 'VCLStyle', 'Windows');
     Settings.Formatter                     := iniFile.ReadString('Global', 'Formatter', '');
     Settings.CheckForUpdates               := iniFile.ReadBool('Global', 'CheckForUpdates', True);
+    Settings.DisableVClStylesNC            := iniFile.ReadBool('Global', 'DisableVClStylesNC', False);
   finally
     iniFile.Free;
   end;
@@ -545,6 +555,7 @@ begin
     iniFile.WriteString('Global', 'VCLStyle', Settings.VCLStyle);
     iniFile.WriteString('Global', 'Formatter', Settings.Formatter);
     iniFile.WriteBool('Global', 'CheckForUpdates', Settings.CheckForUpdates);
+    iniFile.WriteBool('Global', 'DisableVClStylesNC', Settings.DisableVClStylesNC);
   finally
     iniFile.Free;
   end;
@@ -642,6 +653,8 @@ begin
 end;
 
 procedure TFrmSettings.ButtonApplyClick(Sender: TObject);
+var
+  i  : Integer;
 begin
   //if Application.MessageBox(PChar(Format('Do you want save the changes ?%s', [''])), 'Confirmation', MB_YESNO + MB_ICONQUESTION) = idYes then
   if MessageDlg('Do you want save the changes ?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
@@ -658,9 +671,16 @@ begin
     FSettings.VCLStyle                      := ComboBoxVCLStyle.Text;
     FSettings.Formatter                     := CbFormatter.Text;
     FSettings.CheckForUpdates               := CheckBoxUpdates.Checked;
+    FSettings.DisableVClStylesNC            := CheckBoxDisableVClStylesNC.Checked;
     WriteSettings(FSettings);
     Close();
     LoadVCLStyle(ComboBoxVCLStyle.Text);
+
+    for I :=0 to  Screen.FormCount-1 do
+    begin
+      LoadCurrentThemeFont(Screen.Forms[i],ComboBoxFont.Text,StrToInt(EditFontSize.Text));
+      LoadCurrentTheme(Screen.Forms[i],ComboBoxTheme.Text);
+    end;
   end;
 end;
 
@@ -669,36 +689,7 @@ begin
   Close();
 end;
 
-{
-procedure LoadCurrentTheme(Form: TForm;const ThemeName:string);
-var
- FileName : string;
- i        : Integer;
- FCurrentTheme : TIDETheme;
-begin
-  FileName:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))+'\Themes')+ThemeName+sThemesExt;
-  LoadThemeFromXMLFile(FCurrentTheme, FileName);
-  for i := 0 to Form.ComponentCount-1 do
-   if Form.Components[i] is TSynEdit then
-   begin
-     RefreshSynPasHighlighter(FCurrentTheme,TSynEdit(Form.Components[i]));
-     RefreshSynCppHighlighter(FCurrentTheme,TSynEdit(Form.Components[i]));
-   end;
-end;
 
-
-procedure LoadCurrentThemeFont(Form: TForm;const FontName:string;FontSize:Word);
-var
- i        : Integer;
-begin
-  for i := 0 to Form.ComponentCount-1 do
-   if Form.Components[i] is TSynEdit then
-   begin
-    TSynEdit(Form.Components[i]).Font.Name:=FontName;
-    TSynEdit(Form.Components[i]).Font.Size:=FontSize;
-   end;
-end;
-}
 
 procedure LoadCurrentTheme(Component: TComponent;const ThemeName:string);
 var
@@ -713,10 +704,7 @@ begin
    begin
      RefreshSynPasHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
      RefreshSynCppHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
-   end {
-   else
-   if Component.Components[i] is TComponent then
-      LoadCurrentTheme(Component.Components[i], ThemeName);   }
+   end
 end;
 
 
@@ -730,10 +718,7 @@ begin
    begin
     TSynEdit(Component.Components[i]).Font.Name:=FontName;
     TSynEdit(Component.Components[i]).Font.Size:=FontSize;
-   end  {
-   else
-   if Component.Components[i] is TComponent then
-      LoadCurrentThemeFont(Component.Components[i], FontName, FontSize);    }
+   end
 end;
 
 
@@ -752,14 +737,20 @@ begin
    LabelDescrMethod.Caption:=ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]))];
 end;
 
+procedure TFrmSettings.CheckBoxDisableVClStylesNCClick(Sender: TObject);
+begin
+ if Visible then
+ MsgInformation('This feature will be applied when you restart the aplication');
+end;
+
 procedure TFrmSettings.ComboBoxFontChange(Sender: TObject);
 begin
-  LoadCurrentThemeFont(FForm,ComboBoxFont.Text,StrToInt(EditFontSize.Text));
+  LoadCurrentThemeFont(Self,ComboBoxFont.Text,StrToInt(EditFontSize.Text));
 end;
 
 procedure TFrmSettings.ComboBoxThemeChange(Sender: TObject);
 begin
-  LoadCurrentTheme(FForm,TComboBox(Sender).Text);
+  LoadCurrentTheme(Self,TComboBox(Sender).Text);
 end;
 
 
@@ -860,6 +851,10 @@ begin
   EditOutputFolder.Text              := FSettings.OutputFolder;
 
   CheckBoxUpdates.Checked            := FSettings.CheckForUpdates;
+  CheckBoxDisableVClStylesNC.Checked := FSettings.DisableVClStylesNC;
+
+  LoadCurrentThemeFont(Self,ComboBoxFont.Text,StrToInt(EditFontSize.Text));
+  LoadCurrentTheme(Self,ComboBoxTheme.Text);
 end;
 
 

@@ -23,6 +23,8 @@ unit uXE2Patches;
 interface
 
 uses
+  Vcl.Controls,
+  Vcl.Themes,
   Vcl.Graphics,
   Winapi.Windows,
   Vcl.ComCtrls;
@@ -36,10 +38,15 @@ type
     procedure DrawTab(Canvas: TCanvas; Index: Integer); override;
   end;
 
+  TFormStyleHookNC= class(TMouseTrackControlStyleHook)
+  protected
+    procedure PaintBackground(Canvas: TCanvas); override;
+    constructor Create(AControl: TWinControl); override;
+  end;
+
 implementation
 
 Uses
-  Vcl.Themes,
   System.Classes;
 
 type
@@ -223,6 +230,29 @@ begin
   end;
 end;
 
+
+
+{ TFormStyleHookNC }
+
+constructor TFormStyleHookNC.Create(AControl: TWinControl);
+begin
+  inherited;
+  OverrideEraseBkgnd := True;
+end;
+
+procedure TFormStyleHookNC.PaintBackground(Canvas: TCanvas);
+var
+  Details: TThemedElementDetails;
+  R: TRect;
+begin
+  if StyleServices.Available then
+  begin
+    Details.Element := teWindow;
+    Details.Part := 0;
+    R := Rect(0, 0, Control.ClientWidth, Control.ClientHeight);
+    StyleServices.DrawElement(Canvas.Handle, Details, R);
+  end;
+end;
 
 
 end.
