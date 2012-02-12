@@ -88,16 +88,15 @@ implementation
 {$R *.dfm}
 
 uses
-  uGlobals,
-  Winapi.CommCtrl,
-  StrUtils,
+  uListView_Helper,
   uSelectCompilerVersion,
+  uGlobals,
+  StrUtils,
+  Winapi.CommCtrl,
   uWmiGenCode,
   uWmiOxygenCode,
   uWmiFPCCode,
-  uWmiDelphiCode,
-  uListView_Helper,
-  uWmiClassTree;
+  uWmiDelphiCode;
 
 const
   COND_EVENTPARAM_COLUMN   = 2;
@@ -171,10 +170,7 @@ var
   Conds:  TStringList;
   Str:    string;
   PropsOut: TStringList;
-  DelphiWmiCodeGenerator : TDelphiWmiEventCodeGenerator;
-  FPCWmiCodeGenerator : TFPCWmiEventCodeGenerator;
-  OxygenWmiCodeGenerator : TOxygenWmiEventCodeGenerator;
-
+  WmiCodeGenerator    : TWmiEventCodeGenerator;
 begin
   if (ComboBoxNamespacesEvents.Text = '') or (ComboBoxEvents.Text = '') then
     exit;
@@ -215,46 +211,46 @@ begin
 
       Ct_Delphi:
                  begin
-                   DelphiWmiCodeGenerator := TDelphiWmiEventCodeGenerator.Create;
+                   WmiCodeGenerator := TDelphiWmiEventCodeGenerator.Create;
                    try
-                      DelphiWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                      DelphiWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
-                      DelphiWmiCodeGenerator.PollSeconds          := PollSeconds;
-                      DelphiWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
-                      DelphiWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      FrmCodeEditorEvent.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
+                      WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                      WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
+                      WmiCodeGenerator.PollSeconds          := PollSeconds;
+                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
+                      FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
                    finally
-                      DelphiWmiCodeGenerator.Free;
+                      WmiCodeGenerator.Free;
                    end;
                  end;
 
       Ct_Lazarus_FPC:
                  begin
-                   FPCWmiCodeGenerator := TFPCWmiEventCodeGenerator.Create;
+                   WmiCodeGenerator := TFPCWmiEventCodeGenerator.Create;
                    try
-                      FPCWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                      FPCWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
-                      FPCWmiCodeGenerator.PollSeconds          := PollSeconds;
-                      FPCWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
-                      FPCWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      FrmCodeEditorEvent.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
+                      WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                      WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
+                      WmiCodeGenerator.PollSeconds          := PollSeconds;
+                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
+                      FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
                    finally
-                      FPCWmiCodeGenerator.Free;
+                      WmiCodeGenerator.Free;
                    end;
                  end;
 
       Ct_Oxygene:
                  begin
-                   OxygenWmiCodeGenerator := TOxygenWmiEventCodeGenerator.Create;
+                   WmiCodeGenerator := TOxygenWmiEventCodeGenerator.Create;
                    try
-                      OxygenWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                      OxygenWmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
-                      OxygenWmiCodeGenerator.PollSeconds          := PollSeconds;
-                      OxygenWmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
-                      OxygenWmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
-                      FrmCodeEditorEvent.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
+                      WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                      WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
+                      WmiCodeGenerator.PollSeconds          := PollSeconds;
+                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
+                      FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
                    finally
-                      OxygenWmiCodeGenerator.Free;
+                      WmiCodeGenerator.Free;
                    end;
                  end;
 

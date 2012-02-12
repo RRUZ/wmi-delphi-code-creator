@@ -84,10 +84,6 @@ object FrmMain: TFrmMain
             object TabSheetEvents: TTabSheet
               Caption = 'Receive a WMI Event'
               ImageIndex = 45
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
             end
           end
           object PanelConsole: TPanel
@@ -193,9 +189,12 @@ object FrmMain: TFrmMain
     ButtonWidth = 108
     Caption = 'ToolBarMain'
     Color = clBtnFace
+    DoubleBuffered = False
+    DrawingStyle = dsGradient
     Images = ImageList1
     List = True
     ParentColor = False
+    ParentDoubleBuffered = False
     ShowCaptions = True
     TabOrder = 0
     object ToolButtonSearch: TToolButton
@@ -260,7 +259,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C01012F007800280210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01012F0078002C0210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       00000000000000000000000000000000000000000000000000000000011F0303
       105C0707279A080841D1040420980000000D0000011E00000A5700001D910000
