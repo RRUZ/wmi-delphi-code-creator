@@ -41,25 +41,16 @@ type
     procedure GenerateCode(Props: TStrings);override;
   end;
 
-  TDelphiWmiEventCodeGenerator=class(TDelphiWmiClassCodeGenerator)
-  private
-    FWmiTargetInstance: string;
-    FPollSeconds: Integer;
+  TDelphiWmiEventCodeGenerator=class(TWmiEventCodeGenerator)
   public
-    property WmiTargetInstance : string Read FWmiTargetInstance write FWmiTargetInstance;
-    property PollSeconds : Integer read FPollSeconds write FPollSeconds;
-    procedure GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings);overload;
+    procedure GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings);override;
   end;
 
-  TDelphiWmiMethodCodeGenerator=class(TDelphiWmiClassCodeGenerator)
+  TDelphiWmiMethodCodeGenerator=class(TWmiMethodCodeGenerator)
   private
-    FWmiPath: string;
-    FWmiMethod: string;
     function GetWmiClassDescription: string;
   public
-    property WmiPath : string Read FWmiPath write FWmiPath;
-    property WmiMethod : string Read FWmiMethod write FWmiMethod;
-    procedure GenerateCode(ParamsIn, Values: TStrings);overload;
+    procedure GenerateCode(ParamsIn, Values: TStrings);override;
   end;
 
 
@@ -122,19 +113,19 @@ begin
      WmiCode_Scripting :
                          begin
                               WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
-                                FWmiTargetInstance]);
+                                WmiTargetInstance]);
                               WQL := Format('  FWQL:=%s+%s', [QuotedStr(WQL), sLineBreak]);
 
-                              if FWmiTargetInstance <> '' then
+                              if WmiTargetInstance <> '' then
                               begin
-                                sValue := Format('Where TargetInstance ISA "%s" ', [FWmiTargetInstance]);
+                                sValue := Format('Where TargetInstance ISA "%s" ', [WmiTargetInstance]);
                                 WQL    := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
                               end;
 
                               for i := 0 to Conds.Count - 1 do
                               begin
                                 sValue := '';
-                                if (i > 0) or ((i = 0) and (FWmiTargetInstance <> '')) then
+                                if (i > 0) or ((i = 0) and (WmiTargetInstance <> '')) then
                                   sValue := 'AND ';
                                 sValue := sValue + ' ' + ParamsIn.Names[i] + Conds[i] + Values[i] + ' ';
                                 WQL := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
@@ -189,19 +180,19 @@ begin
 
      WmiCode_COM:        begin
                             WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
-                              FWmiTargetInstance]);
+                              WmiTargetInstance]);
                             WQL := Format('  WQL =%s+%s', [QuotedStr(WQL), sLineBreak]);
 
-                            if FWmiTargetInstance <> '' then
+                            if WmiTargetInstance <> '' then
                             begin
-                              sValue := Format('Where TargetInstance ISA "%s" ', [FWmiTargetInstance]);
+                              sValue := Format('Where TargetInstance ISA "%s" ', [WmiTargetInstance]);
                               WQL    := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
                             end;
 
                             for i := 0 to Conds.Count - 1 do
                             begin
                               sValue := '';
-                              if (i > 0) or ((i = 0) and (FWmiTargetInstance <> '')) then
+                              if (i > 0) or ((i = 0) and (WmiTargetInstance <> '')) then
                                 sValue := 'AND ';
                               sValue := sValue + ' ' + ParamsIn.Names[i] + Conds[i] + Values[i] + ' ';
                               WQL := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;

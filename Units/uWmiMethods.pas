@@ -109,7 +109,7 @@ end;
 
 procedure TFrmWmiMethods.CheckBoxPathClick(Sender: TObject);
 begin
-  LoadParametersMethodInfo(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
+  LoadParametersMethodInfo(CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text));
 end;
 
 procedure TFrmWmiMethods.ComboBoxClassesMethodsChange(Sender: TObject);
@@ -119,7 +119,7 @@ end;
 
 procedure TFrmWmiMethods.ComboBoxMethodsChange(Sender: TObject);
 begin
-  LoadParametersMethodInfo(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
+  LoadParametersMethodInfo(CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text));
   GenerateCode;
 end;
 
@@ -143,7 +143,7 @@ begin
   PostMessage(handle, WM_NEXTDLGCTL, ListViewMethodsParams.Handle, 1);
   TEdit(Sender).Visible := True;
 
-  GenerateMethodInvoker(TWMiClassMetaData(ComboBoxClassesMethods.Items.Objects[ComboBoxClassesMethods.ItemIndex]));
+  GenerateMethodInvoker(CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text));
 end;
 
 
@@ -181,10 +181,7 @@ var
   Params: TStringList;
   Values: TStringList;
   Str:    string;
-  DelphiWmiCodeGenerator : TDelphiWmiMethodCodeGenerator;
-  FPCWmiCodeGenerator : TFPCWmiMethodCodeGenerator;
-  OxygenWmiCodeGenerator : TOxygenWmiMethodCodeGenerator;
-  BorlandCppWmiCodeGenerator : TBorlandCppWmiMethodCodeGenerator;
+  WmiCodeGenerator : TWmiMethodCodeGenerator;
 begin
   if (ComboBoxClassesMethods.Text = '') or (ComboBoxMethods.Text = '') then
     exit;
@@ -215,57 +212,57 @@ begin
     case FrmCodeEditorMethod.CompilerType of
       Ct_Delphi:
                  begin
-                  DelphiWmiCodeGenerator :=TDelphiWmiMethodCodeGenerator.Create;
+                  WmiCodeGenerator :=TDelphiWmiMethodCodeGenerator.Create;
                   try
-                    DelphiWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                    DelphiWmiCodeGenerator.WmiMethod:=WmiMethod;
-                    DelphiWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
-                    DelphiWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                    DelphiWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
-                    DelphiWmiCodeGenerator.GenerateCode(Params, Values);
-                    FrmCodeEditorMethod.SourceCode:=DelphiWmiCodeGenerator.OutPutCode;
+                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                    WmiCodeGenerator.WmiMethod:=WmiMethod;
+                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
+                    WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
+                    WmiCodeGenerator.GenerateCode(Params, Values);
+                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
                   finally
-                    DelphiWmiCodeGenerator.Free;
+                    WmiCodeGenerator.Free;
                   end;
                  end;
 
       Ct_BorlandCpp:
                  begin
-                  BorlandCppWmiCodeGenerator :=TBorlandCppWmiMethodCodeGenerator.Create;
+                  WmiCodeGenerator :=TBorlandCppWmiMethodCodeGenerator.Create;
                   try
-                    BorlandCppWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                    BorlandCppWmiCodeGenerator.WmiMethod:=WmiMethod;
-                    BorlandCppWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
-                    BorlandCppWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                    BorlandCppWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
-                    BorlandCppWmiCodeGenerator.GenerateCode(Params, Values);
-                    FrmCodeEditorMethod.SourceCode:=BorlandCppWmiCodeGenerator.OutPutCode;
+                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                    WmiCodeGenerator.WmiMethod:=WmiMethod;
+                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
+                    WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
+                    WmiCodeGenerator.GenerateCode(Params, Values);
+                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
                   finally
-                    BorlandCppWmiCodeGenerator.Free;
+                    WmiCodeGenerator.Free;
                   end;
                  end;
 
       Ct_Lazarus_FPC:
                  begin
-                  FPCWmiCodeGenerator :=TFPCWmiMethodCodeGenerator.Create;
+                  WmiCodeGenerator :=TFPCWmiMethodCodeGenerator.Create;
                   try
-                    FPCWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                    FPCWmiCodeGenerator.WmiMethod:=WmiMethod;
-                    FPCWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
-                    FPCWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                    FPCWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
-                    FPCWmiCodeGenerator.GenerateCode(Params, Values);
-                    FrmCodeEditorMethod.SourceCode:=FPCWmiCodeGenerator.OutPutCode;
+                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                    WmiCodeGenerator.WmiMethod:=WmiMethod;
+                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
+                    WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
+                    WmiCodeGenerator.GenerateCode(Params, Values);
+                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
                   finally
-                    FPCWmiCodeGenerator.Free;
+                    WmiCodeGenerator.Free;
                   end;
                  end;
 
       Ct_Oxygene:
                  begin
-                  OxygenWmiCodeGenerator :=TOxygenWmiMethodCodeGenerator.Create;
+                  WmiCodeGenerator :=TOxygenWmiMethodCodeGenerator.Create;
                   try
-                    OxygenWmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                     OxygenWmiCodeGenerator.WmiMethod:=WmiMethod;
                     OxygenWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
                     OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;

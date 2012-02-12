@@ -38,29 +38,19 @@ const
 type
   TOxygenWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
   public
-    procedure GenerateCode(Props: TStrings);override;//reintroduce; overload;
+    procedure GenerateCode(Props: TStrings);override;
   end;
 
-  TOxygenWmiEventCodeGenerator=class(TOxygenWmiClassCodeGenerator)
-  private
-    FWmiTargetInstance: string;
-    FPollSeconds: Integer;
+  TOxygenWmiEventCodeGenerator=class(TWmiEventCodeGenerator)
   public
-    property WmiTargetInstance : string Read FWmiTargetInstance write FWmiTargetInstance;
-    property PollSeconds : Integer read FPollSeconds write FPollSeconds;
-    procedure GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings);overload;
+    procedure GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings);override;
   end;
 
-
-  TOxygenWmiMethodCodeGenerator=class(TOxygenWmiClassCodeGenerator)
+  TOxygenWmiMethodCodeGenerator=class(TWmiMethodCodeGenerator)
   private
-    FWmiPath: string;
-    FWmiMethod: string;
     function GetWmiClassDescription: string;
   public
-    property WmiPath : string Read FWmiPath write FWmiPath;
-    property WmiMethod : string Read FWmiMethod write FWmiMethod;
-    procedure GenerateCode(ParamsIn, Values: TStrings);overload;
+    procedure GenerateCode(ParamsIn, Values: TStrings);override;
   end;
 
 implementation

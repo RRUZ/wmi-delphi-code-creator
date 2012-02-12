@@ -26,12 +26,16 @@ interface
 //TODO
 {
   disable run as admin requirement
+
   Fix disabled icons
+
   Remote machine support
+
   Improve source code
   Add automated tests
   Store cache x machine
   Create code based in plugins and interfaces
+
   refactor GUI based in tree
    show wmi classes and task for class detecting possibles operations (show values, create code, event , invoke method)
    code gen
@@ -40,7 +44,9 @@ interface
      fpc
    database
    tree (hierarchy)
+
   add option to edit templates
+
   plugin handle
 }
 

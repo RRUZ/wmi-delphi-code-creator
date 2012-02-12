@@ -60,6 +60,28 @@ type
     function GetWmiClassDescription: string;
   end;
 
+  TWmiEventCodeGenerator=class(TWmiClassCodeGenerator)
+  private
+    FWmiTargetInstance: string;
+    FPollSeconds: Integer;
+  public
+    property WmiTargetInstance : string Read FWmiTargetInstance write FWmiTargetInstance;
+    property PollSeconds : Integer read FPollSeconds write FPollSeconds;
+    procedure GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings);reintroduce;virtual;
+  end;
+
+  TWmiMethodCodeGenerator=class(TWmiEventCodeGenerator)
+  private
+    FWmiPath: string;
+    FWmiMethod: string;
+  public
+    property WmiPath : string Read FWmiPath write FWmiPath;
+    property WmiMethod : string Read FWmiMethod write FWmiMethod;
+    procedure GenerateCode(ParamsIn, Values: TStrings);reintroduce;virtual;
+  end;
+
+
+
 
 const
   WbemEmptyParam     = 'VarEmpty';
@@ -200,6 +222,21 @@ begin
   finally
     ClassDescr.Free;
   end;
+end;
+
+{ TWmiEventCodeGenerator }
+
+procedure TWmiEventCodeGenerator.GenerateCode(ParamsIn, Values, Conds,
+  PropsOut: TStrings);
+begin
+//
+end;
+
+{ TWmiMethodCodeGenerator }
+
+procedure TWmiMethodCodeGenerator.GenerateCode(ParamsIn, Values: TStrings);
+begin
+//
 end;
 
 end.
