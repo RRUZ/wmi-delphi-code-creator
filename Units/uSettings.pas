@@ -202,14 +202,14 @@ uses
   Vcl.FileCtrl,
   {$WARN UNIT_PLATFORM ON}
   uDelphiVersions,
-  //SynHighlighterPas,
   SynHighlighterCpp,
-  //SynEditHighlighter,
   StrUtils,
   IOUtils,
   IniFiles,
   uWmiDelphiCode,
   uWmiGenCode,
+  PngFunctions,
+  Vcl.Imaging.pngimage,
   Vcl.Styles.Ext,
   Vcl.Styles,
   Vcl.Themes,
@@ -766,6 +766,7 @@ var
   LBitmap   : TBitmap;
   LStyle    : TCustomStyleExt;
   SourceInfo: TSourceInfo;
+  LPng      : TPngImage;
 begin
    ImageVCLStyle.Picture:=nil;
 
@@ -781,7 +782,16 @@ begin
        LStyle:=TCustomStyleExt.Create(TStream(SourceInfo.Data));
        try
          DrawSampleWindow(LStyle, LBitmap.Canvas, ImageVCLStyle.ClientRect, StyleName);
-         ImageVCLStyle.Picture.Assign(LBitmap);
+
+         ConvertToPNG(LBitmap, LPng);
+         try
+           ImageVCLStyle.Picture.Assign(LPng);
+           //LPng.SaveToFile(ChangeFileExt(ParamStr(0),'.png'));
+         finally
+           LPng.Free;
+         end;
+
+         //ImageVCLStyle.Picture.Assign(LBitmap);
        finally
          LStyle.Free;
        end;

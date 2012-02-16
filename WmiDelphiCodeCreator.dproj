@@ -111,9 +111,9 @@
 			<DCC_DebugInformation>true</DCC_DebugInformation>
 			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
 			<VerInfo_MinorVer>2</VerInfo_MinorVer>
-			<VerInfo_Build>1</VerInfo_Build>
-			<VerInfo_Release>95</VerInfo_Release>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.2.95.1;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<VerInfo_Build>3</VerInfo_Build>
+			<VerInfo_Release>97</VerInfo_Release>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.2.97.3;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="$(MainSource)">
@@ -192,6 +192,8 @@
 				<FormType>dfm</FormType>
 			</DCCReference>
 			<DCCReference Include="Units\uGlobals.pas"/>
+			<DCCReference Include="Units\PngFunctions.pas"/>
+			<DCCReference Include="Units\PngImageList.pas"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
@@ -217,7 +219,7 @@
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">1</VersionInfo>
 						<VersionInfo Name="Release">2</VersionInfo>
-						<VersionInfo Name="Build">190</VersionInfo>
+						<VersionInfo Name="Build">192</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -229,7 +231,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription"/>
-						<VersionInfoKeys Name="FileVersion">1.1.2.190</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.1.2.192</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright"/>
 						<VersionInfoKeys Name="LegalTrademarks"/>

@@ -100,7 +100,7 @@ object FrmWmiMethods: TFrmWmiMethods
       OnChange = ComboBoxNamespaceMethodsChange
     end
     object ListViewMethodsParams: TListView
-      Left = 11
+      Left = 10
       Top = 216
       Width = 368
       Height = 247
@@ -129,6 +129,7 @@ object FrmWmiMethods: TFrmWmiMethods
         end>
       HideSelection = False
       ReadOnly = True
+      RowSelect = True
       TabOrder = 6
       ViewStyle = vsReport
       OnClick = ListViewMethodsParamsClick

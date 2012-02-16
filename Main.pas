@@ -53,8 +53,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls,
-  SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmi_Metadata,uWmiDatabase,
-  Menus, Buttons, uWmiClassTree, uWmiEvents, uWmiMethods, uWmiClasses, Generics.Collections;
+  SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmiDatabase, uWmi_Metadata,
+  Menus, Buttons, uWmiClassTree, uWmiEvents, uWmiMethods, uWmiClasses;
 
 type
   TProgressBar = class(ComCtrls.TProgressBar)

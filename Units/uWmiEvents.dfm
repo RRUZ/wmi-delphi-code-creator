@@ -113,6 +113,7 @@ object FrmWmiEvents: TFrmWmiEvents
         end>
       HideSelection = False
       ReadOnly = True
+      RowSelect = True
       TabOrder = 6
       ViewStyle = vsReport
       OnClick = ListViewEventsCondsClick

@@ -44,7 +44,9 @@ uses
   uWmiEvents in 'Units\uWmiEvents.pas' {FrmWmiEvents},
   uWmiMethods in 'Units\uWmiMethods.pas' {FrmWmiMethods},
   uWmiClasses in 'Units\uWmiClasses.pas' {FrmWmiClasses},
-  uGlobals in 'Units\uGlobals.pas';
+  uGlobals in 'Units\uGlobals.pas',
+  PngFunctions in 'Units\PngFunctions.pas',
+  PngImageList in 'Units\PngImageList.pas';
 
 {$R *.res}
 

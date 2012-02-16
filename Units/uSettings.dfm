@@ -30,7 +30,7 @@ object FrmSettings: TFrmSettings
       Top = 6
       Width = 570
       Height = 387
-      ActivePage = TabSheet4
+      ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
       object TabSheet4: TTabSheet
@@ -206,6 +206,7 @@ object FrmSettings: TFrmSettings
           Top = 87
           Width = 422
           Height = 258
+          Transparent = True
         end
         object ComboBoxVCLStyle: TComboBox
           Left = 5

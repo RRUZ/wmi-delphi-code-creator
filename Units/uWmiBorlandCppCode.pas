@@ -78,7 +78,7 @@ end;
 
 
 
-{ TFPCWmiClassCodeGenerator }
+{ TBorlandCppWmiClassCodeGenerator }
 procedure TBorlandCppWmiClassCodeGenerator.GenerateCode(Props: TStrings);
 var
   StrCode: string;
@@ -172,106 +172,14 @@ begin
   end;
 end;
 
-{ TFPCWmiEventCodeGenerator }
+{ TBorlandCppWmiEventCodeGenerator }
 
 procedure TBorlandCppWmiEventCodeGenerator.GenerateCode(ParamsIn, Values, Conds,  PropsOut: TStrings);
-var
-  StrCode: string;
-  sValue:  string;
-  Wql:     string;
-  i :  integer;
-  Props:   TStrings;
 begin
-  StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_FPC]));
-
-  WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
-    WmiTargetInstance]);
-  WQL := Format('  WQL =%s+%s', [QuotedStr(WQL), sLineBreak]);
-
-  if WmiTargetInstance <> '' then
-  begin
-    sValue := Format('Where TargetInstance ISA "%s" ', [WmiTargetInstance]);
-    WQL    := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
-  end;
-
-  for i := 0 to Conds.Count - 1 do
-  begin
-    sValue := '';
-    if (i > 0) or ((i = 0) and (WmiTargetInstance <> '')) then
-      sValue := 'AND ';
-    sValue := sValue + ' ' + ParamsIn.Names[i] + Conds[i] + Values[i] + ' ';
-    WQL := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
-  end;
-
-  i := LastDelimiter('+', Wql);
-  if i > 0 then
-    Wql[i] := ';';
-
-
-  //not wbemTargetInstance
-  Props := TStringList.Create;
-  try
-    for i := 0 to PropsOut.Count - 1 do
-     if not StartsText(wbemTargetInstance,PropsOut[i]) then
-     begin
-      {
-      if Succeeded(apObjArray.Get('TIME_CREATED', lFlags, pVal, pType, plFlavor)) then
-        begin
-          sValue:=pVal;
-          VarClear(pVal);
-          Writeln(Format('TIME_CREATED %s',[sValue]));
-        end;
-      }
-      Props.Add('    //You must convert to string the next types manually -> CIM_OBJECT, CIM_EMPTY, CIM_DATETIME, CIM_REFERENCE');
-      Props.Add(Format('    if Succeeded(apObjArray.Get(%s, lFlags, pVal, pType, plFlavor)) and ((pType<>CIM_OBJECT) and (pType<>CIM_EMPTY) and (pType<>CIM_DATETIME) and (pType<>CIM_REFERENCE) )  then',[QuotedStr(PropsOut[i])]));
-      Props.Add('    begin');
-      Props.Add('      sValue:=pVal;');
-      Props.Add('      VarClear(pVal);');
-      Props.Add(Format('      Writeln(Format(''%s %%s'',[sValue]));',[PropsOut[i]]));
-      Props.Add('    end;');
-      Props.Add('');
-     end;
-    StrCode := StringReplace(StrCode, sTagCppEventsOut, Props.Text, [rfReplaceAll]);
-  finally
-    props.Free;
-  end;
-
-  Props := TStringList.Create;
-  try
-    for i := 0 to PropsOut.Count - 1 do
-     if StartsText(wbemTargetInstance,PropsOut[i]) then
-     begin
-      {
-        Instance.Get('Caption', 0, pVal, pType, plFlavor);
-        sValue:=pVal;
-        VarClear(pVal);
-        Writeln(Format('Caption %s',[sValue]));
-      }
-      sValue:= StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]);
-
-      Props.Add('        //You must convert to string the next types manually -> CIM_OBJECT, CIM_EMPTY, CIM_DATETIME, CIM_REFERENCE');
-      Props.Add(Format('        if Succeeded(Instance.Get(%s, 0, pVal, pType, plFlavor)) and ((pType<>CIM_OBJECT) and (pType<>CIM_EMPTY) and (pType<>CIM_DATETIME) and (pType<>CIM_REFERENCE) ) then ',[QuotedStr(sValue)]));
-      Props.Add('        begin');
-      Props.Add('          sValue:=pVal;');
-      Props.Add('          VarClear(pVal);');
-      Props.Add(Format('          Writeln(Format(''%s %%s'',[sValue]));',[sValue]));
-      Props.Add('        end;');
-      Props.Add('');
-     end;
-    StrCode := StringReplace(StrCode, sTagCppEventsOut2, Props.Text, [rfReplaceAll]);
-  finally
-    props.Free;
-  end;
-
-
-  StrCode := StringReplace(StrCode, sTagCppEventsWql, WQL, [rfReplaceAll]);
-  StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNamespace, [rfReplaceAll]);
-  StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
-
-  OutPutCode.Text := StrCode;
+  OutPutCode.Text := 'Not implemented yet';
 end;
 
-{ TFPCWmiMethodCodeGenerator }
+{ TBorlandCppWmiMethodCodeGenerator }
 
 procedure TBorlandCppWmiMethodCodeGenerator.GenerateCode(ParamsIn, Values: TStrings);
 var
