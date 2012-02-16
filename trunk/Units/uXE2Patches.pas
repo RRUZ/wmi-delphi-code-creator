@@ -39,9 +39,9 @@ type
   end;
 
   TFormStyleHookNC= class(TMouseTrackControlStyleHook)
-  protected
+  public
     procedure PaintBackground(Canvas: TCanvas); override;
-    constructor Create(AControl: TWinControl); override;
+    constructor Create(AControl: TWinControl);  override;
   end;
 
 implementation

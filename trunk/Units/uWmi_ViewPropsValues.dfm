@@ -27,10 +27,6 @@ object FrmWmiVwProps: TFrmWmiVwProps
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 0
-    ExplicitLeft = 72
-    ExplicitTop = 224
-    ExplicitWidth = 441
-    ExplicitHeight = 171
     object PageControl1: TPageControl
       Left = 5
       Top = 5
@@ -39,15 +35,9 @@ object FrmWmiVwProps: TFrmWmiVwProps
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 586
-      ExplicitHeight = 465
       object TabSheetProps: TTabSheet
         Caption = 'Properties'
         TabVisible = False
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object ListViewWmi: TListView
           Left = 0
           Top = 0
@@ -77,10 +67,6 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheet1: TTabSheet
         Caption = 'Properties'
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object ListViewGrid: TListView
           Left = 0
           Top = 0
@@ -88,7 +74,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           Height = 337
           Align = alClient
           Columns = <>
-          GridLines = True
+          HideSelection = False
           OwnerData = True
           ReadOnly = True
           RowSelect = True
@@ -167,7 +153,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C010102000400780010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000400840010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

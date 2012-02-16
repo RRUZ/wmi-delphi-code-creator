@@ -369,8 +369,9 @@ type
 
   procedure GetListWmiMethodInParameters(const NameSpace,WmiClass,WmiMethod:String;ParamsList,ParamsTypes,ParamsDescr :TStringList);
   procedure GetListWmiMethodOutParameters(const NameSpace,WmiClass,WmiMethod:String;ParamsList,ParamsTypes,ParamsDescr :TStringList);
-  procedure GetWmiClassPath(const WmiNameSpace,WmiClass:string;Const List :TStrings);
 
+  procedure GetWmiClassPath(const WmiNameSpace,WmiClass:string;Const List :TStrings);
+ {
   function  GetWmiClassMOF(const NameSpace,  WmiClass:String):string;
   function  GetWmiClassXML(const NameSpace,WmiClass:String;FormatXml:boolean=True):string;
   function  GetWmiClassDescription(const NameSpace,WmiClass:String):string;
@@ -390,7 +391,7 @@ type
   procedure GetOutParamsValidValues(const NameSpace,WmiClass,WmiMethod, ParamName:String;ValidValues :TStringList);
 
   function  WmiClassIsSingleton(const NameSpace,  WmiClass:String):Boolean;
-
+    }
 implementation
 
 uses
@@ -603,6 +604,18 @@ begin
    Result := 'Unknow'
 end;
 
+function GetWMIObject(const objectName: string): IDispatch;
+var
+  chEaten: Integer;
+  BindCtx: IBindCtx;
+  Moniker: IMoniker;
+begin
+  OleCheck(CreateBindCtx(0, bindCtx));
+  OleCheck(MkParseDisplayName(BindCtx, StringToOleStr(objectName), chEaten, Moniker));
+  OleCheck(Moniker.BindToObject(BindCtx, nil, IDispatch, Result));
+end;
+
+
 function  WmiClassIsSingleton(const NameSpace, WmiClass:String):Boolean;
 var
   objWMIService : OLEVariant;
@@ -628,16 +641,6 @@ begin
   colItem       :=Unassigned;
 end;
 
-function GetWMIObject(const objectName: string): IDispatch;
-var
-  chEaten: Integer;
-  BindCtx: IBindCtx;
-  Moniker: IMoniker;
-begin
-  OleCheck(CreateBindCtx(0, bindCtx));
-  OleCheck(MkParseDisplayName(BindCtx, StringToOleStr(objectName), chEaten, Moniker));
-  OleCheck(Moniker.BindToObject(BindCtx, nil, IDispatch, Result));
-end;
 
 function  GetWmiVersion:string;
 var
@@ -654,13 +657,9 @@ begin
   colItems       :=Unassigned;
 end;
 
-procedure  GetListWMINameSpaces(const List :TStrings); cdecl;
-begin
-  GetListWMINameSpaces('root', List, False);
-end;
 
 
-procedure  GetListWMINameSpaces(const RootNameSpace:String;const List :TStrings;ReportException:Boolean=True); cdecl;//recursive function
+procedure  GetListWMINameSpaces(const RootNameSpace:String;const List :TStrings;ReportException:Boolean=True); cdecl;overload;//recursive function
 var
   objSWbemLocator : OleVariant;
   objWMIService   : OleVariant;
@@ -683,6 +682,12 @@ begin
      raise;
  end;
 end;
+
+procedure  GetListWMINameSpaces(const List :TStrings); cdecl;overload;
+begin
+  GetListWMINameSpaces('root', List, False);
+end;
+
 
 procedure  GetWmiClassPath(const WmiNameSpace,WmiClass:string;Const List :TStrings);
 var
@@ -753,7 +758,7 @@ begin
 end;
 
 
-procedure  GetListWmiClasses(const NameSpace:String;Const List :TStrings);
+procedure  GetListWmiClasses(const NameSpace:String;Const List :TStrings);overload;
 var
   objSWbemLocator : OleVariant;
   objWMIService   : OleVariant;
@@ -803,7 +808,7 @@ end;
 
 
 
-procedure  GetListWmiClasses(const NameSpace:String;const List :TStrings;const IncludeQualifiers,ExcludeQualifiers: Array of string;ExcludeEvents:Boolean);
+procedure  GetListWmiClasses(const NameSpace:String;const List :TStrings;const IncludeQualifiers,ExcludeQualifiers: Array of string;ExcludeEvents:Boolean);overload;
 var
   objSWbemLocator   : OLEVariant;
   objWMIService     : OLEVariant;
@@ -1119,6 +1124,41 @@ begin
   colItem       :=Unassigned;
 end;
 
+
+procedure GetWmiClassMethodsQualifiers(const NameSpace,WmiClass,WmiMethod:String;Const List :TStringList);
+var
+  objWMIService : OLEVariant;
+  colItems      : OLEVariant;
+  colItem       : OLEVariant;
+  Qualifiers    : OLEVariant;
+  Qualif        : OLEVariant;
+  Str           : string;
+  Value         : string;
+begin
+  List.Clear;
+  Str:='';
+  objWMIService := GetWMIObject(Format('winmgmts:\\%s\%s:%s',[wbemLocalhost,NameSpace,WmiClass]));
+  colItems      := objWMIService.Methods_;
+    for colItem in GetOleVariantEnum(colItems) do
+    if VarStrNull(colItem.Name)=WmiMethod then
+    begin
+       Qualifiers    := colItem.Qualifiers_;
+         for Qualif in GetOleVariantEnum(Qualifiers) do
+         begin
+          Value:=StringReplace(VarStrNull(Qualif.Value),',',';',[rfReplaceAll,rfIgnoreCase]);
+          Value:=StringReplace(Value,' ','_',[rfReplaceAll,rfIgnoreCase]);
+          str:=Str+Format('%s=%s, ',[VarStrNull(Qualif.Name),Value]);
+         end;
+    end;
+
+  List.CommaText := Str;
+  objWMIService :=Unassigned;
+  colItems      :=Unassigned;
+  colItem       :=Unassigned;
+  Qualifiers    :=Unassigned;
+  Qualif        :=Unassigned;
+end;
+
 procedure  GetListWmiClassImplementedMethods(const NameSpace,WmiClass:String;Const List :TStrings);
 var
   objWMIService : OLEVariant;
@@ -1363,39 +1403,6 @@ begin
   colItem       :=Unassigned;
 end;
 
-procedure GetWmiClassMethodsQualifiers(const NameSpace,WmiClass,WmiMethod:String;Const List :TStringList);
-var
-  objWMIService : OLEVariant;
-  colItems      : OLEVariant;
-  colItem       : OLEVariant;
-  Qualifiers    : OLEVariant;
-  Qualif        : OLEVariant;
-  Str           : string;
-  Value         : string;
-begin
-  List.Clear;
-  Str:='';
-  objWMIService := GetWMIObject(Format('winmgmts:\\%s\%s:%s',[wbemLocalhost,NameSpace,WmiClass]));
-  colItems      := objWMIService.Methods_;
-    for colItem in GetOleVariantEnum(colItems) do
-    if VarStrNull(colItem.Name)=WmiMethod then
-    begin
-       Qualifiers    := colItem.Qualifiers_;
-         for Qualif in GetOleVariantEnum(Qualifiers) do
-         begin
-          Value:=StringReplace(VarStrNull(Qualif.Value),',',';',[rfReplaceAll,rfIgnoreCase]);
-          Value:=StringReplace(Value,' ','_',[rfReplaceAll,rfIgnoreCase]);
-          str:=Str+Format('%s=%s, ',[VarStrNull(Qualif.Name),Value]);
-         end;
-    end;
-
-  List.CommaText := Str;
-  objWMIService :=Unassigned;
-  colItems      :=Unassigned;
-  colItem       :=Unassigned;
-  Qualifiers    :=Unassigned;
-  Qualif        :=Unassigned;
-end;
 
 procedure GetWmiMethodValidValues(const NameSpace,WmiClass,WmiMethod:String;ValidValues :TStringList);
 var

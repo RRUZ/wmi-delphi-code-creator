@@ -14,7 +14,7 @@
 { The Original Code is uListView_Helper.pas.                                                       }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011 Rodrigo Ruz V.                         }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -30,14 +30,15 @@ uses
 const
   LVSCW_AUTOSIZE_BESTFIT = -3;
 
-procedure AutoResizeColumn(const Column: TListColumn;
-  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
-procedure AutoResizeColumns(const Columns: array of TListColumn;
-  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
-procedure AutoResizeListView(const ListView: TListView;
-  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
+procedure AutoResizeColumn(const Column: TListColumn;  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
+procedure AutoResizeColumns(const Columns: array of TListColumn;  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
+procedure AutoResizeListView(const ListView: TListView;  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
+
 
 implementation
+
+uses
+  Windows;
 
 
 procedure AutoResizeColumn(const Column: TListColumn;
@@ -77,5 +78,6 @@ begin
   for i := 0 to ListView.Columns.Count - 1 do
     AutoResizeColumn(ListView.Columns[i], Mode);
 end;
+
 
 end.

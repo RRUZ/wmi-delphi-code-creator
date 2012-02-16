@@ -263,14 +263,14 @@ begin
                   WmiCodeGenerator :=TOxygenWmiMethodCodeGenerator.Create;
                   try
                     WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                    OxygenWmiCodeGenerator.WmiMethod:=WmiMethod;
-                    OxygenWmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
-                    OxygenWmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                    OxygenWmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
-                    OxygenWmiCodeGenerator.GenerateCode(Params, Values);
-                    FrmCodeEditorMethod.SourceCode:=OxygenWmiCodeGenerator.OutPutCode;
+                    WmiCodeGenerator.WmiMethod:=WmiMethod;
+                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
+                    WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
+                    WmiCodeGenerator.GenerateCode(Params, Values);
+                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
                   finally
-                    OxygenWmiCodeGenerator.Free;
+                    WmiCodeGenerator.Free;
                   end;
                  end;
     end;

@@ -123,8 +123,9 @@ uses
 procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList);
 var
   Frm: TFrmWmiVwProps;
+  WmiMetaData : TWMiClassMetaData;
+  i           : Integer;
 begin
-
   if (WmiClass <> '') and (Namespace <> '') then
   begin
     Frm := TFrmWmiVwProps.Create(nil);
@@ -132,13 +133,20 @@ begin
     Frm.WmiNamespace := Namespace;
     Frm.Caption      := 'Properties Values for the class ' + WmiClass;
 
+    Frm.Wmiproperties.Clear;
     if (Properties=nil) or (Properties.Count=0) then
-     GetListWmiClassProperties(NameSpace,WmiClass, Frm.Wmiproperties)
-    else
     begin
-     GetListWmiClassProperties(NameSpace,WmiClass, Properties);
-     Frm.Wmiproperties.AddStrings(Properties);
-    end;
+     WmiMetaData:=TWMiClassMetaData.Create(NameSpace,WmiClass);
+     try
+      for i:=0 to WmiMetaData.PropertiesCount-1 do
+        Frm.Wmiproperties.Add(WmiMetaData.Properties[i].Name)
+     finally
+      WmiMetaData.Free;
+     end;
+    end
+    else
+      for i:=0 to Properties.Count-1 do
+        Frm.Wmiproperties.Add(Properties[i]);
 
     Frm.LoadValues;
     Frm.Show();
@@ -170,7 +178,6 @@ begin
   FThread := nil;
   ListViewGrid.DoubleBuffered := True;
   FValues:=TList<TStrings>.Create;
-
   //NullStrictConvert:=False;
 end;
 
@@ -267,12 +274,67 @@ begin
  Frm.Show();
 end;
 
+
+procedure AutoResizeVirtualListView(const ListView: TListView;Values:TList<TStrings>);
+Var
+ i, j        : Integer;
+ TopIndex    : Integer;
+ BottomIndex : Integer;
+ psz         : string;
+ cw,lw       : Integer;
+ //pszText     : Array[0..4096-1] of Char;
+ //pItem       : TLVItem;
+
+begin
+ if ListView.Items.Count>0 then
+ begin
+  TopIndex   :=ListView.Perform(LVM_GETTOPINDEX,0,0);
+  BottomIndex:=TopIndex+ListView.Perform(LVM_GETCOUNTPERPAGE,0,0);
+  if BottomIndex>ListView.Items.Count-1 then
+   BottomIndex:=ListView.Items.Count;
+
+  for j:=0 to ListView.Columns.Count-1 do
+  begin
+    cw:=ListView.Columns.Items[j].Width;
+
+    for i :=TopIndex to BottomIndex do
+    begin
+      {
+     if j=0 then
+      psz:=ListView.Items.Item[i].Caption
+     else
+     begin
+      ZeroMemory(@pItem, SizeOf(pItem));
+      pItem.pszText    := pszText;
+      pItem.cchTextMax := Length(pszText);
+      pItem.mask       := LVIF_TEXT;
+      pItem.iItem      := i;
+      pItem.iSubItem   := j;
+      ListView_GetItem(ListView.Handle, pItem);
+      psz:=pszText;
+      OutputDebugString(pchar(psz));
+     end;
+       }
+     psz:=Values[i].Strings[j];
+
+     lw :=ListView_GetStringWidth(ListView.Handle, PChar(psz));
+     if lw>cw then
+      cw:=lw;
+    end;
+
+    if ListView.Columns.Items[j].Width<>cw then
+     ListView.Columns.Items[j].Width:=cw+20;
+  end;
+ end;
+end;
+
 { TWMIQueryToListView }
 
 
 procedure TWMIQueryToListView.AdjustColumnsWidth;
 begin
-  AutoResizeListView(FListView);
+  //AutoResizeListView(FListView);
+  AutoResizeVirtualListView(FListView, FValues);
 end;
 
 constructor TWMIQueryToListView.Create(const Server, User, PassWord, NameSpace, WQL: string;
@@ -304,8 +366,9 @@ begin
     begin
       Column := FListView.Columns.Add;
       Column.Caption := FProperties[i];
-      //Column.Width   := LVSCW_AUTOSIZE_USEHEADER;
-      Column.AutoSize:=True;
+      //Column.Width   := LVSCW_AUTOSIZE;
+      Column.Width:=80;
+      //Column.AutoSize:=True;
     end;
   finally
     FListView.Items.EndUpdate;
@@ -333,8 +396,6 @@ var
   FCount: integer;
   RowData : TStringList;
   CimType : integer;
-
-
 begin
   Success := CoInitialize(nil); //CoInitializeEx(nil, COINIT_MULTITHREADED);
   try
@@ -350,6 +411,7 @@ begin
 
     FMsg := 'Fetching results';
     Synchronize(SendMsg);
+    //NullStrictConvert:=False;
 
     while (not Terminated) and (FEnum.Next(1, FWbemObject, iValue) = 0) do
     begin
@@ -386,6 +448,7 @@ begin
 
       for i := 0 to FProperties.Count - 1 -1 do
         RowData.Add(FormatWbemValue(Props.Item(FProperties[i]).Value, Integer(FProperties.Objects[i])));
+        //RowData.Add(VarToStr(Props.Item(FProperties[i]).Value));
 
       RowData.Add(VarStrNull(FWbemObject.Path_.RelPath));
 
@@ -397,13 +460,13 @@ begin
       FWbemObject := Unassigned;
       Props := Unassigned;
     end;
-
+    //NullStrictConvert:=True;
 
     if not Terminated then
     begin
       if FCount = 0 then
       begin
-        FMsg := 'Does not exist values for this class';
+        FMsg := 'Does not exist instances for this wmi class';
         Synchronize(SendMsg);
       end
       else
