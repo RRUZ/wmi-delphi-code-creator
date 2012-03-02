@@ -91,7 +91,7 @@
 			<DCC_RemoteDebug>true</DCC_RemoteDebug>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-			<Manifest_File>None</Manifest_File>
+			<Manifest_File>ManAdmin.manifest</Manifest_File>
 			<VerInfo_Release>4</VerInfo_Release>
 			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
 			<VerInfo_MinorVer>2</VerInfo_MinorVer>
@@ -105,7 +105,7 @@
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-			<Manifest_File>None</Manifest_File>
+			<Manifest_File>ManAdmin.manifest</Manifest_File>
 			<DCC_MapFile>3</DCC_MapFile>
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 			<DCC_DebugInformation>true</DCC_DebugInformation>

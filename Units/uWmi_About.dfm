@@ -2,6 +2,7 @@ object FrmAbout: TFrmAbout
   Left = 651
   Top = 323
   ActiveControl = btnCheckUpdates
+  BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'About'
   ClientHeight = 316

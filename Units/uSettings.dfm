@@ -30,7 +30,7 @@ object FrmSettings: TFrmSettings
       Top = 6
       Width = 570
       Height = 387
-      ActivePage = TabSheet1
+      ActivePage = TabSheet4
       Align = alClient
       TabOrder = 0
       object TabSheet4: TTabSheet
@@ -108,6 +108,10 @@ object FrmSettings: TFrmSettings
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 35
@@ -232,6 +236,10 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -244,6 +252,10 @@ object FrmSettings: TFrmSettings
       object TabSheet5: TTabSheet
         Caption = 'Syntax Highlighting'
         ImageIndex = 4
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label1: TLabel
           Left = 11
           Top = 8
