@@ -37,15 +37,15 @@ interface
   Create code based in plugins and interfaces
 
   refactor GUI based in tree
-   show wmi classes and task for class detecting possibles operations (show values, create code, event , invoke method)
-   code gen
+   Show wmi classes and task for class detecting possibles operations (show values, create code, event , invoke method)
+   Code gen
      c++
      delphi
      fpc
-   database
-   tree (hierarchy)
+   Database
+   Tree (hierarchy)
 
-  add option to edit templates
+  Add option to edit templates
 
   plugin handle
 }
@@ -57,10 +57,6 @@ uses
   Menus, Buttons, uWmiClassTree, uWmiEvents, uWmiMethods, uWmiClasses;
 
 type
-  TProgressBar = class(ComCtrls.TProgressBar)
-    procedure CreateParams(var Params: TCreateParams); override;
-  end;
-
 
   TFrmMain = class(TForm)
     PanelMain: TPanel;
@@ -128,28 +124,14 @@ var
 implementation
 
 uses
+  ComObj,
+  ShellApi,
   uXE2Patches,
   Vcl.Styles.Ext,
-  VCl.Themes,
-  ShellApi,
-  ComObj,
+  Vcl.Themes,
   uWmi_About;
 
-const
-  PBS_MARQUEE    = $08;
-  PBM_SETMARQUEE = (WM_USER + 10);
-
 {$R *.dfm}
-
-{$R ManAdmin.RES}
-
-
-{ TProgressBar }
-procedure TProgressBar.CreateParams(var Params: TCreateParams);
-begin
-  inherited CreateParams(Params);
-  Params.Style := Params.Style or PBS_MARQUEE;
-end;
 
 procedure TFrmMain.FormActivate(Sender: TObject);
 begin
@@ -166,13 +148,10 @@ begin
 end;
 
 procedure TFrmMain.FormCreate(Sender: TObject);
-var
-  ProgressBarStyle: integer;
 begin
   {$WARN SYMBOL_PLATFORM OFF}
   ReportMemoryLeaksOnShutdown:=DebugHook<>0;
   {$WARN SYMBOL_PLATFORM ON}
-
 
   FSettings :=TSettings.Create;
   SetLog('Reading settings');
@@ -197,11 +176,6 @@ begin
   StatusBar1.Panels[2].Text := Format('WMI installed version %s      ', [GetWmiVersion]);
 
   ProgressBarWmi.Parent := StatusBar1;
-  ProgressBarStyle      := GetWindowLong(ProgressBarWmi.Handle, GWL_EXSTYLE);
-  ProgressBarStyle      := ProgressBarStyle - WS_EX_STATICEDGE;
-  SetWindowLong(ProgressBarWmi.Handle, GWL_EXSTYLE, ProgressBarStyle);
-  ProgressBarWmi.Perform(PBM_SETMARQUEE, 1, 100);
-
   FrmWmiDatabase := TFrmWmiDatabase.Create(Self);
   FrmWmiDatabase.Parent := TabSheetWmiDatabase;
   FrmWmiDatabase.BorderStyle := bsNone;
@@ -293,7 +267,7 @@ begin
   try
 
     {$WARN SYMBOL_PLATFORM OFF}
-    if (DebugHook=0) and (SameText(Settings.VCLStyle,'Windows')) then
+    if (DebugHook=0) and (SameText(Settings.VCLStyle,'Windows') or Settings.DisableVClStylesNC) then
     Frm.Show;
     {$WARN SYMBOL_PLATFORM ON}
 
