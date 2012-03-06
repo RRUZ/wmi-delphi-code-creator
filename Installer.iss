@@ -121,12 +121,17 @@ Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Template
 Source: Templates\TemplateNonStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppBorlandCPP.cpp; DestDir: {app}\Templates\
+Source: Styles\Amakrits.vsf; DestDir: {app}\Styles\
 Source: Styles\AmethystKamri.vsf; DestDir: {app}\Styles\
 Source: Styles\AquaGraphite.vsf; DestDir: {app}\Styles\
 Source: Styles\AquaLightSlate.vsf; DestDir: {app}\Styles\
+Source: Styles\Auric.vsf; DestDir: {app}\Styles\
 Source: Styles\BlueGraphite.vsf; DestDir: {app}\Styles\
 Source: Styles\Carbon.vsf; DestDir: {app}\Styles\
+Source: Styles\CharcoalDarkSlate.vsf; DestDir: {app}\Styles\
 Source: Styles\CobaltXEMedia.vsf; DestDir: {app}\Styles\
+Source: Styles\CyanDusk.vsf; DestDir: {app}\Styles\
+Source: Styles\CyanNight.vsf; DestDir: {app}\Styles\
 Source: Styles\EmeraldLightSlate.vsf; DestDir: {app}\Styles\
 Source: Styles\GoldenGraphite.vsf; DestDir: {app}\Styles\
 Source: Styles\GreenGraphite.vsf; DestDir: {app}\Styles\
@@ -135,6 +140,9 @@ Source: Styles\khaki.vsf; DestDir: {app}\Styles\
 Source: Styles\LavenderClassico.vsf; DestDir: {app}\Styles\
 Source: Styles\LightGreen.vsf; DestDir: {app}\Styles\
 Source: Styles\lilac.vsf; DestDir: {app}\Styles\
+Source: Styles\MetroBlack.vsf; DestDir: {app}\Styles\
+Source: Styles\MetroBlue.vsf; DestDir: {app}\Styles\
+Source: Styles\MetroGreen.vsf; DestDir: {app}\Styles\
 Source: Styles\Orange.vsf; DestDir: {app}\Styles\
 Source: Styles\OrangeGraphite.vsf; DestDir: {app}\Styles\
 Source: Styles\Pink.vsf; DestDir: {app}\Styles\
@@ -144,6 +152,7 @@ Source: Styles\sepia.vsf; DestDir: {app}\Styles\
 Source: Styles\Sky.vsf; DestDir: {app}\Styles\
 Source: Styles\SlateClassico.vsf; DestDir: {app}\Styles\
 Source: Styles\SmokeyQuartzKamri.vsf; DestDir: {app}\Styles\
+Source: Styles\TurquoiseGray.vsf; DestDir: {app}\Styles\
 Source: Styles\YellowGraphite.vsf; DestDir: {app}\Styles\
 [Setup]
 UsePreviousLanguage=no
