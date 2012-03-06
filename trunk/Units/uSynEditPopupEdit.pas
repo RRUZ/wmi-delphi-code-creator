@@ -24,7 +24,8 @@ unit uSynEditPopupEdit;
 interface
 
 uses
- ActnList,
+ Vcl.ActnList,
+ Vcl.ActnPopup,
  Menus,
  Classes,
  SynEdit;
@@ -33,7 +34,7 @@ type
   TSynEdit = class(SynEdit.TSynEdit)
   private
     FActnList: TActionList;
-    FPopupMenu : TPopupMenu;
+    FPopupMenu : TPopupActionBar;
     procedure CreateActns;
     procedure FillPopupMenu(APopupMenu : TPopupMenu);
     procedure CutExecute(Sender: TObject);
@@ -141,7 +142,7 @@ constructor TSynEdit.Create(AOwner: TComponent);
 begin
   inherited;
   FActnList:=TActionList.Create(Self);
-  FPopupMenu:=TPopupMenu.Create(Self);
+  FPopupMenu:=TPopupActionBar.Create(Self);
   FPopupMenu.Name:=MenuName;
   CreateActns;
   FillPopupMenu(FPopupMenu);
