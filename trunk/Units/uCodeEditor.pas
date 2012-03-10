@@ -330,7 +330,10 @@ begin
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2008\GetWMI_Info.sln'
             else
             if Pos('2010', item.Caption)>0 then
-             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2010\GetWMI_Info.sln';
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2010\GetWMI_Info.sln'
+            else
+            if Pos('11', item.Caption)>0 then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS11\GetWMI_Info.sln';
 
             SynEditCode.Lines.SaveToFile(FileName);
 
