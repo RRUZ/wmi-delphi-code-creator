@@ -36,6 +36,8 @@ object FrmSettings: TFrmSettings
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
+        ExplicitLeft = 0
+        ExplicitTop = 28
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -53,7 +55,7 @@ object FrmSettings: TFrmSettings
             'This option delete the cache  of stored Namespaces and Wmi class' +
             'es used by the application to improve the performance. Use this ' +
             'option after your rebuild the WMI repository or when you install' +
-            ' new WMI providers in the system'
+            ' new WMI providers in the system.'
           WordWrap = True
         end
         object Label10: TLabel
@@ -62,6 +64,13 @@ object FrmSettings: TFrmSettings
           Width = 78
           Height = 13
           Caption = 'Sorce Formatter'
+        end
+        object Label11: TLabel
+          Left = 16
+          Top = 120
+          Width = 150
+          Height = 13
+          Caption = 'Default Programming Language'
         end
         object EditOutputFolder: TEdit
           Left = 16
@@ -104,14 +113,18 @@ object FrmSettings: TFrmSettings
           Caption = 'Check for updates in the startup'
           TabOrder = 4
         end
+        object ComboBoxLanguageSel: TComboBox
+          Left = 16
+          Top = 139
+          Width = 220
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 5
+        end
       end
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 35
@@ -236,10 +249,6 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -252,10 +261,6 @@ object FrmSettings: TFrmSettings
       object TabSheet5: TTabSheet
         Caption = 'Syntax Highlighting'
         ImageIndex = 4
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label1: TLabel
           Left = 11
           Top = 8
@@ -431,7 +436,7 @@ object FrmSettings: TFrmSettings
     CharAttri.Foreground = clWhite
     SymbolAttri.Background = 4598550
     SymbolAttri.Foreground = clWhite
-    Left = 234
+    Left = 458
     Top = 198
   end
 end

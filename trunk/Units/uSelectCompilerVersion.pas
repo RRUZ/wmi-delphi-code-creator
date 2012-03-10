@@ -28,8 +28,11 @@ uses
   Dialogs, StdCtrls, ImgList, ComCtrls;
 
 type
-  TCompilerType = (Ct_Delphi, Ct_Lazarus_FPC, Ct_Oxygene, Ct_BorlandCpp, Ct_VSCpp);
+  TSourceLanguages = (Lng_Delphi, Lng_FPC, Lng_Oxygen, Lng_BorlandCpp, Lng_VSCpp);
+const
+  ListSourceLanguages: array[TSourceLanguages] of string = ('Delphi', 'Lazarus', 'Oxygene', 'Borland/Embarcadero C++', 'Microsoft C++');
 
+type
   TFrmSelCompilerVer = class(TForm)
     LabelText:    TLabel;
     ButtonOk:     TButton;
@@ -42,20 +45,18 @@ type
     procedure ListViewIDEsSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
   private
-    FCompilerType: TCompilerType;
+    FLanguageSource: TSourceLanguages;
     FShowCompiler: boolean;
     FShow64BitsCompiler: boolean;
     { Private declarations }
   public
     { Public declarations }
     procedure LoadInstalledVersions;
-    property CompilerType: TCompilerType Read FCompilerType Write FCompilerType;
+    property LanguageSource: TSourceLanguages Read FLanguageSource Write FLanguageSource;
     property ShowCompiler: boolean Read FShowCompiler Write FShowCompiler;
     property Show64BitsCompiler: boolean Read FShow64BitsCompiler Write FShow64BitsCompiler;
   end;
 
-const
-  ListCompilerType: array[TCompilerType] of string = ('Delphi', 'Lazarus', 'Oxygene', 'Borland/Embarcadero C++', 'Microsoft C++');
 
 implementation
 
@@ -92,7 +93,7 @@ end;
 { TFrmSelDelphiVer }
 procedure TFrmSelCompilerVer.FormActivate(Sender: TObject);
 begin
-  LabelText.Caption := Format('%s compilers installed', [ListCompilerType[FCompilerType]]);
+  LabelText.Caption := Format('%s compilers installed', [ListSourceLanguages[FLanguageSource]]);
 end;
 
 procedure TFrmSelCompilerVer.FormCreate(Sender: TObject);
@@ -121,9 +122,9 @@ var
   ImageIndex: integer;
   RootKey: HKEY;
 begin
-  case FCompilerType of
+  case FLanguageSource of
 
-    Ct_Delphi:
+    Lng_Delphi:
     begin
       for DelphiComp :=
         Low(TDelphiVersions) to High(TDelphiVersions) do
@@ -139,7 +140,7 @@ begin
             ExtractIconFileToImageList(ImageList1, Filename);
             ImageIndex := ImageList1.Count - 1;
             item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Ct_Delphi));
+            item.Data := Pointer(Ord(Lng_Delphi));
 
             if (DelphiComp>=DelphiXE2) and FShow64BitsCompiler then
             begin
@@ -150,13 +151,13 @@ begin
               ExtractIconFileToImageList(ImageList1, Filename);
               ImageIndex := ImageList1.Count - 1;
               item.ImageIndex := ImageIndex;
-              item.Data := Pointer(Ord(Ct_Delphi));
+              item.Data := Pointer(Ord(Lng_Delphi));
             end;
 
           end;
     end;
 
-    Ct_BorlandCpp:
+    Lng_BorlandCpp:
     begin
       for BorlandCppComp :=Low(TBorlandCppVersions) to High(TBorlandCppVersions) do
       begin
@@ -174,13 +175,13 @@ begin
             ExtractIconFileToImageList(ImageList1, Filename);
             ImageIndex := ImageList1.Count - 1;
             item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Ct_BorlandCpp));
+            item.Data := Pointer(Ord(Lng_BorlandCpp));
           end;
       end;
 
     end;
 
-    Ct_Lazarus_FPC:
+    Lng_FPC:
     begin
       if IsLazarusInstalled then
       begin
@@ -192,11 +193,11 @@ begin
         ExtractIconFileToImageList(ImageList1, Filename);
         ImageIndex := ImageList1.Count - 1;
         item.ImageIndex := ImageIndex;
-        item.Data := Pointer(Ord(Ct_Lazarus_FPC));
+        item.Data := Pointer(Ord(Lng_FPC));
       end;
     end;
 
-    Ct_VSCpp  :
+    Lng_VSCpp  :
                 begin
                   if IsVS2008Installed then
                   begin
@@ -208,7 +209,7 @@ begin
                     ExtractIconFileToImageList(ImageList1, Filename);
                     ImageIndex := ImageList1.Count - 1;
                     item.ImageIndex := ImageIndex;
-                    item.Data := Pointer(Ord(Ct_Oxygene));
+                    item.Data := Pointer(Ord(Lng_VSCpp));
                   end;
 
                   if IsVS2010Installed then
@@ -221,7 +222,7 @@ begin
                     ExtractIconFileToImageList(ImageList1, Filename);
                     ImageIndex := ImageList1.Count - 1;
                     item.ImageIndex := ImageIndex;
-                    item.Data := Pointer(Ord(Ct_Oxygene));
+                    item.Data := Pointer(Ord(Lng_VSCpp));
                   end;
 
                   if IsVS11Installed then
@@ -234,11 +235,11 @@ begin
                     ExtractIconFileToImageList(ImageList1, Filename);
                     ImageIndex := ImageList1.Count - 1;
                     item.ImageIndex := ImageIndex;
-                    item.Data := Pointer(Ord(Ct_Oxygene));
+                    item.Data := Pointer(Ord(Lng_VSCpp));
                   end;
                 end;
 
-    Ct_Oxygene:
+    Lng_Oxygen:
     begin
 
       if IsDelphiPrismInstalled then
@@ -254,7 +255,7 @@ begin
           //ExtractIconFileToImageList(ImageList1,ExtractFilePath(ParamStr(0))+'Extras\MonoDevelop.ico');
           ImageIndex := ImageList1.Count - 1;
           item.ImageIndex := ImageIndex;
-          item.Data := Pointer(Ord(Ct_Oxygene));
+          item.Data := Pointer(Ord(Lng_Oxygen));
         end
         else
         begin
@@ -271,7 +272,7 @@ begin
               ImageList1, ExtractFilePath(ParamStr(0)) + 'Extras\MonoDevelop.ico');
             ImageIndex := ImageList1.Count - 1;
             item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Ct_Oxygene));
+            item.Data := Pointer(Ord(Lng_Oxygen));
           end;
 
           if IsVS2008Installed and
@@ -285,7 +286,7 @@ begin
             ExtractIconFileToImageList(ImageList1, Filename);
             ImageIndex := ImageList1.Count - 1;
             item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Ct_Oxygene));
+            item.Data := Pointer(Ord(Lng_Oxygen));
           end;
 
           if IsVS2010Installed and
@@ -299,7 +300,7 @@ begin
             ExtractIconFileToImageList(ImageList1, Filename);
             ImageIndex := ImageList1.Count - 1;
             item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Ct_Oxygene));
+            item.Data := Pointer(Ord(Lng_Oxygen));
           end;
 
         end;

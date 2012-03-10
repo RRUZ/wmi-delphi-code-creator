@@ -149,7 +149,7 @@ begin
   FrmCodeEditorEvent.CodeGenerator:=GenerateCode;
   FrmCodeEditorEvent.Parent := PanelEventCode;
   FrmCodeEditorEvent.Show;
-  FrmCodeEditorEvent.CompilerType:=Ct_Delphi;
+  FrmCodeEditorEvent.SourceLanguage:=Lng_Delphi;
 end;
 
 procedure TFrmWmiEvents.GenerateCode;
@@ -207,9 +207,9 @@ begin
 
     Params.CommaText := Str;
 
-    case FrmCodeEditorEvent.CompilerType  of
+    case FrmCodeEditorEvent.SourceLanguage  of
 
-      Ct_Delphi:
+      Lng_Delphi:
                  begin
                    WmiCodeGenerator := TDelphiWmiEventCodeGenerator.Create;
                    try
@@ -224,7 +224,7 @@ begin
                    end;
                  end;
 
-      Ct_Lazarus_FPC:
+      Lng_FPC:
                  begin
                    WmiCodeGenerator := TFPCWmiEventCodeGenerator.Create;
                    try
@@ -239,7 +239,7 @@ begin
                    end;
                  end;
 
-      Ct_Oxygene:
+      Lng_Oxygen:
                  begin
                    WmiCodeGenerator := TOxygenWmiEventCodeGenerator.Create;
                    try
@@ -448,7 +448,6 @@ begin
 end;
 
 
-
 procedure TFrmWmiEvents.RadioButtonIntrinsicClick(Sender: TObject);
 begin
   LoadWmiEvents(ComboBoxNamespacesEvents.Text);
@@ -464,6 +463,7 @@ procedure TFrmWmiEvents.SetSettings(const Value: TSettings);
 begin
   FSettings := Value;
   FrmCodeEditorEvent.Settings:=Value;
+  FrmCodeEditorEvent.SourceLanguage:=TSourceLanguages(Value.DefaultLanguage);
 
   LoadCurrentTheme(FrmCodeEditorEvent, Settings.CurrentTheme);
   LoadCurrentThemeFont(FrmCodeEditorEvent ,Settings.FontName,Settings.FontSize);

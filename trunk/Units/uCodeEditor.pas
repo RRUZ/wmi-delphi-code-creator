@@ -59,7 +59,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxLanguageSelChange(Sender: TObject);
   private
-    FCompilerType: TCompilerType;
+    FSourceLanguage: TSourceLanguages;
     FSettings: TSettings;
     FConsole: TMemo;
     FCodeGenerator: TProcWMiCodeGen;
@@ -67,10 +67,10 @@ type
     procedure ScrollMemo(Memo : TSynEdit);overload;
     function GetSourceCode: TStrings;
     procedure SetSourceCode(const Value: TStrings);
-    procedure SetCompilerType(const Value: TCompilerType);
+    procedure SetSourceLanguage(const Value: TSourceLanguages);
     procedure GenerateCode;
   public
-    property CompilerType : TCompilerType read FCompilerType write SetCompilerType;
+    property SourceLanguage : TSourceLanguages read FSourceLanguage write SetSourceLanguage;
     property Settings : TSettings read FSettings write FSettings;
     property Console : TMemo read FConsole write FConsole;
     property SourceCode : TStrings read GetSourceCode write SetSourceCode;
@@ -117,15 +117,25 @@ begin
   Memo.SelStart  := Memo.GetTextLen;
 end;
 
-procedure TFrmCodeEditor.SetCompilerType(const Value: TCompilerType);
+procedure TFrmCodeEditor.SetSourceLanguage(const Value: TSourceLanguages);
+var
+  i : integer;
 begin
-  FCompilerType := Value;
-  case FCompilerType of
-    Ct_BorlandCpp,
-    Ct_VSCpp   :  SynEditCode.Highlighter:=SynCppSyn1;
+  FSourceLanguage := Value;
+  case FSourceLanguage of
+    Lng_BorlandCpp,
+    Lng_VSCpp     :  SynEditCode.Highlighter:=SynCppSyn1;
   else
     SynEditCode.Highlighter:=SynPasSyn1;
   end;
+
+  for i:=0 to ComboBoxLanguageSel.Items.Count-1 do
+   if TSourceLanguages(ComboBoxLanguageSel.Items.Objects[i])=Value then
+   begin
+    ComboBoxLanguageSel.ItemIndex:=i;
+    break;
+   end;
+
   if Assigned(Settings) then
     LoadCurrentTheme(Self,Settings.CurrentTheme);
 end;
@@ -147,20 +157,18 @@ begin
   if not FileExists(Settings.Formatter) then
     MsgWarning('Before to continue, you must set a source code formatter in the settings')
   else
-  case FCompilerType of
-    Ct_VSCpp,
-    Ct_BorlandCpp  : FormatBorlandCppCode(Console.Lines, SourceCode, Settings.Formatter);
-
-    Ct_Delphi,
-    Ct_Lazarus_FPC : FormatDelphiCode(Console.Lines, SourceCode, Settings.Formatter);
-
-    Ct_Oxygene     : ;
+  case FSourceLanguage of
+    Lng_VSCpp,
+    Lng_BorlandCpp  : FormatBorlandCppCode(Console.Lines, SourceCode, Settings.Formatter);
+    Lng_Delphi,
+    Lng_FPC         : FormatDelphiCode(Console.Lines, SourceCode, Settings.Formatter);
+    Lng_Oxygen      : ;
   end;
 end;
 
 procedure TFrmCodeEditor.ActionFormatUpdate(Sender: TObject);
 begin
-  TAction(Sender).Enabled := FCompilerType in [Ct_Delphi, Ct_Lazarus_FPC, Ct_BorlandCpp, Ct_VSCpp];
+  TAction(Sender).Enabled := FSourceLanguage in [Lng_Delphi, Lng_FPC, Lng_BorlandCpp, Lng_VSCpp];
 end;
 
 procedure TFrmCodeEditor.ActionOpenIDEExecute(Sender: TObject);
@@ -173,7 +181,7 @@ var
 begin
   Frm := TFrmSelCompilerVer.Create(Self);
   try
-    Frm.CompilerType := CompilerType;
+    Frm.LanguageSource := SourceLanguage;
     Frm.Show64BitsCompiler:=False;
     Frm.LoadInstalledVersions;
     if Frm.ListViewIDEs.Items.Count = 0 then
@@ -187,22 +195,22 @@ begin
         IdeName := item.SubItems[0];
         FileName := IncludeTrailingPathDelimiter(Settings.OutputFolder);
 
-        case CompilerType of
-          Ct_Delphi:
+        case SourceLanguage of
+          Lng_Delphi:
           begin
             FileName := FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.dpr';
             SynEditCode.Lines.SaveToFile(FileName);
             ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
 
-          Ct_BorlandCpp:
+          Lng_BorlandCpp:
           begin
             FileName := FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.cpp';
             SynEditCode.Lines.SaveToFile(FileName);
             ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
 
-          Ct_Lazarus_FPC:
+          Lng_FPC:
           begin
             FileName := FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.lpr';
             SynEditCode.Lines.SaveToFile(FileName);
@@ -213,7 +221,7 @@ begin
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
 
-          Ct_Oxygene:
+          Lng_Oxygen:
           begin
             FileName := FileName + 'Program.pas';
             SynEditCode.Lines.SaveToFile(FileName);
@@ -247,7 +255,7 @@ begin
 
           end;
 
-          Ct_VSCpp:
+          Lng_VSCpp:
           begin
             FileName := FileName + 'main.cpp';
             SynEditCode.Lines.SaveToFile(FileName);
@@ -287,18 +295,18 @@ begin
   Frm := TFrmSelCompilerVer.Create(Self);
   try
     Frm.ShowCompiler := True;
-    Frm.CompilerType := CompilerType;
+    Frm.LanguageSource := SourceLanguage;
     Frm.LoadInstalledVersions;
     if Frm.ListViewIDEs.Items.Count = 0 then
-      MsgWarning(Format('Not exist a %s compiler installed in this system', [ListCompilerType[CompilerType]]))
+      MsgWarning(Format('Not exist a %s compiler installed in this system', [ListSourceLanguages[SourceLanguage]]))
     else
     if Frm.ShowModal = mrOk then
     begin
       item := Frm.ListViewIDEs.Selected;
       if Assigned(item) then
       begin
-        case CompilerType of
-          Ct_Delphi:
+        case SourceLanguage of
+          Lng_Delphi:
           begin
             CompilerName := item.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
@@ -312,7 +320,7 @@ begin
             ScrollMemo(Console);
           end;
 
-          Ct_BorlandCpp:
+          Lng_BorlandCpp:
           begin
             CompilerName := item.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
@@ -324,7 +332,7 @@ begin
           end;
 
 
-          Ct_Lazarus_FPC:
+          Lng_FPC:
           begin
             CompilerName := item.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
@@ -341,7 +349,7 @@ begin
           end;
 
 
-          Ct_VSCpp:
+          Lng_VSCpp:
           begin
             CompilerName := item.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
@@ -368,7 +376,7 @@ begin
             ScrollMemo(Console);
           end;
 
-          Ct_Oxygene:
+          Lng_Oxygen:
           begin
             CompilerName := item.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
@@ -395,26 +403,28 @@ begin
 end;
 procedure TFrmCodeEditor.ActionSaveExecute(Sender: TObject);
 begin
-   case CompilerType of
-    Ct_Delphi      :
+   case SourceLanguage of
+    Lng_Delphi      :
                 begin
                   SaveDialog1.FileName := 'GetWMI_Info.dpr';
                   SaveDialog1.Filter   := 'Delphi Project files|*.dpr';
                 end;
-    Ct_Lazarus_FPC :
+    Lng_FPC :
                 begin
                   SaveDialog1.FileName := 'GetWMI_Info.pas';
                   SaveDialog1.Filter   := 'Lazarus Source Code files|*.pas';
                 end;
-    Ct_Oxygene     :
+    Lng_Oxygen     :
                 begin
                   SaveDialog1.FileName := 'GetWMI_Info.pas';
                   SaveDialog1.Filter   := 'Oxygen Source Code files|*.pas';
                 end;
-    Ct_BorlandCpp :
+
+    Lng_VSCpp,
+    Lng_BorlandCpp :
                 begin
                   SaveDialog1.FileName := 'GetWMI_Info.cpp';
-                  SaveDialog1.Filter   := 'C++ Source Code files|*.pas';
+                  SaveDialog1.Filter   := 'C++ Source Code files|*.cpp';
                 end;
    end;
 
@@ -426,7 +436,7 @@ end;
 
 procedure TFrmCodeEditor.ComboBoxLanguageSelChange(Sender: TObject);
 begin
-   CompilerType:=ListCompilerLanguages[TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex])];
+   FSourceLanguage:=TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex]);
    GenerateCode;
 end;
 
