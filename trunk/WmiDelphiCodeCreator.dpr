@@ -46,7 +46,9 @@ uses
   uWmiClasses in 'Units\uWmiClasses.pas' {FrmWmiClasses},
   uGlobals in 'Units\uGlobals.pas',
   PngFunctions in 'Units\PngFunctions.pas',
-  PngImageList in 'Units\PngImageList.pas';
+  PngImageList in 'Units\PngImageList.pas',
+  uWmiVsCppCode in 'Units\uWmiVsCppCode.pas',
+  uVisualStudio in 'Units\uVisualStudio.pas';
 
 {$R *.res}
 

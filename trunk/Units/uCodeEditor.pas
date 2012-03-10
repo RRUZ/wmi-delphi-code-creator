@@ -88,6 +88,7 @@ uses
  uBorlandCppIDE,
  uDelphiPrismIDE,
  uDelphiPrismHelper,
+ uVisualStudio,
  StrUtils,
  uMisc;
 
@@ -120,7 +121,8 @@ procedure TFrmCodeEditor.SetCompilerType(const Value: TCompilerType);
 begin
   FCompilerType := Value;
   case FCompilerType of
-    Ct_BorlandCpp  :  SynEditCode.Highlighter:=SynCppSyn1;
+    Ct_BorlandCpp,
+    Ct_VSCpp   :  SynEditCode.Highlighter:=SynCppSyn1;
   else
     SynEditCode.Highlighter:=SynPasSyn1;
   end;
@@ -146,16 +148,19 @@ begin
     MsgWarning('Before to continue, you must set a source code formatter in the settings')
   else
   case FCompilerType of
+    Ct_VSCpp,
     Ct_BorlandCpp  : FormatBorlandCppCode(Console.Lines, SourceCode, Settings.Formatter);
+
     Ct_Delphi,
     Ct_Lazarus_FPC : FormatDelphiCode(Console.Lines, SourceCode, Settings.Formatter);
+
     Ct_Oxygene     : ;
   end;
 end;
 
 procedure TFrmCodeEditor.ActionFormatUpdate(Sender: TObject);
 begin
-  TAction(Sender).Enabled := FCompilerType in [Ct_Delphi, Ct_Lazarus_FPC, Ct_BorlandCpp];
+  TAction(Sender).Enabled := FCompilerType in [Ct_Delphi, Ct_Lazarus_FPC, Ct_BorlandCpp, Ct_VSCpp];
 end;
 
 procedure TFrmCodeEditor.ActionOpenIDEExecute(Sender: TObject);
@@ -256,6 +261,7 @@ var
   item: TListItem;
   FileName: string;
   CompilerName: string;
+  TargetFile: string;
 begin
   Frm := TFrmSelCompilerVer.Create(Self);
   try
@@ -311,6 +317,31 @@ begin
               CompileAndRunFPCCode(Console.Lines,CompilerName, FileName, TComponent(Sender).Tag = 1);
 
              ScrollMemo(Console);
+          end;
+
+
+          Ct_VSCpp:
+          begin
+            CompilerName := item.SubItems[1];
+            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
+            FileName     := FileName + 'main.cpp';
+
+            if Pos('2008', item.Caption)>0 then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2008\GetWMI_Info.sln'
+            else
+            if Pos('2010', item.Caption)>0 then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2010\GetWMI_Info.sln';
+
+            SynEditCode.Lines.SaveToFile(FileName);
+
+
+            if CreateVsProject(
+              ExtractFileName(FileName), ExtractFilePath(FileName), TargetFile, FileName) then
+              CompileAndRunVsCode(Console.Lines,CompilerName, FileName,
+                TComponent(Sender).Tag = 1);
+
+
+            ScrollMemo(Console);
           end;
 
           Ct_Oxygene:

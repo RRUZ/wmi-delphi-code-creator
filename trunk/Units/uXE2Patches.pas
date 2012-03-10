@@ -29,7 +29,11 @@ uses
   Winapi.Windows,
   Vcl.ComCtrls;
 
+{.$DEFINE USE_TabControlFix}
+
 type
+
+{$IFDEF USE_TabControlFix}
   TMyTabControlStyleHook = class(TTabControlStyleHook)
   strict private
     procedure AngleTextOut(Canvas: TCanvas; Angle: Integer; X, Y: Integer; const Text: string);
@@ -37,6 +41,7 @@ type
   strict protected
     procedure DrawTab(Canvas: TCanvas; Index: Integer); override;
   end;
+{$ENDIF}
 
   TFormStyleHookNC= class(TMouseTrackControlStyleHook)
   public
@@ -49,11 +54,10 @@ implementation
 Uses
   System.Classes;
 
+{$IFDEF USE_TabControlFix}
+
 type
   THackCustomTabControl  =class (TCustomTabControl);
-   //TControlClass = class(TWinControl);
-
-
 { TMyTabControlStyleHook }
 
 procedure TMyTabControlStyleHook.AngleTextOut(Canvas: TCanvas; Angle, X,
@@ -229,7 +233,7 @@ begin
       DrawControlText(Canvas, Details, Tabs[Index], LayoutR, DT_VCENTER or DT_CENTER or DT_SINGLELINE  or DT_NOCLIP);
   end;
 end;
-
+{$ENDIF}
 
 
 { TFormStyleHookNC }

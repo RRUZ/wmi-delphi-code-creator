@@ -28,7 +28,7 @@ uses
   Dialogs, StdCtrls, ImgList, ComCtrls;
 
 type
-  TCompilerType = (Ct_Delphi, Ct_Lazarus_FPC, Ct_Oxygene, Ct_BorlandCpp);
+  TCompilerType = (Ct_Delphi, Ct_Lazarus_FPC, Ct_Oxygene, Ct_BorlandCpp, Ct_VSCpp);
 
   TFrmSelCompilerVer = class(TForm)
     LabelText:    TLabel;
@@ -55,13 +55,14 @@ type
   end;
 
 const
-  ListCompilerType: array[TCompilerType] of string = ('Delphi', 'Lazarus', 'Oxygene', 'Borland/Embarcadero C++');
+  ListCompilerType: array[TCompilerType] of string = ('Delphi', 'Lazarus', 'Oxygene', 'Borland/Embarcadero C++', 'Microsoft C++');
 
 implementation
 
 {$R *.dfm}
 
 uses
+  uVisualStudio,
   uRegistry,
   uLazarusIDE,
   uDelphiIDE,
@@ -194,6 +195,46 @@ begin
         item.Data := Pointer(Ord(Ct_Lazarus_FPC));
       end;
     end;
+
+    Ct_VSCpp  :
+                begin
+                    //agregar soporte a vs2008, vs2010 express
+                    //agregar soporte a vs2012
+
+                    if FShowCompiler then
+                    begin
+
+                      if IsVS2008Installed and
+                        IsDelphiPrismAttachedtoVS2008 then
+                      begin
+                        FileName := GetVS2008IDEFileName;
+                        item     := ListViewIDEs.Items.Add;
+                        item.Caption := 'Visual Studio 2008';
+                        item.SubItems.Add(FileName);
+                        item.SubItems.Add(GetVS2008CompilerFileName);
+                        ExtractIconFileToImageList(ImageList1, Filename);
+                        ImageIndex := ImageList1.Count - 1;
+                        item.ImageIndex := ImageIndex;
+                        item.Data := Pointer(Ord(Ct_Oxygene));
+                      end;
+
+                      if IsVS2010Installed and
+                        IsDelphiPrismAttachedtoVS2010 then
+                      begin
+                        FileName := GetVS2010IDEFileName;
+                        item     := ListViewIDEs.Items.Add;
+                        item.Caption := 'Visual Studio 2010';
+                        item.SubItems.Add(FileName);
+                        item.SubItems.Add(GetVS2010CompilerFileName);
+                        ExtractIconFileToImageList(ImageList1, Filename);
+                        ImageIndex := ImageList1.Count - 1;
+                        item.ImageIndex := ImageIndex;
+                        item.Data := Pointer(Ord(Ct_Oxygene));
+                      end;
+
+                    end;
+
+                end;
 
     Ct_Oxygene:
     begin

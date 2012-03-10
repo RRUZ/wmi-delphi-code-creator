@@ -14,7 +14,7 @@
 { The Original Code is uDelphiPrismIDE.pas.                                                        }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011 Rodrigo Ruz V.                         }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -33,15 +33,12 @@ function GetDelphiPrismCompilerFolder: string;
 
 function IsMonoDevelopInstalled: boolean;
 function IsDelphiPrismAttachedtoMonoDevelop: boolean;
+
 function GetMonoDevelopIDEFileName: string;
 
-function IsVS2008Installed: boolean;
 function IsDelphiPrismAttachedtoVS2008: boolean;
-function GetVS2008IDEFileName: string;
-
-function IsVS2010Installed: boolean;
 function IsDelphiPrismAttachedtoVS2010: boolean;
-function GetVS2010IDEFileName: string;
+
 
 procedure CompileAndRunOxygenCode(Console:TStrings;const CompilerName, ProjectFile: string;
   Run: boolean);
@@ -52,16 +49,14 @@ uses
   Windows,
   ShellAPI,
   uRegistry,
-  SysUtils, uMisc;
+  uVisualStudio,
+  SysUtils,
+  uMisc;
 
 const
   //HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\RemObjects\Oxygene
   DelphiPrismx86RegEntry = '\Software\RemObjects\Oxygene';
   DelphiPrismx64RegEntry = '\Software\Wow6432Node\RemObjects\Oxygene';
-  VS2010x64RegEntry      = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VS';
-  VS2010x86RegEntry      = '\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS';
-  VS2008x64RegEntry      = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0\Setup\VS';
-  VS2008x86RegEntry      = '\SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS';
 
   DelphiPrismVS2008x64 =
     '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0\InstalledProducts\RemObjects Oxygene';
@@ -95,26 +90,7 @@ begin
 end;
 
 
-function IsWow64: boolean;
-type
-  TIsWow64Process = function(Handle: Windows.THandle;
-      var Res: Windows.BOOL): Windows.BOOL; stdcall;
-var
-  IsWow64Result:  Windows.BOOL;
-  IsWow64Process: TIsWow64Process;
-begin
-  IsWow64Process := Windows.GetProcAddress(Windows.GetModuleHandle('kernel32.dll'),
-    'IsWow64Process');
-  if Assigned(IsWow64Process) then
-  begin
-    if not IsWow64Process(Windows.GetCurrentProcess, IsWow64Result) then
-      Result := False
-    else
-      Result := IsWow64Result;
-  end
-  else
-    Result := False;
-end;
+
 
 function IsMonoDevelopInstalled: boolean;
 var
@@ -191,28 +167,7 @@ begin
 end;
 
 
-function IsVS2008Installed: boolean;
-var
-  Value: string;
-begin
-  Result := False;
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS2008x64RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS2008x64RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end
-  else
-  begin
-    if RegKeyExists(VS2008x86RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS2008x86RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end;
-end;
+
 
 function IsDelphiPrismAttachedtoVS2008: boolean;
 begin
@@ -230,58 +185,9 @@ begin
     Result := RegKeyExists(DelphiPrismVS2010x86, HKEY_LOCAL_MACHINE);
 end;
 
-function GetVS2008IDEFileName: string;
-begin
-  Result := '';
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS2008x64RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS2008x64RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end
-  else
-  begin
-    if RegKeyExists(VS2008x86RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS2008x86RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end;
-end;
 
-function GetVS2010IDEFileName: string;
-begin
-  Result := '';
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS2010x64RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS2010x64RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end
-  else
-  begin
-    if RegKeyExists(VS2010x86RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS2010x86RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end;
-end;
 
-function IsVS2010Installed: boolean;
-var
-  Value: string;
-begin
-  Result := False;
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS2010x64RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS2010x64RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end
-  else
-  begin
-    if RegKeyExists(VS2010x86RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS2010x86RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end;
-end;
+
 
 function GetDelphiPrismRegValue(const Value: string): string;
 begin

@@ -95,32 +95,6 @@ Source: Delphi\JwaWinDLLNames.pas; DestDir: {app}\Delphi\
 Source: Delphi\JwaWinNT.pas; DestDir: {app}\Delphi\
 Source: Delphi\JwaWinType.pas; DestDir: {app}\Delphi\
 Source: Delphi\WbemScripting_TLB.pas; DestDir: {app}\Delphi\
-Source: Templates\TemplateConsoleAppDelphi.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppDelphiSingleton.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppDelphiSingleton_TLB.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppDelphi_COM.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppDelphi_TLB.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppFPC.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppFPCSingleton.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppOxygen.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateEventsDelphi.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateEventsDelphi_COM.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateEventsFPC.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateEventsOxygen.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateHelperFunctions.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateNonStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateNonStaticMethodInvokerDelphi_COM.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateNonStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateNonStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateNonStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateStaticMethodInvokerDelphi_COM.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
-Source: Templates\TemplateNonStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\
-Source: Templates\TemplateStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\
-Source: Templates\TemplateConsoleAppBorlandCPP.cpp; DestDir: {app}\Templates\
 Source: Styles\Amakrits.vsf; DestDir: {app}\Styles\
 Source: Styles\AmethystKamri.vsf; DestDir: {app}\Styles\
 Source: Styles\AquaGraphite.vsf; DestDir: {app}\Styles\
@@ -154,6 +128,45 @@ Source: Styles\SlateClassico.vsf; DestDir: {app}\Styles\
 Source: Styles\SmokeyQuartzKamri.vsf; DestDir: {app}\Styles\
 Source: Styles\TurquoiseGray.vsf; DestDir: {app}\Styles\
 Source: Styles\YellowGraphite.vsf; DestDir: {app}\Styles\
+Source: Templates\TemplateConsoleAppBorlandCPP.cpp; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppDelphi.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppDelphiSingleton.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppDelphiSingleton_TLB.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppDelphi_COM.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppDelphi_TLB.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppFPC.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppFPCSingleton.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppMicrosoftCPP.cpp; DestDir: {app}\Templates\
+Source: Templates\TemplateConsoleAppOxygen.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateEventsDelphi.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateEventsDelphi_COM.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateEventsFPC.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateEventsOxygen.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateHelperFunctions.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerDelphi_COM.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerMicrosoftCPP.cpp; DestDir: {app}\Templates\
+Source: Templates\TemplateNonStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerDelphi_COM.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerMicrosoftCPP.cpp; DestDir: {app}\Templates\
+Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
+Source: Microsoft_C++\VS2008\GetWMI_Info.sln; DestDir: {app}\Microsoft_C++\VS2008
+Source: Microsoft_C++\VS2008\GetWMI_Info.vcproj; DestDir: {app}\Microsoft_C++\VS2008
+Source: Microsoft_C++\VS2008\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS2008
+Source: Microsoft_C++\VS2008\stdafx.h; DestDir: {app}\Microsoft_C++\VS2008
+Source: Microsoft_C++\VS2008\targetver.h; DestDir: {app}\Microsoft_C++\VS2008
+Source: Microsoft_C++\VS2010\GetWMI_Info.sln; DestDir: {app}\Microsoft_C++\VS2010
+Source: Microsoft_C++\VS2010\GetWMI_Info.vcxproj; DestDir: {app}\Microsoft_C++\VS2010
+Source: Microsoft_C++\VS2010\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS2010
+Source: Microsoft_C++\VS2010\stdafx.h; DestDir: {app}\Microsoft_C++\VS2010
+Source: Microsoft_C++\VS2010\targetver.h; DestDir: {app}\Microsoft_C++\VS2010
 [Setup]
 UsePreviousLanguage=no
 AppName={#MyAppName}
@@ -260,8 +273,11 @@ Name: {app}\Oxygene\VS2008\Properties
 Name: {app}\Oxygene\VS2010
 Name: {app}\Oxygene\VS2010\Properties
 Name: {app}\Delphi
-Name: {app}\Templates
 Name: {app}\Styles
+Name: {app}\Templates
+Name: {app}\Microsoft_C++
+Name: {app}\Microsoft_C++\VS2008
+Name: {app}\Microsoft_C++\VS2010
 [Icons]
 Name: {group}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}
 Name: {userdesktop}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}

@@ -30,24 +30,10 @@ function CreateOxygeneProject(const FileName, Path, ProjectTemplate: string;
 implementation
 
 uses
+  uMisc,
   SysUtils,
-  Windows,
-  ShellApi;
+  Windows;
 
-function CopyDir(const fromDir, toDir: string): boolean;
-var
-  lpFileOp: TSHFileOpStruct;
-begin
-  ZeroMemory(@lpFileOp, SizeOf(lpFileOp));
-  with lpFileOp do
-  begin
-    wFunc  := FO_COPY;
-    fFlags := FOF_NOCONFIRMMKDIR;
-    pFrom  := PChar(fromDir + #0);
-    pTo    := PChar(toDir);
-  end;
-  Result := (ShFileOperation(lpFileOp) = S_OK);
-end;
 
 
 function CreateOxygeneProject(const FileName, Path, ProjectTemplate: string;
