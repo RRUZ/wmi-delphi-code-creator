@@ -32,10 +32,13 @@ function IsVS2008Installed: boolean;
 function GetVS2008IDEFileName: string;
 function GetVS2008CompilerFileName: string;
 
-
 function IsVS2010Installed: boolean;
 function GetVS2010IDEFileName: string;
 function GetVS2010CompilerFileName: string;
+
+function IsVS11Installed: boolean;
+function GetVS11IDEFileName: string;
+function GetVS11CompilerFileName: string;
 
 function CreateVsProject(const FileName, Path, ProjectTemplate: string;
   var NewFileName: string): boolean;
@@ -55,6 +58,8 @@ uses
 
 
 const
+  VS11x64RegEntry        = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\Setup\VS';
+  VS11x86RegEntry        = '\SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS';
   VS2010x64RegEntry      = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VS';
   VS2010x86RegEntry      = '\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS';
   VS2008x64RegEntry      = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0\Setup\VS';
@@ -183,6 +188,51 @@ end;
 function GetVS2010CompilerFileName: string;
 begin
  Result:=ChangeFileExt(GetVS2010IDEFileName,'.com');
+end;
+
+function IsVS11Installed: boolean;
+var
+  Value: string;
+begin
+  Result := False;
+  if IsWow64 then
+  begin
+    if RegKeyExists(VS11x64RegEntry, HKEY_LOCAL_MACHINE) then
+    begin
+      RegReadStr(VS11x64RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
+      Result := FileExists(Value);
+    end;
+  end
+  else
+  begin
+    if RegKeyExists(VS11x86RegEntry, HKEY_LOCAL_MACHINE) then
+    begin
+      RegReadStr(VS11x86RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
+      Result := FileExists(Value);
+    end;
+  end;
+end;
+
+
+function GetVS11IDEFileName: string;
+begin
+  Result := '';
+  if IsWow64 then
+  begin
+    if RegKeyExists(VS11x64RegEntry, HKEY_LOCAL_MACHINE) then
+      RegReadStr(VS11x64RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
+  end
+  else
+  begin
+    if RegKeyExists(VS11x86RegEntry, HKEY_LOCAL_MACHINE) then
+      RegReadStr(VS11x86RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
+  end;
+end;
+
+
+function GetVS11CompilerFileName: string;
+begin
+ Result:=ChangeFileExt(GetVS11IDEFileName,'.com');
 end;
 
 end.

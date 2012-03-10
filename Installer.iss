@@ -95,39 +95,6 @@ Source: Delphi\JwaWinDLLNames.pas; DestDir: {app}\Delphi\
 Source: Delphi\JwaWinNT.pas; DestDir: {app}\Delphi\
 Source: Delphi\JwaWinType.pas; DestDir: {app}\Delphi\
 Source: Delphi\WbemScripting_TLB.pas; DestDir: {app}\Delphi\
-Source: Styles\Amakrits.vsf; DestDir: {app}\Styles\
-Source: Styles\AmethystKamri.vsf; DestDir: {app}\Styles\
-Source: Styles\AquaGraphite.vsf; DestDir: {app}\Styles\
-Source: Styles\AquaLightSlate.vsf; DestDir: {app}\Styles\
-Source: Styles\Auric.vsf; DestDir: {app}\Styles\
-Source: Styles\BlueGraphite.vsf; DestDir: {app}\Styles\
-Source: Styles\Carbon.vsf; DestDir: {app}\Styles\
-Source: Styles\CharcoalDarkSlate.vsf; DestDir: {app}\Styles\
-Source: Styles\CobaltXEMedia.vsf; DestDir: {app}\Styles\
-Source: Styles\CyanDusk.vsf; DestDir: {app}\Styles\
-Source: Styles\CyanNight.vsf; DestDir: {app}\Styles\
-Source: Styles\EmeraldLightSlate.vsf; DestDir: {app}\Styles\
-Source: Styles\GoldenGraphite.vsf; DestDir: {app}\Styles\
-Source: Styles\GreenGraphite.vsf; DestDir: {app}\Styles\
-Source: Styles\IcebergClassico.vsf; DestDir: {app}\Styles\
-Source: Styles\khaki.vsf; DestDir: {app}\Styles\
-Source: Styles\LavenderClassico.vsf; DestDir: {app}\Styles\
-Source: Styles\LightGreen.vsf; DestDir: {app}\Styles\
-Source: Styles\lilac.vsf; DestDir: {app}\Styles\
-Source: Styles\MetroBlack.vsf; DestDir: {app}\Styles\
-Source: Styles\MetroBlue.vsf; DestDir: {app}\Styles\
-Source: Styles\MetroGreen.vsf; DestDir: {app}\Styles\
-Source: Styles\Orange.vsf; DestDir: {app}\Styles\
-Source: Styles\OrangeGraphite.vsf; DestDir: {app}\Styles\
-Source: Styles\Pink.vsf; DestDir: {app}\Styles\
-Source: Styles\RubyGraphite.vsf; DestDir: {app}\Styles\
-Source: Styles\SapphireKamri.vsf; DestDir: {app}\Styles\
-Source: Styles\sepia.vsf; DestDir: {app}\Styles\
-Source: Styles\Sky.vsf; DestDir: {app}\Styles\
-Source: Styles\SlateClassico.vsf; DestDir: {app}\Styles\
-Source: Styles\SmokeyQuartzKamri.vsf; DestDir: {app}\Styles\
-Source: Styles\TurquoiseGray.vsf; DestDir: {app}\Styles\
-Source: Styles\YellowGraphite.vsf; DestDir: {app}\Styles\
 Source: Templates\TemplateConsoleAppBorlandCPP.cpp; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppDelphi.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppDelphiSingleton.pas; DestDir: {app}\Templates\
@@ -167,6 +134,45 @@ Source: Microsoft_C++\VS2010\GetWMI_Info.vcxproj; DestDir: {app}\Microsoft_C++\V
 Source: Microsoft_C++\VS2010\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS2010
 Source: Microsoft_C++\VS2010\stdafx.h; DestDir: {app}\Microsoft_C++\VS2010
 Source: Microsoft_C++\VS2010\targetver.h; DestDir: {app}\Microsoft_C++\VS2010
+Source: Styles\Amakrits.vsf; DestDir: {app}\Styles\
+Source: Styles\AmethystKamri.vsf; DestDir: {app}\Styles\
+Source: Styles\AquaGraphite.vsf; DestDir: {app}\Styles\
+Source: Styles\AquaLightSlate.vsf; DestDir: {app}\Styles\
+Source: Styles\Auric.vsf; DestDir: {app}\Styles\
+Source: Styles\BlueGraphite.vsf; DestDir: {app}\Styles\
+Source: Styles\Carbon.vsf; DestDir: {app}\Styles\
+Source: Styles\CharcoalDarkSlate.vsf; DestDir: {app}\Styles\
+Source: Styles\CobaltXEMedia.vsf; DestDir: {app}\Styles\
+Source: Styles\CyanDusk.vsf; DestDir: {app}\Styles\
+Source: Styles\CyanNight.vsf; DestDir: {app}\Styles\
+Source: Styles\EmeraldLightSlate.vsf; DestDir: {app}\Styles\
+Source: Styles\GoldenGraphite.vsf; DestDir: {app}\Styles\
+Source: Styles\GreenGraphite.vsf; DestDir: {app}\Styles\
+Source: Styles\IcebergClassico.vsf; DestDir: {app}\Styles\
+Source: Styles\khaki.vsf; DestDir: {app}\Styles\
+Source: Styles\LavenderClassico.vsf; DestDir: {app}\Styles\
+Source: Styles\LightGreen.vsf; DestDir: {app}\Styles\
+Source: Styles\lilac.vsf; DestDir: {app}\Styles\
+Source: Styles\Metro Grey.vsf; DestDir: {app}\Styles\
+Source: Styles\MetroBlack.vsf; DestDir: {app}\Styles\
+Source: Styles\MetroBlue.vsf; DestDir: {app}\Styles\
+Source: Styles\MetroGreen.vsf; DestDir: {app}\Styles\
+Source: Styles\Orange.vsf; DestDir: {app}\Styles\
+Source: Styles\OrangeGraphite.vsf; DestDir: {app}\Styles\
+Source: Styles\Pink.vsf; DestDir: {app}\Styles\
+Source: Styles\RubyGraphite.vsf; DestDir: {app}\Styles\
+Source: Styles\SapphireKamri.vsf; DestDir: {app}\Styles\
+Source: Styles\sepia.vsf; DestDir: {app}\Styles\
+Source: Styles\Sky.vsf; DestDir: {app}\Styles\
+Source: Styles\SlateClassico.vsf; DestDir: {app}\Styles\
+Source: Styles\SmokeyQuartzKamri.vsf; DestDir: {app}\Styles\
+Source: Styles\TurquoiseGray.vsf; DestDir: {app}\Styles\
+Source: Styles\YellowGraphite.vsf; DestDir: {app}\Styles\
+Source: Microsoft_C++\VS11\GetWMI_Info.sln; DestDir: {app}\Microsoft_C++\VS11
+Source: Microsoft_C++\VS11\GetWMI_Info.vcxproj; DestDir: {app}\Microsoft_C++\VS11
+Source: Microsoft_C++\VS11\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS11
+Source: Microsoft_C++\VS11\stdafx.h; DestDir: {app}\Microsoft_C++\VS11
+Source: Microsoft_C++\VS11\targetver.h; DestDir: {app}\Microsoft_C++\VS11
 [Setup]
 UsePreviousLanguage=no
 AppName={#MyAppName}
@@ -273,11 +279,12 @@ Name: {app}\Oxygene\VS2008\Properties
 Name: {app}\Oxygene\VS2010
 Name: {app}\Oxygene\VS2010\Properties
 Name: {app}\Delphi
-Name: {app}\Styles
 Name: {app}\Templates
 Name: {app}\Microsoft_C++
 Name: {app}\Microsoft_C++\VS2008
 Name: {app}\Microsoft_C++\VS2010
+Name: {app}\Styles
+Name: {app}\Microsoft_C++\VS11
 [Icons]
 Name: {group}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}
 Name: {userdesktop}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}

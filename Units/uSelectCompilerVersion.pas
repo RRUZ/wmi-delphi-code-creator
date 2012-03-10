@@ -232,6 +232,20 @@ begin
                         item.Data := Pointer(Ord(Ct_Oxygene));
                       end;
 
+                      if IsVS11Installed and
+                        IsDelphiPrismAttachedtoVS2010 then
+                      begin
+                        FileName := GetVS11IDEFileName;
+                        item     := ListViewIDEs.Items.Add;
+                        item.Caption := 'Visual Studio 11';
+                        item.SubItems.Add(FileName);
+                        item.SubItems.Add(GetVS11CompilerFileName);
+                        ExtractIconFileToImageList(ImageList1, Filename);
+                        ImageIndex := ImageList1.Count - 1;
+                        item.ImageIndex := ImageIndex;
+                        item.Data := Pointer(Ord(Ct_Oxygene));
+                      end;
+
                     end;
 
                 end;
