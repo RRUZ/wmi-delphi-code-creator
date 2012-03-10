@@ -456,8 +456,5 @@ initialization
 if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then
  TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TScrollingStyleHook);
 
-TStyleManager.Engine.UnRegisterStyleHook(TCustomTabControl, TTabControlStyleHook);
-TStyleManager.Engine.RegisterStyleHook(TCustomTabControl, TMyTabControlStyleHook);
-
 
 end.

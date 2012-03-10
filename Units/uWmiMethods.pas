@@ -95,6 +95,7 @@ uses
   uWmiFPCCode,
   uWmiDelphiCode,
   uWmiBorlandCppCode,
+  uWmiVsCppCode,
   uListView_Helper;
 
 
@@ -241,6 +242,23 @@ begin
                     WmiCodeGenerator.Free;
                   end;
                  end;
+
+      Ct_VSCpp:
+                 begin
+                  WmiCodeGenerator :=TVsWmiMethodCodeGenerator.Create;
+                  try
+                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                    WmiCodeGenerator.WmiMethod:=WmiMethod;
+                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
+                    WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
+                    WmiCodeGenerator.GenerateCode(Params, Values);
+                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
+                  finally
+                    WmiCodeGenerator.Free;
+                  end;
+                 end;
+
 
       Ct_Lazarus_FPC:
                  begin

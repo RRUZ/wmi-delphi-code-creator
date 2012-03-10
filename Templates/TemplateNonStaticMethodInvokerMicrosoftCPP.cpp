@@ -19,7 +19,6 @@ using namespace std;
 #include <Wbemidl.h>
 # pragma comment(lib, "wbemuuid.lib")
 
-
 //CREDENTIAL structure
 //http://msdn.microsoft.com/en-us/library/windows/desktop/aa374788%28v=vs.85%29.aspx
 #define CRED_MAX_USERNAME_LENGTH            513
@@ -40,7 +39,6 @@ int main(int argc, char* argv[])
 
 	COAUTHIDENTITY *userAcct =  NULL ;
 	COAUTHIDENTITY authIdent;
-	
 	HRESULT hres;
 
 	// Initialize COM. ------------------------------------------
@@ -56,7 +54,6 @@ int main(int argc, char* argv[])
 	}
 
 	// Set general COM security levels --------------------------
-
 	if (localconn)
 		hres =  CoInitializeSecurity(
 			NULL,
@@ -219,25 +216,20 @@ int main(int argc, char* argv[])
 
 	// Execute Method
 	IWbemClassObject* pOutParams = NULL;
-	hres = pSvc->ExecMethod(ClassName, MethodName, 0,
+	hres = pSvc->ExecMethod(L"[WMIPATH]", MethodName, 0,
 	NULL, pClassInstance, &pOutParams, NULL);
 
 	if (FAILED(hres))
 	{
 		cout << "Could not execute method. Error code = 0x" << hex << hres << endl;
-		cout << _com_error(hres).ErrorMessage() << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;		
 		SysFreeString(ClassName);
 		SysFreeString(MethodName);
-		if (pClass)			
-		pClass->Release();
-		if (pInParamsDefinition)			
-		pInParamsDefinition->Release();
-		if (pOutParams)			
-		pOutParams->Release();
-		if (pSvc)			
-		pSvc->Release();
-		if (pLoc)			
-		pLoc->Release();     
+		if (pClass)	pClass->Release();
+		if (pInParamsDefinition) pInParamsDefinition->Release();
+		if (pOutParams) pOutParams->Release();
+		if (pSvc) pSvc->Release();
+		if (pLoc) pLoc->Release();     
 		CoUninitialize();
 		cout << "press enter to exit" << endl;
 		cin.get();			
@@ -245,20 +237,19 @@ int main(int argc, char* argv[])
 	}
 
 
-	
 [CPPCODEOUTPARAMS]	
 
     // Clean up    
-    SysFreeString(ClassName);
-    SysFreeString(MethodName);
-    pClass->Release();
-    pInParamsDefinition->Release();
-    pOutParams->Release();
-    pLoc->Release();
-    pSvc->Release();
-    CoUninitialize();
-    cout << "press enter to exit" << endl;
-    cin.get();	
-    return 0;
+	SysFreeString(ClassName);
+	SysFreeString(MethodName);	
+	if (pClass)	pClass->Release();
+	if (pInParamsDefinition) pInParamsDefinition->Release();
+	if (pOutParams)	pOutParams->Release();
+	if (pLoc) pLoc->Release();
+	if (pSvc) pSvc->Release();
+	CoUninitialize();
+	cout << "press enter to exit" << endl;
+	cin.get();	
+	return 0;
 }
 //---------------------------------------------------------------------------

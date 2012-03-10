@@ -40,12 +40,52 @@ procedure MsgInformation(const Msg: string);
 function  MsgQuestion(const Msg: string):Boolean;
 function  GetFileVersion(const FileName: string): string;
 function  GetTempDirectory: string;
+function IsWow64: boolean;
+function CopyDir(const fromDir, toDir: string): boolean;
 
 implementation
 
 Uses
+ ShellAPi,
  Vcl.Controls,
  Vcl.Dialogs;
+
+function CopyDir(const fromDir, toDir: string): boolean;
+var
+  lpFileOp: TSHFileOpStruct;
+begin
+  ZeroMemory(@lpFileOp, SizeOf(lpFileOp));
+  with lpFileOp do
+  begin
+    wFunc  := FO_COPY;
+    fFlags := FOF_NOCONFIRMMKDIR;
+    pFrom  := PChar(fromDir + #0);
+    pTo    := PChar(toDir);
+  end;
+  Result := (ShFileOperation(lpFileOp) = S_OK);
+end;
+
+
+function IsWow64: boolean;
+type
+  TIsWow64Process = function(Handle: Windows.THandle;
+      var Res: Windows.BOOL): Windows.BOOL; stdcall;
+var
+  IsWow64Result:  Windows.BOOL;
+  IsWow64Process: TIsWow64Process;
+begin
+  IsWow64Process := Windows.GetProcAddress(Windows.GetModuleHandle('kernel32.dll'),
+    'IsWow64Process');
+  if Assigned(IsWow64Process) then
+  begin
+    if not IsWow64Process(Windows.GetCurrentProcess, IsWow64Result) then
+      Result := False
+    else
+      Result := IsWow64Result;
+  end
+  else
+    Result := False;
+end;
 
 function GetTempDirectory: string;
 var
