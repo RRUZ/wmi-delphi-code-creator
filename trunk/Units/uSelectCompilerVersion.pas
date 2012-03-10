@@ -198,56 +198,44 @@ begin
 
     Ct_VSCpp  :
                 begin
-                    //agregar soporte a vs2008, vs2010 express
-                    //agregar soporte a vs2012
+                  if IsVS2008Installed then
+                  begin
+                    FileName := GetVS2008IDEFileName;
+                    item     := ListViewIDEs.Items.Add;
+                    item.Caption := 'Visual Studio 2008';
+                    item.SubItems.Add(FileName);
+                    item.SubItems.Add(GetVS2008CompilerFileName);
+                    ExtractIconFileToImageList(ImageList1, Filename);
+                    ImageIndex := ImageList1.Count - 1;
+                    item.ImageIndex := ImageIndex;
+                    item.Data := Pointer(Ord(Ct_Oxygene));
+                  end;
 
-                    if FShowCompiler then
-                    begin
+                  if IsVS2010Installed then
+                  begin
+                    FileName := GetVS2010IDEFileName;
+                    item     := ListViewIDEs.Items.Add;
+                    item.Caption := 'Visual Studio 2010';
+                    item.SubItems.Add(FileName);
+                    item.SubItems.Add(GetVS2010CompilerFileName);
+                    ExtractIconFileToImageList(ImageList1, Filename);
+                    ImageIndex := ImageList1.Count - 1;
+                    item.ImageIndex := ImageIndex;
+                    item.Data := Pointer(Ord(Ct_Oxygene));
+                  end;
 
-                      if IsVS2008Installed and
-                        IsDelphiPrismAttachedtoVS2008 then
-                      begin
-                        FileName := GetVS2008IDEFileName;
-                        item     := ListViewIDEs.Items.Add;
-                        item.Caption := 'Visual Studio 2008';
-                        item.SubItems.Add(FileName);
-                        item.SubItems.Add(GetVS2008CompilerFileName);
-                        ExtractIconFileToImageList(ImageList1, Filename);
-                        ImageIndex := ImageList1.Count - 1;
-                        item.ImageIndex := ImageIndex;
-                        item.Data := Pointer(Ord(Ct_Oxygene));
-                      end;
-
-                      if IsVS2010Installed and
-                        IsDelphiPrismAttachedtoVS2010 then
-                      begin
-                        FileName := GetVS2010IDEFileName;
-                        item     := ListViewIDEs.Items.Add;
-                        item.Caption := 'Visual Studio 2010';
-                        item.SubItems.Add(FileName);
-                        item.SubItems.Add(GetVS2010CompilerFileName);
-                        ExtractIconFileToImageList(ImageList1, Filename);
-                        ImageIndex := ImageList1.Count - 1;
-                        item.ImageIndex := ImageIndex;
-                        item.Data := Pointer(Ord(Ct_Oxygene));
-                      end;
-
-                      if IsVS11Installed and
-                        IsDelphiPrismAttachedtoVS2010 then
-                      begin
-                        FileName := GetVS11IDEFileName;
-                        item     := ListViewIDEs.Items.Add;
-                        item.Caption := 'Visual Studio 11';
-                        item.SubItems.Add(FileName);
-                        item.SubItems.Add(GetVS11CompilerFileName);
-                        ExtractIconFileToImageList(ImageList1, Filename);
-                        ImageIndex := ImageList1.Count - 1;
-                        item.ImageIndex := ImageIndex;
-                        item.Data := Pointer(Ord(Ct_Oxygene));
-                      end;
-
-                    end;
-
+                  if IsVS11Installed then
+                  begin
+                    FileName := GetVS11IDEFileName;
+                    item     := ListViewIDEs.Items.Add;
+                    item.Caption := 'Visual Studio 11';
+                    item.SubItems.Add(FileName);
+                    item.SubItems.Add(GetVS11CompilerFileName);
+                    ExtractIconFileToImageList(ImageList1, Filename);
+                    ImageIndex := ImageList1.Count - 1;
+                    item.ImageIndex := ImageIndex;
+                    item.Data := Pointer(Ord(Ct_Oxygene));
+                  end;
                 end;
 
     Ct_Oxygene:

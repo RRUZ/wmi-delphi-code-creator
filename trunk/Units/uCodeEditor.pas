@@ -169,6 +169,7 @@ var
   item: TListItem;
   FileName: string;
   IdeName: string;
+  TargetFile: string;
 begin
   Frm := TFrmSelCompilerVer.Create(Self);
   try
@@ -244,6 +245,26 @@ begin
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
             end;
 
+          end;
+
+          Ct_VSCpp:
+          begin
+            FileName := FileName + 'main.cpp';
+            SynEditCode.Lines.SaveToFile(FileName);
+
+            if Pos('2008', item.Caption)>0 then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2008\GetWMI_Info.sln'
+            else
+            if Pos('2010', item.Caption)>0 then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2010\GetWMI_Info.sln'
+            else
+            if Pos('11', item.Caption)>0 then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS11\GetWMI_Info.sln';
+
+
+             CreateVsProject(ExtractFileName(FileName), ExtractFilePath(FileName), TargetFile, FileName);
+             FileName := ChangeFileExt(FileName, '.sln');
+             ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
 
         end;
