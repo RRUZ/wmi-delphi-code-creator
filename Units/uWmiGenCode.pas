@@ -29,8 +29,6 @@ uses
   Classes;
 
 type
-
-  TSourceLanguages = (Lng_Delphi, Lng_FPC, Lng_Oxygen, Lng_BorlandCpp, Lng_VSCpp);
   TWmiCode        =  (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
 
   TWmiCodeGenerator=class
@@ -93,10 +91,6 @@ const
   sTagWmiMethodName  = '[WMIMETHOD]';
   sTagWmiMethodDescr = '[WMIMETHODDESC]';
   sTagWmiPath        = '[WMIPATH]';
-
-  ListCompilerLanguages: array[TSourceLanguages] of
-    TCompilerType = (Ct_Delphi, Ct_Lazarus_FPC, Ct_Oxygene, Ct_BorlandCpp, Ct_VSCpp);
-
 
   sTemplateTemplateFuncts = 'TemplateHelperFunctions.pas';
 

@@ -53,6 +53,7 @@ type
     FLastWmiMethod: string;
     FCheckForUpdates: Boolean;
     FDisableVClStylesNC: Boolean;
+    FDefaultLanguage: integer;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -84,6 +85,7 @@ type
     property DisableVClStylesNC : Boolean read FDisableVClStylesNC write FDisableVClStylesNC;
 
     property Formatter : string read FFormatter write FFormatter;
+    property DefaultLanguage : integer read FDefaultLanguage write FDefaultLanguage;
 
     property CheckForUpdates : Boolean read FCheckForUpdates write FCheckForUpdates;
   end;
@@ -133,6 +135,8 @@ type
     UpDown1: TUpDown;
     SynEditCode: TSynEdit;
     SynPasSyn1: TSynPasSyn;
+    ComboBoxLanguageSel: TComboBox;
+    Label11: TLabel;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -202,6 +206,7 @@ uses
   Vcl.FileCtrl,
   {$WARN UNIT_PLATFORM ON}
   uDelphiVersions,
+  uSelectCompilerVersion,
   SynHighlighterCpp,
   StrUtils,
   IOUtils,
@@ -523,6 +528,8 @@ begin
     Settings.Formatter                     := iniFile.ReadString('Global', 'Formatter', '');
     Settings.CheckForUpdates               := iniFile.ReadBool('Global', 'CheckForUpdates', True);
     Settings.DisableVClStylesNC            := iniFile.ReadBool('Global', 'DisableVClStylesNC', False);
+
+    Settings.DefaultLanguage               := iniFile.ReadInteger('Global', 'DefaultLanguage', Integer(TSourceLanguages.Lng_Delphi));
   finally
     iniFile.Free;
   end;
@@ -556,6 +563,7 @@ begin
     iniFile.WriteString('Global', 'Formatter', Settings.Formatter);
     iniFile.WriteBool('Global', 'CheckForUpdates', Settings.CheckForUpdates);
     iniFile.WriteBool('Global', 'DisableVClStylesNC', Settings.DisableVClStylesNC);
+    iniFile.WriteInteger('Global', 'DefaultLanguage', Settings.DefaultLanguage);
   finally
     iniFile.Free;
   end;
@@ -672,6 +680,8 @@ begin
     FSettings.Formatter                     := CbFormatter.Text;
     FSettings.CheckForUpdates               := CheckBoxUpdates.Checked;
     FSettings.DisableVClStylesNC            := CheckBoxDisableVClStylesNC.Checked;
+    FSettings.DefaultLanguage               := Integer(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex]);
+
     WriteSettings(FSettings);
     Close();
     LoadVCLStyle(ComboBoxVCLStyle.Text);
@@ -802,7 +812,12 @@ begin
 end;
 
 procedure TFrmSettings.FormCreate(Sender: TObject);
+var
+  i : TSourceLanguages;
 begin
+  for i := Low(TSourceLanguages) to High(TSourceLanguages) do
+    ComboBoxLanguageSel.Items.AddObject(ListSourceLanguages[i], TObject(i));
+
   FSettings:=TSettings.Create;
   DummyFrm:=Self;
   LoadFixedWidthFonts;
@@ -822,6 +837,14 @@ var
   i  : integer;
 begin
   ReadSettings(FSettings);
+
+  for i := 0 to ComboBoxLanguageSel.Items.Count-1 do
+   if Integer(ComboBoxLanguageSel.Items.Objects[i])=FSettings.DefaultLanguage then
+    begin
+     ComboBoxLanguageSel.ItemIndex:=i;
+     break;
+    end;
+
   ComboBoxTheme.ItemIndex    := ComboBoxTheme.Items.IndexOf(FSettings.CurrentTheme);
   ComboBoxVCLStyle.ItemIndex := ComboBoxVCLStyle.Items.IndexOf(FSettings.VCLStyle);
   DrawSeletedVCLStyle;

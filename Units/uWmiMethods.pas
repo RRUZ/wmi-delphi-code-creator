@@ -163,7 +163,7 @@ begin
   FrmCodeEditorMethod.Show;
   //FrmCodeEditorMethod.Settings:=Settings;
   //FrmCodeEditorMethod.Console:=MemoConsole;
-  FrmCodeEditorMethod.CompilerType:=Ct_Delphi;
+  FrmCodeEditorMethod.SourceLanguage:=Lng_Delphi;
 end;
 
 procedure TFrmWmiMethods.GenerateCode;
@@ -210,8 +210,8 @@ begin
 
     Params.CommaText := Str;
 
-    case FrmCodeEditorMethod.CompilerType of
-      Ct_Delphi:
+    case FrmCodeEditorMethod.SourceLanguage of
+      Lng_Delphi:
                  begin
                   WmiCodeGenerator :=TDelphiWmiMethodCodeGenerator.Create;
                   try
@@ -227,7 +227,7 @@ begin
                   end;
                  end;
 
-      Ct_BorlandCpp:
+      Lng_BorlandCpp:
                  begin
                   WmiCodeGenerator :=TBorlandCppWmiMethodCodeGenerator.Create;
                   try
@@ -243,7 +243,7 @@ begin
                   end;
                  end;
 
-      Ct_VSCpp:
+      Lng_VSCpp:
                  begin
                   WmiCodeGenerator :=TVsWmiMethodCodeGenerator.Create;
                   try
@@ -260,7 +260,7 @@ begin
                  end;
 
 
-      Ct_Lazarus_FPC:
+      Lng_FPC:
                  begin
                   WmiCodeGenerator :=TFPCWmiMethodCodeGenerator.Create;
                   try
@@ -276,7 +276,7 @@ begin
                   end;
                  end;
 
-      Ct_Oxygene:
+      Lng_Oxygen:
                  begin
                   WmiCodeGenerator :=TOxygenWmiMethodCodeGenerator.Create;
                   try
@@ -474,6 +474,7 @@ procedure TFrmWmiMethods.SetSettings(const Value: TSettings);
 begin
   FSettings := Value;
   FrmCodeEditorMethod.Settings:=Value;
+  FrmCodeEditorMethod.SourceLanguage:=TSourceLanguages(Value.DefaultLanguage);
 
   LoadCurrentTheme(FrmCodeEditorMethod, Settings.CurrentTheme);
   LoadCurrentThemeFont(FrmCodeEditorMethod ,Settings.FontName,Settings.FontSize);

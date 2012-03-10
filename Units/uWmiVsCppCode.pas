@@ -58,6 +58,7 @@ type
 implementation
 
 uses
+  uSelectCompilerVersion,
   StrUtils,
   IOUtils,
   ComObj,
