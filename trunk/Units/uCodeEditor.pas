@@ -432,11 +432,9 @@ begin
       SynEditCode.Lines.SaveToFile(SaveDialog1.FileName);
 end;
 
-
-
 procedure TFrmCodeEditor.ComboBoxLanguageSelChange(Sender: TObject);
 begin
-   FSourceLanguage:=TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex]);
+   SourceLanguage:=TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex]);
    GenerateCode;
 end;
 

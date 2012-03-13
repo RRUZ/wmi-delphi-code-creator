@@ -125,6 +125,7 @@ object FrmWmiEvents: TFrmWmiEvents
       Height = 21
       TabOrder = 8
       Visible = False
+      OnExit = EditValueEventExit
     end
     object ComboBoxCond: TComboBox
       Left = 88

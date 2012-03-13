@@ -239,6 +239,8 @@ begin
 
   LoadCurrentTheme(Self,Settings.CurrentTheme);
   LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
+
+
 end;
 
 
