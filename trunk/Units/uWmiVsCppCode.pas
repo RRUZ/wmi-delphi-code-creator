@@ -181,8 +181,12 @@ var
   Wql:     string;
   i :  integer;
   Props:   TStrings;
+  Padding : string;
+  CimType : Integer;
+  HasTargetInstance : boolean;
 begin
   StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_VSCpp]));
+  Padding := StringOfChar(' ',4);
 
   WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds, WmiTargetInstance]);
   WQL := Format('  WQL =L"%s"%s', [WQL, sLineBreak]);
@@ -202,75 +206,185 @@ begin
     WQL := WQL + StringOfChar(' ', 8) + 'L"'+EscapeCppStr(sValue)+'"' + sLineBreak;
   end;
 
-  {
-  i := LastDelimiter('+', Wql);
-  if i > 0 then
-    Wql[i] := ';';
-   }
-
    Wql:=Wql+';';
 
 
   //not wbemTargetInstance
   Props := TStringList.Create;
   try
+//    hr = apObjArray[i]->Get(_bstr_t(L"TIME_CREATED"), 0, &vtProp, 0, 0);
+//		if (!FAILED(hr))
+//		{
+//			  if ((vtProp.vt==VT_NULL) || (vtProp.vt==VT_EMPTY))
+//				wcout << "TIME_CREATED : " << ((vtProp.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
+//			  else
+//			  if ((vtProp.vt & VT_ARRAY))
+//				wcout << "TIME_CREATED : " << "Array types not supported (yet)" << endl;
+//			  else
+//				wcout << "TIME_CREATED : " << vtProp.bstrVal << endl;
+//		}
+//		VariantClear(&vtProp);
+
+
     for i := 0 to PropsOut.Count - 1 do
      if not StartsText(wbemTargetInstance,PropsOut[i]) then
      begin
-      {
-      if Succeeded(apObjArray.Get('TIME_CREATED', lFlags, pVal, pType, plFlavor)) then
-        begin
-          sValue:=pVal;
-          VarClear(pVal);
-          Writeln(Format('TIME_CREATED %s',[sValue]));
+       sValue:=PropsOut[i];
+
+       Props.Add(Padding+ Format('hr = apObjArray[i]->Get(_bstr_t(L"%s"), 0, &vtProp, 0, 0);',[sValue]));
+       Props.Add(Padding+ ' if (!FAILED(hr))');
+       Props.Add(Padding+ ' {');
+       Props.Add(Padding+ '   if ((vtProp.vt==VT_NULL) || (vtProp.vt==VT_EMPTY))');
+       Props.Add(Padding+ '   '+Format('wcout << "%s : " << ((vtProp.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;',[sValue]));
+       Props.Add(Padding+ '   else');
+       Props.Add(Padding+ '   if ((vtProp.vt & VT_ARRAY))');
+       Props.Add(Padding+ '   '+Format('wcout << "%s : " << "Array types not supported (yet)" << endl;',[sValue]));
+       Props.Add(Padding+ '   else');
+        CimType  :=Integer(PropsOut.Objects[i]);
+        case CimType of
+          wbemCimtypeSint8     : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.bVal   << endl;',[sValue]));
+          wbemCimtypeUint8     : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.bVal   << endl;',[sValue]));
+          wbemCimtypeSint16    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.iVal << endl;',[sValue]));
+          wbemCimtypeUint16    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.uiVal << endl;',[sValue]));
+          wbemCimtypeSint32    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.intVal << endl;',[sValue]));
+          wbemCimtypeUint32    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.uintVal << endl;',[sValue]));
+          wbemCimtypeSint64    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.intVal << endl;',[sValue]));
+          wbemCimtypeUint64    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.uintVal << endl;',[sValue]));
+          wbemCimtypeReal32    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.fltVal << endl;',[sValue]));
+          wbemCimtypeReal64    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.dblVal << endl;',[sValue]));
+          wbemCimtypeBoolean   : Props.Add(Padding + Format('   wcout << "%s : " << (vtProp.boolVal ? "True" : "False") << endl;',[sValue]));//ok
+          wbemCimtypeString    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.bstrVal << endl;',[sValue]));//ok
+          wbemCimtypeDatetime  : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.bstrVal << endl;',[sValue]));//ok
+          wbemCimtypeReference : Props.Add(Padding + Format('   wcout << "%s : " << "Reference Type is not supported" << endl;',[sValue]));
+          wbemCimtypeChar16    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.bstrVal << endl;',[sValue]));
+          wbemCimtypeObject    : Props.Add(Padding + Format('   wcout << "%s : " << "Object Type is not supported" << endl;',[sValue]));
         end;
-      }
-      Props.Add('    //You must convert to string the next types manually -> CIM_OBJECT, CIM_EMPTY, CIM_DATETIME, CIM_REFERENCE');
-      Props.Add(Format('    if Succeeded(apObjArray.Get(%s, lFlags, pVal, pType, plFlavor)) and ((pType<>CIM_OBJECT) and (pType<>CIM_EMPTY) and (pType<>CIM_DATETIME) and (pType<>CIM_REFERENCE) )  then',[QuotedStr(PropsOut[i])]));
-      Props.Add('    begin');
-      Props.Add('      sValue:=pVal;');
-      Props.Add('      VarClear(pVal);');
-      Props.Add(Format('      Writeln(Format(''%s %%s'',[sValue]));',[PropsOut[i]]));
-      Props.Add('    end;');
-      Props.Add('');
+       Props.Add(Padding+ ' }');
+       Props.Add(Padding+ ' VariantClear(&vtProp);');
      end;
     StrCode := StringReplace(StrCode, sTagCppEventsOut, Props.Text, [rfReplaceAll]);
   finally
     props.Free;
   end;
 
-  Props := TStringList.Create;
+  HasTargetInstance:=False;
+  for i := 0 to PropsOut.Count - 1 do
+   if StartsText(wbemTargetInstance,PropsOut[i]) then
+   begin
+     HasTargetInstance:=True;
+     break;
+   end;
+
+   Props := TStringList.Create;
   try
-    for i := 0 to PropsOut.Count - 1 do
-     if StartsText(wbemTargetInstance,PropsOut[i]) then
-     begin
-      {
-        Instance.Get('Caption', 0, pVal, pType, plFlavor);
-        sValue:=pVal;
-        VarClear(pVal);
-        Writeln(Format('Caption %s',[sValue]));
-      }
-      sValue:= StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]);
 
-      Props.Add('        //You must convert to string the next types manually -> CIM_OBJECT, CIM_EMPTY, CIM_DATETIME, CIM_REFERENCE');
-      Props.Add(Format('        if Succeeded(Instance.Get(%s, 0, pVal, pType, plFlavor)) and ((pType<>CIM_OBJECT) and (pType<>CIM_EMPTY) and (pType<>CIM_DATETIME) and (pType<>CIM_REFERENCE) ) then ',[QuotedStr(sValue)]));
-      Props.Add('        begin');
-      Props.Add('          sValue:=pVal;');
-      Props.Add('          VarClear(pVal);');
-      Props.Add(Format('          Writeln(Format(''%s %%s'',[sValue]));',[sValue]));
-      Props.Add('        end;');
-      Props.Add('');
-     end;
-    StrCode := StringReplace(StrCode, sTagCppEventsOut2, Props.Text, [rfReplaceAll]);
+  //		hr = apObjArray[i]->Get(_bstr_t(L"TargetInstance"), 0, &vtProp, 0, 0);
+  //        if (!FAILED(hr))
+  //        {
+  //			IUnknown* str = vtProp;
+  //			hr = str->QueryInterface( IID_IWbemClassObject, reinterpret_cast< void** >( &apObjArray[i] ) );
+  //			if ( SUCCEEDED( hr ) )
+  //			{
+  //				_variant_t cn;
+  //
+  //
+  //				hr = apObjArray[i]->Get( L"ExecutablePath", 0, &cn, NULL, NULL );
+  //				if ( SUCCEEDED( hr ) )
+  //				{
+  //
+  //				  if ((cn.vt==VT_NULL) || (cn.vt==VT_EMPTY))
+  //					wcout << "ExecutablePath : " << ((cn.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
+  //				  else
+  //				  if ((cn.vt & VT_ARRAY))
+  //					wcout << "ExecutablePath : " << "Array types not supported (yet)" << endl;
+  //				  else
+  //					wcout << "ExecutablePath : " << cn.bstrVal << endl;
+  //				}
+  //        VariantClear(&cn);
+  //
+  //
+  //				hr = apObjArray[i]->Get( L"Name", 0, &cn, NULL, NULL );
+  //				if ( SUCCEEDED( hr ) )
+  //				{
+  //
+  //				  if ((cn.vt==VT_NULL) || (cn.vt==VT_EMPTY))
+  //					wcout << "Name : " << ((cn.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
+  //				  else
+  //				  if ((cn.vt & VT_ARRAY))
+  //					wcout << "Name : " << "Array types not supported (yet)" << endl;
+  //				  else
+  //					wcout << "Name : " << cn.bstrVal << endl;
+  //				}
+  //
+  //				VariantClear(&cn);
+  //			}
+  //
+  //        }
+  //        VariantClear(&vtProp);
+
+    if HasTargetInstance then
+    begin
+      Props.Add(Padding+ 'hr = apObjArray[i]->Get(_bstr_t(L"TargetInstance"), 0, &vtProp, 0, 0);');
+      Props.Add(Padding+ ' if (!FAILED(hr))');
+      Props.Add(Padding+ ' {');
+      Props.Add(Padding+ '   IUnknown* str = vtProp;');
+      Props.Add(Padding+ '   hr = str->QueryInterface( IID_IWbemClassObject, reinterpret_cast< void** >( &apObjArray[i] ) );');
+      Props.Add(Padding+ '   if ( SUCCEEDED( hr ) )');
+      Props.Add(Padding+ '   {');
+      Props.Add(Padding+ '      _variant_t cn;');
+
+      for i := 0 to PropsOut.Count - 1 do
+       if StartsText(wbemTargetInstance,PropsOut[i]) then
+       begin
+         sValue:=StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]);
+         Props.Add(Padding+ '     '+Format('hr = apObjArray[i]->Get( L"%s", 0, &cn, NULL, NULL );',[sValue]));
+         Props.Add(Padding+ '      if ( SUCCEEDED( hr ) )');
+         Props.Add(Padding+ '      {');
+         Props.Add(Padding+ '        if ((cn.vt==VT_NULL) || (cn.vt==VT_EMPTY))');
+         Props.Add(Padding+ '         '+Format('wcout << "%s : " << ((cn.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;',[sValue]));
+         Props.Add(Padding+ '        else');
+         Props.Add(Padding+ '        if ((cn.vt & VT_ARRAY))');
+         Props.Add(Padding+ '         '+Format('wcout << "%s : " << "Array types not supported (yet)" << endl;',[sValue]));
+         Props.Add(Padding+ '        else');
+
+          CimType  :=Integer(PropsOut.Objects[i]);
+          case CimType of
+            wbemCimtypeSint8     : Props.Add(Padding + Format('         wcout << "%s : " << cn.bVal   << endl;',[sValue]));
+            wbemCimtypeUint8     : Props.Add(Padding + Format('         wcout << "%s : " << cn.bVal   << endl;',[sValue]));
+            wbemCimtypeSint16    : Props.Add(Padding + Format('         wcout << "%s : " << cn.iVal << endl;',[sValue]));
+            wbemCimtypeUint16    : Props.Add(Padding + Format('         wcout << "%s : " << cn.uiVal << endl;',[sValue]));
+            wbemCimtypeSint32    : Props.Add(Padding + Format('         wcout << "%s : " << cn.intVal << endl;',[sValue]));
+            wbemCimtypeUint32    : Props.Add(Padding + Format('         wcout << "%s : " << cn.uintVal << endl;',[sValue]));
+            wbemCimtypeSint64    : Props.Add(Padding + Format('         wcout << "%s : " << cn.intVal << endl;',[sValue]));
+            wbemCimtypeUint64    : Props.Add(Padding + Format('         wcout << "%s : " << cn.uintVal << endl;',[sValue]));
+            wbemCimtypeReal32    : Props.Add(Padding + Format('         wcout << "%s : " << cn.fltVal << endl;',[sValue]));
+            wbemCimtypeReal64    : Props.Add(Padding + Format('         wcout << "%s : " << cn.dblVal << endl;',[sValue]));
+            wbemCimtypeBoolean   : Props.Add(Padding + Format('         wcout << "%s : " << (cn.boolVal ? "True" : "False") << endl;',[sValue]));//ok
+            wbemCimtypeString    : Props.Add(Padding + Format('         wcout << "%s : " << cn.bstrVal << endl;',[sValue]));//ok
+            wbemCimtypeDatetime  : Props.Add(Padding + Format('         wcout << "%s : " << cn.bstrVal << endl;',[sValue]));//ok
+            wbemCimtypeReference : Props.Add(Padding + Format('         wcout << "%s : " << "Reference Type is not supported" << endl;',[sValue]));
+            wbemCimtypeChar16    : Props.Add(Padding + Format('         wcout << "%s : " << cn.bstrVal << endl;',[sValue]));
+            wbemCimtypeObject    : Props.Add(Padding + Format('         wcout << "%s : " << "Object Type is not supported" << endl;',[sValue]));
+          end;
+         Props.Add(Padding+ '      }');
+         Props.Add(Padding+ '      VariantClear(&cn);');
+         Props.Add(Padding+ '       ');
+       end;
+
+
+      Props.Add(Padding+ '');
+      Props.Add(Padding+ '   }');
+      Props.Add(Padding+ ' }');
+      Props.Add(Padding+ ' VariantClear(&vtProp);');
+    end;
+      StrCode := StringReplace(StrCode, sTagCppEventsOut2, Props.Text, [rfReplaceAll]);
   finally
-    props.Free;
+      props.Free;
   end;
-
 
   StrCode := StringReplace(StrCode, sTagWmiNameSpace, EscapeCppStr(WmiNameSpace), [rfReplaceAll]);
   StrCode := StringReplace(StrCode, sTagCppEventsWql, WQL, [rfReplaceAll]);
   StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
-
   OutPutCode.Text := StrCode;
 end;
 
