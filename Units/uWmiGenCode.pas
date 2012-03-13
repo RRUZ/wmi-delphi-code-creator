@@ -114,7 +114,7 @@ const
     'TemplateNonStaticMethodInvokerFPC.pas', 'TemplateNonStaticMethodInvokerOxygen.pas','TemplateNonStaticMethodInvokerBorlandCPP.cpp', 'TemplateNonStaticMethodInvokerMicrosoftCPP.cpp');
 
   ListSourceTemplatesEvents: array[TSourceLanguages] of
-    string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas','', 'TemplateEventsMicrosoft.cpp');
+    string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas','TemplateEventsBorlandCpp.cpp', 'TemplateEventsMicrosoft.cpp');
 
   ListWmiCodeName  : array [TWmiCode] of string = ('Microsoft WMI Scripting Library - WbemScripting_TLB','Microsoft WMI Scripting Library - Late Binding', 'WMI COM API');
   ListWmiCodeDescr : array [TWmiCode] of string = ('Generate code using the Microsoft WMI Scripting Library using the WbemScripting_TLB unit',
