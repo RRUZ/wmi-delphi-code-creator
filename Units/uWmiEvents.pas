@@ -62,6 +62,7 @@ type
     procedure ButtonGenerateEventCodeClick(Sender: TObject);
     procedure ComboBoxCondExit(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure EditValueEventExit(Sender: TObject);
   private
     FItem:      TListitem;
     FrmCodeEditorEvent  : TFrmCodeEditor;
@@ -96,7 +97,9 @@ uses
   uWmiGenCode,
   uWmiOxygenCode,
   uWmiFPCCode,
-  uWmiDelphiCode;
+  uWmiDelphiCode,
+  uWmiBorlandCppCode,
+  uWmiVsCppCode;
 
 const
   COND_EVENTPARAM_COLUMN   = 2;
@@ -132,6 +135,18 @@ procedure TFrmWmiEvents.ComboBoxTargetInstanceChange(Sender: TObject);
 begin
   LoadTargetInstanceProps;
 end;
+
+procedure TFrmWmiEvents.EditValueEventExit(Sender: TObject);
+begin
+  if Assigned(FItem) then
+  begin
+    FItem.SubItems[VALUE_EVENTPARAM_COLUMN - 1] := TEdit(Sender).Text;
+    FItem := nil;
+  end;
+  PostMessage(handle, WM_NEXTDLGCTL, ListViewEventsConds.Handle, 1);
+  TEdit(Sender).Visible := True;
+end;
+
 
 procedure TFrmWmiEvents.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -253,6 +268,38 @@ begin
                       WmiCodeGenerator.Free;
                    end;
                  end;
+
+      Lng_BorlandCpp:
+                 begin
+                   WmiCodeGenerator := TBorlandCppWmiEventCodeGenerator.Create;
+                   try
+                      WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                      WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
+                      WmiCodeGenerator.PollSeconds          := PollSeconds;
+                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
+                      FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
+                   finally
+                      WmiCodeGenerator.Free;
+                   end;
+                 end;
+
+
+      Lng_VSCpp     :
+                 begin
+                   WmiCodeGenerator := TVsCppWmiEventCodeGenerator.Create;
+                   try
+                      WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                      WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
+                      WmiCodeGenerator.PollSeconds          := PollSeconds;
+                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
+                      FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
+                   finally
+                      WmiCodeGenerator.Free;
+                   end;
+                 end;
+
 
     end;
 

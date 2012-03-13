@@ -4,7 +4,7 @@
 			<ProjectVersion>13.4</ProjectVersion>
 			<MainSource>WmiDelphiCodeCreator.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Release</Config>
+			<Config Condition="'$(Config)'==''">Debug</Config>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>

@@ -145,8 +145,8 @@ object FrmWmiMethods: TFrmWmiMethods
       TabOrder = 5
     end
     object EditValueMethodParam: TEdit
-      Left = 37
-      Top = 239
+      Left = 103
+      Top = 290
       Width = 121
       Height = 21
       TabOrder = 7

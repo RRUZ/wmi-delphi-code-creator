@@ -124,7 +124,7 @@ end;
 
 procedure CaptureConsoleOutput(const lpCommandLine: string; OutPutList: TStrings);
 const
-  ReadBuffer = 1048576;
+  ReadBuffer = 1024*1024;
 var
   lpPipeAttributes      : TSecurityAttributes;
   ReadPipe              : THandle;
@@ -176,13 +176,20 @@ begin
             else
             if BytesRead > 0 then
               ReadFile(ReadPipe, Buffer[TotalBytesRead], BytesRead, BytesRead, nil);
-            Inc(TotalBytesRead, BytesRead);
+
+            //Inc(TotalBytesRead, BytesRead);
+
+            Buffer[BytesRead] := #0;
+            OemToAnsi(Buffer, Buffer);
+            OutPutList.Text := OutPutList.Text + String(Buffer);
+
           until (Apprunning <> WAIT_TIMEOUT) or (n > 150);
 
+            {
           Buffer[TotalBytesRead] := #0;
-          //OemToCharA(Buffer, Buffer);
           OemToAnsi(Buffer, Buffer);
           OutPutList.Text := OutPutList.Text + String(Buffer);
+            }
         finally
           CloseHandle(lpProcessInformation.hProcess);
           CloseHandle(lpProcessInformation.hThread);
