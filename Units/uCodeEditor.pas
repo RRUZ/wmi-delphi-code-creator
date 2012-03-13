@@ -31,7 +31,6 @@ uses
   SynHighlighterCpp, Vcl.ActnMenus, Vcl.ExtCtrls, uSynEditPopupEdit;
 
 type
-  //TProcWMiCodeGen = procedure (WmiMetaClassInfo : TWMiClassMetaData) of object;
   TProcWMiCodeGen = procedure of object;
   TFrmCodeEditor = class(TForm)
     PageControlCode: TPageControl;

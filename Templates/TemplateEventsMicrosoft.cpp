@@ -82,11 +82,13 @@ HRESULT EventSink::QueryInterface(REFIID riid, void** ppv)
 HRESULT EventSink::Indicate(long lObjectCount,
     IWbemClassObject **apObjArray)
 {
-	HRESULT hres = S_OK;
+   HRESULT hr = S_OK;
+   _variant_t vtProp;
 
     for (int i = 0; i < lObjectCount; i++)
     {
-        printf("Event occurred\n");
+[CPPEVENTSOUT]
+[CPPEVENTSOUT2]		
     }
 
     return WBEM_S_NO_ERROR;

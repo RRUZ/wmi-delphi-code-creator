@@ -28,13 +28,6 @@ uses
  Classes;
 
 
-const
-  sTagCppCode          = '[CPPCODE]';
-  sTagCppCodeParamsIn  = '[CPPCODEINPARAMS]';
-  sTagCppCodeParamsOut = '[CPPCODEOUTPARAMS]';
-  sTagCppEventsWql     = '[CPPEVENTSWQL]';
-  sTagCppEventsOut     = '[CPPEVENTSOUT]';
-  sTagCppEventsOut2    = '[CPPEVENTSOUT2]';
 
 type
   TBorlandCppWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
@@ -65,6 +58,14 @@ uses
   uWmi_Metadata,
   SysUtils;
 
+const
+  sTagCppCode          = '[CPPCODE]';
+  sTagCppCodeParamsIn  = '[CPPCODEINPARAMS]';
+  sTagCppCodeParamsOut = '[CPPCODEOUTPARAMS]';
+  sTagCppEventsWql     = '[CPPEVENTSWQL]';
+  sTagCppEventsOut     = '[CPPEVENTSOUT]';
+  sTagCppEventsOut2    = '[CPPEVENTSOUT2]';
+
 function EscapeCppStr(const Value:string) : string;
 const
  ArrChrEscape : Array [0..1] of Char = ('"','\');
@@ -75,9 +76,6 @@ begin
   for i:= Low(ArrChrEscape) to High(ArrChrEscape) do
    Result:=StringReplace(Result,ArrChrEscape[i],ArrChrEscape[i]+ArrChrEscape[i], [rfReplaceAll]);
 end;
-
-
-
 
 { TBorlandCppWmiClassCodeGenerator }
 procedure TBorlandCppWmiClassCodeGenerator.GenerateCode(Props: TStrings);
