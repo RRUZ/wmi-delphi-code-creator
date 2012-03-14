@@ -54,7 +54,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls,
   SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmiDatabase, uWmi_Metadata,
-  Menus, Buttons, uWmiClassTree, uWmiEvents, uWmiMethods, uWmiClasses;
+  Menus, Buttons, uWmiClassTree, uWmiEvents, uWmiMethods, uWmiClasses,
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup;
 
 type
 
@@ -87,6 +88,7 @@ type
     ToolButtonSettings: TToolButton;
     TabSheetTreeClasses: TTabSheet;
     TabSheetEvents: TTabSheet;
+    PopupActionBar1: TPopupActionBar;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure ToolButtonOnlineClick(Sender: TObject);
@@ -127,6 +129,7 @@ uses
   ComObj,
   ShellApi,
   uXE2Patches,
+  uStdActionsPopMenu,
   Vcl.Styles.Ext,
   Vcl.Themes,
   uWmi_About;
@@ -153,6 +156,10 @@ begin
   ReportMemoryLeaksOnShutdown:=DebugHook<>0;
   {$WARN SYMBOL_PLATFORM ON}
 
+  FillPopupActionBar(PopupActionBar1);
+
+
+
   FSettings :=TSettings.Create;
   SetLog('Reading settings');
 
@@ -162,6 +169,7 @@ begin
 
   if FSettings.DisableVClStylesNC then
   begin
+   TStyleManager.Engine.RegisterStyleHook(TCustomForm, TFormStyleHookNC);
    TStyleManager.Engine.RegisterStyleHook(TForm, TFormStyleHookNC);
    //GlassFrame.Enabled:=True;
   end;
@@ -240,7 +248,7 @@ begin
   LoadCurrentTheme(Self,Settings.CurrentTheme);
   LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
 
-
+  AssignStdActionsPopUpMenu(Self, PopupActionBar1);
 end;
 
 
