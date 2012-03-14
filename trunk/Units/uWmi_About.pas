@@ -40,12 +40,14 @@ type
     Button3: TButton;
     Image2: TImage;
     btnCheckUpdates: TButton;
+    Image3: TImage;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure btnCheckUpdatesClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure Image3Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -104,7 +106,7 @@ begin
   LabelVersion.Caption    := Format('Version %s', [FileVersionStr]);
   LabelWmiVersion.Caption := Format('WMI installed version %s', [GetWmiVersion]);
   MemoCopyRights.Lines.Add(
-    'Author Rodrigo Ruz rodrigo.ruz.v@gmail.com - © 2010-2011 all rights reserved.');
+    'Author Rodrigo Ruz rodrigo.ruz.v@gmail.com - © 2010-2012 all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add(
     'SynEdit http://synedit.svn.sourceforge.net/viewvc/synedit/ all rights reserved.');
@@ -118,5 +120,10 @@ begin
   MemoCopyRights.Lines.Add('Go Delphi Go');
 end;
 
+
+procedure TFrmAbout.Image3Click(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open', 'http://tp.embarcadero.com/ctprefer?partner_id=1445&product_id=0',nil,nil, SW_SHOWNORMAL) ;
+end;
 
 end.

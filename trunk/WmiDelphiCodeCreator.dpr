@@ -48,7 +48,8 @@ uses
   PngFunctions in 'Units\PngFunctions.pas',
   PngImageList in 'Units\PngImageList.pas',
   uWmiVsCppCode in 'Units\uWmiVsCppCode.pas',
-  uVisualStudio in 'Units\uVisualStudio.pas';
+  uVisualStudio in 'Units\uVisualStudio.pas',
+  uStdActionsPopMenu in 'Units\uStdActionsPopMenu.pas';
 
 {$R *.res}
 
