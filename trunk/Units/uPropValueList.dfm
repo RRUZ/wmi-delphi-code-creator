@@ -26,10 +26,6 @@ object FrmValueList: TFrmValueList
     TitleCaptions.Strings = (
       'Property'
       'Value')
-    ExplicitLeft = 16
-    ExplicitTop = 24
-    ExplicitWidth = 306
-    ExplicitHeight = 300
     ColWidths = (
       150
       204)

@@ -130,6 +130,7 @@ uses
   ShellApi,
   uXE2Patches,
   uStdActionsPopMenu,
+  Vcl.Styles.OwnerDrawFix,
   Vcl.Styles.Ext,
   Vcl.Themes,
   uWmi_About;
@@ -249,6 +250,7 @@ begin
   LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
 
   AssignStdActionsPopUpMenu(Self, PopupActionBar1);
+  ApplyVclStylesOwnerDrawFix(Self, True);
 end;
 
 

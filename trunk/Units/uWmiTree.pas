@@ -83,6 +83,7 @@ function FindTextTreeView(const AText: string;
 implementation
 
 uses
+  uxtheme,
   uSettings,
   uGlobals,
   ComObj,
@@ -204,6 +205,10 @@ begin
       SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
       WebBrowserWmi.Navigate(Format(UrlWmiHelp, [WmiMetaClassInfo.WmiClass]));
+      {
+      while WebBrowserWmi.ReadyState <> READYSTATE_COMPLETE do
+        Application.ProcessMessages;
+      }
       MemoWmiMOF.Lines.Text := WmiMetaClassInfo.WmiClassMOF;
       Xml := WmiMetaClassInfo.WmiClassXML;
       LoadXMLWMIClass(Xml);
@@ -473,5 +478,6 @@ begin
       PanelClassInfo.Height := 220;
   end;
 end;
+
 
 end.
