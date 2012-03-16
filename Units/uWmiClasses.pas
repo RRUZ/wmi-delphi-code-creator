@@ -382,6 +382,8 @@ begin
   for i := 0 to ListViewProperties.Columns.Count - 1 do
     AutoResizeColumn(ListViewProperties.Column[i]);
 
+  ListViewProperties.Repaint;
+
   GenerateCode;
 end;
 
