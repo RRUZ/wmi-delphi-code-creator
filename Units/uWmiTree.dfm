@@ -143,10 +143,6 @@ object FrmWMITree: TFrmWMITree
         object TabSheet3: TTabSheet
           Caption = 'Online Help'
           ImageIndex = 2
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object WebBrowserWmi: TWebBrowser
             Left = 0
             Top = 0
@@ -200,7 +196,7 @@ object FrmWMITree: TFrmWMITree
     Left = 176
     Top = 128
     Bitmap = {
-      494C010107000800540010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010107000800580010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

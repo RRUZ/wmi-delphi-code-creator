@@ -26,7 +26,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, SynEditHighlighter, ImgList, uWmi_Metadata, uMisc,
-  XMLDoc,  XMLIntf, OleCtrls, SHDocVw, SynEdit, ComCtrls, StdCtrls, ExtCtrls;
+  XMLDoc,  XMLIntf, OleCtrls, SHDocVw, SynEdit, ComCtrls, StdCtrls, ExtCtrls, Vcl.Styles.WebBrowser;
 
 const
   NamespaceImageIndex = 0;
@@ -42,6 +42,7 @@ const
   LevelPropertyMethod = 2;
 
 type
+  TWebBrowser=class(TVclStylesWebBrowser);
   TFrmWMITree = class(TForm)
     PanelTreeMain:  TPanel;
     Splitter7:      TSplitter;
