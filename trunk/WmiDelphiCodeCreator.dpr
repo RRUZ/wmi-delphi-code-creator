@@ -50,7 +50,8 @@ uses
   PngFunctions in 'Units\ThirdParty\PngFunctions.pas',
   PngImageList in 'Units\ThirdParty\PngImageList.pas',
   uXE2Patches in 'Units\Vcl.Styles.Utils\uXE2Patches.pas',
-  uWmi_Metadata in 'Units\WMI\uWmi_Metadata.pas';
+  uWmi_Metadata in 'Units\WMI\uWmi_Metadata.pas',
+  Vcl.Styles.WebBrowser in 'Units\Vcl.Styles.Utils\Vcl.Styles.WebBrowser.pas';
 
 {$R *.res}
 

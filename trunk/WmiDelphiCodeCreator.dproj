@@ -111,9 +111,9 @@
 			<DCC_DebugInformation>true</DCC_DebugInformation>
 			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
 			<VerInfo_MinorVer>3</VerInfo_MinorVer>
-			<VerInfo_Build>12</VerInfo_Build>
+			<VerInfo_Build>40</VerInfo_Build>
 			<VerInfo_Release>8</VerInfo_Release>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.3.8.12;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.3.8.40;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="$(MainSource)">
@@ -198,6 +198,7 @@
 			<DCCReference Include="Units\ThirdParty\PngImageList.pas"/>
 			<DCCReference Include="Units\Vcl.Styles.Utils\uXE2Patches.pas"/>
 			<DCCReference Include="Units\WMI\uWmi_Metadata.pas"/>
+			<DCCReference Include="Units\Vcl.Styles.Utils\Vcl.Styles.WebBrowser.pas"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
