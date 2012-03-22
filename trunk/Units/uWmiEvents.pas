@@ -99,6 +99,7 @@ uses
   uWmiFPCCode,
   uWmiDelphiCode,
   uWmiBorlandCppCode,
+  uWmiCSharpCode,
   uWmiVsCppCode;
 
 const
@@ -300,6 +301,20 @@ begin
                    end;
                  end;
 
+      Lng_CSharp     :
+                 begin
+                   WmiCodeGenerator := TCSharpWmiEventCodeGenerator.Create;
+                   try
+                      WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                      WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
+                      WmiCodeGenerator.PollSeconds          := PollSeconds;
+                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
+                      FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
+                   finally
+                      WmiCodeGenerator.Free;
+                   end;
+                 end;
 
     end;
 
