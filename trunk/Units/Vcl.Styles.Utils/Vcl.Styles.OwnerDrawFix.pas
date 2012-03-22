@@ -59,9 +59,15 @@ var
  i : Integer;
 begin
   for i:=0 to Parent.ComponentCount-1 do
-    if (Parent.Components[i] is TComboBox) and Active and (TComboBox(Parent.Components[i]).Style<>csOwnerDrawFixed) then
+    if (Parent.Components[i] is TComboBox) and Active and (TComboBox(Parent.Components[i]).Style in [csDropDown, csSimple, csDropDownList]) then
     begin
-     TComboBox(Parent.Components[i]).Style     :=csOwnerDrawFixed;
+     case TComboBox(Parent.Components[i]).Style  of
+      csDropDown           :begin
+                             TComboBox(Parent.Components[i]).Style     :=csOwnerDrawFixed;
+                             //SetWindowLong(TComboBox(Parent.Components[i]).Handle, GWL_STYLE,GetWindowLong(TComboBox(Parent.Components[i]).Handle, GWL_STYLE) or CBS_DROPDOWN);
+                            end;
+      csDropDownList       :TComboBox(Parent.Components[i]).Style     :=csOwnerDrawFixed;
+     end;
      TComboBox(Parent.Components[i]).OnDrawItem:=VclStylesOwnerDrawFix.ComboBoxDrawItem;
     end
     else

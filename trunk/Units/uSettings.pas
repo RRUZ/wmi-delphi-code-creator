@@ -26,7 +26,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
-  SynEditHighlighter, SynHighlighterPas;
+  SynEditHighlighter, SynHighlighterPas, uCheckUpdate;
 
 type
   TSettings = class
@@ -193,6 +193,8 @@ type
 
   function GetWMICFolderCache : string;
 
+  function GetUpdaterInstance : TFrmCheckUpdate;
+
 
 implementation
 
@@ -225,6 +227,16 @@ const
 
 Var
   DummyFrm : TFrmSettings;
+
+function GetUpdaterInstance : TFrmCheckUpdate;
+begin
+  Result:=TFrmCheckUpdate.Create(nil);
+  Result.RemoteVersionFile       :='http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Version.xml';
+  Result.ApplicationName         :='WMI Delphi Code Creator';
+  Result.XPathVersionNumber      :='/versioninfo/@versionapp';
+  Result.XPathUrlInstaller       :='/versioninfo/@url';
+  Result.XPathInstallerFileName  :='/versioninfo/@installerfilename';
+end;
 
 function GetSpecialFolder(const CSIDL: integer) : string;
 var

@@ -60,6 +60,7 @@ implementation
 
 uses
   uCheckUpdate,
+  uSettings,
   uWmiGenCode,
   uWmi_Metadata,
   ShellApi;
@@ -72,7 +73,7 @@ procedure TFrmAbout.btnCheckUpdatesClick(Sender: TObject);
 var
   Frm: TFrmCheckUpdate;
 begin
-  Frm := TFrmCheckUpdate.Create(nil);
+  Frm := GetUpdaterInstance;
   try
     Frm.ShowModal();
   finally
