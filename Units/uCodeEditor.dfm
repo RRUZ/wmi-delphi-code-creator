@@ -220,7 +220,7 @@ object FrmCodeEditor: TFrmCodeEditor
     Left = 432
     Top = 152
     Bitmap = {
-      494C010109001800380010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010109001800480010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       00000000000000000000000000000000000000000003000000100000001A0000
       001A0000001A0000001A00000017000000110000000B00000007000000070000
@@ -624,8 +624,8 @@ object FrmCodeEditor: TFrmCodeEditor
       000000000000}
   end
   object SynCppSyn1: TSynCppSyn
-    Left = 351
-    Top = 203
+    Left = 287
+    Top = 195
   end
   object SynPasSyn1: TSynPasSyn
     AsmAttri.Background = 4598550
@@ -661,5 +661,9 @@ object FrmCodeEditor: TFrmCodeEditor
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 160
     Top = 150
+  end
+  object SynCSSyn1: TSynCSSyn
+    Left = 336
+    Top = 184
   end
 end

@@ -90,6 +90,7 @@ uses
   uWmiDelphiCode,
   uWmiBorlandCppCode,
   uWmiVsCppCode,
+  uWmiCSharpCode,
   uListView_Helper;
 
 procedure TFrmWmiClasses.ButtonGetValuesClick(Sender: TObject);
@@ -245,6 +246,22 @@ begin
                       WmiCodeGenerator.Free;
                     end;
                   end;
+
+      Lng_CSharp  :
+                  begin
+                    WmiCodeGenerator:=TCSharpWmiClassCodeGenerator.Create;
+                    try
+                      WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
+                      WmiCodeGenerator.UseHelperFunctions:=false;
+                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
+                      WmiCodeGenerator.GenerateCode(Props);
+                      FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
+                    finally
+                      WmiCodeGenerator.Free;
+                    end;
+                  end;
+
+
 
     end;
 

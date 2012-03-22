@@ -39,6 +39,7 @@ begin
  Console.Read();
 end;
 
+[WMICLASSDESC]
 class method ConsoleApp.Get[WMICLASSNAME]Info;
 const
   sComputerName = 'localhost';

@@ -28,7 +28,6 @@ uses
  ComObj,
  SysUtils,
  Forms,
- Windows,
  Classes;
 
 type
@@ -40,13 +39,17 @@ procedure MsgInformation(const Msg: string);
 function  MsgQuestion(const Msg: string):Boolean;
 function  GetFileVersion(const FileName: string): string;
 function  GetTempDirectory: string;
-function IsWow64: boolean;
-function CopyDir(const fromDir, toDir: string): boolean;
+function  GetWindowsDirectory : string;
+function  GetSpecialFolder(const CSIDL: integer) : string;
+function  IsWow64: boolean;
+function  CopyDir(const fromDir, toDir: string): boolean;
 
 implementation
 
 Uses
+ ShlObj,
  ShellAPi,
+ WinApi.Windows,
  Vcl.Controls,
  Vcl.Dialogs;
 
@@ -68,17 +71,17 @@ end;
 
 function IsWow64: boolean;
 type
-  TIsWow64Process = function(Handle: Windows.THandle;
-      var Res: Windows.BOOL): Windows.BOOL; stdcall;
+  TIsWow64Process = function(Handle: WinApi.Windows.THandle;
+      var Res: WinApi.Windows.BOOL): WinApi.Windows.BOOL; stdcall;
 var
-  IsWow64Result:  Windows.BOOL;
+  IsWow64Result:  WinApi.Windows.BOOL;
   IsWow64Process: TIsWow64Process;
 begin
-  IsWow64Process := Windows.GetProcAddress(Windows.GetModuleHandle('kernel32.dll'),
+  IsWow64Process := WinApi.Windows.GetProcAddress(WinApi.Windows.GetModuleHandle('kernel32.dll'),
     'IsWow64Process');
   if Assigned(IsWow64Process) then
   begin
-    if not IsWow64Process(Windows.GetCurrentProcess, IsWow64Result) then
+    if not IsWow64Process(WinApi.Windows.GetCurrentProcess, IsWow64Result) then
       Result := False
     else
       Result := IsWow64Result;
@@ -93,6 +96,32 @@ var
 begin
   GetTempPath(MAX_PATH, @lpBuffer);
   Result := StrPas(lpBuffer);
+end;
+
+function GetWindowsDirectory : string;
+var
+  lpBuffer: array[0..MAX_PATH] of Char;
+begin
+  WinApi.Windows.GetWindowsDirectory(@lpBuffer, MAX_PATH);
+  Result := StrPas(lpBuffer);
+end;
+
+
+
+function GetSpecialFolder(const CSIDL: integer) : string;
+var
+  lpszPath : PWideChar;
+begin
+    lpszPath := StrAlloc(MAX_PATH);
+    try
+       ZeroMemory(lpszPath, MAX_PATH);
+      if SHGetSpecialFolderPath(0, lpszPath, CSIDL, False)  then
+        Result := lpszPath
+      else
+        Result := '';
+    finally
+      StrDispose(lpszPath);
+    end;
 end;
 
 

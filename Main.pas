@@ -26,6 +26,8 @@ interface
 //TODO
 {
   Add detection of additioal compilers
+  Add plattform outpu x82, x64
+  add .net framework (2,3,4,4.5 +detect)
 
   disable run as admin requirement
   Fix disabled icons

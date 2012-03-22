@@ -51,7 +51,9 @@ uses
   uWinInet in 'Units\Misc\uWinInet.pas',
   uComboBox in 'Units\Misc\uComboBox.pas',
   uCustomImageDrawHook in 'Units\Misc\uCustomImageDrawHook.pas',
-  uCheckUpdate in 'Units\Misc\uCheckUpdate.pas' {FrmCheckUpdate};
+  uCheckUpdate in 'Units\Misc\uCheckUpdate.pas' {FrmCheckUpdate},
+  uWmiCSharpCode in 'Units\uWmiCSharpCode.pas',
+  uDotNetFrameWork in 'Units\uDotNetFrameWork.pas';
 
 {$R *.res}
 

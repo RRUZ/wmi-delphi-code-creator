@@ -95,26 +95,26 @@ const
   sTemplateTemplateFuncts = 'TemplateHelperFunctions.pas';
 
   ListSourceLanguages: array[TSourceLanguages] of
-    string = ('Delphi', 'Free Pascal', 'Delphi Prism', 'Borland/Embarcadero C++', 'Microsoft C++');
+    string = ('Delphi', 'Free Pascal', 'Delphi Prism', 'Borland/Embarcadero C++', 'Microsoft C++', 'C#');
 
   ListSourceTemplates: array[TSourceLanguages] of
     string = ('TemplateConsoleAppDelphi.pas', 'TemplateConsoleAppFPC.pas',
-    'TemplateConsoleAppOxygen.pas','TemplateConsoleAppBorlandCPP.cpp', 'TemplateConsoleAppMicrosoftCPP.cpp');
+    'TemplateConsoleAppOxygen.pas','TemplateConsoleAppBorlandCPP.cpp', 'TemplateConsoleAppMicrosoftCPP.cpp','TemplateConsoleAppCSharp.cs');
 
   ListSourceTemplatesSingleton: array[TSourceLanguages] of
     string = ('TemplateConsoleAppDelphiSingleton.pas', 'TemplateConsoleAppFPCSingleton.pas',
-    'TemplateConsoleAppOxygen.pas','','');
+    'TemplateConsoleAppOxygen.pas','','','');
 
   ListSourceTemplatesStaticInvoker: array[TSourceLanguages] of
     string = ('TemplateStaticMethodInvokerDelphi.pas', 'TemplateStaticMethodInvokerFPC.pas',
-    'TemplateStaticMethodInvokerOxygen.pas','TemplateStaticMethodInvokerBorlandCPP.cpp', 'TemplateStaticMethodInvokerMicrosoftCPP.cpp');
+    'TemplateStaticMethodInvokerOxygen.pas','TemplateStaticMethodInvokerBorlandCPP.cpp', 'TemplateStaticMethodInvokerMicrosoftCPP.cpp', '');
 
   ListSourceTemplatesNonStaticInvoker: array[TSourceLanguages] of
     string = ('TemplateNonStaticMethodInvokerDelphi.pas',
-    'TemplateNonStaticMethodInvokerFPC.pas', 'TemplateNonStaticMethodInvokerOxygen.pas','TemplateNonStaticMethodInvokerBorlandCPP.cpp', 'TemplateNonStaticMethodInvokerMicrosoftCPP.cpp');
+    'TemplateNonStaticMethodInvokerFPC.pas', 'TemplateNonStaticMethodInvokerOxygen.pas','TemplateNonStaticMethodInvokerBorlandCPP.cpp', 'TemplateNonStaticMethodInvokerMicrosoftCPP.cpp','');
 
   ListSourceTemplatesEvents: array[TSourceLanguages] of
-    string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas','TemplateEventsBorlandCpp.cpp', 'TemplateEventsMicrosoft.cpp');
+    string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas','TemplateEventsBorlandCpp.cpp', 'TemplateEventsMicrosoft.cpp','');
 
   ListWmiCodeName  : array [TWmiCode] of string = ('Microsoft WMI Scripting Library - WbemScripting_TLB','Microsoft WMI Scripting Library - Late Binding', 'WMI COM API');
   ListWmiCodeDescr : array [TWmiCode] of string = ('Generate code using the Microsoft WMI Scripting Library using the WbemScripting_TLB unit',
