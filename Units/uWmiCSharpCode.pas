@@ -125,17 +125,18 @@ var
   Wql:     string;
   i, Len:  integer;
   Props:   TStrings;
+  Padding : string;
 begin
-  StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_Oxygen]));
+  Padding :=StringOfChar(' ',10);
+  StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_CSharp]));
 
-  WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
-    WmiTargetInstance]);
-  WQL := Format('  WmiQuery:=%s+%s', [QuotedStr(WQL), sLineBreak]);
+  WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds]);
+  WQL := Format(Padding+StringOfChar(' ',6)+'WmiQuery ="%s"+%s', [WQL, sLineBreak]);
 
   if WmiTargetInstance <> '' then
   begin
-    sValue := Format('Where TargetInstance ISA "%s" ', [WmiTargetInstance]);
-    WQL    := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
+    sValue := Format('"Where TargetInstance ISA %s "', [QuotedStr(WmiTargetInstance)]);
+    WQL    := WQL + Padding+StringOfChar(' ',6) + sValue + '+' + sLineBreak;
   end;
 
   for i := 0 to Conds.Count - 1 do
@@ -157,18 +158,20 @@ begin
   try
     for i := 0 to PropsOut.Count - 1 do
      if StartsText(wbemTargetInstance,PropsOut[i]) then
-      Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + ManagementBaseObject(e.NewEvent[%s])[%s]);',
-      [QuotedStr(PropsOut[i]+' : '),QuotedStr(wbemTargetInstance), QuotedStr(StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]))]))
+      Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + ((ManagementBaseObject)e.NewEvent.Properties["%s"].Value)["%s"]);',
+      [PropsOut[i]+' : ',wbemTargetInstance, StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll])]))
      else
-      Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + e.NewEvent.Properties[%s].Value.ToString());', [QuotedStr(PropsOut[i]+' : '), QuotedStr(PropsOut[i])]));
+      Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + e.NewEvent.Properties["%s"].Value.ToString());', [PropsOut[i]+' : ', PropsOut[i]]));
 
     StrCode := StringReplace(StrCode, sTagCSharpEventsOut, Props.Text, [rfReplaceAll]);
   finally
     props.Free;
   end;
 
+  StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
   StrCode := StringReplace(StrCode, sTagCSharpEventsWql, WQL, [rfReplaceAll]);
-  StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNamespace, [rfReplaceAll]);
+  StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
+  StrCode := StringReplace(StrCode, sTagWmiNameSpace, EscapeCSharpStr(WmiNamespace), [rfReplaceAll]);
   OutPutCode.Text := StrCode;
 end;
 

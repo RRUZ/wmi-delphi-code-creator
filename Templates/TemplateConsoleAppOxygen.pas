@@ -33,7 +33,7 @@ begin
  try
     Get[WMICLASSNAME]Info;    
  except on E: Exception do
-  Console.WriteLine(E.ToString()+' Trace '+E.StackTrace );
+  Console.WriteLine(String.Format('{0} Trace {1}', E.Message, E.StackTrace));
  end;
  Console.WriteLine('Press Enter to exit');
  Console.Read();
