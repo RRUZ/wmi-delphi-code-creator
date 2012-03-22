@@ -25,12 +25,11 @@ interface
 
 //TODO
 {
+  Add detection of additioal compilers
+
   disable run as admin requirement
-
   Fix disabled icons
-
   Remote machine support
-
   Improve source code
   Add automated tests
   Store cache x machine
@@ -44,9 +43,7 @@ interface
      fpc
    Database
    Tree (hierarchy)
-
   Add option to edit templates
-
   plugin handle
 }
 
@@ -156,10 +153,7 @@ begin
   {$WARN SYMBOL_PLATFORM OFF}
   ReportMemoryLeaksOnShutdown:=DebugHook<>0;
   {$WARN SYMBOL_PLATFORM ON}
-
   FillPopupActionBar(PopupActionBar1);
-
-
 
   FSettings :=TSettings.Create;
   SetLog('Reading settings');

@@ -51,6 +51,11 @@ type
     FStopwatch : TStopwatch;
     FCheckExternal: boolean;
     FErrorUpdate : boolean;
+    FRemoteVersionFile: string;
+    FApplicationName: string;
+    FXPathVersionNumber: string;
+    FXPathUrlInstaller: string;
+    FXPathInstallerFileName: string;
     procedure ReadRemoteInfo;
     procedure ReadLocalInfo;
     function GetUpdateAvailable: Boolean;
@@ -65,6 +70,11 @@ type
     procedure ExecuteInstaller;
     procedure DownloadCallBack(BytesRead:Integer);
   public
+    property  RemoteVersionFile : string read FRemoteVersionFile write FRemoteVersionFile;
+    property  ApplicationName  : string read FApplicationName write FApplicationName;
+    property  XPathVersionNumber   : string read FXPathVersionNumber  write FXPathVersionNumber;
+    property  XPathUrlInstaller   : string read FXPathUrlInstaller  write FXPathUrlInstaller;
+    property  XPathInstallerFileName   : string read FXPathInstallerFileName  write FXPathInstallerFileName;
     property  CheckExternal   : boolean read FCheckExternal write FCheckExternal;
     property  UpdateAvailable : Boolean read GetUpdateAvailable;
     procedure ExecuteUpdater;
@@ -81,14 +91,14 @@ uses
 
 Type
    TProcCallBack= procedure(BytesRead:Integer) of object;
-
+      {
 const
   sRemoteVersionFile       = 'http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Version.xml';
   sApplicationName         = 'WMI Delphi Code Creator';
   sXPathVersionNumber      = '/versioninfo/@versionapp';
   sXPathUrlInstaller       = '/versioninfo/@url';
   sXPathInstallerFileName  = '/versioninfo/@installerfilename';
-
+   }
 {$R *.dfm}
 
 
@@ -154,7 +164,7 @@ end;
 
 procedure TFrmCheckUpdate.ExecuteInstaller;
 begin
-  if MessageDlg(Format('Do you want install the new version (the %s will be closed) ?',[sApplicationName]),
+  if MessageDlg(Format('Do you want install the new version (the %s will be closed) ?',[FApplicationName]),
       mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
     ShellExecute(Handle, 'Open', PChar(TempInstallerFileName), nil, nil, SW_SHOWNORMAL) ;
@@ -171,11 +181,11 @@ begin
       if not UpdateAvailable then
       begin
        if not FErrorUpdate then
-        MsgInformation(Format('%s is up to date',[sApplicationName]));
+        MsgInformation(Format('%s is up to date',[FApplicationName]));
        Close;
       end
       else
-      if MessageDlg(Format('Exist a new version available (%s) of the %s , Do you want download the new version?',[RemoteVersion, sApplicationName]),
+      if MessageDlg(Format('Exist a new version available (%s) of the %s , Do you want download the new version?',[RemoteVersion, FApplicationName]),
       mtConfirmation, [mbYes, mbNo], 0) = mrYes then
       begin
        if not Visible then
@@ -249,19 +259,19 @@ begin
   XmlDoc.Async := False;
   try
     SetMsg('Getting version info');
-    FXmlVersionInfo:=WinInet_HttpGet(sRemoteVersionFile,DownloadCallBack);
+    FXmlVersionInfo:=WinInet_HttpGet(FRemoteVersionFile,DownloadCallBack);
     XmlDoc.LoadXml(XmlVersionInfo);
     XmlDoc.SetProperty('SelectionLanguage','XPath');
     if (XmlDoc.parseError.errorCode <> 0) then
      raise Exception.CreateFmt('Error in Xml Data Code %s Reason %s',[XmlDoc.parseError.errorCode, XmlDoc.parseError.reason]);
 
-     Node:=XmlDoc.selectSingleNode(sXPathVersionNumber);
+     Node:=XmlDoc.selectSingleNode(FXPathVersionNumber);
      if not VarIsClear(Node) then FRemoteVersion:=Node.Text;
 
-     Node:=XmlDoc.selectSingleNode(sXPathUrlInstaller);
+     Node:=XmlDoc.selectSingleNode(FXPathUrlInstaller);
      if not VarIsClear(Node) then FUrlInstaller:=Node.Text;
 
-     Node:=XmlDoc.selectSingleNode(sXPathInstallerFileName);
+     Node:=XmlDoc.selectSingleNode(FXPathInstallerFileName);
      if not VarIsClear(Node) then FInstallerFileName:=Node.Text;
   finally
    XmlDoc    :=Unassigned;

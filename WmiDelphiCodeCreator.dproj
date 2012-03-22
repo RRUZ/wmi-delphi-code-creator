@@ -126,7 +126,6 @@
 				<Form>FrmWMITree</Form>
 			</DCCReference>
 			<DCCReference Include="Units\uDelphiSyntax.pas"/>
-			<DCCReference Include="Units\uListView_Helper.pas"/>
 			<DCCReference Include="Units\uWmi_About.pas">
 				<Form>FrmAbout</Form>
 			</DCCReference>
@@ -141,13 +140,9 @@
 			<DCCReference Include="Units\uWmi_ViewPropsValues.pas">
 				<Form>FrmWmiVwProps</Form>
 			</DCCReference>
-			<DCCReference Include="Units\uRegistry.pas"/>
 			<DCCReference Include="Units\uWmiDatabase.pas">
 				<Form>FrmWmiDatabase</Form>
 			</DCCReference>
-			<DCCReference Include="Units\uCustomImageDrawHook.pas"/>
-			<DCCReference Include="Units\uMisc.pas"/>
-			<DCCReference Include="Units\uComboBox.pas"/>
 			<DCCReference Include="Units\uSettings.pas">
 				<Form>FrmSettings</Form>
 			</DCCReference>
@@ -156,10 +151,6 @@
 			<DCCReference Include="Units\uWmiGenCode.pas"/>
 			<DCCReference Include="Units\uWmiOxygenCode.pas"/>
 			<DCCReference Include="Units\uWmiFPCCode.pas"/>
-			<DCCReference Include="Units\uCheckUpdate.pas">
-				<Form>FrmCheckUpdate</Form>
-			</DCCReference>
-			<DCCReference Include="Units\uWinInet.pas"/>
 			<DCCReference Include="Units\uWmiClassTree.pas">
 				<Form>FrmWmiClassTree</Form>
 			</DCCReference>
@@ -169,8 +160,6 @@
 			<DCCReference Include="Units\uWmiBorlandCppCode.pas"/>
 			<DCCReference Include="Units\uBorlandCppVersions.pas"/>
 			<DCCReference Include="Units\uBorlandCppIDE.pas"/>
-			<DCCReference Include="Units\uOleVariantEnum.pas"/>
-			<DCCReference Include="Units\uSynEditPopupEdit.pas"/>
 			<DCCReference Include="Units\uCodeEditor.pas">
 				<Form>FrmCodeEditor</Form>
 				<FormType>dfm</FormType>
@@ -190,7 +179,6 @@
 			<DCCReference Include="Units\uGlobals.pas"/>
 			<DCCReference Include="Units\uWmiVsCppCode.pas"/>
 			<DCCReference Include="Units\uVisualStudio.pas"/>
-			<DCCReference Include="Units\uStdActionsPopMenu.pas"/>
 			<DCCReference Include="Units\Vcl.Styles.Utils\Vcl.Styles.Ext.pas"/>
 			<DCCReference Include="Units\Vcl.Styles.Utils\Vcl.Styles.OwnerDrawFix.pas"/>
 			<DCCReference Include="Units\ThirdParty\AsyncCalls.pas"/>
@@ -199,6 +187,18 @@
 			<DCCReference Include="Units\Vcl.Styles.Utils\uXE2Patches.pas"/>
 			<DCCReference Include="Units\WMI\uWmi_Metadata.pas"/>
 			<DCCReference Include="Units\Vcl.Styles.Utils\Vcl.Styles.WebBrowser.pas"/>
+			<DCCReference Include="Units\Misc\uStdActionsPopMenu.pas"/>
+			<DCCReference Include="Units\Misc\uSynEditPopupEdit.pas"/>
+			<DCCReference Include="Units\Misc\uOleVariantEnum.pas"/>
+			<DCCReference Include="Units\Misc\uRegistry.pas"/>
+			<DCCReference Include="Units\Misc\uMisc.pas"/>
+			<DCCReference Include="Units\Misc\uListView_Helper.pas"/>
+			<DCCReference Include="Units\Misc\uWinInet.pas"/>
+			<DCCReference Include="Units\Misc\uComboBox.pas"/>
+			<DCCReference Include="Units\Misc\uCustomImageDrawHook.pas"/>
+			<DCCReference Include="Units\Misc\uCheckUpdate.pas">
+				<Form>FrmCheckUpdate</Form>
+			</DCCReference>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
@@ -224,7 +224,7 @@
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">1</VersionInfo>
 						<VersionInfo Name="Release">2</VersionInfo>
-						<VersionInfo Name="Build">196</VersionInfo>
+						<VersionInfo Name="Build">198</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -236,7 +236,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription"/>
-						<VersionInfoKeys Name="FileVersion">1.1.2.196</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.1.2.198</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright"/>
 						<VersionInfoKeys Name="LegalTrademarks"/>

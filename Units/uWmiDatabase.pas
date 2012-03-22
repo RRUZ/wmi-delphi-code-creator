@@ -41,7 +41,7 @@ type
     GroupBoxMode: TGroupBox;
     RadioButtonInsensitive: TRadioButton;
     RadioButtonSensitive: TRadioButton;
-    ComboBoxSearch: TComboBox;
+    ComboBoxSearch2: TComboBox;
     GroupBox1: TGroupBox;
     CheckBoxProperties: TCheckBox;
     CheckBoxMethods: TCheckBox;
@@ -61,15 +61,17 @@ type
     Label1: TLabel;
     Label2: TLabel;
     LabelMsg: TLabel;
+    EditSearch: TEdit;
     procedure ButtonSearchWmiDatabaseClick(Sender: TObject);
-    procedure ComboBoxSearchChange(Sender: TObject);
-    procedure ComboBoxSearchExit(Sender: TObject);
+    procedure ComboBoxSearch2Change(Sender: TObject);
+    procedure ComboBoxSearch2Exit(Sender: TObject);
     procedure ButtonBuildWmiDatabaseClick(Sender: TObject);
     procedure ButtonSaveBddClick(Sender: TObject);
     procedure ButtonDelBddClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure DBGridWMIDblClick(Sender: TObject);
+    procedure EditSearchChange(Sender: TObject);
   private
     FDatabaseFile: string;
     FHistoryFile:  string;
@@ -285,7 +287,8 @@ begin
 
   Log(FormatDateTime('hh:nn:ss.zzz', Now - d));
   DBGridWMI.Enabled      := True;
-  ComboBoxSearch.Enabled := True;
+  ComboBoxSearch2.Enabled := True;
+  EditSearch.Enabled     :=True;
   ButtonSearchWmiDatabase.Enabled := True;
   ButtonDelBdd.Enabled   := True;
   ButtonSaveBdd.Enabled  := True;
@@ -306,22 +309,22 @@ end;
 
 procedure TFrmWmiDatabase.ButtonSearchWmiDatabaseClick(Sender: TObject);
 begin
-  SearchDatabase(ComboBoxSearch.Text);
+  SearchDatabase(EditSearch.Text);
 end;
 
-procedure TFrmWmiDatabase.ComboBoxSearchChange(Sender: TObject);
+procedure TFrmWmiDatabase.ComboBoxSearch2Change(Sender: TObject);
 begin
-  SearchDatabase(ComboBoxSearch.Text);
+  SearchDatabase(ComboBoxSearch2.Text);
 end;
 
-procedure TFrmWmiDatabase.ComboBoxSearchExit(Sender: TObject);
+procedure TFrmWmiDatabase.ComboBoxSearch2Exit(Sender: TObject);
 begin
-  if (Trim(ComboBoxSearch.Text) <> '') and
-    (ComboBoxSearch.Items.IndexOf(ComboBoxSearch.Text) = -1) then
+  if (Trim(ComboBoxSearch2.Text) <> '') and
+    (ComboBoxSearch2.Items.IndexOf(ComboBoxSearch2.Text) = -1) then
   begin
-    if ComboBoxSearch.Items.Count = MaxHistory then
-      ComboBoxSearch.Items.Delete(ComboBoxSearch.Items.Count - 1);
-    ComboBoxSearch.Items.Insert(0, ComboBoxSearch.Text);
+    if ComboBoxSearch2.Items.Count = MaxHistory then
+      ComboBoxSearch2.Items.Delete(ComboBoxSearch2.Items.Count - 1);
+    ComboBoxSearch2.Items.Insert(0, ComboBoxSearch2.Text);
   end;
 end;
 
@@ -354,8 +357,8 @@ begin
   begin
     ClientDataSetWmi.EmptyDataSet;
     DeleteFile(FDatabaseFile);
-
-    ComboBoxSearch.Enabled := False;
+    ComboBoxSearch2.Enabled := False;
+    EditSearch.Enabled:=False;
     ButtonBuildWmiDatabase.Enabled := True;
     ButtonSearchWmiDatabase.Enabled := False;
     ButtonDelBdd.Enabled := False;
@@ -368,21 +371,27 @@ begin
   end;
 end;
 
+procedure TFrmWmiDatabase.EditSearchChange(Sender: TObject);
+begin
+ SearchDatabase(EditSearch.Text);
+end;
+
 procedure TFrmWmiDatabase.FormCreate(Sender: TObject);
 begin
   PanelStatus.Height:=0;
   FNameSpaces   := TStringList.Create;
   FDatabaseFile := GetWMICFolderCache + WmiDatabaseName;
   FHistoryFile  := GetWMICFolderCache + 'WmiFiltersHistory.txt';
+
   if FileExists(FHistoryFile) then
-    ComboBoxSearch.Items.LoadFromFile(FHistoryFile);
+    ComboBoxSearch2.Items.LoadFromFile(FHistoryFile);
 
   CreateWmiDatabaseStructure;
 end;
 
 procedure TFrmWmiDatabase.FormDestroy(Sender: TObject);
 begin
-  ComboBoxSearch.Items.SaveToFile(FHistoryFile);
+  ComboBoxSearch2.Items.SaveToFile(FHistoryFile);
   FNameSpaces.Free;
 end;
 

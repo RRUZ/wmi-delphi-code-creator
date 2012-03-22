@@ -5,7 +5,6 @@ uses
   Main in 'Main.pas' {FrmMain},
   uWmiTree in 'Units\uWmiTree.pas' {FrmWMITree},
   uDelphiSyntax in 'Units\uDelphiSyntax.pas',
-  uListView_Helper in 'Units\uListView_Helper.pas',
   uWmi_About in 'Units\uWmi_About.pas' {FrmAbout},
   uWmiDelphiCode in 'Units\uWmiDelphiCode.pas',
   uDelphiIDE in 'Units\uDelphiIDE.pas',
@@ -14,26 +13,18 @@ uses
   uLazarusIDE in 'Units\uLazarusIDE.pas',
   uSelectCompilerVersion in 'Units\uSelectCompilerVersion.pas' {FrmSelCompilerVer},
   uWmi_ViewPropsValues in 'Units\uWmi_ViewPropsValues.pas' {FrmWmiVwProps},
-  uRegistry in 'Units\uRegistry.pas',
   uWmiDatabase in 'Units\uWmiDatabase.pas' {FrmWmiDatabase},
-  uCustomImageDrawHook in 'Units\uCustomImageDrawHook.pas',
-  uMisc in 'Units\uMisc.pas',
-  uComboBox in 'Units\uComboBox.pas',
   uSettings in 'Units\uSettings.pas' {FrmSettings},
   uDelphiIDEHighlight in 'Units\uDelphiIDEHighlight.pas',
   uDelphiVersions in 'Units\uDelphiVersions.pas',
   uWmiGenCode in 'Units\uWmiGenCode.pas',
   uWmiOxygenCode in 'Units\uWmiOxygenCode.pas',
   uWmiFPCCode in 'Units\uWmiFPCCode.pas',
-  uCheckUpdate in 'Units\uCheckUpdate.pas' {FrmCheckUpdate},
-  uWinInet in 'Units\uWinInet.pas',
   uWmiClassTree in 'Units\uWmiClassTree.pas' {FrmWmiClassTree},
   uPropValueList in 'Units\uPropValueList.pas' {FrmValueList},
   uWmiBorlandCppCode in 'Units\uWmiBorlandCppCode.pas',
   uBorlandCppVersions in 'Units\uBorlandCppVersions.pas',
   uBorlandCppIDE in 'Units\uBorlandCppIDE.pas',
-  uOleVariantEnum in 'Units\uOleVariantEnum.pas',
-  uSynEditPopupEdit in 'Units\uSynEditPopupEdit.pas',
   Vcl.Themes,
   Vcl.Styles,
   uCodeEditor in 'Units\uCodeEditor.pas' {FrmCodeEditor},
@@ -43,7 +34,6 @@ uses
   uGlobals in 'Units\uGlobals.pas',
   uWmiVsCppCode in 'Units\uWmiVsCppCode.pas',
   uVisualStudio in 'Units\uVisualStudio.pas',
-  uStdActionsPopMenu in 'Units\uStdActionsPopMenu.pas',
   Vcl.Styles.Ext in 'Units\Vcl.Styles.Utils\Vcl.Styles.Ext.pas',
   Vcl.Styles.OwnerDrawFix in 'Units\Vcl.Styles.Utils\Vcl.Styles.OwnerDrawFix.pas',
   AsyncCalls in 'Units\ThirdParty\AsyncCalls.pas',
@@ -51,7 +41,17 @@ uses
   PngImageList in 'Units\ThirdParty\PngImageList.pas',
   uXE2Patches in 'Units\Vcl.Styles.Utils\uXE2Patches.pas',
   uWmi_Metadata in 'Units\WMI\uWmi_Metadata.pas',
-  Vcl.Styles.WebBrowser in 'Units\Vcl.Styles.Utils\Vcl.Styles.WebBrowser.pas';
+  Vcl.Styles.WebBrowser in 'Units\Vcl.Styles.Utils\Vcl.Styles.WebBrowser.pas',
+  uStdActionsPopMenu in 'Units\Misc\uStdActionsPopMenu.pas',
+  uSynEditPopupEdit in 'Units\Misc\uSynEditPopupEdit.pas',
+  uOleVariantEnum in 'Units\Misc\uOleVariantEnum.pas',
+  uRegistry in 'Units\Misc\uRegistry.pas',
+  uMisc in 'Units\Misc\uMisc.pas',
+  uListView_Helper in 'Units\Misc\uListView_Helper.pas',
+  uWinInet in 'Units\Misc\uWinInet.pas',
+  uComboBox in 'Units\Misc\uComboBox.pas',
+  uCustomImageDrawHook in 'Units\Misc\uCustomImageDrawHook.pas',
+  uCheckUpdate in 'Units\Misc\uCheckUpdate.pas' {FrmCheckUpdate};
 
 {$R *.res}
 
@@ -59,7 +59,8 @@ procedure UpdateApp;
 var
   Frm: TFrmCheckUpdate;
 begin
-  Frm := TFrmCheckUpdate.Create(nil);
+
+  Frm := GetUpdaterInstance;
   try
     Frm.CheckExternal:=True;
     if Frm.UpdateAvailable then

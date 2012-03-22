@@ -25,8 +25,6 @@ object FrmWmiDatabase: TFrmWmiDatabase
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = -24
-    ExplicitTop = -6
     object Label7: TLabel
       Left = 11
       Top = 51
@@ -68,7 +66,7 @@ object FrmWmiDatabase: TFrmWmiDatabase
       Height = 41
       Caption = 'Mode'
       Enabled = False
-      TabOrder = 3
+      TabOrder = 4
       object RadioButtonInsensitive: TRadioButton
         Left = 9
         Top = 16
@@ -90,15 +88,16 @@ object FrmWmiDatabase: TFrmWmiDatabase
         OnClick = ButtonSearchWmiDatabaseClick
       end
     end
-    object ComboBoxSearch: TComboBox
-      Left = 11
-      Top = 70
-      Width = 288
+    object ComboBoxSearch2: TComboBox
+      Left = 160
+      Top = 43
+      Width = 139
       Height = 21
       Enabled = False
-      TabOrder = 8
-      OnChange = ComboBoxSearchChange
-      OnExit = ComboBoxSearchExit
+      TabOrder = 3
+      Visible = False
+      OnChange = ComboBoxSearch2Change
+      OnExit = ComboBoxSearch2Exit
     end
     object GroupBox1: TGroupBox
       Left = 471
@@ -121,7 +120,7 @@ object FrmWmiDatabase: TFrmWmiDatabase
         Width = 60
         Height = 18
         Caption = 'Methods'
-        TabOrder = 0
+        TabOrder = 1
       end
       object CheckBox1: TCheckBox
         Left = 14
@@ -132,7 +131,7 @@ object FrmWmiDatabase: TFrmWmiDatabase
         Checked = True
         Enabled = False
         State = cbChecked
-        TabOrder = 1
+        TabOrder = 0
       end
     end
     object GroupBoxSearchIn: TGroupBox
@@ -183,7 +182,7 @@ object FrmWmiDatabase: TFrmWmiDatabase
       Width = 88
       Height = 25
       Caption = 'Apply filter'
-      TabOrder = 4
+      TabOrder = 5
       OnClick = ButtonSearchWmiDatabaseClick
     end
     object ButtonBuildWmiDatabase: TButton
@@ -192,7 +191,7 @@ object FrmWmiDatabase: TFrmWmiDatabase
       Width = 100
       Height = 25
       Caption = 'Build Database'
-      TabOrder = 5
+      TabOrder = 6
       OnClick = ButtonBuildWmiDatabaseClick
     end
     object ButtonSaveBdd: TButton
@@ -201,7 +200,7 @@ object FrmWmiDatabase: TFrmWmiDatabase
       Width = 100
       Height = 25
       Caption = 'Save Database'
-      TabOrder = 6
+      TabOrder = 7
       OnClick = ButtonSaveBddClick
     end
     object ButtonDelBdd: TButton
@@ -210,8 +209,17 @@ object FrmWmiDatabase: TFrmWmiDatabase
       Width = 110
       Height = 25
       Caption = 'Delete Database'
-      TabOrder = 7
+      TabOrder = 8
       OnClick = ButtonDelBddClick
+    end
+    object EditSearch: TEdit
+      Left = 11
+      Top = 70
+      Width = 288
+      Height = 21
+      Enabled = False
+      TabOrder = 9
+      OnChange = EditSearchChange
     end
   end
   object DBGridWMI: TDBGrid
@@ -240,7 +248,6 @@ object FrmWmiDatabase: TFrmWmiDatabase
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitTop = 552
     object Label1: TLabel
       Left = 11
       Top = 6
