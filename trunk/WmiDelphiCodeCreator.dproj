@@ -199,6 +199,8 @@
 			<DCCReference Include="Units\Misc\uCheckUpdate.pas">
 				<Form>FrmCheckUpdate</Form>
 			</DCCReference>
+			<DCCReference Include="Units\uWmiCSharpCode.pas"/>
+			<DCCReference Include="Units\uDotNetFrameWork.pas"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>

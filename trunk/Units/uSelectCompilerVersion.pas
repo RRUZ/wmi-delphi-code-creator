@@ -28,9 +28,9 @@ uses
   Dialogs, StdCtrls, ImgList, ComCtrls;
 
 type
-  TSourceLanguages = (Lng_Delphi, Lng_FPC, Lng_Oxygen, Lng_BorlandCpp, Lng_VSCpp);
+  TSourceLanguages = (Lng_Delphi, Lng_FPC, Lng_Oxygen, Lng_BorlandCpp, Lng_VSCpp, Lng_CSharp);
 const
-  ListSourceLanguages: array[TSourceLanguages] of string = ('Delphi', 'Lazarus', 'Oxygene', 'Borland/Embarcadero C++', 'Microsoft C++');
+  ListSourceLanguages: array[TSourceLanguages] of string = ('Delphi', 'Lazarus', 'Oxygene', 'Borland/Embarcadero C++', 'Microsoft C++', 'C#');
 
 type
   TFrmSelCompilerVer = class(TForm)
@@ -65,6 +65,7 @@ implementation
 uses
   uVisualStudio,
   uRegistry,
+  uDotNetFrameWork,
   uLazarusIDE,
   uDelphiIDE,
   uDelphiVersions,
@@ -118,6 +119,8 @@ var
   item:     TListItem;
   DelphiComp: TDelphiVersions;
   BorlandCppComp: TBorlandCppVersions;
+  CSharpComp : TDotNetVersions;
+
   FileName: string;
   ImageIndex: integer;
   RootKey: HKEY;
@@ -180,6 +183,69 @@ begin
       end;
 
     end;
+
+    Lng_CSharp:
+    begin
+      if ShowCompiler then
+      for CSharpComp :=Low(TDotNetVersions) to High(TDotNetVersions) do
+      begin
+        FileName:=IncludeTrailingPathDelimiter(NetFrameworkPath(CSharpComp))+'csc.exe';
+        if FileExists(FileName) then
+        begin
+          item := ListViewIDEs.Items.Add;
+          item.Caption := DotNetNames[CSharpComp];
+          item.SubItems.Add(ExtractFilePath(FileName) );
+          item.SubItems.Add(FileName);
+          ExtractIconFileToImageList(ImageList1, Filename);
+          ImageIndex := ImageList1.Count - 1;
+          item.ImageIndex := ImageIndex;
+          item.Data := Pointer(Ord(CSharpComp));
+        end;
+      end
+      else
+      begin
+        if IsVS2008Installed then
+        begin
+          FileName := GetVS2008IDEFileName;
+          item     := ListViewIDEs.Items.Add;
+          item.Caption := 'Visual Studio 2008';
+          item.SubItems.Add(FileName);
+          item.SubItems.Add(GetVS2008CompilerFileName);
+          ExtractIconFileToImageList(ImageList1, Filename);
+          ImageIndex := ImageList1.Count - 1;
+          item.ImageIndex := ImageIndex;
+          item.Data := Pointer(Ord(Lng_VSCpp));
+        end;
+
+        if IsVS2010Installed then
+        begin
+          FileName := GetVS2010IDEFileName;
+          item     := ListViewIDEs.Items.Add;
+          item.Caption := 'Visual Studio 2010';
+          item.SubItems.Add(FileName);
+          item.SubItems.Add(GetVS2010CompilerFileName);
+          ExtractIconFileToImageList(ImageList1, Filename);
+          ImageIndex := ImageList1.Count - 1;
+          item.ImageIndex := ImageIndex;
+          item.Data := Pointer(Ord(Lng_VSCpp));
+        end;
+
+        if IsVS11Installed then
+        begin
+          FileName := GetVS11IDEFileName;
+          item     := ListViewIDEs.Items.Add;
+          item.Caption := 'Visual Studio 11';
+          item.SubItems.Add(FileName);
+          item.SubItems.Add(GetVS11CompilerFileName);
+          ExtractIconFileToImageList(ImageList1, Filename);
+          ImageIndex := ImageList1.Count - 1;
+          item.ImageIndex := ImageIndex;
+          item.Data := Pointer(Ord(Lng_VSCpp));
+        end;
+      end;
+
+    end;
+
 
     Lng_FPC:
     begin

@@ -210,6 +210,7 @@ uses
   uDelphiVersions,
   uSelectCompilerVersion,
   SynHighlighterCpp,
+  SynHighlighterCS,
   StrUtils,
   IOUtils,
   IniFiles,
@@ -238,21 +239,6 @@ begin
   Result.XPathInstallerFileName  :='/versioninfo/@installerfilename';
 end;
 
-function GetSpecialFolder(const CSIDL: integer) : string;
-var
-  lpszPath : PWideChar;
-begin
-    lpszPath := StrAlloc(MAX_PATH);
-    try
-       ZeroMemory(lpszPath, MAX_PATH);
-      if SHGetSpecialFolderPath(0, lpszPath, CSIDL, False)  then
-        Result := lpszPath
-      else
-        Result := '';
-    finally
-      StrDispose(lpszPath);
-    end;
-end;
 
 function GetWMICFolderCache : string;
 begin
@@ -370,7 +356,7 @@ end;
 
 function TSettings.GetBackGroundColor: TColor;
 var
-  Element      : TIDEHighlightElements;
+  Element  : TIDEHighlightElements;
   IDETheme : TIDETheme;
 begin
   Element := TIDEHighlightElements.PlainText;
@@ -380,7 +366,7 @@ end;
 
 function TSettings.GetForeGroundColor: TColor;
 var
-  Element      : TIDEHighlightElements;
+  Element  : TIDEHighlightElements;
   IDETheme : TIDETheme;
 begin
   Element := TIDEHighlightElements.PlainText;
@@ -509,7 +495,29 @@ begin
     end;
 end;
 
+procedure RefreshSynCSharpHighlighter(FCurrentTheme:TIDETheme;SynEdit: TSynEdit);
+var
+  DelphiVer : TDelphiVersions;
+begin
+    if not (SynEdit.Highlighter is TSynCSSyn) then exit;
+    DelphiVer := DelphiXE;
 
+    RefreshSynEdit(FCurrentTheme, SynEdit);
+
+    with TSynCSSyn(SynEdit.Highlighter) do
+    begin
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Assembler, AsmAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Comment, CommentAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Preprocessor, DirecAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Identifier, IdentifierAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Preprocessor, InvalidAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.ReservedWord, KeyAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Number, NumberAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Whitespace, SpaceAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.String, StringAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Symbol, SymbolAttri,DelphiVer);
+    end;
+end;
 procedure ReadSettings(var Settings: TSettings);
 var
   iniFile: TIniFile;
@@ -726,6 +734,7 @@ begin
    begin
      RefreshSynPasHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
      RefreshSynCppHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
+     RefreshSynCSharpHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
    end
 end;
 

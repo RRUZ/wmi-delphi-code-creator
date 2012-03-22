@@ -28,7 +28,8 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, Vcl.ComCtrls, Vcl.ImgList,
   Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ActnCtrls, uSelectCompilerVersion,
   uSettings,Vcl.StdCtrls,  Vcl.ToolWin, SynHighlighterPas, SynEditHighlighter,
-  SynHighlighterCpp, Vcl.ActnMenus, Vcl.ExtCtrls, uSynEditPopupEdit;
+  SynHighlighterCpp, Vcl.ActnMenus, Vcl.ExtCtrls, uSynEditPopupEdit,
+  SynHighlighterCS;
 
 type
   TProcWMiCodeGen = procedure of object;
@@ -50,6 +51,7 @@ type
     PanelLanguageSet: TPanel;
     Label8: TLabel;
     ComboBoxLanguageSel: TComboBox;
+    SynCSSyn1: TSynCSSyn;
     procedure ActionRunExecute(Sender: TObject);
     procedure ActionFormatExecute(Sender: TObject);
     procedure ActionFormatUpdate(Sender: TObject);
@@ -82,6 +84,7 @@ implementation
 uses
  ShellApi,
  uWmiGenCode,
+ uDotNetFrameWork,
  uDelphiIDE,
  uLazarusIDE,
  uBorlandCppIDE,
@@ -122,6 +125,8 @@ var
 begin
   FSourceLanguage := Value;
   case FSourceLanguage of
+    Lng_CSharp    :  SynEditCode.Highlighter:=SynCSSyn1;
+
     Lng_BorlandCpp,
     Lng_VSCpp     :  SynEditCode.Highlighter:=SynCppSyn1;
   else
@@ -162,6 +167,7 @@ begin
     Lng_Delphi,
     Lng_FPC         : FormatDelphiCode(Console.Lines, SourceCode, Settings.Formatter);
     Lng_Oxygen      : ;
+    Lng_CSharp      : ;
   end;
 end;
 
@@ -184,7 +190,7 @@ begin
     Frm.Show64BitsCompiler:=False;
     Frm.LoadInstalledVersions;
     if Frm.ListViewIDEs.Items.Count = 0 then
-      MsgWarning('Does not exist a Object Pascal IDEs installed in this system')
+      MsgWarning(Format('Does not exist a %s IDEs installed in this system',[ListSourceLanguages[SourceLanguage]]))
     else
     if Frm.ShowModal = mrOk then
     begin
@@ -273,6 +279,27 @@ begin
              FileName := ChangeFileExt(FileName, '.sln');
              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
+
+          Lng_CSharp:
+          begin
+            FileName := FileName + 'Program.cs';
+            SynEditCode.Lines.SaveToFile(FileName);
+
+            if Pos('2008', item.Caption)>0 then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2008\GetWMI_Info.sln'
+            else
+            if Pos('2010', item.Caption)>0 then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2010\GetWMI_Info.sln'
+            else
+            if Pos('11', item.Caption)>0 then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS11\GetWMI_Info.sln';
+
+
+             CreateVsProject(ExtractFileName(FileName), ExtractFilePath(FileName), TargetFile, FileName);
+             FileName := ChangeFileExt(FileName, '.sln');
+             ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
+          end;
+
 
         end;
       end;
@@ -392,6 +419,17 @@ begin
              ScrollMemo(Console);
           end;
 
+          Lng_CSharp:
+          begin
+            CompilerName := item.SubItems[1];
+            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
+            FileName     := FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.cs';
+
+            SynEditCode.Lines.SaveToFile(FileName);
+            CompileAndRunCSharpCode(Console.Lines, CompilerName, FileName, TComponent(Sender).Tag = 1);
+            ScrollMemo(Console);
+          end;
+
         end;
 
       end;
@@ -417,6 +455,12 @@ begin
                 begin
                   SaveDialog1.FileName := 'GetWMI_Info.pas';
                   SaveDialog1.Filter   := 'Oxygen Source Code files|*.pas';
+                end;
+
+    Lng_CSharp     :
+                begin
+                  SaveDialog1.FileName := 'GetWMI_Info.cs';
+                  SaveDialog1.Filter   := 'C# Source Code files|*.cs';
                 end;
 
     Lng_VSCpp,
