@@ -1,7 +1,6 @@
 program WmiDelphiCodeCreator;
 
 uses
-  ExceptionLog,
   Forms,
   Main in 'Main.pas' {FrmMain},
   uWmiTree in 'Units\uWmiTree.pas' {FrmWMITree},
