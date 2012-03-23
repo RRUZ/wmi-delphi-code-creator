@@ -45,7 +45,7 @@ object FrmSettings: TFrmSettings
         end
         object Label7: TLabel
           Left = 16
-          Top = 236
+          Top = 260
           Width = 264
           Height = 87
           AutoSize = False
@@ -58,17 +58,31 @@ object FrmSettings: TFrmSettings
         end
         object Label10: TLabel
           Left = 16
-          Top = 56
-          Width = 78
+          Top = 59
+          Width = 84
           Height = 13
-          Caption = 'Sorce Formatter'
+          Caption = 'Source Formatter'
         end
         object Label11: TLabel
           Left = 16
-          Top = 120
+          Top = 175
           Width = 150
           Height = 13
           Caption = 'Default Programming Language'
+        end
+        object Label12: TLabel
+          Left = 16
+          Top = 78
+          Width = 276
+          Height = 13
+          Caption = 'RAD Studio Source Formatter (Delphi, FPC, Borland C++)'
+        end
+        object Label13: TLabel
+          Left = 320
+          Top = 78
+          Width = 134
+          Height = 13
+          Caption = 'AStyle (Microsoft C++, C#)'
         end
         object EditOutputFolder: TEdit
           Left = 16
@@ -88,24 +102,24 @@ object FrmSettings: TFrmSettings
         end
         object BtnDeleteCache: TButton
           Left = 16
-          Top = 205
+          Top = 221
           Width = 264
           Height = 25
           Caption = 'Delete Cache'
-          TabOrder = 2
+          TabOrder = 6
           OnClick = BtnDeleteCacheClick
         end
         object CbFormatter: TComboBox
           Left = 16
-          Top = 70
+          Top = 97
           Width = 281
           Height = 21
           Style = csDropDownList
-          TabOrder = 3
+          TabOrder = 2
         end
         object CheckBoxUpdates: TCheckBox
           Left = 16
-          Top = 97
+          Top = 152
           Width = 177
           Height = 17
           Caption = 'Check for updates in the startup'
@@ -113,20 +127,23 @@ object FrmSettings: TFrmSettings
         end
         object ComboBoxLanguageSel: TComboBox
           Left = 16
-          Top = 139
+          Top = 194
           Width = 220
           Height = 21
           Style = csDropDownList
           TabOrder = 5
         end
+        object EditAStyle: TEdit
+          Left = 320
+          Top = 97
+          Width = 225
+          Height = 21
+          TabOrder = 3
+        end
       end
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 35
@@ -213,10 +230,6 @@ object FrmSettings: TFrmSettings
       end
       object TabSheet1: TTabSheet
         Caption = 'Theme Settings'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label9: TLabel
           Left = 3
           Top = 41
@@ -237,7 +250,7 @@ object FrmSettings: TFrmSettings
           Width = 254
           Height = 21
           Style = csDropDownList
-          TabOrder = 0
+          TabOrder = 1
           OnChange = ComboBoxVCLStyleChange
         end
         object CheckBoxDisableVClStylesNC: TCheckBox
@@ -248,17 +261,13 @@ object FrmSettings: TFrmSettings
           Caption = 
             'Disable VCL Styles in Non client Area (Only valid when Vcl Style' +
             's are activated)'
-          TabOrder = 1
+          TabOrder = 0
           OnClick = CheckBoxDisableVClStylesNCClick
         end
       end
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -271,10 +280,6 @@ object FrmSettings: TFrmSettings
       object TabSheet5: TTabSheet
         Caption = 'Syntax Highlighting'
         ImageIndex = 4
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label1: TLabel
           Left = 11
           Top = 8
@@ -302,7 +307,7 @@ object FrmSettings: TFrmSettings
           Width = 254
           Height = 21
           Style = csDropDownList
-          TabOrder = 0
+          TabOrder = 1
           OnChange = ComboBoxThemeChange
         end
         object ButtonGetMore: TButton
@@ -311,7 +316,7 @@ object FrmSettings: TFrmSettings
           Width = 98
           Height = 25
           Caption = 'Get more themes'
-          TabOrder = 1
+          TabOrder = 0
           OnClick = ButtonGetMoreClick
         end
         object ComboBoxFont: TComboBox
