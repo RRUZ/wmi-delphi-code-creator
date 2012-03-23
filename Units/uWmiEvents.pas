@@ -247,7 +247,6 @@ begin
                       WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                       WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
                       WmiCodeGenerator.PollSeconds          := PollSeconds;
-                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
                       FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
                    finally
@@ -262,7 +261,6 @@ begin
                       WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                       WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
                       WmiCodeGenerator.PollSeconds          := PollSeconds;
-                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
                       FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
                    finally
@@ -277,7 +275,6 @@ begin
                       WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                       WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
                       WmiCodeGenerator.PollSeconds          := PollSeconds;
-                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
                       FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
                    finally
@@ -293,7 +290,6 @@ begin
                       WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                       WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
                       WmiCodeGenerator.PollSeconds          := PollSeconds;
-                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
                       FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
                    finally
@@ -308,16 +304,13 @@ begin
                       WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                       WmiCodeGenerator.WmiTargetInstance    := WmiTargetInstance;
                       WmiCodeGenerator.PollSeconds          := PollSeconds;
-                      WmiCodeGenerator.ModeCodeGeneration   := TWmiCode(Settings.DelphiWmiEventCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Params, Values, Conds, PropsOut);
                       FrmCodeEditorEvent.SourceCode:=WmiCodeGenerator.OutPutCode;
                    finally
                       WmiCodeGenerator.Free;
                    end;
                  end;
-
     end;
-
   finally
     Conds.Free;
     Params.Free;

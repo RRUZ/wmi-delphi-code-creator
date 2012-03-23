@@ -84,7 +84,9 @@ begin
   Console.Add('');
 
   CaptureConsoleOutput(Format(
-  '"%s" /target:exe /r:System.Management.dll /r:System.Data.dll /r:System.Drawing.dll /r:System.Drawing.Design.dll /r:System.Windows.Forms.dll /r:System.dll /out:"%s" "%s"',
+  //'"%s" /target:exe /r:System.Management.dll /r:System.Data.dll /r:System.Drawing.dll /r:System.Drawing.Design.dll /r:System.Windows.Forms.dll /r:System.dll /out:"%s" "%s"',
+  '"%s" /target:exe /r:System.Management.dll /r:System.dll /out:"%s" "%s"',
+
   [CompilerName, ChangeFileExt(ProjectFile, '.exe'), ProjectFile]), Console);
 
   if Run then

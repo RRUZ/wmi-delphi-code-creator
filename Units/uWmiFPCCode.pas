@@ -89,22 +89,24 @@ begin
     if Singleton then
     begin
       Padding := '';
+      {
       if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
-
-        StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesSingleton[Lng_FPC]));
+      }
+        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_FPC, ModeCodeGeneration, TWmiGenCode.WmiClassesSingleton));
     end
     else
     begin
       Padding := '  ';
+      {
       if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
-
-      StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplates[Lng_FPC]));
+      }
+      StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_FPC, ModeCodeGeneration, TWmiGenCode.WmiClasses));
     end;
 
 
@@ -152,7 +154,7 @@ var
   i :  integer;
   Props:   TStrings;
 begin
-  StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_FPC]));
+  StrCode :=TFile.ReadAllText(GetTemplateLocation(Lng_FPC, ModeCodeGeneration, TWmiGenCode.WmiEvents));
 
   WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds, WmiTargetInstance]);
   WQL := Format('  WQL =%s+%s', [QuotedStr(WQL), sLineBreak]);
@@ -264,23 +266,23 @@ begin
     OutPutCode.Clear;
     if IsStatic then
     begin
+      {
       if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
-
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesStaticInvoker[Lng_FPC]));
+      }
+        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_FPC, ModeCodeGeneration, TWmiGenCode.WmiMethodStatic));
     end
     else
     begin
+    {
       if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
-
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesNonStaticInvoker[Lng_FPC]));
+    }
+        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_FPC, ModeCodeGeneration, TWmiGenCode.WmiMethodNonStatic));
     end;
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
