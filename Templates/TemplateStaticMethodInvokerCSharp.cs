@@ -20,7 +20,7 @@ namespace GetWMI_Info
 {
     class Program
     {
-[WMICLASSDESC]		
+[WMIMETHODDESC]		
         static void Main(string[] args)
         {
             try
@@ -40,13 +40,14 @@ namespace GetWMI_Info
                     Scope = new ManagementScope(String.Format("\\\\{0}\\[WMINAMESPACE]", ComputerName), null);
 
                 Scope.Connect();
-                ObjectQuery Query = new ObjectQuery("SELECT * FROM [WMICLASSNAME]");
-                ManagementObjectSearcher Searcher = new ManagementObjectSearcher(Scope, Query);
-
-                foreach (ManagementObject WmiObject in Searcher.Get())
-                {
-[CSHARPCODE]	                    
-                }
+                ObjectGetOptions Options      = new ObjectGetOptions();
+                ManagementPath Path           = new ManagementPath("[WMICLASSNAME]");
+                ManagementClass  ClassInstance= new ManagementClass(Scope, Path, Options);
+                ManagementBaseObject inParams = ClassInstance.GetMethodParameters("[WMIMETHOD]");
+				
+[CSHARPCODEINPARAMS]  
+                ManagementBaseObject outParams= ClassInstance.InvokeMethod("[WMIMETHOD]", inParams ,null);
+[CSHARPCODEOUTPARAMS]
             }
             catch (Exception e)
             {

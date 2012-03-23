@@ -55,7 +55,7 @@ namespace GetWMI_Info
                 Console.Read();
                 Watcher.Stop();
             }
-            catch (ManagementException e)
+            catch (Exception e)
             {
                 Console.WriteLine("Exception {0} Trace {1}", e.Message, e.StackTrace);
             }
