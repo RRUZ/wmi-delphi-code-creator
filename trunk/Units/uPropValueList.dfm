@@ -21,7 +21,6 @@ object FrmValueList: TFrmValueList
     Width = 360
     Height = 524
     Align = alClient
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect, goThumbTracking]
     TabOrder = 0
     TitleCaptions.Strings = (
       'Property'

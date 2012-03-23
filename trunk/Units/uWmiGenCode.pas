@@ -106,12 +106,24 @@ const
     'TemplateConsoleAppOxygen.pas','','','');
 
   ListSourceTemplatesStaticInvoker: array[TSourceLanguages] of
-    string = ('TemplateStaticMethodInvokerDelphi.pas', 'TemplateStaticMethodInvokerFPC.pas',
-    'TemplateStaticMethodInvokerOxygen.pas','TemplateStaticMethodInvokerBorlandCPP.cpp', 'TemplateStaticMethodInvokerMicrosoftCPP.cpp', '');
+    string =
+    (
+    'TemplateStaticMethodInvokerDelphi.pas',
+    'TemplateStaticMethodInvokerFPC.pas',
+    'TemplateStaticMethodInvokerOxygen.pas',
+    'TemplateStaticMethodInvokerBorlandCPP.cpp',
+    'TemplateStaticMethodInvokerMicrosoftCPP.cpp',
+    'TemplateStaticMethodInvokerCSharp.cs'
+    );
 
   ListSourceTemplatesNonStaticInvoker: array[TSourceLanguages] of
-    string = ('TemplateNonStaticMethodInvokerDelphi.pas',
-    'TemplateNonStaticMethodInvokerFPC.pas', 'TemplateNonStaticMethodInvokerOxygen.pas','TemplateNonStaticMethodInvokerBorlandCPP.cpp', 'TemplateNonStaticMethodInvokerMicrosoftCPP.cpp','');
+    string = (
+    'TemplateNonStaticMethodInvokerDelphi.pas',
+    'TemplateNonStaticMethodInvokerFPC.pas',
+    'TemplateNonStaticMethodInvokerOxygen.pas',
+    'TemplateNonStaticMethodInvokerBorlandCPP.cpp',
+    'TemplateNonStaticMethodInvokerMicrosoftCPP.cpp',
+    'TemplateNonStaticMethodInvokerCSharp.cs');
 
   ListSourceTemplatesEvents: array[TSourceLanguages] of
     string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas','TemplateEventsBorlandCpp.cpp', 'TemplateEventsMicrosoft.cpp','TemplateEventsCSharp.cs');

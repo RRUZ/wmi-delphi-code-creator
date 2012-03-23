@@ -27,12 +27,6 @@ uses
  uWmiGenCode,
  Classes;
 
-const
-  sTagCSharpCode          = '[CSHARPCODE]';
-  sTagCSharpEventsWql     = '[CSHARPEVENTSWQL]';
-  sTagCSharpEventsOut     = '[CSHARPEVENTSOUT]';
-  sTagCSharpCodeParamsIn  = '[CSHARPCODEINPARAMS]';
-  sTagCSharpCodeParamsOut = '[CSHARPCODEOUTPARAMS]';
 
 type
   TCSharpWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
@@ -62,10 +56,18 @@ uses
   uWmi_Metadata,
   SysUtils;
 
+
+const
+  sTagCSharpCode          = '[CSHARPCODE]';
+  sTagCSharpEventsWql     = '[CSHARPEVENTSWQL]';
+  sTagCSharpEventsOut     = '[CSHARPEVENTSOUT]';
+  sTagCSharpCodeParamsIn  = '[CSHARPCODEINPARAMS]';
+  sTagCSharpCodeParamsOut = '[CSHARPCODEOUTPARAMS]';
+
 function EscapeCSharpStr(const Value:string) : string;
 const
- ArrChr       : Array [0..0] of Char = ('\');
- ArrChrEscape : Array [0..0] of Char = ('\');
+ ArrChr       : Array [0..1] of Char = ('\','"');
+ ArrChrEscape : Array [0..1] of Char = ('\','\');
 Var
  i : integer;
 begin
@@ -75,7 +77,7 @@ begin
 end;
 
 
-{ TOxygenWmiClassCodeGenerator }
+{ TCSharpWmiClassCodeGenerator }
 
 procedure TCSharpWmiClassCodeGenerator.GenerateCode(Props: TStrings);
 var
@@ -115,7 +117,7 @@ begin
 end;
 
 
-{ TOxygenWmiEventCodeGenerator }
+{ TCSharpWmiEventCodeGenerator }
 
 procedure TCSharpWmiEventCodeGenerator.GenerateCode(ParamsIn, Values, Conds,
   PropsOut: TStrings);
@@ -176,7 +178,7 @@ begin
 end;
 
 
-{ TOxygenWmiMethodCodeGenerator }
+{ TCSharpWmiMethodCodeGenerator }
 
 procedure TCSharpWmiMethodCodeGenerator.GenerateCode(ParamsIn,
   Values: TStrings);
@@ -189,7 +191,9 @@ var
 
   IsStatic: boolean;
   TemplateCode : string;
+  Padding : string;
 begin
+  Padding := stringofchar(' ', 14);
   Descr := GetWmiClassDescription;
   OutPutCode.BeginUpdate;
   DynCodeInParams := TStringList.Create;
@@ -206,7 +210,7 @@ begin
         TemplateCode:='';
 
         StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesStaticInvoker[Lng_Oxygen]));
+          ListSourceTemplatesStaticInvoker[Lng_CSharp]));
     end
     else
     begin
@@ -217,14 +221,14 @@ begin
         TemplateCode:='';
 
         StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesNonStaticInvoker[Lng_Oxygen]));
+          ListSourceTemplatesNonStaticInvoker[Lng_CSharp]));
     end;
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
-    StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNamespace, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagWmiNameSpace, EscapeCSharpStr(WmiNamespace), [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiMethodName, WmiMethod, [rfReplaceAll]);
-    StrCode := StringReplace(StrCode, sTagWmiPath, WmiPath, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagWmiPath, EscapeCSharpStr(WmiPath), [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
 
 
@@ -234,10 +238,10 @@ begin
         if Values[i] <> WbemEmptyParam then
           if ParamsIn.ValueFromIndex[i] = wbemtypeString then
             DynCodeInParams.Add(
-              Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), QuotedStr(Values[i])]))
+              Format(Padding+'  inParams["%s"]="%s";', [ParamsIn.Names[i], Values[i]]))
           else
             DynCodeInParams.Add(
-              Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), Values[i]]));
+              Format(Padding+'  inParams["%s"]=%s;', [ParamsIn.Names[i], Values[i]]));
     StrCode := StringReplace(StrCode, sTagCSharpCodeParamsIn, DynCodeInParams.Text, [rfReplaceAll]);
 
     //Out Params
@@ -245,15 +249,14 @@ begin
     begin
       for i := 0 to WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count - 1 do
         DynCodeOutParams.Add(
-          Format('  Console.WriteLine(''{0,-35} {1,-40}'',%s,outParams[%s]);',
-          [QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name), QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name)]));
+          Format(Padding+'  Console.WriteLine("{0,-35} {1,-40}","%s",outParams["%s"]);',
+          [WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name, WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name]));
     end
     else
     if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count = 1 then
     begin
       DynCodeOutParams.Add(
-        Format('  Console.WriteLine(''{0,-35} {1,-40}'',''Return Value'',%s);',
-        ['outParams[''ReturnValue'']']));
+        Format(Padding+'  Console.WriteLine("{0,-35} {1,-40}","Return Value",%s);',['outParams["ReturnValue"]']));
     end;
 
     StrCode := StringReplace(StrCode, sTagCSharpCodeParamsOut,

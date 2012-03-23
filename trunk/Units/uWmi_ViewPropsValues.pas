@@ -268,6 +268,7 @@ begin
  RowData:=FValues[ListViewGrid.Selected.Index];
 
  Frm:=TFrmValueList.Create(nil);
+ Frm.Caption:='Properties '+WmiClass;
   for i := 0 to ListViewGrid.Columns.Count-1 do
     Frm.ValueList.InsertRow(ListViewGrid.Columns[i].Caption, RowData[i], True);
 

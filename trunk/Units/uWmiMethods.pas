@@ -96,6 +96,7 @@ uses
   uWmiDelphiCode,
   uWmiBorlandCppCode,
   uWmiVsCppCode,
+  uWmiCSharpCode,
   uListView_Helper;
 
 
@@ -279,6 +280,22 @@ begin
       Lng_Oxygen:
                  begin
                   WmiCodeGenerator :=TOxygenWmiMethodCodeGenerator.Create;
+                  try
+                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
+                    WmiCodeGenerator.WmiMethod:=WmiMethod;
+                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
+                    WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
+                    WmiCodeGenerator.GenerateCode(Params, Values);
+                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
+                  finally
+                    WmiCodeGenerator.Free;
+                  end;
+                 end;
+
+      Lng_CSharp:
+                 begin
+                  WmiCodeGenerator :=TCSharpWmiMethodCodeGenerator.Create;
                   try
                     WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
                     WmiCodeGenerator.WmiMethod:=WmiMethod;
