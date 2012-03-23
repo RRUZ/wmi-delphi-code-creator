@@ -54,6 +54,7 @@ type
     FCheckForUpdates: Boolean;
     FDisableVClStylesNC: Boolean;
     FDefaultLanguage: integer;
+    FAStyleCmdLine: string;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -88,6 +89,7 @@ type
     property DefaultLanguage : integer read FDefaultLanguage write FDefaultLanguage;
 
     property CheckForUpdates : Boolean read FCheckForUpdates write FCheckForUpdates;
+    property AStyleCmdLine : string read FAStyleCmdLine write FAStyleCmdLine;
   end;
 
 
@@ -137,6 +139,9 @@ type
     SynPasSyn1: TSynPasSyn;
     ComboBoxLanguageSel: TComboBox;
     Label11: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
+    EditAStyle: TEdit;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -549,6 +554,7 @@ begin
     Settings.CheckForUpdates               := iniFile.ReadBool('Global', 'CheckForUpdates', True);
     Settings.DisableVClStylesNC            := iniFile.ReadBool('Global', 'DisableVClStylesNC', False);
 
+    Settings.AStyleCmdLine                 := iniFile.ReadString('Global', 'AStyleCmdLine', '--style=allman "%s"');
     Settings.DefaultLanguage               := iniFile.ReadInteger('Global', 'DefaultLanguage', Integer(TSourceLanguages.Lng_Delphi));
   finally
     iniFile.Free;
@@ -584,6 +590,8 @@ begin
     iniFile.WriteBool('Global', 'CheckForUpdates', Settings.CheckForUpdates);
     iniFile.WriteBool('Global', 'DisableVClStylesNC', Settings.DisableVClStylesNC);
     iniFile.WriteInteger('Global', 'DefaultLanguage', Settings.DefaultLanguage);
+    iniFile.WriteString('Global', 'AStyleCmdLine', Settings.AStyleCmdLine);
+
   finally
     iniFile.Free;
   end;
@@ -699,6 +707,7 @@ begin
     FSettings.VCLStyle                      := ComboBoxVCLStyle.Text;
     FSettings.Formatter                     := CbFormatter.Text;
     FSettings.CheckForUpdates               := CheckBoxUpdates.Checked;
+    FSettings.AStyleCmdLine                 := EditAStyle.Text;
     FSettings.DisableVClStylesNC            := CheckBoxDisableVClStylesNC.Checked;
     FSettings.DefaultLanguage               := Integer(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex]);
 
@@ -906,6 +915,8 @@ begin
 
   CheckBoxUpdates.Checked            := FSettings.CheckForUpdates;
   CheckBoxDisableVClStylesNC.Checked := FSettings.DisableVClStylesNC;
+
+  EditAStyle.Text                    := FSettings.AStyleCmdLine;
 
   LoadCurrentThemeFont(Self,ComboBoxFont.Text,StrToInt(EditFontSize.Text));
   LoadCurrentTheme(Self,ComboBoxTheme.Text);

@@ -156,24 +156,44 @@ begin
  ScrollMemo(SynEditCode);
 end;
 
+procedure FormatAStyle(Console, SourceCode:TStrings; const Ext,AStyleCmdLine:string);
+var
+  TempFile      : string;
+  FormatterPath : string;
+begin
+  Console.Add('');
+  FormatterPath:=ExtractFilePath(ParamStr(0))+'AStyle\bin\AStyle.exe';
+  if FileExists(FormatterPath) then
+  begin
+   TempFile:=IncludeTrailingPathDelimiter(GetTempDirectory)+FormatDateTime('hhnnss.zzz',Now)+Ext;
+   SourceCode.SaveToFile(TempFile);
+   CaptureConsoleOutput(Format('"%s" '+AStyleCmdLine, [FormatterPath,TempFile]), Console);
+   SourceCode.LoadFromFile(TempFile);
+  end;
+end;
+
+
 procedure TFrmCodeEditor.ActionFormatExecute(Sender: TObject);
 begin
-  if not FileExists(Settings.Formatter) then
+  if not FileExists(Settings.Formatter) and (FSourceLanguage in [Lng_BorlandCpp, Lng_Delphi, Lng_FPC]) then
     MsgWarning('Before to continue, you must set a source code formatter in the settings')
   else
   case FSourceLanguage of
-    Lng_VSCpp,
     Lng_BorlandCpp  : FormatBorlandCppCode(Console.Lines, SourceCode, Settings.Formatter);
     Lng_Delphi,
     Lng_FPC         : FormatDelphiCode(Console.Lines, SourceCode, Settings.Formatter);
     Lng_Oxygen      : ;
-    Lng_CSharp      : ;
+
+    Lng_VSCpp       : FormatAStyle(Console.Lines, SourceCode,'.cpp', Settings.AStyleCmdLine);
+    Lng_CSharp      : FormatAStyle(Console.Lines, SourceCode,'.cs', Settings.AStyleCmdLine);
   end;
+  ScrollMemo(Console);
+  ScrollMemo(SynEditCode);
 end;
 
 procedure TFrmCodeEditor.ActionFormatUpdate(Sender: TObject);
 begin
-  TAction(Sender).Enabled := FSourceLanguage in [Lng_Delphi, Lng_FPC, Lng_BorlandCpp, Lng_VSCpp];
+  TAction(Sender).Enabled := FSourceLanguage in [Lng_Delphi, Lng_FPC, Lng_BorlandCpp, Lng_VSCpp, Lng_CSharp];
 end;
 
 procedure TFrmCodeEditor.ActionOpenIDEExecute(Sender: TObject);
