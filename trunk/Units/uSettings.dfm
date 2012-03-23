@@ -3,8 +3,8 @@ object FrmSettings: TFrmSettings
   Top = 302
   BorderStyle = bsDialog
   Caption = 'Settings'
-  ClientHeight = 434
-  ClientWidth = 582
+  ClientHeight = 475
+  ClientWidth = 587
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,22 +20,26 @@ object FrmSettings: TFrmSettings
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 582
-    Height = 399
+    Width = 587
+    Height = 440
     Align = alClient
     BorderWidth = 5
     TabOrder = 0
+    ExplicitWidth = 582
+    ExplicitHeight = 399
     object PageControl1: TPageControl
       Left = 6
       Top = 6
-      Width = 570
-      Height = 387
+      Width = 575
+      Height = 428
       ActivePage = TabSheet4
       Align = alClient
       TabOrder = 0
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
+        ExplicitWidth = 562
+        ExplicitHeight = 359
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -144,6 +148,8 @@ object FrmSettings: TFrmSettings
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
+        ExplicitWidth = 562
+        ExplicitHeight = 359
         object Label4: TLabel
           Left = 3
           Top = 35
@@ -229,45 +235,196 @@ object FrmSettings: TFrmSettings
         end
       end
       object TabSheet1: TTabSheet
-        Caption = 'Theme Settings'
-        object Label9: TLabel
-          Left = 3
-          Top = 41
-          Width = 45
-          Height = 13
-          Caption = 'VCL Style'
-        end
-        object ImageVCLStyle: TImage
-          Left = 5
-          Top = 87
-          Width = 422
-          Height = 258
-          Transparent = True
-        end
-        object ComboBoxVCLStyle: TComboBox
-          Left = 5
-          Top = 60
-          Width = 254
-          Height = 21
-          Style = csDropDownList
-          TabOrder = 1
-          OnChange = ComboBoxVCLStyleChange
-        end
-        object CheckBoxDisableVClStylesNC: TCheckBox
-          Left = 5
-          Top = 10
-          Width = 396
-          Height = 17
-          Caption = 
-            'Disable VCL Styles in Non client Area (Only valid when Vcl Style' +
-            's are activated)'
+        Caption = 'GUI Settings'
+        ExplicitWidth = 562
+        ExplicitHeight = 359
+        object Panel3: TPanel
+          Left = 0
+          Top = 0
+          Width = 567
+          Height = 400
+          Align = alClient
+          BevelOuter = bvNone
+          BorderWidth = 5
           TabOrder = 0
-          OnClick = CheckBoxDisableVClStylesNCClick
+          ExplicitLeft = 5
+          ExplicitTop = 160
+          ExplicitWidth = 398
+          ExplicitHeight = 169
+          object PageControl2: TPageControl
+            Left = 5
+            Top = 5
+            Width = 557
+            Height = 390
+            ActivePage = TabSheet6
+            Align = alClient
+            TabOrder = 0
+            ExplicitWidth = 388
+            ExplicitHeight = 159
+            object TabSheet6: TTabSheet
+              Caption = 'Themes (Vcl Styles)'
+              ExplicitWidth = 380
+              ExplicitHeight = 131
+              object Label9: TLabel
+                Left = 3
+                Top = 26
+                Width = 45
+                Height = 13
+                Caption = 'VCL Style'
+              end
+              object ImageVCLStyle: TImage
+                Left = 3
+                Top = 72
+                Width = 350
+                Height = 246
+                Transparent = True
+              end
+              object CheckBoxDisableVClStylesNC: TCheckBox
+                Left = 3
+                Top = 3
+                Width = 396
+                Height = 17
+                Caption = 
+                  'Disable VCL Styles in Non client Area (Only valid when Vcl Style' +
+                  's are activated)'
+                TabOrder = 0
+                OnClick = CheckBoxDisableVClStylesNCClick
+              end
+              object ComboBoxVCLStyle: TComboBox
+                Left = 3
+                Top = 45
+                Width = 254
+                Height = 21
+                Style = csDropDownList
+                TabOrder = 1
+                OnChange = ComboBoxVCLStyleChange
+              end
+            end
+            object TabSheet7: TTabSheet
+              Caption = 'Syntax Highlighting'
+              ImageIndex = 1
+              ExplicitLeft = 72
+              object Label3: TLabel
+                Left = 491
+                Top = 8
+                Width = 19
+                Height = 13
+                Caption = 'Size'
+              end
+              object Label2: TLabel
+                Left = 375
+                Top = 8
+                Width = 81
+                Height = 13
+                Caption = 'Code Editor Font'
+              end
+              object Label1: TLabel
+                Left = 133
+                Top = 10
+                Width = 127
+                Height = 13
+                Caption = 'Syntax Highlighting Theme'
+              end
+              object Label14: TLabel
+                Left = 11
+                Top = 10
+                Width = 47
+                Height = 13
+                Caption = 'Language'
+              end
+              object SynEditCode: TSynEdit
+                Left = 11
+                Top = 56
+                Width = 534
+                Height = 300
+                Align = alCustom
+                Color = 4598550
+                ActiveLineColor = clBlue
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clWindowText
+                Font.Height = -13
+                Font.Name = 'Consolas'
+                Font.Pitch = fpFixed
+                Font.Style = []
+                TabOrder = 6
+                Gutter.Color = 4598550
+                Gutter.BorderColor = clYellow
+                Gutter.Font.Charset = DEFAULT_CHARSET
+                Gutter.Font.Color = clWhite
+                Gutter.Font.Height = -11
+                Gutter.Font.Name = 'Courier New'
+                Gutter.Font.Style = []
+                Gutter.ShowLineNumbers = True
+                Gutter.GradientStartColor = 4539717
+                Gutter.GradientEndColor = 2565927
+                Highlighter = SynPasSyn1
+              end
+              object UpDown1: TUpDown
+                Left = 523
+                Top = 27
+                Width = 16
+                Height = 21
+                Associate = EditFontSize
+                Min = 8
+                Max = 48
+                Position = 10
+                TabOrder = 1
+              end
+              object EditFontSize: TEdit
+                Left = 491
+                Top = 27
+                Width = 32
+                Height = 21
+                ReadOnly = True
+                TabOrder = 0
+                Text = '10'
+                OnChange = ComboBoxFontChange
+              end
+              object ComboBoxFont: TComboBox
+                Left = 375
+                Top = 29
+                Width = 110
+                Height = 21
+                Style = csDropDownList
+                TabOrder = 5
+                OnChange = ComboBoxFontChange
+              end
+              object ButtonGetMore: TButton
+                Left = 271
+                Top = 28
+                Width = 98
+                Height = 23
+                Caption = 'Get more themes'
+                TabOrder = 2
+                OnClick = ButtonGetMoreClick
+              end
+              object ComboBoxTheme: TComboBox
+                Left = 133
+                Top = 29
+                Width = 132
+                Height = 21
+                Style = csDropDownList
+                TabOrder = 4
+                OnChange = ComboBoxThemeChange
+              end
+              object ComboBoxLanguageThemes: TComboBox
+                Left = 11
+                Top = 29
+                Width = 116
+                Height = 21
+                Style = csDropDownList
+                TabOrder = 3
+                OnChange = ComboBoxLanguageThemesChange
+              end
+            end
+          end
         end
       end
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
+        ExplicitWidth = 562
+        ExplicitHeight = 359
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -278,139 +435,22 @@ object FrmSettings: TFrmSettings
         end
       end
       object TabSheet5: TTabSheet
-        Caption = 'Syntax Highlighting'
+        Caption = 'Templates'
         ImageIndex = 4
-        object Label1: TLabel
-          Left = 11
-          Top = 8
-          Width = 127
-          Height = 13
-          Caption = 'Syntax Highlighting Theme'
-        end
-        object Label2: TLabel
-          Left = 375
-          Top = 8
-          Width = 81
-          Height = 13
-          Caption = 'Code Editor Font'
-        end
-        object Label3: TLabel
-          Left = 491
-          Top = 8
-          Width = 19
-          Height = 13
-          Caption = 'Size'
-        end
-        object ComboBoxTheme: TComboBox
-          Left = 11
-          Top = 27
-          Width = 254
-          Height = 21
-          Style = csDropDownList
-          TabOrder = 1
-          OnChange = ComboBoxThemeChange
-        end
-        object ButtonGetMore: TButton
-          Left = 271
-          Top = 25
-          Width = 98
-          Height = 25
-          Caption = 'Get more themes'
-          TabOrder = 0
-          OnClick = ButtonGetMoreClick
-        end
-        object ComboBoxFont: TComboBox
-          Left = 375
-          Top = 27
-          Width = 110
-          Height = 21
-          Style = csDropDownList
-          TabOrder = 2
-          OnChange = ComboBoxFontChange
-        end
-        object EditFontSize: TEdit
-          Left = 491
-          Top = 27
-          Width = 32
-          Height = 21
-          ReadOnly = True
-          TabOrder = 3
-          Text = '10'
-          OnChange = ComboBoxFontChange
-        end
-        object UpDown1: TUpDown
-          Left = 523
-          Top = 27
-          Width = 16
-          Height = 21
-          Associate = EditFontSize
-          Min = 8
-          Max = 48
-          Position = 10
-          TabOrder = 4
-        end
-        object SynEditCode: TSynEdit
-          Left = 11
-          Top = 56
-          Width = 534
-          Height = 300
-          Align = alCustom
-          Color = 4598550
-          ActiveLineColor = clBlue
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -13
-          Font.Name = 'Consolas'
-          Font.Pitch = fpFixed
-          Font.Style = []
-          TabOrder = 5
-          Gutter.Color = 4598550
-          Gutter.BorderColor = clYellow
-          Gutter.Font.Charset = DEFAULT_CHARSET
-          Gutter.Font.Color = clWhite
-          Gutter.Font.Height = -11
-          Gutter.Font.Name = 'Courier New'
-          Gutter.Font.Style = []
-          Gutter.ShowLineNumbers = True
-          Gutter.GradientStartColor = 4539717
-          Gutter.GradientEndColor = 2565927
-          Highlighter = SynPasSyn1
-          Lines.Strings = (
-            '{ Syntax highlighting }'
-            'procedure TForm1.Button1Click(Sender: TObject);'
-            'var'
-            '  Number, I, X: Integer;'
-            'begin'
-            '  Number := 123 + $FF + Trunc(12.3);'
-            '  Caption := '#39'The Number is'#39' + #32 + IntToStr(Number);'
-            '  {Search Match, Text Block}'
-            '  { Invalid breakpoint }'
-            '  for I := 0 to Number do {execution point}'
-            '  begin'
-            '    Inc(X); { Enabled breakpoint }'
-            '    Dec(X); { Disabled breakpoint }'
-            '    X := X + 1.0; {Error Line}'
-            '    Listbox1.Items.Add(IntToStr(X));'
-            '  end;'
-            '  {$R+}'
-            '  asm'
-            '    mov AX, 1234H'
-            '    mov Number, AX'
-            '  end;'
-            '  {$R-}'
-            '  {$WARNINGS OFF}'
-            'end;')
-        end
+        ExplicitWidth = 562
+        ExplicitHeight = 359
       end
     end
   end
   object Panel2: TPanel
     Left = 0
-    Top = 399
-    Width = 582
+    Top = 440
+    Width = 587
     Height = 35
     Align = alBottom
     TabOrder = 1
+    ExplicitTop = 399
+    ExplicitWidth = 582
     object ButtonApply: TButton
       Left = 6
       Top = 6
@@ -455,7 +495,15 @@ object FrmSettings: TFrmSettings
     CharAttri.Foreground = clWhite
     SymbolAttri.Background = 4598550
     SymbolAttri.Foreground = clWhite
-    Left = 458
-    Top = 198
+    Left = 218
+    Top = 230
+  end
+  object SynCSSyn1: TSynCSSyn
+    Left = 256
+    Top = 160
+  end
+  object SynCppSyn1: TSynCppSyn
+    Left = 296
+    Top = 224
   end
 end

@@ -103,38 +103,7 @@ const
   sTagWmiMethodDescr = '[WMIMETHODDESC]';
   sTagWmiPath        = '[WMIPATH]';
 
-  sTemplateTemplateFuncts = 'TemplateHelperFunctions.pas';
-
-  ListSourceTemplates: array[TSourceLanguages] of
-    string = ('TemplateConsoleAppDelphi.pas', 'TemplateConsoleAppFPC.pas',
-    'TemplateConsoleAppOxygen.pas','TemplateConsoleAppBorlandCPP.cpp', 'TemplateConsoleAppMicrosoftCPP.cpp','TemplateConsoleAppCSharp.cs');
-
-  ListSourceTemplatesSingleton: array[TSourceLanguages] of
-    string = ('TemplateConsoleAppDelphiSingleton.pas', 'TemplateConsoleAppFPCSingleton.pas',
-    'TemplateConsoleAppOxygen.pas','','','');
-
-  ListSourceTemplatesStaticInvoker: array[TSourceLanguages] of
-    string =
-    (
-    'TemplateStaticMethodInvokerDelphi.pas',
-    'TemplateStaticMethodInvokerFPC.pas',
-    'TemplateStaticMethodInvokerOxygen.pas',
-    'TemplateStaticMethodInvokerBorlandCPP.cpp',
-    'TemplateStaticMethodInvokerMicrosoftCPP.cpp',
-    'TemplateStaticMethodInvokerCSharp.cs'
-    );
-
-  ListSourceTemplatesNonStaticInvoker: array[TSourceLanguages] of
-    string = (
-    'TemplateNonStaticMethodInvokerDelphi.pas',
-    'TemplateNonStaticMethodInvokerFPC.pas',
-    'TemplateNonStaticMethodInvokerOxygen.pas',
-    'TemplateNonStaticMethodInvokerBorlandCPP.cpp',
-    'TemplateNonStaticMethodInvokerMicrosoftCPP.cpp',
-    'TemplateNonStaticMethodInvokerCSharp.cs');
-
-  ListSourceTemplatesEvents: array[TSourceLanguages] of
-    string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas','TemplateEventsBorlandCpp.cpp', 'TemplateEventsMicrosoft.cpp','TemplateEventsCSharp.cs');
+  //sTemplateTemplateFuncts = 'TemplateHelperFunctions.pas';
 
   ListWmiCodeName  : array [TWmiCode] of string = ('Microsoft WMI Scripting Library - WbemScripting_TLB','Microsoft WMI Scripting Library - Late Binding', 'WMI COM API','WMI Default');
   ListWmiCodeDescr : array [TWmiCode] of string = ('Generate code using the Microsoft WMI Scripting Library using the WbemScripting_TLB unit',
@@ -142,12 +111,9 @@ const
                                                    'Generate code using the COM API for WMI uisng the JwaWbemCli (part of the JEDI API Library)',
                                                    'Generate code using the stadard WMI library provided by the current framework (internal use, does not select this option)');
 
-
   function GetMaxLengthItemName(List: TStrings): integer;
   function GetMaxLengthItem(List: TStrings): integer;
-  function GetTemplateLocation(const TemplateName: string): string; overload;
-  function GetTemplateLocation(Language:TSourceLanguages;Mode : TWmiCode;GenCode :TWmiGenCode): string;overload;
-
+  function GetTemplateLocation(Language:TSourceLanguages;Mode : TWmiCode;GenCode :TWmiGenCode): string;
 
 var
   FileVersionStr: string;
@@ -214,10 +180,12 @@ begin
       Result := Length(List.Names[i]);
 end;
 
+{
 function GetTemplateLocation(const TemplateName: string): string;
 begin
   Result := ExtractFilePath(ParamStr(0)) + 'Templates\' + TemplateName;
 end;
+}
 
 function GetTemplateLocation(Language:TSourceLanguages;Mode : TWmiCode;GenCode :TWmiGenCode): string;
 const
