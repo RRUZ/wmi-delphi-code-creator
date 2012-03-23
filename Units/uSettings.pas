@@ -26,7 +26,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
-  SynEditHighlighter, SynHighlighterPas, uCheckUpdate;
+  SynEditHighlighter, SynHighlighterPas, uCheckUpdate, SynHighlighterCpp,
+  SynHighlighterCS;
 
 type
   TSettings = class
@@ -127,21 +128,29 @@ type
     CheckBoxUpdates: TCheckBox;
     CheckBoxDisableVClStylesNC: TCheckBox;
     TabSheet5: TTabSheet;
-    ComboBoxTheme: TComboBox;
-    Label1: TLabel;
-    ButtonGetMore: TButton;
-    ComboBoxFont: TComboBox;
-    Label2: TLabel;
-    Label3: TLabel;
-    EditFontSize: TEdit;
-    UpDown1: TUpDown;
-    SynEditCode: TSynEdit;
     SynPasSyn1: TSynPasSyn;
     ComboBoxLanguageSel: TComboBox;
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
     EditAStyle: TEdit;
+    Panel3: TPanel;
+    PageControl2: TPageControl;
+    TabSheet6: TTabSheet;
+    TabSheet7: TTabSheet;
+    SynEditCode: TSynEdit;
+    UpDown1: TUpDown;
+    Label3: TLabel;
+    EditFontSize: TEdit;
+    Label2: TLabel;
+    ComboBoxFont: TComboBox;
+    ButtonGetMore: TButton;
+    ComboBoxTheme: TComboBox;
+    Label1: TLabel;
+    ComboBoxLanguageThemes: TComboBox;
+    Label14: TLabel;
+    SynCSSyn1: TSynCSSyn;
+    SynCppSyn1: TSynCppSyn;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -156,6 +165,7 @@ type
     procedure BtnDeleteCacheClick(Sender: TObject);
     procedure ComboBoxVCLStyleChange(Sender: TObject);
     procedure CheckBoxDisableVClStylesNCClick(Sender: TObject);
+    procedure ComboBoxLanguageThemesChange(Sender: TObject);
   private
     FSettings: TSettings;
     //FCurrentTheme:  TIDETheme;
@@ -214,8 +224,6 @@ uses
   {$WARN UNIT_PLATFORM ON}
   uDelphiVersions,
   uSelectCompilerVersion,
-  SynHighlighterCpp,
-  SynHighlighterCS,
   StrUtils,
   IOUtils,
   IniFiles,
@@ -788,6 +796,54 @@ begin
   LoadCurrentThemeFont(Self,ComboBoxFont.Text,StrToInt(EditFontSize.Text));
 end;
 
+procedure TFrmSettings.ComboBoxLanguageThemesChange(Sender: TObject);
+begin
+  case TSourceLanguages(ComboBoxLanguageThemes.Items.Objects[ComboBoxLanguageThemes.ItemIndex]) of
+    Lng_Delphi      :begin
+                      SynEditCode.Highlighter:=SynPasSyn1;
+                      SynEditCode.Lines.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Templates\Template_Delphi.pas' );
+                      if ComboBoxTheme.Text<>'' then
+                       LoadCurrentTheme(Self, ComboBoxTheme.Text);
+                     end;
+
+    Lng_FPC         :begin
+                      SynEditCode.Highlighter:=SynPasSyn1;
+                      SynEditCode.Lines.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Templates\Template_FPC.pas' );
+                      if ComboBoxTheme.Text<>'' then
+                       LoadCurrentTheme(Self, ComboBoxTheme.Text);
+                     end;
+
+    Lng_Oxygen      :begin
+                      SynEditCode.Highlighter:=SynPasSyn1;
+                      SynEditCode.Lines.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Templates\Template_Oxygen.pas' );
+                      if ComboBoxTheme.Text<>'' then
+                       LoadCurrentTheme(Self, ComboBoxTheme.Text);
+                     end;
+
+    Lng_BorlandCpp  :begin
+                       SynEditCode.Highlighter:=SynCppSyn1;
+                       SynEditCode.Lines.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Templates\Template_BorlandCpp.cpp' );
+                      if ComboBoxTheme.Text<>'' then
+                       LoadCurrentTheme(Self, ComboBoxTheme.Text);
+                     end;
+
+    Lng_VSCpp       :begin
+                      SynEditCode.Highlighter:=SynCppSyn1;
+                      SynEditCode.Lines.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Templates\Template_MicrosoftCpp.cpp' );
+                      if ComboBoxTheme.Text<>'' then
+                       LoadCurrentTheme(Self, ComboBoxTheme.Text);
+                     end;
+
+    Lng_CSharp      :begin
+                      SynEditCode.Highlighter:=SynCSSyn1;
+                      SynEditCode.Lines.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Templates\Template_Csharp.cs' );
+                      if ComboBoxTheme.Text<>'' then
+                       LoadCurrentTheme(Self, ComboBoxTheme.Text);
+                     end;
+  end;
+
+end;
+
 procedure TFrmSettings.ComboBoxThemeChange(Sender: TObject);
 begin
   LoadCurrentTheme(Self,TComboBox(Sender).Text);
@@ -846,7 +902,10 @@ var
   i : TSourceLanguages;
 begin
   for i := Low(TSourceLanguages) to High(TSourceLanguages) do
+  begin
     ComboBoxLanguageSel.Items.AddObject(ListSourceLanguages[i], TObject(i));
+    ComboBoxLanguageThemes.Items.AddObject(ListSourceLanguages[i], TObject(i));
+  end;
 
   FSettings:=TSettings.Create;
   DummyFrm:=Self;
@@ -855,6 +914,9 @@ begin
   LoadThemes;
   LoadCodeGenData;
   LoadFormatters;
+
+  ComboBoxLanguageThemes.ItemIndex:=0;
+  ComboBoxLanguageThemesChange(nil);
 end;
 
 procedure TFrmSettings.FormDestroy(Sender: TObject);

@@ -94,7 +94,7 @@ begin
   DynCode    := TStringList.Create;
   try
     OutPutCode.Clear;
-    StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplates[Lng_CSharp]));
+    StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiClasses));
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
@@ -129,8 +129,8 @@ var
   Props:   TStrings;
   Padding : string;
 begin
-  Padding :=StringOfChar(' ',10);
-  StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_CSharp]));
+  Padding := StringOfChar(' ',10);
+  StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiEvents));
 
   WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds]);
   WQL := Format(Padding+StringOfChar(' ',6)+'WmiQuery ="%s"+%s', [WQL, sLineBreak]);
@@ -204,24 +204,23 @@ begin
     OutPutCode.Clear;
     if IsStatic then
     begin
+     {
       if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
-
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesStaticInvoker[Lng_CSharp]));
+     }
+        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiMethodStatic));
     end
     else
     begin
-
+            {
       if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
-
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesNonStaticInvoker[Lng_CSharp]));
+         }
+        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiMethodNonStatic));
     end;
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
