@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Templates modified="2011-04-26 19:44:13">
+  <Lng_Delphi Mode="WmiCode_Scripting">
+    <WmiClasses>TemplateConsoleAppDelphi_TLB.pas</WmiClasses>
+    <WmiClassesSingleton>TemplateConsoleAppDelphiSingleton_TLB.pas</WmiClassesSingleton>
+    <WmiMethodStatic>TemplateStaticMethodInvokerDelphi_TLB.pas</WmiMethodStatic>
+    <WmiMethodNonStatic>TemplateNonStaticMethodInvokerDelphi_TLB.pas</WmiMethodNonStatic>
+	<WmiEvents>TemplateEventsDelphi.pas</WmiEvents>
+  </Lng_Delphi>
+  <Lng_Delphi Mode="WmiCode_LateBinding">
+    <WmiClasses>TemplateConsoleAppDelphi.pas</WmiClasses>
+    <WmiClassesSingleton>TemplateConsoleAppDelphiSingleton.pas</WmiClassesSingleton>
+    <WmiMethodStatic>TemplateStaticMethodInvokerDelphi.pas</WmiMethodStatic>
+    <WmiMethodNonStatic>TemplateNonStaticMethodInvokerDelphi.pas</WmiMethodNonStatic>
+	<WmiEvents>TemplateEventsDelphi.pas</WmiEvents>
+  </Lng_Delphi>  
+  <Lng_Delphi Mode="WmiCode_COM">
+    <WmiClasses>TemplateConsoleAppDelphi_COM.pas</WmiClasses>
+    <WmiClassesSingleton>TemplateConsoleAppDelphi_COM.pas</WmiClassesSingleton>
+    <WmiMethodStatic>TemplateStaticMethodInvokerDelphi_COM.pas</WmiMethodStatic>
+    <WmiMethodNonStatic>TemplateNonStaticMethodInvokerDelphi_COM.pas</WmiMethodNonStatic>
+	<WmiEvents>TemplateEventsDelphi_COM.pas</WmiEvents>
+  </Lng_Delphi>  
+  <Lng_FPC Mode="WmiCode_Default">
+    <WmiClasses>TemplateConsoleAppFPC.pas</WmiClasses>
+    <WmiClassesSingleton>TemplateConsoleAppFPCSingleton.pas</WmiClassesSingleton>
+    <WmiMethodStatic>TemplateStaticMethodInvokerFPC.pas</WmiMethodStatic>
+    <WmiMethodNonStatic>TemplateNonStaticMethodInvokerFPC.pas</WmiMethodNonStatic>
+	<WmiEvents>TemplateEventsFPC.pas</WmiEvents>
+  </Lng_FPC>  
+  <Lng_Oxygen Mode="WmiCode_Default">
+    <WmiClasses>TemplateConsoleAppOxygen.pas</WmiClasses>
+    <WmiClassesSingleton>TemplateConsoleAppOxygen.pas</WmiClassesSingleton>
+    <WmiMethodStatic>TemplateStaticMethodInvokerOxygen.pas</WmiMethodStatic>
+    <WmiMethodNonStatic>TemplateNonStaticMethodInvokerOxygen.pas</WmiMethodNonStatic>
+	<WmiEvents>TemplateEventsOxygen.pas</WmiEvents>
+  </Lng_Oxygen>    
+  <Lng_BorlandCpp Mode="WmiCode_Default">
+    <WmiClasses>TemplateConsoleAppBorlandCPP.cpp</WmiClasses>
+    <WmiClassesSingleton>TemplateConsoleAppBorlandCPP.cpp</WmiClassesSingleton>
+    <WmiMethodStatic>TemplateStaticMethodInvokerBorlandCPP.cpp</WmiMethodStatic>
+    <WmiMethodNonStatic>TemplateNonStaticMethodInvokerBorlandCPP.cpp</WmiMethodNonStatic>
+	<WmiEvents>TemplateEventsBorlandCpp.cpp</WmiEvents>
+  </Lng_BorlandCpp>    
+  <Lng_VSCpp Mode="WmiCode_Default">
+    <WmiClasses>TemplateConsoleAppMicrosoftCPP.cpp</WmiClasses>
+    <WmiClassesSingleton>TemplateConsoleAppMicrosoftCPP.cpp</WmiClassesSingleton>
+    <WmiMethodStatic>TemplateStaticMethodInvokerMicrosoftCPP.cpp</WmiMethodStatic>
+    <WmiMethodNonStatic>TemplateNonStaticMethodInvokerMicrosoftCPP.cpp</WmiMethodNonStatic>
+	<WmiEvents>TemplateEventsMicrosoft.cpp</WmiEvents>
+  </Lng_VSCpp>    
+  <Lng_CSharp Mode="WmiCode_Default">
+    <WmiClasses>TemplateConsoleAppCSharp.cs</WmiClasses>
+    <WmiClassesSingleton>TemplateConsoleAppCSharp.cs</WmiClassesSingleton>
+    <WmiMethodStatic>TemplateStaticMethodInvokerCSharp.cs</WmiMethodStatic>
+    <WmiMethodNonStatic>TemplateNonStaticMethodInvokerCSharp.cs</WmiMethodNonStatic>
+	<WmiEvents>TemplateEventsCSharp.cs</WmiEvents>
+  </Lng_CSharp>    
+</Templates>

@@ -236,7 +236,6 @@ begin
                     WmiCodeGenerator.WmiMethod:=WmiMethod;
                     WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
                     WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     WmiCodeGenerator.GenerateCode(Params, Values);
                     FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
                   finally
@@ -252,7 +251,6 @@ begin
                     WmiCodeGenerator.WmiMethod:=WmiMethod;
                     WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
                     WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     WmiCodeGenerator.GenerateCode(Params, Values);
                     FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
                   finally
@@ -269,7 +267,6 @@ begin
                     WmiCodeGenerator.WmiMethod:=WmiMethod;
                     WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
                     WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     WmiCodeGenerator.GenerateCode(Params, Values);
                     FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
                   finally
@@ -285,7 +282,6 @@ begin
                     WmiCodeGenerator.WmiMethod:=WmiMethod;
                     WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
                     WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     WmiCodeGenerator.GenerateCode(Params, Values);
                     FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
                   finally
@@ -301,7 +297,6 @@ begin
                     WmiCodeGenerator.WmiMethod:=WmiMethod;
                     WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
                     WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
                     WmiCodeGenerator.GenerateCode(Params, Values);
                     FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
                   finally

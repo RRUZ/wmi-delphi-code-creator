@@ -65,6 +65,7 @@ uses
   StrUtils,
   Forms,
   uMisc,
+  uSelectCompilerVersion,
   uWmi_Metadata;
 
 const
@@ -75,14 +76,14 @@ const
   sTagDelphiEventsOut     = '[DELPHIEVENTSOUT]';
   sTagDelphiEventsOut2    = '[DELPHIEVENTSOUT2]';
 
+  {
+  ListDelphiWmiClassTemplates            : Array [0..DelphiMaxTypesClassCodeGen-1] of  string = ('TemplateConsoleAppDelphi_TLB.pas', 'TemplateConsoleAppDelphi.pas', 'TemplateConsoleAppDelphi_COM.pas');
+  ListDelphiWmiClassSingletonTemplates   : Array [0..DelphiMaxTypesClassCodeGen-1] of  string = ('TemplateConsoleAppDelphiSingleton_TLB.pas', 'TemplateConsoleAppDelphiSingleton.pas', 'TemplateConsoleAppDelphi_COM.pas');
 
-  ListDelphiWmiClassTemplates           : Array [0..DelphiMaxTypesClassCodeGen-1] of  string = ('TemplateConsoleAppDelphi_TLB.pas', 'TemplateConsoleAppDelphi.pas', 'TemplateConsoleAppDelphi_COM.pas');
-  ListDelphiWmiClassSingletonTemplates  : Array [0..DelphiMaxTypesClassCodeGen-1] of  string = ('TemplateConsoleAppDelphiSingleton_TLB.pas', 'TemplateConsoleAppDelphiSingleton.pas', 'TemplateConsoleAppDelphi_COM.pas');
-
-  ListDelphiWmiEventsTemplates : Array [0..DelphiMaxTypesEventsCodeGen-1] of  string = ('TemplateEventsDelphi.pas', 'TemplateEventsDelphi_COM.pas');
+  ListDelphiWmiEventsTemplates           : Array [0..DelphiMaxTypesEventsCodeGen-1] of  string = ('TemplateEventsDelphi.pas', 'TemplateEventsDelphi_COM.pas');
   ListDelphiWmiMethodsStaticTemplates    : Array [0..DelphiMaxTypesMethodCodeGen-1] of  string = ('TemplateStaticMethodInvokerDelphi_TLB.pas', 'TemplateStaticMethodInvokerDelphi.pas','TemplateStaticMethodInvokerDelphi_COM.pas');
   ListDelphiWmiMethodsNonStaticTemplates : Array [0..DelphiMaxTypesMethodCodeGen-1] of  string = ('TemplateNonStaticMethodInvokerDelphi_TLB.pas', 'TemplateNonStaticMethodInvokerDelphi.pas','TemplateNonStaticMethodInvokerDelphi_COM.pas');
-
+  }
 
 
 { TDelphiWmiEventCodeGenerator }
@@ -97,7 +98,7 @@ var
   Props   :TStrings;
   CimType :Integer;
 begin
-
+              {
   if UseHelperFunctions then
     TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
   else
@@ -108,8 +109,11 @@ begin
       break;
 
     StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiEventsTemplates[i]));
+    }
+    StrCode:=TFile.ReadAllText(GetTemplateLocation(Lng_Delphi, ModeCodeGeneration, TWmiGenCode.WmiEvents));;
 
     case ModeCodeGeneration of
+     WmiCode_Default,
      WmiCode_Scripting :
                          begin
                               WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
@@ -176,7 +180,7 @@ begin
                               StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
                          end;
 
-     WmiCode_LateBinding:;
+     WmiCode_LateBinding:StrCode := '//Not implemented, please select another method for code generation in the Settings option';
 
      WmiCode_COM:        begin
                             WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
@@ -278,17 +282,18 @@ var
   DynCode: TStrings;
   i:   integer;
   Len: integer;
-  Singleton: boolean;
+  //Singleton: boolean;
   Padding: string;
   CimType:Integer;
 begin
-  Singleton := WMiClassMetaData.IsSingleton;
+  //Singleton := WMiClassMetaData.IsSingleton;
   Descr     := GetWmiClassDescription;
 
   DynCode    := TStringList.Create;
   try
     OutPutCode.Clear;
 
+      {
     if UseHelperFunctions then
       TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
     else
@@ -304,6 +309,10 @@ begin
         Padding := '  ';
         StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiClassTemplates[Integer(ModeCodeGeneration)]));
     end;
+       }
+
+    StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Delphi, ModeCodeGeneration, TWmiGenCode.WmiClasses));
+
 
 
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
@@ -350,6 +359,7 @@ begin
                                 end;
                           end;
 
+      WmiCode_Default,
       WmiCode_LateBinding:
                           begin
                             if Props.Count > 0 then
@@ -477,7 +487,7 @@ begin
   DynCodeOutParams := TStringList.Create;
   try
     IsStatic := WMiClassMetaData.MethodByName[WmiMethod].IsStatic;
-
+              {
     if UseHelperFunctions then
       TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
     else
@@ -487,10 +497,16 @@ begin
     if DelphiWmiMethodCodeSupported[Index]=ModeCodeGeneration then
       break;
 
+
     if IsStatic then
       StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiMethodsStaticTemplates[Index]))
     else
       StrCode := TFile.ReadAllText(GetTemplateLocation(ListDelphiWmiMethodsNonStaticTemplates[Index]));
+      }
+    if IsStatic then
+      StrCode :=TFile.ReadAllText(GetTemplateLocation(Lng_Delphi, ModeCodeGeneration, TWmiGenCode.WmiMethodStatic))
+    else
+      StrCode :=TFile.ReadAllText(GetTemplateLocation(Lng_Delphi, ModeCodeGeneration, TWmiGenCode.WmiMethodNonStatic));
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
@@ -598,6 +614,8 @@ begin
                               StrCode := StringReplace(StrCode, sTagDelphiCodeParamsOut, DynCodeOutParams.Text, [rfReplaceAll]);
 
                             end;
+
+      WmiCode_Default,
       WmiCode_LateBinding :
                             begin
                               if IsStatic then

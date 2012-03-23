@@ -79,13 +79,13 @@ begin
   DynCode    := TStringList.Create;
   try
     OutPutCode.Clear;
-
+               {
     if UseHelperFunctions then
       TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
     else
       TemplateCode:='';
-
-    StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplates[Lng_Oxygen]));
+                }
+    StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiClasses));
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
@@ -124,7 +124,7 @@ var
   i, Len:  integer;
   Props:   TStrings;
 begin
-  StrCode := TFile.ReadAllText(GetTemplateLocation(ListSourceTemplatesEvents[Lng_Oxygen]));
+  StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiEvents));
 
   WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
     WmiTargetInstance]);
@@ -195,24 +195,23 @@ begin
     OutPutCode.Clear;
     if IsStatic then
     begin
+      {
       if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
-
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesStaticInvoker[Lng_Oxygen]));
+      }
+        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiMethodStatic));
     end
     else
     begin
-
+       {
       if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
       else
         TemplateCode:='';
-
-        StrCode := TFile.ReadAllText(GetTemplateLocation(
-          ListSourceTemplatesNonStaticInvoker[Lng_Oxygen]));
+        }
+        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiMethodNonStatic));
     end;
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);

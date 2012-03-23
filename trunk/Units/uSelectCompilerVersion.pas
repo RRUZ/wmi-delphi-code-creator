@@ -25,12 +25,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ImgList, ComCtrls;
+  Dialogs, StdCtrls, ImgList, ComCtrls, uWmiGenCode;
 
-type
-  TSourceLanguages = (Lng_Delphi, Lng_FPC, Lng_Oxygen, Lng_BorlandCpp, Lng_VSCpp, Lng_CSharp);
-const
-  ListSourceLanguages: array[TSourceLanguages] of string = ('Delphi', 'Lazarus', 'Oxygene', 'Borland/Embarcadero C++', 'Microsoft C++', 'C#');
 
 type
   TFrmSelCompilerVer = class(TForm)

@@ -196,7 +196,6 @@ begin
                     try
                       WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
                       WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Props);
                       FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
@@ -211,7 +210,6 @@ begin
                     try
                       WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
                       WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Props);
                       FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
@@ -225,7 +223,6 @@ begin
                     try
                       WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
                       WmiCodeGenerator.UseHelperFunctions:=false;
-                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Props);
                       FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
@@ -239,7 +236,6 @@ begin
                     try
                       WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
                       WmiCodeGenerator.UseHelperFunctions:=false;
-                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Props);
                       FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
@@ -253,16 +249,12 @@ begin
                     try
                       WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
                       WmiCodeGenerator.UseHelperFunctions:=false;
-                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Props);
                       FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
                       WmiCodeGenerator.Free;
                     end;
                   end;
-
-
-
     end;
 
   finally

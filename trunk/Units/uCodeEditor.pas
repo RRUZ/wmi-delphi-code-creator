@@ -26,7 +26,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, Vcl.ComCtrls, Vcl.ImgList,
-  Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ActnCtrls, uSelectCompilerVersion,
+  Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ActnCtrls, uWmiGenCode,
   uSettings,Vcl.StdCtrls,  Vcl.ToolWin, SynHighlighterPas, SynEditHighlighter,
   SynHighlighterCpp, Vcl.ActnMenus, Vcl.ExtCtrls, uSynEditPopupEdit,
   SynHighlighterCS;
@@ -83,7 +83,7 @@ implementation
 
 uses
  ShellApi,
- uWmiGenCode,
+ uSelectCompilerVersion,
  uDotNetFrameWork,
  uDelphiIDE,
  uLazarusIDE,

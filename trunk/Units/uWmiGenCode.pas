@@ -24,13 +24,24 @@ unit uWmiGenCode;
 interface
 
 uses
-  uSelectCompilerVersion,
   uWmi_Metadata,
   Classes;
 
 type
-  TWmiCode        =  (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
+  TWmiGenCode      =  (WmiClasses, WmiClassesSingleton, WmiMethodStatic, WmiMethodNonStatic, WmiEvents);
+  TWmiCode         =  (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM, WmiCode_Default);
+  TSourceLanguages =  (Lng_Delphi, Lng_FPC, Lng_Oxygen, Lng_BorlandCpp, Lng_VSCpp, Lng_CSharp);
+const
+  ListWmiGenCode     : array[TWmiGenCode] of string = (
+  'Wmi classes code generation',
+  'Wmi singleton classes code generation',
+  'Wmi Static methods code generation',
+  'Wmi Non Static methods code generation',
+  'Wmi events code generation');
 
+  ListSourceLanguages: array[TSourceLanguages] of string = ('Delphi', 'Free Pascal', 'Oxygene', 'Borland/Embarcadero C++', 'Microsoft C++', 'C#');
+
+type
   TWmiCodeGenerator=class
   private
     FUseHelperFunctions: boolean;
@@ -94,9 +105,6 @@ const
 
   sTemplateTemplateFuncts = 'TemplateHelperFunctions.pas';
 
-  ListSourceLanguages: array[TSourceLanguages] of
-    string = ('Delphi', 'Free Pascal', 'Delphi Prism', 'Borland/Embarcadero C++', 'Microsoft C++', 'C#');
-
   ListSourceTemplates: array[TSourceLanguages] of
     string = ('TemplateConsoleAppDelphi.pas', 'TemplateConsoleAppFPC.pas',
     'TemplateConsoleAppOxygen.pas','TemplateConsoleAppBorlandCPP.cpp', 'TemplateConsoleAppMicrosoftCPP.cpp','TemplateConsoleAppCSharp.cs');
@@ -128,15 +136,17 @@ const
   ListSourceTemplatesEvents: array[TSourceLanguages] of
     string = ('TemplateEventsDelphi.pas', 'TemplateEventsFPC.pas', 'TemplateEventsOxygen.pas','TemplateEventsBorlandCpp.cpp', 'TemplateEventsMicrosoft.cpp','TemplateEventsCSharp.cs');
 
-  ListWmiCodeName  : array [TWmiCode] of string = ('Microsoft WMI Scripting Library - WbemScripting_TLB','Microsoft WMI Scripting Library - Late Binding', 'WMI COM API');
+  ListWmiCodeName  : array [TWmiCode] of string = ('Microsoft WMI Scripting Library - WbemScripting_TLB','Microsoft WMI Scripting Library - Late Binding', 'WMI COM API','WMI Default');
   ListWmiCodeDescr : array [TWmiCode] of string = ('Generate code using the Microsoft WMI Scripting Library using the WbemScripting_TLB unit',
                                                    'Generate code using the Microsoft WMI Scripting Library using late binding',
-                                                   'Generate code using the COM API for WMI uisng the JwaWbemCli (part of the JEDI API Library)');
+                                                   'Generate code using the COM API for WMI uisng the JwaWbemCli (part of the JEDI API Library)',
+                                                   'Generate code using the stadard WMI library provided by the current framework (internal use, does not select this option)');
 
 
   function GetMaxLengthItemName(List: TStrings): integer;
   function GetMaxLengthItem(List: TStrings): integer;
-  function GetTemplateLocation(const TemplateName: string): string;
+  function GetTemplateLocation(const TemplateName: string): string; overload;
+  function GetTemplateLocation(Language:TSourceLanguages;Mode : TWmiCode;GenCode :TWmiGenCode): string;overload;
 
 
 var
@@ -146,8 +156,10 @@ var
 implementation
 
 Uses
-  ComObj,
-  SysUtils;
+  TypInfo,
+  System.Variants,
+  System.Win.ComObj,
+  System.SysUtils;
 
 { TWmiCodeGenerator }
 
@@ -156,6 +168,7 @@ begin
   inherited;
   FUseHelperFunctions:=False;
   FOutPutCode:=TStringList.Create;
+  FModeCodeGeneration:=TWmiCode.WmiCode_Default;
 end;
 
 destructor TWmiCodeGenerator.Destroy;
@@ -205,6 +218,41 @@ function GetTemplateLocation(const TemplateName: string): string;
 begin
   Result := ExtractFilePath(ParamStr(0)) + 'Templates\' + TemplateName;
 end;
+
+function GetTemplateLocation(Language:TSourceLanguages;Mode : TWmiCode;GenCode :TWmiGenCode): string;
+const
+  Msxml2_DOMDocument='Msxml2.DOMDocument.6.0';
+var
+  XmlDoc, Node : OleVariant;
+  xPathElement : string;
+  sLang   : string;
+  sMode   : string;
+  sType   : string;
+begin
+  XmlDoc       := CreateOleObject(Msxml2_DOMDocument);
+  XmlDoc.Async := False;
+  try
+    XmlDoc.Load(ExtractFilePath(ParamStr(0)) + 'Templates\Templates.xml');
+    XmlDoc.SetProperty('SelectionLanguage','XPath');
+    if (XmlDoc.parseError.errorCode <> 0) then
+     raise Exception.CreateFmt('Error in Template Xml Data %s',[XmlDoc.parseError]);
+
+    sLang:=GetEnumName(TypeInfo(TSourceLanguages),integer(Language));
+    sMode:=GetEnumName(TypeInfo(TWmiCode),integer(Mode));
+    sType:=GetEnumName(TypeInfo(TWmiGenCode),integer(GenCode));
+    {//Templates/Lng_Delphi[@Mode="WmiCode_Scripting"]/WmiClasses}
+    xPathElement:=Format('//Templates/%s[@Mode="%s"]/%s',[sLang, sMode, sType]);
+    Node:=XmlDoc.selectSingleNode(xPathElement);
+    if VarIsClear(Node) or VarIsNull(Node) then
+      Result:=''
+    else
+      Result:=ExtractFilePath(ParamStr(0)) + 'Templates\' + Node.text;
+  finally
+   XmlDoc    :=Unassigned;
+  end;
+end;
+
+
 
 { TWmiClassCodeGenerator }
 
