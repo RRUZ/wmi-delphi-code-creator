@@ -44,6 +44,11 @@ function CreateVsProject(const FileName, Path, ProjectTemplate: string;
   var NewFileName: string): boolean;
 
 procedure CompileAndRunVsCode(Console:TStrings;const CompilerName, ProjectFile: string;  Run: boolean);
+procedure CompileAndRunMicrosoftCppCode(Console:TStrings;const CompilerName, ProjectFile, SwitchOpts: string;  Run: boolean);
+
+function GetMicrosoftCppCompiler2008 : string;
+function GetMicrosoftCppCompiler2010 : string;
+function GetMicrosoftCppCompiler11   : string;
 
 implementation
 
@@ -54,6 +59,7 @@ uses
   SysUtils,
   Windows,
   uRegistry,
+  IOUtils,
   uMisc;
 
 
@@ -102,7 +108,61 @@ begin
   end;
 end;
 
+procedure CompileAndRunMicrosoftCppCode(Console:TStrings;const CompilerName, ProjectFile, SwitchOpts: string;  Run: boolean);
+var
+  ExeFile : string;
+  CmdLine : string;
+  vcvars32: string;
 
+  Bat     : TStringList;
+  BatFile : string;
+  CmdBuffer: array [0..MAX_PATH] of Char;
+begin
+  Bat:=TStringList.Create;
+  try
+    Console.Add('');
+    vcvars32:=ExtractFilePath(CompilerName)+'vcvars32.bat';
+    Bat.Add('CALL '+TFile.ReadAllText(vcvars32));
+
+    {/EHsc /Fe"[OutPutPath][FileName].exe" /Fo"[OutPutPath][FileName].obj" "[OutPutPath][FileName].cpp"}
+    CmdLine:=Format('"%s" %s', [CompilerName, SwitchOpts]);
+    CmdLine:=StringReplace(CmdLine,'[OutPutPath]',ExtractFilePath(ProjectFile),[rfReplaceAll]);
+    CmdLine:=StringReplace(CmdLine,'[FileName]',ChangeFileExt(ExtractFileName(ProjectFile),''),[rfReplaceAll]);
+    Bat.Add(CmdLine);
+    BatFile:=ChangeFileExt(ProjectFile,'.bat');
+    Bat.SaveToFile(BatFile);
+
+    GetEnvironmentVariable('COMSPEC', CmdBuffer, MAX_PATH+1);
+    CmdLine:=Format('%s /C "%s"',[CmdBuffer, BatFile]);
+    CaptureConsoleOutput(CmdLine, Console);
+    if Run then
+    begin
+      ExeFile := ExtractFilePath(ProjectFile) + ChangeFileExt(ExtractFileName(ProjectFile), '.exe');
+      if FileExists(ExeFile) then
+        ShellExecute(0, nil, PChar(Format('"%s"',[ExeFile])), nil, nil, SW_SHOWNORMAL)
+      else
+        MsgWarning(Format('Could not find %s', [ExeFile]));
+    end;
+  finally
+    Bat.Free;
+  end;
+end;
+
+
+function GetMicrosoftCppCompiler2008 : string;
+begin
+ Result:=ExpandFileName(ExtractFilePath(GetVS2008IDEFileName)+'\..\..')+'\VC\bin\cl.exe';
+end;
+
+function GetMicrosoftCppCompiler2010 : string;
+begin
+ Result:=ExpandFileName(ExtractFilePath(GetVS2010IDEFileName)+'\..\..')+'\VC\bin\cl.exe';
+end;
+
+function GetMicrosoftCppCompiler11   : string;
+begin
+ Result:=ExpandFileName(ExtractFilePath(GetVS11IDEFileName)+'\..\..')+'\VC\bin\cl.exe';
+end;
 
 function IsVS2008Installed: boolean;
 var

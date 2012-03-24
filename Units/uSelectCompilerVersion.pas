@@ -59,6 +59,7 @@ implementation
 {$R *.dfm}
 
 uses
+  uMisc,
   uVisualStudio,
   uRegistry,
   uDotNetFrameWork,
@@ -299,6 +300,49 @@ begin
                     item.ImageIndex := ImageIndex;
                     item.Data := Pointer(Ord(Lng_VSCpp));
                   end;
+
+                  if ShowCompiler then
+                  begin
+                    FileName :=GetMicrosoftCppCompiler2008;
+                    if FileExists(FileName) then
+                    begin
+                      item     := ListViewIDEs.Items.Add;
+                      item.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
+                      item.SubItems.Add(FileName);
+                      item.SubItems.Add(FileName);
+                      ExtractIconFileToImageList(ImageList1, Filename);
+                      ImageIndex := ImageList1.Count - 1;
+                      item.ImageIndex := ImageIndex;
+                      item.Data := Pointer(Ord(Lng_VSCpp));
+                    end;
+
+                    FileName :=GetMicrosoftCppCompiler2010;
+                    if FileExists(FileName) then
+                    begin
+                      item     := ListViewIDEs.Items.Add;
+                      item.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
+                      item.SubItems.Add(FileName);
+                      item.SubItems.Add(FileName);
+                      ExtractIconFileToImageList(ImageList1, Filename);
+                      ImageIndex := ImageList1.Count - 1;
+                      item.ImageIndex := ImageIndex;
+                      item.Data := Pointer(Ord(Lng_VSCpp));
+                    end;
+
+                    FileName :=GetMicrosoftCppCompiler11;
+                    if FileExists(FileName) then
+                    begin
+                      item     := ListViewIDEs.Items.Add;
+                      item.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
+                      item.SubItems.Add(FileName);
+                      item.SubItems.Add(FileName);
+                      ExtractIconFileToImageList(ImageList1, Filename);
+                      ImageIndex := ImageList1.Count - 1;
+                      item.ImageIndex := ImageIndex;
+                      item.Data := Pointer(Ord(Lng_VSCpp));
+                    end;
+                  end;
+
                 end;
 
     Lng_Oxygen:

@@ -203,6 +203,7 @@ var
   FileName: string;
   IdeName: string;
   TargetFile: string;
+  UseVS : Boolean;
 begin
   Frm := TFrmSelCompilerVer.Create(Self);
   try
@@ -284,20 +285,22 @@ begin
           begin
             FileName := FileName + 'main.cpp';
             SynEditCode.Lines.SaveToFile(FileName);
-
-            if Pos('2008', item.Caption)>0 then
+            UseVS        := Pos('Visual Studio', item.Caption)>0;
+            if UseVS and (Pos('2008', item.Caption)>0) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2008\GetWMI_Info.sln'
             else
-            if Pos('2010', item.Caption)>0 then
+            if UseVS and (Pos('2010', item.Caption)>0) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2010\GetWMI_Info.sln'
             else
-            if Pos('11', item.Caption)>0 then
+            if UseVS and (Pos('11', item.Caption)>0) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS11\GetWMI_Info.sln';
 
-
+            if UseVS then
+            begin
              CreateVsProject(ExtractFileName(FileName), ExtractFilePath(FileName), TargetFile, FileName);
              FileName := ChangeFileExt(FileName, '.sln');
              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
+            end;
           end;
 
           Lng_CSharp:
@@ -319,8 +322,6 @@ begin
              FileName := ChangeFileExt(FileName, '.sln');
              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
           end;
-
-
         end;
       end;
     end;
@@ -337,6 +338,7 @@ var
   FileName: string;
   CompilerName: string;
   TargetFile: string;
+  UseVS : Boolean;
 begin
   Frm := TFrmSelCompilerVer.Create(Self);
   try
@@ -399,25 +401,34 @@ begin
           begin
             CompilerName := item.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
-            FileName     := FileName + 'main.cpp';
+            UseVS        := Pos('Visual Studio', item.Caption)>0;
 
-            if Pos('2008', item.Caption)>0 then
+            if UseVS then
+             FileName     := FileName + 'main.cpp'
+            else
+              FileName    := FileName + 'GetWMI_Info.cpp';
+
+            if UseVS and (Pos('2008', item.Caption)>0) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2008\GetWMI_Info.sln'
             else
-            if Pos('2010', item.Caption)>0 then
+            if UseVS and (Pos('2010', item.Caption)>0) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2010\GetWMI_Info.sln'
             else
-            if Pos('11', item.Caption)>0 then
-             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS11\GetWMI_Info.sln';
+            if UseVS and (Pos('11', item.Caption)>0) then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS11\GetWMI_Info.sln'
+            else
+            TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2008\GetWMI_Info.sln';
 
             SynEditCode.Lines.SaveToFile(FileName);
 
-
             if CreateVsProject(
-              ExtractFileName(FileName), ExtractFilePath(FileName), TargetFile, FileName) then
-              CompileAndRunVsCode(Console.Lines,CompilerName, FileName,
-                TComponent(Sender).Tag = 1);
-
+                ExtractFileName(FileName), ExtractFilePath(FileName), TargetFile, FileName) then
+                if UseVS then
+                 CompileAndRunVsCode(Console.Lines,CompilerName, FileName,
+                   TComponent(Sender).Tag = 1)
+                else
+                 CompileAndRunMicrosoftCppCode(Console.Lines,CompilerName, FileName, FSettings.MicrosoftCppCmdLine,
+                   TComponent(Sender).Tag = 1);
 
             ScrollMemo(Console);
           end;

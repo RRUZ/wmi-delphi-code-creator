@@ -25,8 +25,6 @@ object FrmSettings: TFrmSettings
     Align = alClient
     BorderWidth = 5
     TabOrder = 0
-    ExplicitWidth = 582
-    ExplicitHeight = 399
     object PageControl1: TPageControl
       Left = 6
       Top = 6
@@ -38,8 +36,6 @@ object FrmSettings: TFrmSettings
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
-        ExplicitWidth = 562
-        ExplicitHeight = 359
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -148,8 +144,6 @@ object FrmSettings: TFrmSettings
       object TabSheet2: TTabSheet
         Caption = 'Delphi Code generation'
         ImageIndex = 1
-        ExplicitWidth = 562
-        ExplicitHeight = 359
         object Label4: TLabel
           Left = 3
           Top = 35
@@ -236,8 +230,6 @@ object FrmSettings: TFrmSettings
       end
       object TabSheet1: TTabSheet
         Caption = 'GUI Settings'
-        ExplicitWidth = 562
-        ExplicitHeight = 359
         object Panel3: TPanel
           Left = 0
           Top = 0
@@ -247,10 +239,6 @@ object FrmSettings: TFrmSettings
           BevelOuter = bvNone
           BorderWidth = 5
           TabOrder = 0
-          ExplicitLeft = 5
-          ExplicitTop = 160
-          ExplicitWidth = 398
-          ExplicitHeight = 169
           object PageControl2: TPageControl
             Left = 5
             Top = 5
@@ -259,12 +247,8 @@ object FrmSettings: TFrmSettings
             ActivePage = TabSheet6
             Align = alClient
             TabOrder = 0
-            ExplicitWidth = 388
-            ExplicitHeight = 159
             object TabSheet6: TTabSheet
               Caption = 'Themes (Vcl Styles)'
-              ExplicitWidth = 380
-              ExplicitHeight = 131
               object Label9: TLabel
                 Left = 3
                 Top = 26
@@ -303,7 +287,6 @@ object FrmSettings: TFrmSettings
             object TabSheet7: TTabSheet
               Caption = 'Syntax Highlighting'
               ImageIndex = 1
-              ExplicitLeft = 72
               object Label3: TLabel
                 Left = 491
                 Top = 8
@@ -423,8 +406,6 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
-        ExplicitWidth = 562
-        ExplicitHeight = 359
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -434,11 +415,88 @@ object FrmSettings: TFrmSettings
           TabOrder = 0
         end
       end
+      object TabSheet8: TTabSheet
+        Caption = 'C++ Compiler Options'
+        ImageIndex = 5
+        object Label18: TLabel
+          Left = 8
+          Top = 16
+          Width = 225
+          Height = 13
+          Caption = 'Microsoft C++ Compiler Command-Line options'
+        end
+        object Label19: TLabel
+          Left = 8
+          Top = 125
+          Width = 266
+          Height = 13
+          Caption = 'Addiional Microsoft C++ compilers (register one by line)'
+        end
+        object EditMicrosoftCppSwitch: TMemo
+          Left = 8
+          Top = 35
+          Width = 529
+          Height = 78
+          ScrollBars = ssBoth
+          TabOrder = 0
+        end
+        object Memo1: TMemo
+          Left = 8
+          Top = 144
+          Width = 529
+          Height = 89
+          ScrollBars = ssBoth
+          TabOrder = 1
+        end
+      end
       object TabSheet5: TTabSheet
         Caption = 'Templates'
         ImageIndex = 4
-        ExplicitWidth = 562
-        ExplicitHeight = 359
+        object Label15: TLabel
+          Left = 11
+          Top = 10
+          Width = 47
+          Height = 13
+          Caption = 'Language'
+        end
+        object Label16: TLabel
+          Left = 187
+          Top = 10
+          Width = 82
+          Height = 13
+          Caption = 'Mode Generation'
+        end
+        object Label17: TLabel
+          Left = 363
+          Top = 10
+          Width = 77
+          Height = 13
+          Caption = 'WMI Type Code'
+        end
+        object ComboBoxLanguageTemplate: TComboBox
+          Left = 11
+          Top = 29
+          Width = 170
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 0
+        end
+        object ComboBox1: TComboBox
+          Left = 187
+          Top = 29
+          Width = 170
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 1
+        end
+        object ComboBox2: TComboBox
+          Left = 363
+          Top = 29
+          Width = 170
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 2
+        end
       end
     end
   end
@@ -449,8 +507,6 @@ object FrmSettings: TFrmSettings
     Height = 35
     Align = alBottom
     TabOrder = 1
-    ExplicitTop = 399
-    ExplicitWidth = 582
     object ButtonApply: TButton
       Left = 6
       Top = 6
@@ -499,11 +555,11 @@ object FrmSettings: TFrmSettings
     Top = 230
   end
   object SynCSSyn1: TSynCSSyn
-    Left = 256
-    Top = 160
+    Left = 184
+    Top = 232
   end
   object SynCppSyn1: TSynCppSyn
-    Left = 296
-    Top = 224
+    Left = 248
+    Top = 232
   end
 end

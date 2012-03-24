@@ -25,7 +25,7 @@ interface
 
 //TODO
 {
-  Add detection of additioal compilers
+  Add detection of additional compilers
   Add plattform output x86, x64
   Add option to edit templates
 
