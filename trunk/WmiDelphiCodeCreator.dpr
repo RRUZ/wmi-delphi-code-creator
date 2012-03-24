@@ -53,7 +53,8 @@ uses
   uCustomImageDrawHook in 'Units\Misc\uCustomImageDrawHook.pas',
   uCheckUpdate in 'Units\Misc\uCheckUpdate.pas' {FrmCheckUpdate},
   uWmiCSharpCode in 'Units\uWmiCSharpCode.pas',
-  uDotNetFrameWork in 'Units\uDotNetFrameWork.pas';
+  uDotNetFrameWork in 'Units\uDotNetFrameWork.pas',
+  uWmiPropertyValue in 'Units\uWmiPropertyValue.pas' {FrmWMIPropValue};
 
 {$R *.res}
 

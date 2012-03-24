@@ -23,31 +23,6 @@ unit Main;
 interface
 
 
-//TODO
-{
-  Add detection of additional compilers
-  Add plattform output x86, x64
-  Add option to edit templates
-
-  disable run as admin requirement
-  Fix disabled icons
-  Remote machine support
-  Improve source code
-  Add automated tests
-  Store cache x machine
-  Create code based in plugins and interfaces
-
-  refactor GUI based in tree
-   Show wmi classes and task for class detecting possibles operations (show values, create code, event , invoke method)
-   Code gen
-     c++
-     delphi
-     fpc
-   Database
-   Tree (hierarchy)
-  plugin handle
-}
-
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls,
