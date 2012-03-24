@@ -21,10 +21,12 @@ object FrmValueList: TFrmValueList
     Width = 360
     Height = 524
     Align = alClient
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goRowSelect, goThumbTracking]
     TabOrder = 0
     TitleCaptions.Strings = (
       'Property'
       'Value')
+    OnDblClick = ValueListDblClick
     ColWidths = (
       150
       204)

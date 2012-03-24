@@ -121,6 +121,54 @@ var
   FileName: string;
   ImageIndex: integer;
   RootKey: HKEY;
+
+
+  procedure  RegisterVSIDE;
+  begin
+    if IsVS2008Installed then
+    begin
+      FileName := GetVS2008IDEFileName;
+      item     := ListViewIDEs.Items.Add;
+      item.Caption := 'Visual Studio 2008';
+      item.SubItems.Add(FileName);
+      item.SubItems.Add(GetVS2008CompilerFileName);
+      ExtractIconFileToImageList(ImageList1, Filename);
+      ImageIndex := ImageList1.Count - 1;
+      item.ImageIndex := ImageIndex;
+      item.Data := Pointer(Ord(FLanguageSource));
+    end;
+
+    if IsVS2010Installed then
+    begin
+      FileName := GetVS2010IDEFileName;
+      item     := ListViewIDEs.Items.Add;
+      item.Caption := 'Visual Studio 2010';
+      item.SubItems.Add(FileName);
+      item.SubItems.Add(GetVS2010CompilerFileName);
+      ExtractIconFileToImageList(ImageList1, Filename);
+      ImageIndex := ImageList1.Count - 1;
+      item.ImageIndex := ImageIndex;
+      item.Data := Pointer(Ord(FLanguageSource));
+    end;
+
+    if IsVS11Installed then
+    begin
+      FileName := GetVS11IDEFileName;
+      item     := ListViewIDEs.Items.Add;
+      item.Caption := 'Visual Studio 11';
+      item.SubItems.Add(FileName);
+      item.SubItems.Add(GetVS11CompilerFileName);
+      ExtractIconFileToImageList(ImageList1, Filename);
+      ImageIndex := ImageList1.Count - 1;
+      item.ImageIndex := ImageIndex;
+      item.Data := Pointer(Ord(FLanguageSource));
+    end;
+  end;
+
+
+
+
+
 begin
   case FLanguageSource of
 
@@ -183,6 +231,9 @@ begin
 
     Lng_CSharp:
     begin
+
+      RegisterVSIDE;
+
       if ShowCompiler then
       for CSharpComp :=Low(TDotNetVersions) to High(TDotNetVersions) do
       begin
@@ -197,47 +248,6 @@ begin
           ImageIndex := ImageList1.Count - 1;
           item.ImageIndex := ImageIndex;
           item.Data := Pointer(Ord(CSharpComp));
-        end;
-      end
-      else
-      begin
-        if IsVS2008Installed then
-        begin
-          FileName := GetVS2008IDEFileName;
-          item     := ListViewIDEs.Items.Add;
-          item.Caption := 'Visual Studio 2008';
-          item.SubItems.Add(FileName);
-          item.SubItems.Add(GetVS2008CompilerFileName);
-          ExtractIconFileToImageList(ImageList1, Filename);
-          ImageIndex := ImageList1.Count - 1;
-          item.ImageIndex := ImageIndex;
-          item.Data := Pointer(Ord(Lng_VSCpp));
-        end;
-
-        if IsVS2010Installed then
-        begin
-          FileName := GetVS2010IDEFileName;
-          item     := ListViewIDEs.Items.Add;
-          item.Caption := 'Visual Studio 2010';
-          item.SubItems.Add(FileName);
-          item.SubItems.Add(GetVS2010CompilerFileName);
-          ExtractIconFileToImageList(ImageList1, Filename);
-          ImageIndex := ImageList1.Count - 1;
-          item.ImageIndex := ImageIndex;
-          item.Data := Pointer(Ord(Lng_VSCpp));
-        end;
-
-        if IsVS11Installed then
-        begin
-          FileName := GetVS11IDEFileName;
-          item     := ListViewIDEs.Items.Add;
-          item.Caption := 'Visual Studio 11';
-          item.SubItems.Add(FileName);
-          item.SubItems.Add(GetVS11CompilerFileName);
-          ExtractIconFileToImageList(ImageList1, Filename);
-          ImageIndex := ImageList1.Count - 1;
-          item.ImageIndex := ImageIndex;
-          item.Data := Pointer(Ord(Lng_VSCpp));
         end;
       end;
 
@@ -262,44 +272,7 @@ begin
 
     Lng_VSCpp  :
                 begin
-                  if IsVS2008Installed then
-                  begin
-                    FileName := GetVS2008IDEFileName;
-                    item     := ListViewIDEs.Items.Add;
-                    item.Caption := 'Visual Studio 2008';
-                    item.SubItems.Add(FileName);
-                    item.SubItems.Add(GetVS2008CompilerFileName);
-                    ExtractIconFileToImageList(ImageList1, Filename);
-                    ImageIndex := ImageList1.Count - 1;
-                    item.ImageIndex := ImageIndex;
-                    item.Data := Pointer(Ord(Lng_VSCpp));
-                  end;
-
-                  if IsVS2010Installed then
-                  begin
-                    FileName := GetVS2010IDEFileName;
-                    item     := ListViewIDEs.Items.Add;
-                    item.Caption := 'Visual Studio 2010';
-                    item.SubItems.Add(FileName);
-                    item.SubItems.Add(GetVS2010CompilerFileName);
-                    ExtractIconFileToImageList(ImageList1, Filename);
-                    ImageIndex := ImageList1.Count - 1;
-                    item.ImageIndex := ImageIndex;
-                    item.Data := Pointer(Ord(Lng_VSCpp));
-                  end;
-
-                  if IsVS11Installed then
-                  begin
-                    FileName := GetVS11IDEFileName;
-                    item     := ListViewIDEs.Items.Add;
-                    item.Caption := 'Visual Studio 11';
-                    item.SubItems.Add(FileName);
-                    item.SubItems.Add(GetVS11CompilerFileName);
-                    ExtractIconFileToImageList(ImageList1, Filename);
-                    ImageIndex := ImageList1.Count - 1;
-                    item.ImageIndex := ImageIndex;
-                    item.Data := Pointer(Ord(Lng_VSCpp));
-                  end;
+                  RegisterVSIDE;
 
                   if ShowCompiler then
                   begin

@@ -31,6 +31,7 @@ type
   TFrmValueList = class(TForm)
     ValueList: TValueListEditor;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ValueListDblClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -45,6 +46,11 @@ implementation
 procedure TFrmValueList.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
  Action:=caFree;
+end;
+
+procedure TFrmValueList.ValueListDblClick(Sender: TObject);
+begin
+// ShowMessage('hello');
 end;
 
 end.

@@ -41,7 +41,7 @@ const
 
 function NetFrameworkInstalled(const NetFrameWorkId:TDotNetVersions): Boolean;
 function NetFrameworkPath(const NetFrameWorkId:TDotNetVersions): string;
-procedure CompileAndRunCSharpCode(Console:TStrings;const CompilerName, ProjectFile: string;  Run: boolean);
+procedure CompileAndRunCSharpCode(Console:TStrings;const CompilerName, SwitchOps, ProjectFile: string;  Run: boolean);
 
 
 implementation
@@ -77,17 +77,25 @@ const
  );
 
 
-procedure CompileAndRunCSharpCode(Console:TStrings;const CompilerName, ProjectFile: string;  Run: boolean);
+procedure CompileAndRunCSharpCode(Console:TStrings;const CompilerName, SwitchOps, ProjectFile: string;  Run: boolean);
 var
   ExeFile: string;
+  CmdLine:string;
 begin
   Console.Add('');
+  CmdLine:=Format('"%s" %s',[CompilerName, SwitchOps]);
+  CmdLine:=StringReplace(CmdLine,'[OutPutPath]',ExtractFilePath(ProjectFile),[rfReplaceAll]);
+  CmdLine:=StringReplace(CmdLine,'[FileName]',ChangeFileExt(ExtractFileName(ProjectFile),''),[rfReplaceAll]);
 
+  CaptureConsoleOutput(CmdLine, Console);
+
+  {
   CaptureConsoleOutput(Format(
   //'"%s" /target:exe /r:System.Management.dll /r:System.Data.dll /r:System.Drawing.dll /r:System.Drawing.Design.dll /r:System.Windows.Forms.dll /r:System.dll /out:"%s" "%s"',
   '"%s" /target:exe /r:System.Management.dll /r:System.dll /out:"%s" "%s"',
-
   [CompilerName, ChangeFileExt(ProjectFile, '.exe'), ProjectFile]), Console);
+  }
+
 
   if Run then
   begin

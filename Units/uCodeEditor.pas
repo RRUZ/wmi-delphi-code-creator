@@ -433,6 +433,41 @@ begin
             ScrollMemo(Console);
           end;
 
+          Lng_CSharp:
+          begin
+            UseVS        := Pos('Visual Studio', item.Caption)>0;
+            CompilerName := item.SubItems[1];
+            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
+
+            if UseVS then
+              FileName := FileName + 'Program.cs'
+            else
+              FileName     := FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.cs';
+
+            SynEditCode.Lines.SaveToFile(FileName);
+
+
+            if UseVS then
+            begin
+              if Pos('2008', item.Caption)>0 then
+               TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2008\GetWMI_Info.sln'
+              else
+              if Pos('2010', item.Caption)>0 then
+               TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2010\GetWMI_Info.sln'
+              else
+              if Pos('11', item.Caption)>0 then
+               TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS11\GetWMI_Info.sln';
+
+              if CreateVsProject(ExtractFileName(FileName), ExtractFilePath(FileName), TargetFile, FileName) then
+                 CompileAndRunVsCode(Console.Lines,CompilerName, FileName, TComponent(Sender).Tag = 1);
+            end;
+
+            if not UseVS then
+            CompileAndRunCSharpCode(Console.Lines, CompilerName, FSettings.CSharpCmdLine, FileName, TComponent(Sender).Tag = 1);
+
+            ScrollMemo(Console);
+          end;
+
           Lng_Oxygen:
           begin
             CompilerName := item.SubItems[1];
@@ -449,18 +484,6 @@ begin
 
              ScrollMemo(Console);
           end;
-
-          Lng_CSharp:
-          begin
-            CompilerName := item.SubItems[1];
-            FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
-            FileName     := FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.cs';
-
-            SynEditCode.Lines.SaveToFile(FileName);
-            CompileAndRunCSharpCode(Console.Lines, CompilerName, FileName, TComponent(Sender).Tag = 1);
-            ScrollMemo(Console);
-          end;
-
         end;
 
       end;
