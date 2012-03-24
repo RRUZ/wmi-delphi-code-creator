@@ -144,6 +144,27 @@ Source: Microsoft_C++\VS11\GetWMI_Info.vcxproj; DestDir: {app}\Microsoft_C++\VS1
 Source: Microsoft_C++\VS11\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS11
 Source: Microsoft_C++\VS11\stdafx.h; DestDir: {app}\Microsoft_C++\VS11
 Source: Microsoft_C++\VS11\targetver.h; DestDir: {app}\Microsoft_C++\VS11
+Source: CSharp\VS11\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS11\Properties
+Source: CSharp\VS11\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS11
+Source: CSharp\VS11\GetWMI_Info.sln; DestDir: {app}\CSharp\VS11
+Source: CSharp\VS2008\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS2008\Properties
+Source: CSharp\VS2008\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS2008
+Source: CSharp\VS2008\GetWMI_Info.sln; DestDir: {app}\CSharp\VS2008
+Source: CSharp\VS2010\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS2010\Properties
+Source: CSharp\VS2010\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS2010
+Source: CSharp\VS2010\GetWMI_Info.sln; DestDir: {app}\CSharp\VS2010
+Source: AStyle\bin\AStyle.exe; DestDir: {app}\AStyle\bin
+Source: AStyle\doc\astyle.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\index.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\install.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\license.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\links.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\news.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\notes.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\scripts.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\styles.css; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\subversion.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\vsinstall.html; DestDir: {app}\AStyle\doc
 Source: Templates\TemplateConsoleAppBorlandCPP.cpp; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppCSharp.cs; DestDir: {app}\Templates\
 Source: Templates\TemplateConsoleAppDelphi.pas; DestDir: {app}\Templates\
@@ -171,6 +192,7 @@ Source: Templates\TemplateNonStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\T
 Source: Templates\TemplateNonStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerMicrosoftCPP.cpp; DestDir: {app}\Templates\
 Source: Templates\TemplateNonStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
+Source: Templates\Templates.xml; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerCSharp.cs; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\
@@ -179,27 +201,12 @@ Source: Templates\TemplateStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Temp
 Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerMicrosoftCPP.cpp; DestDir: {app}\Templates\
 Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\
-Source: CSharp\VS11\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS11\Properties
-Source: CSharp\VS11\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS11
-Source: CSharp\VS11\GetWMI_Info.sln; DestDir: {app}\CSharp\VS11
-Source: CSharp\VS2008\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS2008\Properties
-Source: CSharp\VS2008\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS2008
-Source: CSharp\VS2008\GetWMI_Info.sln; DestDir: {app}\CSharp\VS2008
-Source: CSharp\VS2010\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS2010\Properties
-Source: CSharp\VS2010\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS2010
-Source: CSharp\VS2010\GetWMI_Info.sln; DestDir: {app}\CSharp\VS2010
-Source: AStyle\bin\AStyle.exe; DestDir: {app}\AStyle\bin
-Source: AStyle\doc\astyle.html; DestDir: {app}\AStyle\doc
-Source: AStyle\doc\index.html; DestDir: {app}\AStyle\doc
-Source: AStyle\doc\install.html; DestDir: {app}\AStyle\doc
-Source: AStyle\doc\license.html; DestDir: {app}\AStyle\doc
-Source: AStyle\doc\links.html; DestDir: {app}\AStyle\doc
-Source: AStyle\doc\news.html; DestDir: {app}\AStyle\doc
-Source: AStyle\doc\notes.html; DestDir: {app}\AStyle\doc
-Source: AStyle\doc\scripts.html; DestDir: {app}\AStyle\doc
-Source: AStyle\doc\styles.css; DestDir: {app}\AStyle\doc
-Source: AStyle\doc\subversion.html; DestDir: {app}\AStyle\doc
-Source: AStyle\doc\vsinstall.html; DestDir: {app}\AStyle\doc
+Source: Templates\Template_BorlandCpp.cpp; DestDir: {app}\Templates\
+Source: Templates\Template_Csharp.cs; DestDir: {app}\Templates\
+Source: Templates\Template_Delphi.pas; DestDir: {app}\Templates\
+Source: Templates\Template_FPC.pas; DestDir: {app}\Templates\
+Source: Templates\Template_MicrosoftCpp.cpp; DestDir: {app}\Templates\
+Source: Templates\Template_Oxygen.pas; DestDir: {app}\Templates\
 [Setup]
 UsePreviousLanguage=no
 AppName={#MyAppName}
@@ -312,7 +319,6 @@ Name: {app}\Microsoft_C++\VS2008
 Name: {app}\Microsoft_C++\VS2010
 Name: {app}\Styles
 Name: {app}\Microsoft_C++\VS11
-Name: {app}\Templates
 Name: {app}\CSharp
 Name: {app}\CSharp\VS11
 Name: {app}\CSharp\VS2008
@@ -320,6 +326,7 @@ Name: {app}\CSharp\VS2010
 Name: {app}\AStyle
 Name: {app}\AStyle\bin
 Name: {app}\AStyle\doc
+Name: {app}\Templates
 [Icons]
 Name: {group}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}
 Name: {userdesktop}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}

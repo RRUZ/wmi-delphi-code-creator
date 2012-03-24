@@ -56,6 +56,7 @@ type
     FDisableVClStylesNC: Boolean;
     FDefaultLanguage: integer;
     FAStyleCmdLine: string;
+    FMicrosoftCppCmdLine: string;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -91,6 +92,8 @@ type
 
     property CheckForUpdates : Boolean read FCheckForUpdates write FCheckForUpdates;
     property AStyleCmdLine : string read FAStyleCmdLine write FAStyleCmdLine;
+    property MicrosoftCppCmdLine : string read FMicrosoftCppCmdLine write FMicrosoftCppCmdLine;
+
   end;
 
 
@@ -151,6 +154,17 @@ type
     Label14: TLabel;
     SynCSSyn1: TSynCSSyn;
     SynCppSyn1: TSynCppSyn;
+    Label15: TLabel;
+    ComboBoxLanguageTemplate: TComboBox;
+    Label16: TLabel;
+    ComboBox1: TComboBox;
+    Label17: TLabel;
+    ComboBox2: TComboBox;
+    TabSheet8: TTabSheet;
+    Label18: TLabel;
+    EditMicrosoftCppSwitch: TMemo;
+    Memo1: TMemo;
+    Label19: TLabel;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -563,6 +577,8 @@ begin
     Settings.DisableVClStylesNC            := iniFile.ReadBool('Global', 'DisableVClStylesNC', False);
 
     Settings.AStyleCmdLine                 := iniFile.ReadString('Global', 'AStyleCmdLine', '--style=allman "%s"');
+    Settings.MicrosoftCppCmdLine           := iniFile.ReadString('Global', 'MicrosoftCppCmdLine', '/EHsc /Fe"[OutPutPath][FileName].exe" /Fo"[OutPutPath][FileName].obj" "[OutPutPath][FileName].cpp"');
+
     Settings.DefaultLanguage               := iniFile.ReadInteger('Global', 'DefaultLanguage', Integer(TSourceLanguages.Lng_Delphi));
   finally
     iniFile.Free;
@@ -599,7 +615,7 @@ begin
     iniFile.WriteBool('Global', 'DisableVClStylesNC', Settings.DisableVClStylesNC);
     iniFile.WriteInteger('Global', 'DefaultLanguage', Settings.DefaultLanguage);
     iniFile.WriteString('Global', 'AStyleCmdLine', Settings.AStyleCmdLine);
-
+    iniFile.WriteString('Global', 'MicrosoftCppCmdLine', Settings.MicrosoftCppCmdLine);
   finally
     iniFile.Free;
   end;
@@ -716,6 +732,7 @@ begin
     FSettings.Formatter                     := CbFormatter.Text;
     FSettings.CheckForUpdates               := CheckBoxUpdates.Checked;
     FSettings.AStyleCmdLine                 := EditAStyle.Text;
+    FSettings.MicrosoftCppCmdLine           := EditMicrosoftCppSwitch.Text;
     FSettings.DisableVClStylesNC            := CheckBoxDisableVClStylesNC.Checked;
     FSettings.DefaultLanguage               := Integer(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex]);
 
@@ -799,6 +816,7 @@ end;
 procedure TFrmSettings.ComboBoxLanguageThemesChange(Sender: TObject);
 begin
   case TSourceLanguages(ComboBoxLanguageThemes.Items.Objects[ComboBoxLanguageThemes.ItemIndex]) of
+
     Lng_Delphi      :begin
                       SynEditCode.Highlighter:=SynPasSyn1;
                       SynEditCode.Lines.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Templates\Template_Delphi.pas' );
@@ -905,6 +923,7 @@ begin
   begin
     ComboBoxLanguageSel.Items.AddObject(ListSourceLanguages[i], TObject(i));
     ComboBoxLanguageThemes.Items.AddObject(ListSourceLanguages[i], TObject(i));
+    ComboBoxLanguageTemplate.Items.AddObject(ListSourceLanguages[i], TObject(i));
   end;
 
   FSettings:=TSettings.Create;
@@ -979,6 +998,7 @@ begin
   CheckBoxDisableVClStylesNC.Checked := FSettings.DisableVClStylesNC;
 
   EditAStyle.Text                    := FSettings.AStyleCmdLine;
+  EditMicrosoftCppSwitch.Text        := FSettings.MicrosoftCppCmdLine;
 
   LoadCurrentThemeFont(Self,ComboBoxFont.Text,StrToInt(EditFontSize.Text));
   LoadCurrentTheme(Self,ComboBoxTheme.Text);
