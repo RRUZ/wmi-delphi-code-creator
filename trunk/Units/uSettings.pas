@@ -57,6 +57,7 @@ type
     FDefaultLanguage: integer;
     FAStyleCmdLine: string;
     FMicrosoftCppCmdLine: string;
+    FCSharpCmdLine: string;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -93,6 +94,7 @@ type
     property CheckForUpdates : Boolean read FCheckForUpdates write FCheckForUpdates;
     property AStyleCmdLine : string read FAStyleCmdLine write FAStyleCmdLine;
     property MicrosoftCppCmdLine : string read FMicrosoftCppCmdLine write FMicrosoftCppCmdLine;
+    property CSharpCmdLine : string read FCSharpCmdLine write FCSharpCmdLine;
 
   end;
 
@@ -163,7 +165,7 @@ type
     TabSheet8: TTabSheet;
     Label18: TLabel;
     EditMicrosoftCppSwitch: TMemo;
-    Memo1: TMemo;
+    EditCSharpSwitch: TMemo;
     Label19: TLabel;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
@@ -578,7 +580,7 @@ begin
 
     Settings.AStyleCmdLine                 := iniFile.ReadString('Global', 'AStyleCmdLine', '--style=allman "%s"');
     Settings.MicrosoftCppCmdLine           := iniFile.ReadString('Global', 'MicrosoftCppCmdLine', '/EHsc /Fe"[OutPutPath][FileName].exe" /Fo"[OutPutPath][FileName].obj" "[OutPutPath][FileName].cpp"');
-
+    Settings.CSharpCmdLine                 := iniFile.ReadString('Global', 'CSharpCmdLine', '/target:exe /platform:x86 /r:System.Management.dll /r:System.dll /out:"[OutPutPath][FileName].exe" "[OutPutPath][FileName].cs"');
     Settings.DefaultLanguage               := iniFile.ReadInteger('Global', 'DefaultLanguage', Integer(TSourceLanguages.Lng_Delphi));
   finally
     iniFile.Free;
@@ -616,6 +618,7 @@ begin
     iniFile.WriteInteger('Global', 'DefaultLanguage', Settings.DefaultLanguage);
     iniFile.WriteString('Global', 'AStyleCmdLine', Settings.AStyleCmdLine);
     iniFile.WriteString('Global', 'MicrosoftCppCmdLine', Settings.MicrosoftCppCmdLine);
+    iniFile.WriteString('Global', 'CSharpCmdLine', Settings.CSharpCmdLine);
   finally
     iniFile.Free;
   end;
@@ -733,6 +736,7 @@ begin
     FSettings.CheckForUpdates               := CheckBoxUpdates.Checked;
     FSettings.AStyleCmdLine                 := EditAStyle.Text;
     FSettings.MicrosoftCppCmdLine           := EditMicrosoftCppSwitch.Text;
+    FSettings.CSharpCmdLine                := EditCSharpSwitch.Text;
     FSettings.DisableVClStylesNC            := CheckBoxDisableVClStylesNC.Checked;
     FSettings.DefaultLanguage               := Integer(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex]);
 
@@ -999,6 +1003,7 @@ begin
 
   EditAStyle.Text                    := FSettings.AStyleCmdLine;
   EditMicrosoftCppSwitch.Text        := FSettings.MicrosoftCppCmdLine;
+  EditCSharpSwitch.Text              := FSettings.CSharpCmdLine;
 
   LoadCurrentThemeFont(Self,ComboBoxFont.Text,StrToInt(EditFontSize.Text));
   LoadCurrentTheme(Self,ComboBoxTheme.Text);

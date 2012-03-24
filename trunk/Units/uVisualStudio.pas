@@ -101,8 +101,11 @@ begin
   if Run then
   begin
     ExeFile := ExtractFilePath(ProjectFile) + 'release\' + ChangeFileExt(ExtractFileName(ProjectFile), '.exe');
+    if not FileExists(ExeFile) then
+     ExeFile := ExtractFilePath(ProjectFile) + 'bin\release\' + ChangeFileExt(ExtractFileName(ProjectFile), '.exe');
+
     if FileExists(ExeFile) then
-      ShellExecute(0, nil, PChar(Format('"%s"',[ExeFile])), nil, nil, SW_SHOWNORMAL)
+     ShellExecute(0, nil, PChar(Format('"%s"',[ExeFile])), nil, nil, SW_SHOWNORMAL)
     else
       MsgWarning(Format('Could not find %s', [ExeFile]));
   end;

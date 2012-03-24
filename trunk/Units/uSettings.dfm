@@ -65,7 +65,7 @@ object FrmSettings: TFrmSettings
         end
         object Label11: TLabel
           Left = 16
-          Top = 175
+          Top = 147
           Width = 150
           Height = 13
           Caption = 'Default Programming Language'
@@ -119,7 +119,7 @@ object FrmSettings: TFrmSettings
         end
         object CheckBoxUpdates: TCheckBox
           Left = 16
-          Top = 152
+          Top = 124
           Width = 177
           Height = 17
           Caption = 'Check for updates in the startup'
@@ -127,7 +127,7 @@ object FrmSettings: TFrmSettings
         end
         object ComboBoxLanguageSel: TComboBox
           Left = 16
-          Top = 194
+          Top = 166
           Width = 220
           Height = 21
           Style = csDropDownList
@@ -416,8 +416,10 @@ object FrmSettings: TFrmSettings
         end
       end
       object TabSheet8: TTabSheet
-        Caption = 'C++ Compiler Options'
+        Caption = 'Compiler Options'
         ImageIndex = 5
+        ExplicitLeft = 0
+        ExplicitTop = 28
         object Label18: TLabel
           Left = 8
           Top = 16
@@ -428,9 +430,9 @@ object FrmSettings: TFrmSettings
         object Label19: TLabel
           Left = 8
           Top = 125
-          Width = 266
+          Width = 170
           Height = 13
-          Caption = 'Addiional Microsoft C++ compilers (register one by line)'
+          Caption = 'C# Compiler Command-Line options'
         end
         object EditMicrosoftCppSwitch: TMemo
           Left = 8
@@ -440,7 +442,7 @@ object FrmSettings: TFrmSettings
           ScrollBars = ssBoth
           TabOrder = 0
         end
-        object Memo1: TMemo
+        object EditCSharpSwitch: TMemo
           Left = 8
           Top = 144
           Width = 529
