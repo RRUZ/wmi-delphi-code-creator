@@ -1,6 +1,6 @@
 {**************************************************************************************************}
 {                                                                                                  }
-{ Unit uPropValueList                                                                              }
+{ Unit uWmiPropertyValue                                                                           }
 { Unit for the WMI Delphi Code Creator                                                             }
 {                                                                                                  }
 { The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
@@ -11,7 +11,7 @@
 { ANY KIND, either express or implied. See the License for the specific language governing rights  }
 { and limitations under the License.                                                               }
 {                                                                                                  }
-{ The Original Code is uPropValueList.pas.                                                         }
+{ The Original Code is uWmiPropertyValue.pas.                                                      }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
 { Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
@@ -19,53 +19,43 @@
 {                                                                                                  }
 {**************************************************************************************************}
 
-unit uPropValueList;
+unit uWmiPropertyValue;
 
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Grids, ValEdit;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.Menus, Vcl.ActnPopup;
 
 type
-  TFrmValueList = class(TForm)
-    ValueList: TValueListEditor;
+  TFrmWMIPropValue = class(TForm)
+    MemoValue: TMemo;
+    PopupActionBar1: TPopupActionBar;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure ValueListDblClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
-    FWMIProperties: TStrings;
+    { Private declarations }
   public
-     property WMIProperties: TStrings Read FWMIProperties Write FWMIProperties;
+    { Public declarations }
   end;
-
 
 implementation
 
+uses
+ uStdActionsPopMenu;
+
 {$R *.dfm}
 
-uses
- uWmi_Metadata,
- uWmiPropertyValue;
-
-procedure TFrmValueList.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TFrmWMIPropValue.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
  Action:=caFree;
 end;
 
-procedure TFrmValueList.ValueListDblClick(Sender: TObject);
-Var
- Key : string;
- Index : Integer;
- CimType : Integer;
- Frm : TFrmWMIPropValue;
+procedure TFrmWMIPropValue.FormCreate(Sender: TObject);
 begin
-   Key :=ValueList.Keys[ValueList.Row];
-   Index:=FWMIProperties.IndexOf(Key);
-   CimType:=Integer(FWMIProperties.Objects[Index]);
-   Frm:=TFrmWMIPropValue.Create(nil);
-   Frm.Caption:=Format('%s Type %s',[Key, CIMTypeStr(CimType)]);
-   Frm.MemoValue.Text:= ValueList.Values[Key];
-   Frm.Show;
+  FillPopupActionBar(PopupActionBar1);
+  AssignStdActionsPopUpMenu(Self, PopupActionBar1);
 end;
 
 end.

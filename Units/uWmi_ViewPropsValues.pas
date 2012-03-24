@@ -56,6 +56,7 @@ type
     procedure SendMsg;
   public
     constructor Create(const Server, User, PassWord, NameSpace, WQL: string;
+      ListWMIProperties : TStrings;
       ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>); overload;
     destructor Destroy; override;
     procedure Execute; override;
@@ -89,17 +90,18 @@ type
     FWmiClass: string;
     FWmiNamespace: string;
     FWQL:    TStrings;
-    FWmiproperties: TStrings;
+    FWQLProperties: TStrings;
     FDataLoaded: boolean;
     FContainValues: boolean;
     FThread: TWMIQueryToListView;
+    FWMIProperties: TStrings;
     procedure Log(const msg: string);
     procedure SetWmiClass(const Value: string);
     procedure SetWmiNamespace(const Value: string);
     procedure ShowDetails();
   public
     property ContainValues: boolean Read FContainValues;
-    property Wmiproperties: TStrings Read FWmiproperties Write FWmiproperties;
+    property WQLProperties: TStrings Read FWQLProperties Write FWQLProperties;
     property WmiClass: string Read FWmiClass Write SetWmiClass;
     property WmiNamespace: string Read FWmiNamespace Write SetWmiNamespace;
     property WQL: TStrings Read FWQL;
@@ -133,20 +135,20 @@ begin
     Frm.WmiNamespace := Namespace;
     Frm.Caption      := 'Properties Values for the class ' + WmiClass;
 
-    Frm.Wmiproperties.Clear;
+    Frm.WQLProperties.Clear;
     if (Properties=nil) or (Properties.Count=0) then
     begin
      WmiMetaData:=TWMiClassMetaData.Create(NameSpace,WmiClass);
      try
       for i:=0 to WmiMetaData.PropertiesCount-1 do
-        Frm.Wmiproperties.Add(WmiMetaData.Properties[i].Name)
+        Frm.WQLProperties.Add(WmiMetaData.Properties[i].Name)
      finally
       WmiMetaData.Free;
      end;
     end
     else
       for i:=0 to Properties.Count-1 do
-        Frm.Wmiproperties.Add(Properties[i]);
+        Frm.WQLProperties.Add(Properties[i]);
 
     Frm.LoadValues;
     Frm.Show();
@@ -172,12 +174,13 @@ end;
 procedure TFrmWmiVwProps.FormCreate(Sender: TObject);
 begin
   FDataLoaded := False;
-  FWmiproperties := TStringList.Create;
+  FWQLProperties := TStringList.Create;
   FWQL    := TStringList.Create;
   FContainValues := False;
   FThread := nil;
   ListViewGrid.DoubleBuffered := True;
   FValues:=TList<TStrings>.Create;
+  FWMIProperties:=TStringList.Create;
   //NullStrictConvert:=False;
 end;
 
@@ -185,7 +188,8 @@ procedure TFrmWmiVwProps.FormDestroy(Sender: TObject);
 Var
  i : integer;
 begin
-  FWmiproperties.Free;
+  FWMIProperties.Free;
+  FWQLProperties.Free;
   FWQL.Free;
    if Assigned(FThread) and not FThread.Terminated then
     FThread.Terminate;
@@ -226,17 +230,17 @@ var
 begin
   FDataLoaded := True;
   FWQL.Add('Select');
-  if FWmiproperties.Count = 0 then
+  if FWQLProperties.Count = 0 then
     FWQL.Add(' * ')
   else
-    for i := 0 to FWmiproperties.Count - 1 do
-      if i < FWmiproperties.Count - 1 then
-        FWQL.Add(FWmiproperties[i] + ',')
+    for i := 0 to FWQLProperties.Count - 1 do
+      if i < FWQLProperties.Count - 1 then
+        FWQL.Add(FWQLProperties[i] + ',')
       else
-        FWQL.Add(FWmiproperties[i]);
+        FWQL.Add(FWQLProperties[i]);
 
   FWQL.Add(' From ' + FWmiClass);
-  FThread := TWMIQueryToListView.Create('.', '', '', FWmiNamespace, FWQL.Text, ListViewGrid, Log, FValues);
+  FThread := TWMIQueryToListView.Create('.', '', '', FWmiNamespace, FWQL.Text, FWMIProperties, ListViewGrid, Log, FValues);
 end;
 
 procedure TFrmWmiVwProps.Log(const msg: string);
@@ -268,6 +272,7 @@ begin
  RowData:=FValues[ListViewGrid.Selected.Index];
 
  Frm:=TFrmValueList.Create(nil);
+ Frm.WMIProperties:=FWMIProperties;
  Frm.Caption:='Properties '+WmiClass;
   for i := 0 to ListViewGrid.Columns.Count-1 do
     Frm.ValueList.InsertRow(ListViewGrid.Columns[i].Caption, RowData[i], True);
@@ -339,6 +344,7 @@ begin
 end;
 
 constructor TWMIQueryToListView.Create(const Server, User, PassWord, NameSpace, WQL: string;
+      ListWMIProperties : TStrings;
       ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>);
 begin
   inherited Create(False);
@@ -350,7 +356,7 @@ begin
   FPassword := PassWord;
   FNameSpace := NameSpace;
   //FList           := TList.Create;
-  FProperties := TStringList.Create;
+  FProperties := ListWMIProperties;
   FCallback := CallBack;
   FValues   := Values;
 end;
@@ -383,7 +389,7 @@ begin
   FWMIService    := Unassigned;
   FWbemObjectSet := Unassigned;
   FWbemObject    := Unassigned;
-  FProperties.Free;
+  //FProperties.Free;
   inherited;
 end;
 
@@ -430,7 +436,8 @@ begin
           PropItem := Unassigned;
         end;
 
-        FProperties.Add('Object Path');
+
+        FProperties.AddObject('Object Path', TObject(wbemCimtypeString));
         Synchronize(CreateColumns);
       end;
 
