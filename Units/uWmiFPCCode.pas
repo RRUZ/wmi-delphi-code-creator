@@ -38,8 +38,14 @@ const
 
 type
   TFPCWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
+  private
+   type TFPCHelperCodeGen=class(TWmiCodeGenerator.THelperCodeGen)
+     procedure AddCode(const WmiProperty: string);override;
+   end;
   public
     procedure GenerateCode(Props: TStrings);override;
+    constructor Create;
+    destructor Destroy; override;
   end;
 
   TFPCWmiEventCodeGenerator=class(TWmiEventCodeGenerator)
@@ -65,8 +71,91 @@ uses
   uWmi_Metadata,
   SysUtils;
 
+{ TFPCWmiClassCodeGenerator.TFPCHelperCodeGen }
+
+procedure TFPCWmiClassCodeGenerator.TFPCHelperCodeGen.AddCode(
+  const WmiProperty: string);
+var
+  PropertyMetaData : TWMiPropertyMetaData;
+  k,j : integer;
+
+    function ParseMapValue(const MapValue:string): string;
+    begin
+     Result:=MapValue;
+      if StartsText('0x',MapValue) then
+       Result:=StringReplace(Result,'0x','$',[rfIgnoreCase]);
+    end;
+
+begin
+  inherited;
+  PropertyMetaData:=WMiClassMetaData.PropertyByName[WmiProperty];
+
+
+  //sanity check for valid values
+  if (PropertyMetaData.ValidValues.Count>0) and (PropertyMetaData.ValidMapValues.Count>0) then
+    for j:=0 to PropertyMetaData.ValidValues.Count-1 do
+     if not TryStrToInt(Trim(ParseMapValue(PropertyMetaData.ValidMapValues[j])), k) then
+      exit;
+
+
+  if (PropertyMetaData.ValidValues.Count>0) and (PropertyMetaData.ValidMapValues.Count=0) then
+  begin
+    WmiCodeGenerator.TemplateCode.Add(Format('function Get%sAsString(const %s:%s) : string;',[WmiProperty,'ReturnValue','Integer']));
+    WmiCodeGenerator.TemplateCode.Add('begin');
+    WmiCodeGenerator.TemplateCode.Add(Format('Result:=%s;',[QuotedStr('')]));
+    WmiCodeGenerator.TemplateCode.Add(Format('  case %s of',['ReturnValue']));
+    for j:=0 to PropertyMetaData.ValidValues.Count-1 do
+      WmiCodeGenerator.TemplateCode.Add(Format('    %d : Result:=%s;',[j,QuotedStr(PropertyMetaData.ValidValues[j])]));
+    WmiCodeGenerator.TemplateCode.Add('  end;');
+    WmiCodeGenerator.TemplateCode.Add('end;');
+    WmiCodeGenerator.TemplateCode.Add('');
+
+    HelperFuncts.Add(WmiProperty, Format('Get%sAsString',[WmiProperty]));
+  end
+  else
+  if (PropertyMetaData.ValidValues.Count>0) and (PropertyMetaData.ValidMapValues.Count>0) then
+  begin
+    WmiCodeGenerator.TemplateCode.Add(Format('function Get%sAsString(const %s:%s) : string;',[WmiProperty,'ReturnValue','Integer']));
+    WmiCodeGenerator.TemplateCode.Add('begin');
+    WmiCodeGenerator.TemplateCode.Add(Format('Result:=%s;',[QuotedStr('')]));
+    WmiCodeGenerator.TemplateCode.Add(Format('  case %s of',['ReturnValue']));
+
+    for j:=0 to PropertyMetaData.ValidValues.Count-1 do
+    begin
+     if PropertyMetaData.ValidMapValues[j]='..' then
+     begin
+      k:=WmiCodeGenerator.TemplateCode.Count-1;
+      WmiCodeGenerator.TemplateCode[k]:=Copy(WmiCodeGenerator.TemplateCode[k],1,Length(WmiCodeGenerator.TemplateCode[k])-1);//remove ;
+      WmiCodeGenerator.TemplateCode.Add(Format('    else Result:=%s;',[QuotedStr(PropertyMetaData.ValidValues[j])]));
+     end
+     else
+     WmiCodeGenerator.TemplateCode.Add(Format('    %s : Result:=%s;',[ParseMapValue(PropertyMetaData.ValidMapValues[j]),QuotedStr(PropertyMetaData.ValidValues[j])]));
+    end;
+    WmiCodeGenerator.TemplateCode.Add('  end;');
+    WmiCodeGenerator.TemplateCode.Add('end;');
+    WmiCodeGenerator.TemplateCode.Add('');
+
+    HelperFuncts.Add(WmiProperty, Format('Get%sAsString',[WmiProperty]));
+  end;
+end;
 
 { TFPCWmiClassCodeGenerator }
+constructor TFPCWmiClassCodeGenerator.Create;
+begin
+  inherited;
+  if Assigned(HelperCodeGen) then
+   HelperCodeGen.Free;
+
+  HelperCodeGen:=TFPCHelperCodeGen.Create;
+end;
+
+
+destructor TFPCWmiClassCodeGenerator.Destroy;
+begin
+
+  inherited;
+end;
+
 procedure TFPCWmiClassCodeGenerator.GenerateCode(Props: TStrings);
 var
   StrCode: string;
@@ -76,7 +165,6 @@ var
   Len: integer;
   Singleton: boolean;
   Padding: string;
-  TemplateCode : string;
 begin
   Singleton := WMiClassMetaData.IsSingleton;
   Descr     := GetWmiClassDescription;
@@ -89,43 +177,37 @@ begin
     if Singleton then
     begin
       Padding := '';
-      {
-      if UseHelperFunctions then
-        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
-      else
-        TemplateCode:='';
-      }
         StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_FPC, ModeCodeGeneration, TWmiGenCode.WmiClassesSingleton));
     end
     else
     begin
       Padding := '  ';
-      {
-      if UseHelperFunctions then
-        TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
-      else
-        TemplateCode:='';
-      }
       StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_FPC, ModeCodeGeneration, TWmiGenCode.WmiClasses));
     end;
+
+    HelperCodeGen.WmiCodeGenerator:=Self;
+    TemplateCode.Clear;
+    if UseHelperFunctions then
+    for i := 0 to Props.Count - 1 do
+      HelperCodeGen.AddCode(Props.Names[i]);
 
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNameSpace, [rfReplaceAll]);
-    StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode.Text, [rfReplaceAll]);
 
 
     Len := GetMaxLengthItemName(Props) + 3;
 
     if Props.Count > 0 then
       for i := 0 to Props.Count - 1 do
-        if UseHelperFunctions then
+        if UseHelperFunctions and HelperCodeGen.HelperFuncts.ContainsKey(Props.Names[i]) and not WMiClassMetaData.PropertyByName[Props.Names[i]].IsArray then
         begin
-          DynCode.Add(Padding + Format(
-            '  sValue:= VarStrNull(FWbemObject.Properties_.Item(''%s'').Value);', [Props.Names[i]]));
-          DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
-            Len) + 's %%s'',[sValue]));// %s', [Props.Names[i], Props.ValueFromIndex[i]]));
+          //DynCode.Add(Padding + Format('  sValue:= VarStrNull(FWbemObject.Properties_.Item(''%s'').Value);', [Props.Names[i]]));
+          DynCode.Add(Padding + Format('  sValue:= Get%sAsString(FWbemObject.Properties_.Item(''%s'').Value);', [Props.Names[i], Props.Names[i]]));
+
+          DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[sValue]));// %s', [Props.Names[i], Props.ValueFromIndex[i]]));
         end
         else
         begin
@@ -394,6 +476,7 @@ begin
      ClassDescr.Free;
   end;
 end;
+
 
 
 end.

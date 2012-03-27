@@ -195,7 +195,7 @@ begin
                     WmiCodeGenerator:=TFPCWmiClassCodeGenerator.Create;
                     try
                       WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                      WmiCodeGenerator.UseHelperFunctions:=Settings.FPCWmiClassHelperFuncts;
                       WmiCodeGenerator.GenerateCode(Props);
                       FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
@@ -209,7 +209,7 @@ begin
                     WmiCodeGenerator:=TOxygenWmiClassCodeGenerator.Create;
                     try
                       WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
+                      WmiCodeGenerator.UseHelperFunctions:=False;
                       WmiCodeGenerator.GenerateCode(Props);
                       FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally

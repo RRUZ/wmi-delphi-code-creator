@@ -25,6 +25,7 @@ interface
 
 uses
   uWmi_Metadata,
+  Generics.Collections,
   Classes;
 
 type
@@ -43,22 +44,39 @@ const
 
 type
   TWmiCodeGenerator=class
+  type
+    THelperCodeGen = class
+    private
+     FWMiClassMetaData: TWMiClassMetaData;
+     FWmiCodeGenerator: TWmiCodeGenerator;
+     FHelperFuncts: TDictionary<string,string>;
+    public
+     procedure AddCode(const WmiProperty : string);virtual;
+     property WMiClassMetaData : TWMiClassMetaData read FWMiClassMetaData write FWMiClassMetaData;
+     property WmiCodeGenerator : TWmiCodeGenerator read FWmiCodeGenerator write FWmiCodeGenerator;
+     property HelperFuncts: TDictionary<string,string>  Read FHelperFuncts write FHelperFuncts;
+     constructor Create;
+     destructor Destroy; override;
+    end;
   private
+    FHelperCodeGen : THelperCodeGen;
     FUseHelperFunctions: boolean;
     FModeCodeGeneration: TWmiCode;
     FOutPutCode: TStrings;
-    FTemplateCode : string;
+    FTemplateCode : TStrings;
     FWMiClassMetaData: TWMiClassMetaData;
     function GetWmiClass: string;
     function GetWmiNameSpace: string;
+    procedure SetWMiClassMetaData(const Value: TWMiClassMetaData);
   public
+    property HelperCodeGen : THelperCodeGen read FHelperCodeGen write FHelperCodeGen;
     property WmiNameSpace : string read GetWmiNameSpace;
     property WmiClass : string Read GetWmiClass;
     property UseHelperFunctions : boolean read FUseHelperFunctions write  FUseHelperFunctions;
     property ModeCodeGeneration:TWmiCode read FModeCodeGeneration write FModeCodeGeneration;
     property OutPutCode : TStrings read FOutPutCode;
-    property WMiClassMetaData : TWMiClassMetaData read FWMiClassMetaData write FWMiClassMetaData;
-    property TemplateCode : string read FTemplateCode write FTemplateCode;
+    property WMiClassMetaData : TWMiClassMetaData read FWMiClassMetaData write SetWMiClassMetaData;
+    property TemplateCode : TStrings read FTemplateCode write FTemplateCode;
     procedure GenerateCode(Props: TStrings);virtual;
     constructor Create;
     destructor Destroy; override;
@@ -134,11 +152,18 @@ begin
   inherited;
   FUseHelperFunctions:=False;
   FOutPutCode:=TStringList.Create;
+  FTemplateCode:=TStringList.Create;
   FModeCodeGeneration:=TWmiCode.WmiCode_Default;
+  HelperCodeGen:=THelperCodeGen.Create;
+  HelperCodeGen.WmiCodeGenerator:=Self;
 end;
 
 destructor TWmiCodeGenerator.Destroy;
 begin
+  if HelperCodeGen<>nil then
+   HelperCodeGen.Free;
+
+  FTemplateCode.Free;
   FOutPutCode.Free;
   inherited;
 end;
@@ -158,6 +183,12 @@ end;
 function TWmiCodeGenerator.GetWmiNameSpace: string;
 begin
   Result:=FWMiClassMetaData.WmiNameSpace;
+end;
+
+procedure TWmiCodeGenerator.SetWMiClassMetaData(const Value: TWMiClassMetaData);
+begin
+  FHelperCodeGen.FWMiClassMetaData:=Value;
+  FWMiClassMetaData := Value;
 end;
 
 function GetMaxLengthItem(List: TStrings): integer;
@@ -259,6 +290,23 @@ end;
 procedure TWmiMethodCodeGenerator.GenerateCode(ParamsIn, Values: TStrings);
 begin
 //
+end;
+
+{ TWmiCodeGenerator.THelperCodeGen }
+procedure TWmiCodeGenerator.THelperCodeGen.AddCode(const WmiProperty: string);
+begin
+//
+end;
+
+constructor TWmiCodeGenerator.THelperCodeGen.Create;
+begin
+  FHelperFuncts:=TDictionary<string,string>.Create;
+end;
+
+destructor TWmiCodeGenerator.THelperCodeGen.Destroy;
+begin
+  FHelperFuncts.Free;
+  inherited;
 end;
 
 end.
