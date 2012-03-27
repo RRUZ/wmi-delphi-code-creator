@@ -219,7 +219,7 @@ type
     property Name : string read FName;
     property Value : string read FValue;
   end;
-
+  //WMI and CIM Concepts and Terminology http://msdn.microsoft.com/en-us/windows/hardware/gg463464
   TWMiPropertyMetaData=class
   private
     FName: string;
@@ -244,6 +244,7 @@ type
     property PascalType : string read FPascalType;
     property ValidValues :  TStrings  read FValidValues;
     property ValidMapValues : TStrings  read FValidMapValues;
+    //Standard Qualifiers  http://msdn.microsoft.com/en-us/library/windows/desktop/aa393650%28v=vs.85%29.aspx
     property Qualifiers : TList<TWMiQualifierMetaData> read FQualifiers;
   end;
 
@@ -305,7 +306,8 @@ type
     function GetMethodsCount: Integer;
     function GetPropertiesCount: Integer;
     function GetQualifiersCount: Integer;
-    function GetProperty(index: integer): TWMiPropertyMetaData;
+    function GetProperty(index: integer): TWMiPropertyMetaData;overload;
+    function GetProperty(const Name: string): TWMiPropertyMetaData;overload;
     function GetMethod(index: integer): TWMiMethodMetaData;overload;
     function GetMethod(const Name: string): TWMiMethodMetaData;overload;
     function GetDescriptionEx: string;
@@ -323,6 +325,8 @@ type
 
     property PropertiesCount : Integer read GetPropertiesCount;
     property Properties      [index:integer]  : TWMiPropertyMetaData read GetProperty;
+    property PropertyByName  [const Name:String]  : TWMiPropertyMetaData read GetProperty;
+
     property MethodsCount    : Integer read GetMethodsCount;
     property Methods         [index:integer]      : TWMiMethodMetaData read GetMethod;
     property MethodByName    [const Name:String]  : TWMiMethodMetaData read GetMethod;
@@ -1742,6 +1746,22 @@ end;
 function TWMiClassMetaData.GetPropertiesCount: Integer;
 begin
    Result:=FCollectionPropertyMetaData.Count;
+end;
+
+function TWMiClassMetaData.GetProperty(
+  const Name: string): TWMiPropertyMetaData;
+Var
+ i,Index: Integer;
+begin
+  Index:=-1;
+  for i := 0 to FCollectionPropertyMetaData.Count-1 do
+  if SameText(TWMiPropertyMetaData(FCollectionPropertyMetaData[i]).Name, Name) then
+  begin
+   Index:=i;
+   break;
+  end;
+
+  Result:=TWMiPropertyMetaData(FCollectionPropertyMetaData[index]);
 end;
 
 function TWMiClassMetaData.GetProperty(index: integer): TWMiPropertyMetaData;

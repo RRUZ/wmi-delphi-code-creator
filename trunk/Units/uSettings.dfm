@@ -30,7 +30,7 @@ object FrmSettings: TFrmSettings
       Top = 6
       Width = 575
       Height = 428
-      ActivePage = TabSheet4
+      ActivePage = TabSheet2
       Align = alClient
       TabOrder = 0
       object TabSheet4: TTabSheet
@@ -142,18 +142,20 @@ object FrmSettings: TFrmSettings
         end
       end
       object TabSheet2: TTabSheet
-        Caption = 'Delphi Code generation'
+        Caption = 'Object Pascal Code generation'
         ImageIndex = 1
+        ExplicitLeft = 0
+        ExplicitTop = 28
         object Label4: TLabel
           Left = 3
-          Top = 35
+          Top = 99
           Width = 106
           Height = 13
           Caption = 'Delphi WMI class code'
         end
         object LabelDescr: TLabel
           Left = 152
-          Top = 59
+          Top = 123
           Width = 225
           Height = 49
           AutoSize = False
@@ -162,14 +164,14 @@ object FrmSettings: TFrmSettings
         end
         object Label5: TLabel
           Left = 3
-          Top = 275
+          Top = 299
           Width = 116
           Height = 13
           Caption = 'Delphi WMI events code'
         end
         object LabelDescrEvent: TLabel
           Left = 152
-          Top = 307
+          Top = 331
           Width = 225
           Height = 49
           AutoSize = False
@@ -178,7 +180,7 @@ object FrmSettings: TFrmSettings
         end
         object LabelDescrMethod: TLabel
           Left = 152
-          Top = 177
+          Top = 225
           Width = 225
           Height = 49
           AutoSize = False
@@ -187,31 +189,33 @@ object FrmSettings: TFrmSettings
         end
         object Label8: TLabel
           Left = 3
-          Top = 145
+          Top = 201
           Width = 124
           Height = 13
           Caption = 'Delphi WMI methods code'
         end
         object CbDelphiCodeWmiClass: TComboBox
           Left = 152
-          Top = 35
+          Top = 96
           Width = 225
           Height = 21
           Style = csDropDownList
           TabOrder = 1
           OnChange = CbDelphiCodeWmiClassChange
         end
-        object CheckBoxHelper: TCheckBox
+        object CheckBoxDelphiHelperFunc: TCheckBox
           Left = 3
-          Top = 12
-          Width = 350
+          Top = 73
+          Width = 398
           Height = 17
-          Caption = 'Create Helper functions in generated code to handle null values'
+          Caption = 
+            'Create Helper functions in generated delphi code for know values' +
+            ' of properties'
           TabOrder = 0
         end
         object CbDelphiCodeWmiEvent: TComboBox
           Left = 152
-          Top = 272
+          Top = 296
           Width = 225
           Height = 21
           Style = csDropDownList
@@ -220,12 +224,22 @@ object FrmSettings: TFrmSettings
         end
         object CbDelphiCodeWmiMethod: TComboBox
           Left = 152
-          Top = 142
+          Top = 198
           Width = 225
           Height = 21
           Style = csDropDownList
           TabOrder = 2
           OnChange = CbDelphiCodeWmiMethodChange
+        end
+        object CheckBoxFPCHelperFunc: TCheckBox
+          Left = 3
+          Top = 25
+          Width = 430
+          Height = 17
+          Caption = 
+            'Create Helper functions in generated Free Pascal code for know v' +
+            'alues of properties'
+          TabOrder = 4
         end
       end
       object TabSheet1: TTabSheet
@@ -418,8 +432,6 @@ object FrmSettings: TFrmSettings
       object TabSheet8: TTabSheet
         Caption = 'Compiler Options'
         ImageIndex = 5
-        ExplicitLeft = 0
-        ExplicitTop = 28
         object Label18: TLabel
           Left = 8
           Top = 16

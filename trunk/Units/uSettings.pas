@@ -58,6 +58,7 @@ type
     FAStyleCmdLine: string;
     FMicrosoftCppCmdLine: string;
     FCSharpCmdLine: string;
+    FFPCWmiClassHelperFuncts: Boolean;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -69,6 +70,7 @@ type
     property DelphiWmiClassHelperFuncts: Boolean Read FDelphiWmiClassHelperFuncts Write FDelphiWmiClassHelperFuncts;
     property DelphiWmiEventCodeGenMode : Integer Read FDelphiWmiEventCodeGenMode Write FDelphiWmiEventCodeGenMode;
     property DelphiWmiMethodCodeGenMode : Integer Read FDelphiWmiMethodCodeGenMode Write FDelphiWmiMethodCodeGenMode;
+    property FPCWmiClassHelperFuncts: Boolean Read FFPCWmiClassHelperFuncts Write FFPCWmiClassHelperFuncts;
     property ShowImplementedMethods : Boolean read FShowImplementedMethods write FShowImplementedMethods;
     property OutputFolder : string read GetOutputFolder write FOutputFolder;
     property BackGroundColor : TColor read GetBackGroundColor;
@@ -110,7 +112,7 @@ type
     Label4: TLabel;
     CbDelphiCodeWmiClass: TComboBox;
     LabelDescr: TLabel;
-    CheckBoxHelper: TCheckBox;
+    CheckBoxDelphiHelperFunc: TCheckBox;
     TabSheet3: TTabSheet;
     CheckBoxShowImplMethods: TCheckBox;
     Label5: TLabel;
@@ -167,6 +169,7 @@ type
     EditMicrosoftCppSwitch: TMemo;
     EditCSharpSwitch: TMemo;
     Label19: TLabel;
+    CheckBoxFPCHelperFunc: TCheckBox;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -558,6 +561,8 @@ begin
     Settings.FontSize     := iniFile.ReadInteger('Global', 'FontSize', 10);
     Settings.DelphiWmiClassCodeGenMode     := iniFile.ReadInteger('Global', 'DelphiWmiClassCodeGenMode', integer(WmiCode_LateBinding));
     Settings.DelphiWmiClassHelperFuncts    := iniFile.ReadBool('Global', 'DelphiWmiClassHelperFuncts', False);
+    Settings.FPCWmiClassHelperFuncts       := iniFile.ReadBool('Global', 'FPCWmiClassHelperFuncts', False);
+
     Settings.ShowImplementedMethods        := iniFile.ReadBool('Global', 'ShowImplementedMethods', True);
     Settings.DelphiWmiEventCodeGenMode     := iniFile.ReadInteger('Global', 'DelphiWmiEventCodeGenMode', integer(WmiCode_Scripting));
     Settings.OutputFolder                  := iniFile.ReadString('Global', 'OutputFolder', GetTempDirectory);
@@ -598,6 +603,9 @@ begin
     iniFile.WriteInteger('Global', 'FontSize', Settings.FontSize);
     iniFile.WriteInteger('Global', 'DelphiWmiClassCodeGenMode', Settings.DelphiWmiClassCodeGenMode);
     iniFile.WriteBool('Global', 'DelphiWmiClassHelperFuncts', Settings.DelphiWmiClassHelperFuncts);
+    iniFile.WriteBool('Global', 'FPCWmiClassHelperFuncts', Settings.FPCWmiClassHelperFuncts);
+
+    iniFile.WriteBool('Global', 'FPCWmiClassHelperFuncts', Settings.FPCWmiClassHelperFuncts);
     iniFile.WriteBool('Global', 'ShowImplementedMethods', Settings.ShowImplementedMethods);
     iniFile.WriteInteger('Global', 'DelphiWmiEventCodeGenMode', Settings.DelphiWmiEventCodeGenMode);
     iniFile.WriteString('Global', 'OutputFolder', Settings.OutputFolder);
@@ -726,7 +734,8 @@ begin
     FSettings.FontName     := ComboBoxFont.Text;
     FSettings.FontSize     := StrToInt(EditFontSize.Text);
     FSettings.DelphiWmiClassCodeGenMode     := Integer(CbDelphiCodewmiClass.Items.Objects[CbDelphiCodewmiClass.ItemIndex]);//CbDelphiCodewmiClass.ItemIndex;
-    FSettings.DelphiWmiClassHelperFuncts    := CheckBoxHelper.Checked;
+    FSettings.DelphiWmiClassHelperFuncts    := CheckBoxDelphiHelperFunc.Checked;
+    FSettings.FPCWmiClassHelperFuncts       := CheckBoxFPCHelperFunc.Checked;
     FSettings.ShowImplementedMethods        := CheckBoxShowImplMethods.Checked;
     FSettings.DelphiWmiEventCodeGenMode     := Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]);
     FSettings.DelphiWmiMethodCodeGenMode    := Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]);
@@ -994,7 +1003,8 @@ begin
   LabelDescrEvent.Caption:=ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]))];
   LabelDescrMethod.Caption:=ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]))];
 
-  CheckBoxHelper.Checked    := FSettings.FDelphiWmiClassHelperFuncts;
+  CheckBoxDelphiHelperFunc.Checked   := FSettings.FDelphiWmiClassHelperFuncts;
+  CheckBoxFPCHelperFunc.Checked      := FSettings.FDelphiWmiClassHelperFuncts;
   CheckBoxShowImplMethods.Checked    := FSettings.FShowImplementedMethods;
   EditOutputFolder.Text              := FSettings.OutputFolder;
 

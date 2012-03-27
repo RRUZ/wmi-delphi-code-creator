@@ -1,5 +1,28 @@
 //TODO
 {
+  
+  Add metadata resolver (functions) to code
+   delphi done
+   fpc done
+   oxygen
+   C#
+   c++
+
+  Add Arrays support
+   delphi
+   fpc
+   oxygen
+   C#
+   c++
+
+   Add GUI textures + colors , include tectuers files.
+
+
+  create relation map beteen classes , properties and WinApi using 
+
+
+
+ 
   Add detection of additional compilers
   Add option to edit templates
 
