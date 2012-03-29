@@ -31,9 +31,9 @@ uses
 
 {.$DEFINE USE_TabControlFix}
 
-type
-
 {$IFDEF USE_TabControlFix}
+
+type
   TMyTabControlStyleHook = class(TTabControlStyleHook)
   strict private
     procedure AngleTextOut(Canvas: TCanvas; Angle: Integer; X, Y: Integer; const Text: string);
@@ -43,11 +43,6 @@ type
   end;
 {$ENDIF}
 
-  TFormStyleHookNC= class(TMouseTrackControlStyleHook)
-  public
-    procedure PaintBackground(Canvas: TCanvas); override;
-    constructor Create(AControl: TWinControl);  override;
-  end;
 
 implementation
 
@@ -235,28 +230,6 @@ begin
 end;
 {$ENDIF}
 
-
-{ TFormStyleHookNC }
-
-constructor TFormStyleHookNC.Create(AControl: TWinControl);
-begin
-  inherited;
-  OverrideEraseBkgnd := True;
-end;
-
-procedure TFormStyleHookNC.PaintBackground(Canvas: TCanvas);
-var
-  Details: TThemedElementDetails;
-  R: TRect;
-begin
-  if StyleServices.Available then
-  begin
-    Details.Element := teWindow;
-    Details.Part := 0;
-    R := Rect(0, 0, Control.ClientWidth, Control.ClientHeight);
-    StyleServices.DrawElement(Canvas.Handle, Details, R);
-  end;
-end;
 
 
 end.

@@ -355,6 +355,7 @@ var
   //Singleton: boolean;
   Padding: string;
   CimType:Integer;
+  TypeStr : string;
 begin
   //Singleton := WMiClassMetaData.IsSingleton;
   Descr     := GetWmiClassDescription;
@@ -384,12 +385,29 @@ begin
                           begin
                             if Props.Count > 0 then
                               for i := 0 to Props.Count - 1 do
-                                if UseHelperFunctions and HelperCodeGen.HelperFuncts.ContainsKey(Props.Names[i]) and not WMiClassMetaData.PropertyByName[Props.Names[i]].IsArray then
+                                if UseHelperFunctions and HelperCodeGen.HelperFuncts.ContainsKey(Props.Names[i]) and not WMiClassMetaData.Properties[i].IsArray then
                                   DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(
                                     Len) + 's %%s'',[Get%sAsString(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]))
                                 else
+                                {
+                                if WMiClassMetaData.Properties[i].IsArray then
                                 begin
-                                  //DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[FWbemPropertySet.Item(%s, 0).Get_Value]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+
+
+
+
+                                end
+                                else
+                                }
+                                begin
+
+                                  if WMiClassMetaData.Properties[i].IsArray then
+                                   TypeStr:='Array of '+Props.ValueFromIndex[i]
+                                  else
+                                   TypeStr:=Props.ValueFromIndex[i];
+
+
+
                                   CimType:=Integer(Props.Objects[i]);
                                   case CimType of
 
@@ -400,13 +418,13 @@ begin
                                       wbemCimtypeSint32,
                                       wbemCimtypeUint32,
                                       wbemCimtypeSint64,
-                                      wbemCimtypeUint64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%d'',[Integer(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
-                                      wbemCimtypeReal32    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
-                                      wbemCimtypeReal64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+                                      wbemCimtypeUint64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%d'',[Integer(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), TypeStr]));
+                                      wbemCimtypeReal32    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), TypeStr]));
+                                      wbemCimtypeReal64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), TypeStr]));
                                       wbemCimtypeBoolean,
                                       wbemCimtypeDatetime,
                                       wbemCimtypeString,
-                                      wbemCimtypeChar16    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[String(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+                                      wbemCimtypeChar16    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[String(FWbemPropertySet.Item(%s, 0).Get_Value)]));// %s', [Props.Names[i], QuotedStr(Props.Names[i]), TypeStr]));
 
                                             {
                                       wbemCimtypeReference : ;
@@ -426,6 +444,13 @@ begin
                                 else
                                 begin
 
+
+                                  if WMiClassMetaData.Properties[i].IsArray then
+                                   TypeStr:='Array of '+Props.ValueFromIndex[i]
+                                  else
+                                   TypeStr:=Props.ValueFromIndex[i];
+
+
                                   CimType:=Integer(Props.Objects[i]);
                                   case CimType of
 
@@ -436,17 +461,13 @@ begin
                                       wbemCimtypeSint32,
                                       wbemCimtypeUint32,
                                       wbemCimtypeSint64,
-                                      wbemCimtypeUint64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%d'',[Integer(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i],
-                                    Props.ValueFromIndex[i]]));
-                                      wbemCimtypeReal32    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i],
-                                    Props.ValueFromIndex[i]]));
-                                      wbemCimtypeReal64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i],
-                                    Props.ValueFromIndex[i]]));
+                                      wbemCimtypeUint64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%d'',[Integer(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i], TypeStr]));
+                                      wbemCimtypeReal32    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i], TypeStr]));
+                                      wbemCimtypeReal64    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i], TypeStr]));
                                       wbemCimtypeBoolean,
                                       wbemCimtypeDatetime,
                                       wbemCimtypeString,
-                                      wbemCimtypeChar16    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[String(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i],
-                                    Props.ValueFromIndex[i]]));
+                                      wbemCimtypeChar16    : DynCode.Add(Padding + Format('  Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[String(FWbemObject.%s)]));// %s', [Props.Names[i], Props.Names[i], TypeStr]));
 
                                             {
                                       wbemCimtypeReference : DynCode.Add(Padding + Format('wcout << "%s : " << "Not supported" << endl;',[Props.Names[i]]));
@@ -479,6 +500,13 @@ begin
                                 else
                                 begin
                                   //DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[pVal]));', [Props.Names[i]]));
+
+                                  if WMiClassMetaData.Properties[i].IsArray then
+                                   TypeStr:='Array of '+Props.ValueFromIndex[i]
+                                  else
+                                   TypeStr:=Props.ValueFromIndex[i];
+
+
                                   CimType:=Integer(Props.Objects[i]);
                                   case CimType of
                                       wbemCimtypeSint8,
@@ -488,13 +516,13 @@ begin
                                       wbemCimtypeSint32,
                                       wbemCimtypeUint32,
                                       wbemCimtypeSint64,
-                                      wbemCimtypeUint64    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%d'',[Integer(pVal)]));', [Props.Names[i]]));
-                                      wbemCimtypeReal32    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(pVal)]));', [Props.Names[i]]));
-                                      wbemCimtypeReal64    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(pVal)]));', [Props.Names[i]]));
+                                      wbemCimtypeUint64    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%d'',[Integer(pVal)]));//%s', [Props.Names[i], TypeStr]));
+                                      wbemCimtypeReal32    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(pVal)]));//%s', [Props.Names[i], TypeStr]));
+                                      wbemCimtypeReal64    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%n'',[Double(pVal)]));//%s', [Props.Names[i], TypeStr]));
                                       wbemCimtypeBoolean,
                                       wbemCimtypeDatetime,
                                       wbemCimtypeString,
-                                      wbemCimtypeChar16    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[String(pVal)]));', [Props.Names[i]]));
+                                      wbemCimtypeChar16    : DynCode.Add(Padding + Format('Writeln(Format(''%-' + IntToStr(Len) + 's %%s'',[String(pVal)]));//%s', [Props.Names[i], TypeStr]));
                                       {
                                       wbemCimtypeReference : ;
                                       wbemCimtypeObject    : ;

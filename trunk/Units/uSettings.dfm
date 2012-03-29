@@ -3,7 +3,7 @@ object FrmSettings: TFrmSettings
   Top = 302
   BorderStyle = bsDialog
   Caption = 'Settings'
-  ClientHeight = 475
+  ClientHeight = 463
   ClientWidth = 587
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,21 +21,24 @@ object FrmSettings: TFrmSettings
     Left = 0
     Top = 0
     Width = 587
-    Height = 440
+    Height = 428
     Align = alClient
     BorderWidth = 5
     TabOrder = 0
+    ExplicitHeight = 440
     object PageControl1: TPageControl
       Left = 6
       Top = 6
       Width = 575
-      Height = 428
-      ActivePage = TabSheet2
+      Height = 416
+      ActivePage = TabSheet4
       Align = alClient
       TabOrder = 0
+      ExplicitHeight = 428
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
+        ExplicitHeight = 400
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -144,8 +147,7 @@ object FrmSettings: TFrmSettings
       object TabSheet2: TTabSheet
         Caption = 'Object Pascal Code generation'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 28
+        ExplicitHeight = 400
         object Label4: TLabel
           Left = 3
           Top = 99
@@ -244,63 +246,199 @@ object FrmSettings: TFrmSettings
       end
       object TabSheet1: TTabSheet
         Caption = 'GUI Settings'
+        ExplicitHeight = 400
         object Panel3: TPanel
           Left = 0
           Top = 0
           Width = 567
-          Height = 400
+          Height = 388
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 5
           TabOrder = 0
+          ExplicitHeight = 400
           object PageControl2: TPageControl
             Left = 5
             Top = 5
             Width = 557
-            Height = 390
+            Height = 378
             ActivePage = TabSheet6
             Align = alClient
             TabOrder = 0
+            ExplicitHeight = 390
             object TabSheet6: TTabSheet
               Caption = 'Themes (Vcl Styles)'
+              ExplicitLeft = 0
               object Label9: TLabel
                 Left = 3
-                Top = 26
+                Top = 22
                 Width = 45
                 Height = 13
                 Caption = 'VCL Style'
               end
               object ImageVCLStyle: TImage
                 Left = 3
-                Top = 72
-                Width = 350
-                Height = 246
+                Top = 68
+                Width = 246
+                Height = 261
                 Transparent = True
               end
               object CheckBoxDisableVClStylesNC: TCheckBox
-                Left = 3
-                Top = 3
-                Width = 396
+                Left = 0
+                Top = 0
+                Width = 193
                 Height = 17
-                Caption = 
-                  'Disable VCL Styles in Non client Area (Only valid when Vcl Style' +
-                  's are activated)'
+                Caption = 'Disable VCL Styles in Non client Area.'
                 TabOrder = 0
                 OnClick = CheckBoxDisableVClStylesNCClick
               end
               object ComboBoxVCLStyle: TComboBox
                 Left = 3
-                Top = 45
-                Width = 254
+                Top = 41
+                Width = 190
                 Height = 21
                 Style = csDropDownList
                 TabOrder = 1
                 OnChange = ComboBoxVCLStyleChange
               end
+              object GroupBoxNonClient: TGroupBox
+                Left = 266
+                Top = 76
+                Width = 280
+                Height = 121
+                Caption = 'Non client area'
+                TabOrder = 2
+                object EditNCImage: TEdit
+                  Left = 16
+                  Top = 91
+                  Width = 226
+                  Height = 21
+                  Enabled = False
+                  TabOrder = 0
+                end
+                object RadioButtonNCImage: TRadioButton
+                  Left = 16
+                  Top = 68
+                  Width = 75
+                  Height = 17
+                  Caption = 'Use Image'
+                  TabOrder = 1
+                end
+                object RadioButtonNCColor: TRadioButton
+                  Left = 16
+                  Top = 40
+                  Width = 81
+                  Height = 17
+                  Caption = 'Use Color'
+                  Checked = True
+                  TabOrder = 2
+                  TabStop = True
+                end
+                object ColorBoxNC: TColorBox
+                  Left = 97
+                  Top = 40
+                  Width = 145
+                  Height = 22
+                  Selected = clRed
+                  Style = [cbStandardColors, cbExtendedColors, cbCustomColor, cbPrettyNames, cbCustomColors]
+                  TabOrder = 3
+                  OnGetColors = ColorBoxNCGetColors
+                end
+                object BtnSetNCImage: TButton
+                  Left = 248
+                  Top = 89
+                  Width = 25
+                  Height = 25
+                  Caption = '...'
+                  Enabled = False
+                  TabOrder = 4
+                  OnClick = BtnSetNCImageClick
+                end
+                object CheckBoxNC: TCheckBox
+                  Left = 16
+                  Top = 17
+                  Width = 65
+                  Height = 17
+                  Caption = 'Enabled'
+                  TabOrder = 5
+                end
+              end
+              object GroupBoxBackgroud: TGroupBox
+                Left = 266
+                Top = 203
+                Width = 280
+                Height = 121
+                Caption = 'Background'
+                TabOrder = 3
+                object EditBackImage: TEdit
+                  Left = 16
+                  Top = 91
+                  Width = 226
+                  Height = 21
+                  Enabled = False
+                  TabOrder = 0
+                end
+                object RadioButtonBackImage: TRadioButton
+                  Left = 16
+                  Top = 68
+                  Width = 75
+                  Height = 17
+                  Caption = 'Use Image'
+                  TabOrder = 1
+                end
+                object RadioButtonBackColor: TRadioButton
+                  Left = 16
+                  Top = 40
+                  Width = 81
+                  Height = 17
+                  Caption = 'Use Color'
+                  Checked = True
+                  TabOrder = 2
+                  TabStop = True
+                end
+                object ColorBoxBack: TColorBox
+                  Left = 97
+                  Top = 40
+                  Width = 145
+                  Height = 22
+                  Selected = clRed
+                  Style = [cbStandardColors, cbExtendedColors, cbCustomColor, cbPrettyNames, cbCustomColors]
+                  TabOrder = 3
+                  OnGetColors = ColorBoxNCGetColors
+                end
+                object BtnSetBackImage: TButton
+                  Left = 248
+                  Top = 89
+                  Width = 25
+                  Height = 25
+                  Caption = '...'
+                  Enabled = False
+                  TabOrder = 4
+                  OnClick = BtnSetBackImageClick
+                end
+                object CheckBoxBack: TCheckBox
+                  Left = 16
+                  Top = 17
+                  Width = 65
+                  Height = 17
+                  Caption = 'Enabled'
+                  TabOrder = 5
+                end
+              end
+              object CheckBoxFormCustom: TCheckBox
+                Left = 266
+                Top = 43
+                Width = 280
+                Height = 17
+                Caption = 'Customize non client area and background'
+                TabOrder = 4
+                OnClick = CheckBoxFormCustomClick
+              end
             end
             object TabSheet7: TTabSheet
               Caption = 'Syntax Highlighting'
               ImageIndex = 1
+              ExplicitHeight = 362
               object Label3: TLabel
                 Left = 491
                 Top = 8
@@ -420,6 +558,7 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
+        ExplicitHeight = 400
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -432,6 +571,7 @@ object FrmSettings: TFrmSettings
       object TabSheet8: TTabSheet
         Caption = 'Compiler Options'
         ImageIndex = 5
+        ExplicitHeight = 400
         object Label18: TLabel
           Left = 8
           Top = 16
@@ -466,6 +606,7 @@ object FrmSettings: TFrmSettings
       object TabSheet5: TTabSheet
         Caption = 'Templates'
         ImageIndex = 4
+        ExplicitHeight = 400
         object Label15: TLabel
           Left = 11
           Top = 10
@@ -516,11 +657,12 @@ object FrmSettings: TFrmSettings
   end
   object Panel2: TPanel
     Left = 0
-    Top = 440
+    Top = 428
     Width = 587
     Height = 35
     Align = alBottom
     TabOrder = 1
+    ExplicitTop = 440
     object ButtonApply: TButton
       Left = 6
       Top = 6
@@ -565,15 +707,19 @@ object FrmSettings: TFrmSettings
     CharAttri.Foreground = clWhite
     SymbolAttri.Background = 4598550
     SymbolAttri.Foreground = clWhite
-    Left = 218
-    Top = 230
+    Left = 90
+    Top = 262
   end
   object SynCSSyn1: TSynCSSyn
-    Left = 184
-    Top = 232
+    Left = 48
+    Top = 264
   end
   object SynCppSyn1: TSynCppSyn
-    Left = 248
-    Top = 232
+    Left = 136
+    Top = 264
+  end
+  object OpenPictureDialog1: TOpenPictureDialog
+    Left = 120
+    Top = 198
   end
 end
