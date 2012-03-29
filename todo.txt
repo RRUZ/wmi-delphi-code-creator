@@ -1,6 +1,7 @@
 //TODO
 {
-  
+  Add lock option (read only)
+   
   Add metadata resolver (functions) to code
    delphi done
    fpc done

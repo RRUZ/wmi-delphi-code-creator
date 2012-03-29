@@ -207,6 +207,14 @@ Source: Templates\Template_Delphi.pas; DestDir: {app}\Templates\
 Source: Templates\Template_FPC.pas; DestDir: {app}\Templates\
 Source: Templates\Template_MicrosoftCpp.cpp; DestDir: {app}\Templates\
 Source: Templates\Template_Oxygen.pas; DestDir: {app}\Templates\
+Source: Textures\500.jpg; DestDir: {app}\Textures\
+Source: Textures\650..jpg; DestDir: {app}\Textures\
+Source: Textures\dark-metal-texture.jpg; DestDir: {app}\Textures\
+Source: Textures\metal-plate.jpg; DestDir: {app}\Textures\
+Source: Textures\metal-texture.jpg; DestDir: {app}\Textures\
+Source: Textures\speaker-grille-texture.jpg; DestDir: {app}\Textures\
+Source: Textures\stainless-steel.jpg; DestDir: {app}\Textures\
+Source: Textures\titanium-texture.jpg; DestDir: {app}\Textures\
 [Setup]
 UsePreviousLanguage=no
 AppName={#MyAppName}
@@ -327,6 +335,7 @@ Name: {app}\AStyle
 Name: {app}\AStyle\bin
 Name: {app}\AStyle\doc
 Name: {app}\Templates
+Name: {app}\Textures
 [Icons]
 Name: {group}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}
 Name: {userdesktop}\Wmi Delphi Code Creator; Filename: {app}\WmiDelphiCodeCreator.exe; WorkingDir: {app}

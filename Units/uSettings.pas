@@ -27,7 +27,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
   SynEditHighlighter, SynHighlighterPas, uCheckUpdate, SynHighlighterCpp,
-  SynHighlighterCS;
+  SynHighlighterCS, Vcl.ExtDlgs;
 
 type
   TSettings = class
@@ -59,6 +59,15 @@ type
     FMicrosoftCppCmdLine: string;
     FCSharpCmdLine: string;
     FFPCWmiClassHelperFuncts: Boolean;
+    FActivateCustomForm: Boolean;
+    FCustomFormNC: Boolean;
+    FCustomFormBack: Boolean;
+    FColorBack: TColor;
+    FColorNC: TColor;
+    FImageNC: string;
+    FImageBack: string;
+    FUseColorNC: Boolean;
+    FUseColorBack: Boolean;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -89,6 +98,17 @@ type
 
     property VCLStyle : string read FVCLStyle Write FVCLStyle;
     property DisableVClStylesNC : Boolean read FDisableVClStylesNC write FDisableVClStylesNC;
+
+    property ActivateCustomForm : Boolean read FActivateCustomForm write FActivateCustomForm;
+    property CustomFormNC : Boolean read FCustomFormNC write FCustomFormNC;
+    property CustomFormBack : Boolean read FCustomFormBack write FCustomFormBack;
+    property UseColorNC : Boolean read FUseColorNC write FUseColorNC;
+    property UseColorBack : Boolean read FUseColorBack write FUseColorBack;
+    property ColorNC : TColor read FColorNC write FColorNC;
+    property ColorBack : TColor read FColorBack write FColorBack;
+    property ImageNC : string read FImageNC write FImageNC;
+    property ImageBack : string read FImageBack write FImageBack;
+
 
     property Formatter : string read FFormatter write FFormatter;
     property DefaultLanguage : integer read FDefaultLanguage write FDefaultLanguage;
@@ -170,6 +190,22 @@ type
     EditCSharpSwitch: TMemo;
     Label19: TLabel;
     CheckBoxFPCHelperFunc: TCheckBox;
+    GroupBoxNonClient: TGroupBox;
+    EditNCImage: TEdit;
+    RadioButtonNCImage: TRadioButton;
+    RadioButtonNCColor: TRadioButton;
+    ColorBoxNC: TColorBox;
+    BtnSetNCImage: TButton;
+    CheckBoxNC: TCheckBox;
+    GroupBoxBackgroud: TGroupBox;
+    EditBackImage: TEdit;
+    RadioButtonBackImage: TRadioButton;
+    RadioButtonBackColor: TRadioButton;
+    ColorBoxBack: TColorBox;
+    BtnSetBackImage: TButton;
+    CheckBoxBack: TCheckBox;
+    CheckBoxFormCustom: TCheckBox;
+    OpenPictureDialog1: TOpenPictureDialog;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -185,6 +221,10 @@ type
     procedure ComboBoxVCLStyleChange(Sender: TObject);
     procedure CheckBoxDisableVClStylesNCClick(Sender: TObject);
     procedure ComboBoxLanguageThemesChange(Sender: TObject);
+    procedure CheckBoxFormCustomClick(Sender: TObject);
+    procedure ColorBoxNCGetColors(Sender: TCustomColorBox; Items: TStrings);
+    procedure BtnSetNCImageClick(Sender: TObject);
+    procedure BtnSetBackImageClick(Sender: TObject);
   private
     FSettings: TSettings;
     //FCurrentTheme:  TIDETheme;
@@ -195,6 +235,7 @@ type
     procedure LoadCodeGenData;
     procedure LoadFormatters;
     procedure DrawSeletedVCLStyle;
+    procedure SetStateControls(Container: TWinControl; Value : boolean);
   public
     property Settings: TSettings Read FSettings Write FSettings;
     property Form: TForm Read FForm Write FForm;
@@ -583,6 +624,16 @@ begin
     Settings.CheckForUpdates               := iniFile.ReadBool('Global', 'CheckForUpdates', True);
     Settings.DisableVClStylesNC            := iniFile.ReadBool('Global', 'DisableVClStylesNC', False);
 
+    Settings.ActivateCustomForm            := iniFile.ReadBool('Global', 'ActivateCustomForm', False);
+    Settings.CustomFormNC                  := iniFile.ReadBool('Global', 'CustomFormNC', False);
+    Settings.CustomFormBack                := iniFile.ReadBool('Global', 'CustomFormBack', False);
+    Settings.UseColorNC                    := iniFile.ReadBool('Global', 'UseColorNC', True);
+    Settings.UseColorBack                  := iniFile.ReadBool('Global', 'UseColorBack', True);
+    Settings.ColorNC                       := iniFile.ReadInteger('Global', 'ColorNC', clWebAliceBlue);
+    Settings.ColorBack                     := iniFile.ReadInteger('Global', 'ColorBack', clWebAliceBlue);
+    Settings.ImageNC                       := iniFile.ReadString('Global', 'ImageNC', '');
+    Settings.ImageBack                     := iniFile.ReadString('Global', 'ImageBack', '');
+
     Settings.AStyleCmdLine                 := iniFile.ReadString('Global', 'AStyleCmdLine', '--style=allman "%s"');
     Settings.MicrosoftCppCmdLine           := iniFile.ReadString('Global', 'MicrosoftCppCmdLine', '/EHsc /Fe"[OutPutPath][FileName].exe" /Fo"[OutPutPath][FileName].obj" "[OutPutPath][FileName].cpp"');
     Settings.CSharpCmdLine                 := iniFile.ReadString('Global', 'CSharpCmdLine', '/target:exe /platform:x86 /r:System.Management.dll /r:System.dll /out:"[OutPutPath][FileName].exe" "[OutPutPath][FileName].cs"');
@@ -623,6 +674,20 @@ begin
     iniFile.WriteString('Global', 'Formatter', Settings.Formatter);
     iniFile.WriteBool('Global', 'CheckForUpdates', Settings.CheckForUpdates);
     iniFile.WriteBool('Global', 'DisableVClStylesNC', Settings.DisableVClStylesNC);
+
+    iniFile.WriteBool('Global', 'ActivateCustomForm', Settings.ActivateCustomForm);
+    iniFile.WriteBool('Global', 'CustomFormNC', Settings.CustomFormNC);
+    iniFile.WriteBool('Global', 'CustomFormBack', Settings.CustomFormBack);
+    iniFile.WriteBool('Global', 'UseColorNC', Settings.UseColorNC);
+    iniFile.WriteBool('Global', 'UseColorBack', Settings.UseColorBack);
+    iniFile.WriteInteger('Global', 'ColorNC', Settings.ColorNC);
+    iniFile.WriteInteger('Global', 'ColorBack', Settings.ColorBack);
+    iniFile.WriteString('Global', 'ImageNC', Settings.ImageNC);
+    iniFile.WriteString('Global', 'ImageBack', Settings.ImageBack);
+
+
+
+
     iniFile.WriteInteger('Global', 'DefaultLanguage', Settings.DefaultLanguage);
     iniFile.WriteString('Global', 'AStyleCmdLine', Settings.AStyleCmdLine);
     iniFile.WriteString('Global', 'MicrosoftCppCmdLine', Settings.MicrosoftCppCmdLine);
@@ -723,6 +788,21 @@ begin
    EditOutputFolder.Text := Directory;
 end;
 
+procedure TFrmSettings.BtnSetNCImageClick(Sender: TObject);
+begin
+  OpenPictureDialog1.InitialDir:=ExtractFilePath(ParamStr(0))+'Textures';
+  if OpenPictureDialog1.Execute then
+    EditNCImage.Text := OpenPictureDialog1.FileName;
+
+end;
+
+procedure TFrmSettings.BtnSetBackImageClick(Sender: TObject);
+begin
+  OpenPictureDialog1.InitialDir:=ExtractFilePath(ParamStr(0))+'Textures';
+  if OpenPictureDialog1.Execute then
+    EditBackImage.Text := OpenPictureDialog1.FileName;
+end;
+
 procedure TFrmSettings.ButtonApplyClick(Sender: TObject);
 var
   i  : Integer;
@@ -745,9 +825,20 @@ begin
     FSettings.CheckForUpdates               := CheckBoxUpdates.Checked;
     FSettings.AStyleCmdLine                 := EditAStyle.Text;
     FSettings.MicrosoftCppCmdLine           := EditMicrosoftCppSwitch.Text;
-    FSettings.CSharpCmdLine                := EditCSharpSwitch.Text;
+    FSettings.CSharpCmdLine                 := EditCSharpSwitch.Text;
     FSettings.DisableVClStylesNC            := CheckBoxDisableVClStylesNC.Checked;
     FSettings.DefaultLanguage               := Integer(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex]);
+
+    FSettings.ActivateCustomForm            := CheckBoxFormCustom.Checked;
+    FSettings.CustomFormNC                  := CheckBoxNC.Checked;
+    FSettings.CustomFormBack                := CheckBoxBack.Checked;
+    FSettings.UseColorNC                    := RadioButtonNCColor.Checked;
+    FSettings.UseColorBack                  := RadioButtonBackColor.Checked;
+    FSettings.ColorNC                       := ColorBoxNC.Selected;
+    FSettings.ColorBack                     := ColorBoxBack.Selected;
+    FSettings.ImageNC                       := EditNCImage.Text;
+    FSettings.ImageBack                     := EditBackImage.Text;
+
 
     WriteSettings(FSettings);
     Close();
@@ -818,8 +909,45 @@ end;
 procedure TFrmSettings.CheckBoxDisableVClStylesNCClick(Sender: TObject);
 begin
  if Visible then
- MsgInformation('This feature will be applied when you restart the aplication');
+  MsgInformation('This feature will be applied when you restart the aplication');
 end;
+
+procedure TFrmSettings.CheckBoxFormCustomClick(Sender: TObject);
+
+   procedure SetCheck(const CheckBox : TCheckBox; const Value : boolean) ;
+   var
+     NotifyEvent : TNotifyEvent;
+   begin
+     with CheckBox do
+     begin
+       NotifyEvent := OnClick;
+       OnClick := nil;
+       Checked := Value;
+       OnClick := NotifyEvent;
+     end;
+   end;
+
+begin
+ if CheckBoxDisableVClStylesNC.Checked then
+   SetCheck(CheckBoxDisableVClStylesNC, False);
+
+ SetStateControls(GroupBoxNonClient, CheckBoxFormCustom.Checked);
+ SetStateControls(GroupBoxBackgroud, CheckBoxFormCustom.Checked);
+
+ if Visible then
+  MsgInformation('This feature will be applied when you restart the aplication');
+end;
+
+procedure TFrmSettings.ColorBoxNCGetColors(Sender: TCustomColorBox;
+  Items: TStrings);
+Var
+  Item: TIdentMapEntry;
+begin
+  Items.Clear;
+  for Item in WebNamedColors do
+    Items.AddObject(Item.Name, TObject(Item.Value));
+end;
+
 
 procedure TFrmSettings.ComboBoxFontChange(Sender: TObject);
 begin
@@ -1015,6 +1143,28 @@ begin
   EditMicrosoftCppSwitch.Text        := FSettings.MicrosoftCppCmdLine;
   EditCSharpSwitch.Text              := FSettings.CSharpCmdLine;
 
+  CheckBoxFormCustom.Checked         := FSettings.ActivateCustomForm;
+  CheckBoxNC.Checked                 := FSettings.CustomFormNC;
+  CheckBoxBack.Checked               := FSettings.CustomFormBack;
+
+  if FSettings.UseColorNC then
+   RadioButtonNCColor.Checked         := True
+  else
+   RadioButtonNCImage.Checked        := True;
+
+
+  if FSettings.UseColorBack then
+   RadioButtonBackColor.Checked      := True
+  else
+   RadioButtonBackImage.Checked      := True;
+
+
+  ColorBoxNC.Selected                := FSettings.ColorNC;
+  ColorBoxBack.Selected              := FSettings.ColorBack;
+  EditNCImage.Text                   := FSettings.ImageNC;
+  EditBackImage.Text                 := FSettings.ImageBack;
+  SetStateControls(GroupBoxNonClient, CheckBoxFormCustom.Checked);
+  SetStateControls(GroupBoxBackgroud, CheckBoxFormCustom.Checked);
   LoadCurrentThemeFont(Self,ComboBoxFont.Text,StrToInt(EditFontSize.Text));
   LoadCurrentTheme(Self,ComboBoxTheme.Text);
 end;
@@ -1060,6 +1210,14 @@ begin
   finally
     ComboBoxTheme.Items.EndUpdate;
   end;
+end;
+
+procedure TFrmSettings.SetStateControls(Container: TWinControl; Value: boolean);
+var
+  i : integer;
+begin
+  for i := 0 to Container.ControlCount -1 do
+    Container.Controls[i].Enabled:=Value;
 end;
 
 initialization

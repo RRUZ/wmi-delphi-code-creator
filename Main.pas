@@ -27,11 +27,11 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls,
   SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmiDatabase, uWmi_Metadata,
-  Menus, Buttons, uWmiClassTree, uWmiEvents, uWmiMethods, uWmiClasses,
+  Menus, Buttons, uWmiClassTree, uWmiEvents, uWmiMethods, uWmiClasses, Consts,
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup;
 
-type
 
+type
   TFrmMain = class(TForm)
     PanelMain: TPanel;
     PageControlMain: TPageControl;
@@ -101,8 +101,8 @@ implementation
 uses
   ComObj,
   ShellApi,
-  uXE2Patches,
   uStdActionsPopMenu,
+  Vcl.Styles.FormStyleHooks,
   Vcl.Styles.OwnerDrawFix,
   Vcl.Styles.Ext,
   Vcl.Themes,
@@ -143,6 +143,29 @@ begin
    TStyleManager.Engine.RegisterStyleHook(TCustomForm, TFormStyleHookNC);
    TStyleManager.Engine.RegisterStyleHook(TForm, TFormStyleHookNC);
    //GlassFrame.Enabled:=True;
+  end
+  else
+  if FSettings.ActivateCustomForm then
+  begin
+   TStyleManager.Engine.RegisterStyleHook(TCustomForm, TFormStyleHookBackround);
+   TStyleManager.Engine.RegisterStyleHook(TForm, TFormStyleHookBackround);
+
+   if FSettings.CustomFormNC then
+   begin
+     TFormStyleHookBackround.NCSettings.Enabled  := True;
+     TFormStyleHookBackround.NCSettings.UseColor := FSettings.UseColorNC;
+     TFormStyleHookBackround.NCSettings.Color    := FSettings.ColorNC;
+     TFormStyleHookBackround.NCSettings.ImageLocation := FSettings.ImageNC;
+   end;
+
+   if FSettings.CustomFormBack then
+   begin
+     TFormStyleHookBackround.BackGroundSettings.Enabled  := True;
+     TFormStyleHookBackround.BackGroundSettings.UseColor := FSettings.UseColorBack;
+     TFormStyleHookBackround.BackGroundSettings.Color    := FSettings.ColorBack;
+     TFormStyleHookBackround.BackGroundSettings.ImageLocation := FSettings.ImageBack;
+   end;
+
   end;
 
   MemoConsole.Color:=Settings.BackGroundColor;
