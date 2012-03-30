@@ -29,7 +29,7 @@ uses
   Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ActnCtrls, uWmiGenCode,
   uSettings,Vcl.StdCtrls,  Vcl.ToolWin, SynHighlighterPas, SynEditHighlighter,
   SynHighlighterCpp, Vcl.ActnMenus, Vcl.ExtCtrls, uSynEditPopupEdit,
-  SynHighlighterCS;
+  SynHighlighterCS, Vcl.Menus, Vcl.ActnPopup;
 
 type
   TProcWMiCodeGen = procedure of object;
@@ -52,6 +52,15 @@ type
     Label8: TLabel;
     ComboBoxLanguageSel: TComboBox;
     SynCSSyn1: TSynCSSyn;
+    ActionFullScreen: TAction;
+    PopupActionBar1: TPopupActionBar;
+    Compile1: TMenuItem;
+    Run1: TMenuItem;
+    OpeninIDE1: TMenuItem;
+    FormatCode1: TMenuItem;
+    Save1: TMenuItem;
+    N1: TMenuItem;
+    N2: TMenuItem;
     procedure ActionRunExecute(Sender: TObject);
     procedure ActionFormatExecute(Sender: TObject);
     procedure ActionFormatUpdate(Sender: TObject);
@@ -59,11 +68,14 @@ type
     procedure ActionSaveExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxLanguageSelChange(Sender: TObject);
+    procedure ActionFullScreenUpdate(Sender: TObject);
+    procedure ActionFullScreenExecute(Sender: TObject);
   private
     FSourceLanguage: TSourceLanguages;
     FSettings: TSettings;
     FConsole: TMemo;
     FCodeGenerator: TProcWMiCodeGen;
+    FOldParent: TWinControl;
     procedure ScrollMemo(Memo : TMemo);overload;
     procedure ScrollMemo(Memo : TSynEdit);overload;
     function GetSourceCode: TStrings;
@@ -76,6 +88,7 @@ type
     property Console : TMemo read FConsole write FConsole;
     property SourceCode : TStrings read GetSourceCode write SetSourceCode;
     property CodeGenerator : TProcWMiCodeGen read FCodeGenerator write FCodeGenerator;
+    property OldParent : TWinControl read FOldParent Write FOldParent;
   end;
 
 
@@ -194,6 +207,29 @@ end;
 procedure TFrmCodeEditor.ActionFormatUpdate(Sender: TObject);
 begin
   TAction(Sender).Enabled := FSourceLanguage in [Lng_Delphi, Lng_FPC, Lng_BorlandCpp, Lng_VSCpp, Lng_CSharp];
+end;
+
+procedure TFrmCodeEditor.ActionFullScreenExecute(Sender: TObject);
+begin
+  if Parent<>nil then
+  begin
+   Parent:=nil;
+   BorderStyle:=bsSizeable;
+   Align:=alNone;
+   Position:=poScreenCenter;
+  end
+  else
+  begin
+   Parent:=OldParent;
+   BorderStyle:=bsNone;
+   Align:=alClient;
+   Position:=poScreenCenter;
+  end
+end;
+
+procedure TFrmCodeEditor.ActionFullScreenUpdate(Sender: TObject);
+begin
+  TAction(Sender).Enabled :=True;
 end;
 
 procedure TFrmCodeEditor.ActionOpenIDEExecute(Sender: TObject);

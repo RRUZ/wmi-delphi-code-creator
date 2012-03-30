@@ -164,6 +164,7 @@ begin
   FrmCodeEditorEvent  := TFrmCodeEditor.Create(Self);
   FrmCodeEditorEvent.CodeGenerator:=GenerateCode;
   FrmCodeEditorEvent.Parent := PanelEventCode;
+  FrmCodeEditorEvent.OldParent:= PanelEventCode;
   FrmCodeEditorEvent.Show;
   FrmCodeEditorEvent.SourceLanguage:=Lng_Delphi;
 end;

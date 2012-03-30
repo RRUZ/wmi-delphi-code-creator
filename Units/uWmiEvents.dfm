@@ -21,6 +21,7 @@ object FrmWmiEvents: TFrmWmiEvents
     Top = 0
     Width = 5
     Height = 472
+    Beveled = True
     ExplicitLeft = 402
     ExplicitHeight = 454
   end

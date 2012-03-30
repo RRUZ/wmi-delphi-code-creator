@@ -16,23 +16,22 @@ object FrmWmiClasses: TFrmWmiClasses
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
-    Left = 308
+    Left = 305
     Top = 0
     Width = 5
     Height = 635
-    ExplicitLeft = 289
-    ExplicitHeight = 704
+    Beveled = True
   end
   object PanelMetaWmiInfo: TPanel
     Left = 0
     Top = 0
-    Width = 308
+    Width = 305
     Height = 635
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      308
+      305
       635)
     object LabelProperties: TLabel
       Left = 9
@@ -58,24 +57,26 @@ object FrmWmiClasses: TFrmWmiClasses
     object ComboBoxClasses: TComboBox
       Left = 101
       Top = 32
-      Width = 201
+      Width = 198
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 20
       TabOrder = 1
       OnChange = ComboBoxClassesChange
+      ExplicitWidth = 201
     end
     object ComboBoxNameSpaces: TComboBox
       Left = 101
       Top = 5
-      Width = 200
+      Width = 197
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 20
       TabOrder = 0
       OnChange = ComboBoxNameSpacesChange
+      ExplicitWidth = 200
     end
     object CheckBoxSelAllProps: TCheckBox
       Left = 9
@@ -89,17 +90,18 @@ object FrmWmiClasses: TFrmWmiClasses
     object MemoClassDescr: TMemo
       Left = 9
       Top = 59
-      Width = 293
+      Width = 290
       Height = 73
       Anchors = [akLeft, akTop, akRight]
       ReadOnly = True
       ScrollBars = ssVertical
       TabOrder = 2
+      ExplicitWidth = 293
     end
     object ListViewProperties: TListView
       Left = 7
       Top = 192
-      Width = 295
+      Width = 292
       Height = 433
       Anchors = [akLeft, akTop, akRight, akBottom]
       Checkboxes = True
@@ -128,28 +130,32 @@ object FrmWmiClasses: TFrmWmiClasses
       TabOrder = 5
       ViewStyle = vsReport
       OnClick = ListViewPropertiesClick
+      ExplicitWidth = 295
     end
     object ButtonGetValues: TButton
       Left = 128
       Top = 161
-      Width = 174
+      Width = 171
       Height = 25
+      Anchors = [akLeft, akTop, akRight]
       Caption = 'Get Properties Values'
       ImageIndex = 2
       Images = ImageList1
       TabOrder = 3
       OnClick = ButtonGetValuesClick
+      ExplicitWidth = 174
     end
   end
   object PanelCode: TPanel
-    Left = 313
+    Left = 310
     Top = 0
-    Width = 800
+    Width = 803
     Height = 635
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
+    ExplicitLeft = 311
   end
   object ImageList1: TImageList
     ColorDepth = cd32Bit
@@ -157,7 +163,7 @@ object FrmWmiClasses: TFrmWmiClasses
     Left = 423
     Top = 198
     Bitmap = {
-      494C010103007800080210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010103007800300210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       00030B140B72414841F6606360FE676967FF686968FF365D38EF264727CE6263
