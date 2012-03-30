@@ -161,6 +161,7 @@ begin
   FrmCodeEditorMethod  := TFrmCodeEditor.Create(Self);
   FrmCodeEditorMethod.CodeGenerator:=GenerateCode;
   FrmCodeEditorMethod.Parent := PanelMethodCode;
+  FrmCodeEditorMethod.OldParent:= PanelMethodCode;
   FrmCodeEditorMethod.Show;
   //FrmCodeEditorMethod.Settings:=Settings;
   //FrmCodeEditorMethod.Console:=MemoConsole;

@@ -1152,12 +1152,10 @@ begin
   else
    RadioButtonNCImage.Checked        := True;
 
-
   if FSettings.UseColorBack then
    RadioButtonBackColor.Checked      := True
   else
    RadioButtonBackImage.Checked      := True;
-
 
   ColorBoxNC.Selected                := FSettings.ColorNC;
   ColorBoxBack.Selected              := FSettings.ColorBack;

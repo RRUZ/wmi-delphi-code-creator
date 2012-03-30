@@ -39,9 +39,9 @@ type
     MemoClassDescr: TMemo;
     ListViewProperties: TListView;
     ButtonGetValues: TButton;
-    Splitter1: TSplitter;
     PanelCode: TPanel;
     ImageList1: TImageList;
+    Splitter1: TSplitter;
     procedure ComboBoxNameSpacesChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxClassesChange(Sender: TObject);
@@ -79,6 +79,8 @@ implementation
 
 uses
   uGlobals,
+  Vcl.Styles,
+  Vcl.Themes,
   Winapi.CommCtrl,
   System.Win.ComObj,
   uWmi_ViewPropsValues,
@@ -131,7 +133,10 @@ begin
   FrmCodeEditor  := TFrmCodeEditor.Create(Self);
   FrmCodeEditor.CodeGenerator:=GenerateCode;
   FrmCodeEditor.Parent := PanelCode;
+  FrmCodeEditor.OldParent:= PanelCode;
   FrmCodeEditor.Show;
+  //FrmCodeEditor.Dock(PanelCode, PanelCode.BoundsRect);
+
   //FrmCodeEditor.Settings:=Settings;
   //FrmCodeEditor.Console:=MemoConsole;
   FrmCodeEditor.SourceLanguage:=Lng_Delphi;
@@ -411,5 +416,7 @@ begin
   LoadCurrentTheme(FrmCodeEditor, Settings.CurrentTheme);
   LoadCurrentThemeFont(FrmCodeEditor ,Settings.FontName,Settings.FontSize);
 end;
+
+
 
 end.

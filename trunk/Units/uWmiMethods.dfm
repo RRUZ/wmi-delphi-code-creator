@@ -20,6 +20,7 @@ object FrmWmiMethods: TFrmWmiMethods
     Top = 0
     Width = 5
     Height = 504
+    Beveled = True
     ExplicitLeft = 405
     ExplicitHeight = 473
   end
