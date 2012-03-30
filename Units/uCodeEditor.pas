@@ -34,8 +34,6 @@ uses
 type
   TProcWMiCodeGen = procedure of object;
   TFrmCodeEditor = class(TForm)
-    PageControlCode: TPageControl;
-    TabSheetWmiClassCode: TTabSheet;
     SynEditCode: TSynEdit;
     ActionManager1: TActionManager;
     ActionRun: TAction;

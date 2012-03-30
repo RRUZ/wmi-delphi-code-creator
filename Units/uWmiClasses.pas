@@ -290,8 +290,23 @@ end;
 
 
 procedure TFrmWmiClasses.ListViewPropertiesClick(Sender: TObject);
+
+   procedure SetCheck(const CheckBox : TCheckBox; const Value : boolean) ;
+   var
+     NotifyEvent : TNotifyEvent;
+   begin
+     with CheckBox do
+     begin
+       NotifyEvent := OnClick;
+       OnClick := nil;
+       Checked := Value;
+       OnClick := NotifyEvent;
+     end;
+   end;
+
 begin
-  CheckBoxSelAllProps.Checked := False;
+  if CheckBoxSelAllProps.Checked  then
+  SetCheck(CheckBoxSelAllProps, False);
   GenerateCode;
 end;
 

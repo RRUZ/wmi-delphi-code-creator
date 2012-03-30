@@ -30,6 +30,7 @@ object FrmWmiClasses: TFrmWmiClasses
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitLeft = -1
     DesignSize = (
       305
       635)
