@@ -16,91 +16,84 @@ object FrmCodeEditor: TFrmCodeEditor
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object PageControlCode: TPageControl
+  object PanelLanguageSet: TPanel
     Left = 0
     Top = 0
     Width = 648
-    Height = 475
-    ActivePage = TabSheetWmiClassCode
-    Align = alClient
+    Height = 27
+    Align = alTop
+    BevelOuter = bvNone
     TabOrder = 0
-    object TabSheetWmiClassCode: TTabSheet
-      Caption = 'Code'
-      object SynEditCode: TSynEdit
-        Left = 0
-        Top = 67
-        Width = 640
-        Height = 380
-        Align = alClient
-        Color = 4598550
-        ActiveLineColor = clBlue
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -13
-        Font.Name = 'Consolas'
-        Font.Pitch = fpFixed
-        Font.Style = []
-        PopupMenu = PopupActionBar1
-        TabOrder = 0
-        Gutter.Color = 4598550
-        Gutter.BorderColor = clYellow
-        Gutter.Font.Charset = DEFAULT_CHARSET
-        Gutter.Font.Color = clWhite
-        Gutter.Font.Height = -11
-        Gutter.Font.Name = 'Courier New'
-        Gutter.Font.Style = []
-        Gutter.ShowLineNumbers = True
-        Gutter.GradientStartColor = 4539717
-        Gutter.GradientEndColor = 2565927
-      end
-      object ActionToolBar1: TActionToolBar
-        Left = 0
-        Top = 41
-        Width = 640
-        Height = 26
-        ActionManager = ActionManager1
-        Caption = 'ActionToolBar1'
-        Color = clMenuBar
-        ColorMap.DisabledFontColor = 7171437
-        ColorMap.HighlightColor = clWhite
-        ColorMap.BtnSelectedFont = clBlack
-        ColorMap.UnusedColor = clWhite
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        ParentShowHint = False
-        ShowHint = True
-        Spacing = 0
-      end
-      object PanelLanguageSet: TPanel
-        Left = 0
-        Top = 0
-        Width = 640
-        Height = 41
-        Align = alTop
-        BevelOuter = bvNone
-        TabOrder = 2
-        object Label8: TLabel
-          Left = 5
-          Top = 14
-          Width = 47
-          Height = 13
-          Caption = 'Language'
-        end
-        object ComboBoxLanguageSel: TComboBox
-          Left = 58
-          Top = 14
-          Width = 220
-          Height = 21
-          Style = csDropDownList
-          TabOrder = 0
-          OnChange = ComboBoxLanguageSelChange
-        end
-      end
+    object Label8: TLabel
+      Left = 5
+      Top = 6
+      Width = 47
+      Height = 13
+      Caption = 'Language'
     end
+    object ComboBoxLanguageSel: TComboBox
+      Left = 74
+      Top = 3
+      Width = 220
+      Height = 21
+      Style = csDropDownList
+      TabOrder = 0
+      OnChange = ComboBoxLanguageSelChange
+    end
+  end
+  object ActionToolBar1: TActionToolBar
+    Left = 0
+    Top = 27
+    Width = 648
+    Height = 26
+    ActionManager = ActionManager1
+    Caption = 'ActionToolBar1'
+    Color = clMenuBar
+    ColorMap.DisabledFontColor = 7171437
+    ColorMap.HighlightColor = clWhite
+    ColorMap.BtnSelectedFont = clBlack
+    ColorMap.UnusedColor = clWhite
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
+    Spacing = 0
+    ExplicitTop = 0
+    ExplicitWidth = 640
+  end
+  object SynEditCode: TSynEdit
+    Left = 0
+    Top = 53
+    Width = 648
+    Height = 422
+    Align = alClient
+    Color = 4598550
+    ActiveLineColor = clBlue
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Consolas'
+    Font.Pitch = fpFixed
+    Font.Style = []
+    PopupMenu = PopupActionBar1
+    TabOrder = 2
+    Gutter.Color = 4598550
+    Gutter.BorderColor = clYellow
+    Gutter.Font.Charset = DEFAULT_CHARSET
+    Gutter.Font.Color = clWhite
+    Gutter.Font.Height = -11
+    Gutter.Font.Name = 'Courier New'
+    Gutter.Font.Style = []
+    Gutter.ShowLineNumbers = True
+    Gutter.GradientStartColor = 4539717
+    Gutter.GradientEndColor = 2565927
+    ExplicitTop = 0
+    ExplicitWidth = 640
+    ExplicitHeight = 380
   end
   object ActionManager1: TActionManager
     ActionBars = <
@@ -675,7 +668,7 @@ object FrmCodeEditor: TFrmCodeEditor
     Top = 150
   end
   object SynCSSyn1: TSynCSSyn
-    Left = 336
+    Left = 360
     Top = 184
   end
   object PopupActionBar1: TPopupActionBar
