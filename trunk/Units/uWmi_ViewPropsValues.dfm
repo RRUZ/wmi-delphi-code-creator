@@ -84,6 +84,47 @@ object FrmWmiVwProps: TFrmWmiVwProps
           OnDblClick = ListViewGridDblClick
         end
       end
+      object TabSheet2: TTabSheet
+        Caption = 'Properties Links'
+        ImageIndex = 2
+        object ListViewPropsLinks: TListView
+          Left = 0
+          Top = 0
+          Width = 695
+          Height = 337
+          Align = alClient
+          Columns = <
+            item
+              Caption = 'Property'
+              Width = 100
+            end
+            item
+              Caption = 'Source'
+              Width = 100
+            end
+            item
+              Caption = 'Type'
+              Width = 200
+            end
+            item
+              Caption = 'Structure'
+              Width = 100
+            end
+            item
+              Caption = 'Field'
+              Width = 100
+            end>
+          HideSelection = False
+          ReadOnly = True
+          RowSelect = True
+          TabOrder = 0
+          ViewStyle = vsReport
+          ExplicitLeft = 56
+          ExplicitTop = 40
+          ExplicitWidth = 250
+          ExplicitHeight = 150
+        end
+      end
     end
   end
   object StatusBar1: TStatusBar
@@ -142,9 +183,9 @@ object FrmWmiVwProps: TFrmWmiVwProps
     object BtnUrl: TButton
       Left = 512
       Top = 50
-      Width = 75
+      Width = 161
       Height = 25
-      Caption = 'Go'
+      Caption = 'Go to MSDN Documentation'
       TabOrder = 3
       OnClick = BtnUrlClick
     end
@@ -153,7 +194,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C0101020004008C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000400940010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
