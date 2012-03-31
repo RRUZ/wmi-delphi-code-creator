@@ -26,7 +26,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, SynEdit, ExtCtrls,
-  Generics.Collections,
+  Generics.Collections, uWmi_Metadata,
   ImgList, Contnrs, ActiveX, StdCtrls;
 
 type
@@ -78,6 +78,8 @@ type
     Label2: TLabel;
     EditURL: TEdit;
     BtnUrl: TButton;
+    TabSheet2: TTabSheet;
+    ListViewPropsLinks: TListView;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -95,17 +97,19 @@ type
     FContainValues: boolean;
     FThread: TWMIQueryToListView;
     FWMIProperties: TStrings;
+    WmiMetaData : TWMiClassMetaData;
     procedure Log(const msg: string);
     procedure SetWmiClass(const Value: string);
     procedure SetWmiNamespace(const Value: string);
     procedure ShowDetails();
+    procedure LoadPropsLinks;//MappedStrings
   public
     property ContainValues: boolean Read FContainValues;
     property WQLProperties: TStrings Read FWQLProperties Write FWQLProperties;
     property WmiClass: string Read FWmiClass Write SetWmiClass;
     property WmiNamespace: string Read FWmiNamespace Write SetWmiNamespace;
     property WQL: TStrings Read FWQL;
-    procedure LoadValues; cdecl;
+    procedure LoadValues(Properties : TStringList); cdecl;
   end;
 
   procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList);
@@ -115,7 +119,7 @@ implementation
 uses
   ComObj,
   CommCtrl,
-  uWmi_Metadata,
+  StrUtils,
   ShellAPi,
   uListView_Helper, uPropValueList;
 
@@ -125,8 +129,10 @@ uses
 procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList);
 var
   Frm: TFrmWmiVwProps;
+  {
   WmiMetaData : TWMiClassMetaData;
   i           : Integer;
+  }
 begin
   if (WmiClass <> '') and (Namespace <> '') then
   begin
@@ -134,7 +140,7 @@ begin
     Frm.WmiClass     := WmiClass;
     Frm.WmiNamespace := Namespace;
     Frm.Caption      := 'Properties Values for the class ' + WmiClass;
-
+       {
     Frm.WQLProperties.Clear;
     if (Properties=nil) or (Properties.Count=0) then
     begin
@@ -149,8 +155,8 @@ begin
     else
       for i:=0 to Properties.Count-1 do
         Frm.WQLProperties.Add(Properties[i]);
-
-    Frm.LoadValues;
+    }
+    Frm.LoadValues(Properties);
     Frm.Show();
   end;
 end;
@@ -163,7 +169,7 @@ end;
 procedure TFrmWmiVwProps.FormActivate(Sender: TObject);
 begin
   if not FDataLoaded then
-    LoadValues;
+    LoadValues(nil);
 end;
 
 procedure TFrmWmiVwProps.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -173,6 +179,7 @@ end;
 
 procedure TFrmWmiVwProps.FormCreate(Sender: TObject);
 begin
+  WmiMetaData:=nil;
   FDataLoaded := False;
   FWQLProperties := TStringList.Create;
   FWQL    := TStringList.Create;
@@ -191,6 +198,9 @@ begin
   FWMIProperties.Free;
   FWQLProperties.Free;
   FWQL.Free;
+  if WmiMetaData<>nil then
+    WmiMetaData.Free;
+
    if Assigned(FThread) and not FThread.Terminated then
     FThread.Terminate;
     //FThread.Free;
@@ -224,11 +234,57 @@ begin
   ShowDetails();
 end;
 
-procedure TFrmWmiVwProps.LoadValues;
+procedure TFrmWmiVwProps.LoadPropsLinks;
+var
+  i, j : integer;
+  WMiQualifierMetaData : TWMiQualifierMetaData;
+  Item : TListItem;
+  s, MappingStrings : string;
+begin
+  ListViewPropsLinks.Items.BeginUpdate;
+  try
+    ListViewPropsLinks.Items.Clear;
+    for i:=0 to WmiMetaData.PropertiesCount-1 do
+    for WMiQualifierMetaData in WmiMetaData.Properties[i].Qualifiers do
+      if SameText('MappingStrings',WMiQualifierMetaData.Name) then
+      begin
+        Item:=ListViewPropsLinks.Items.Add;
+        Item.Caption:=WmiMetaData.Properties[i].Name;
+        //[MIF.DMTF|Operational State|003.5|MIB.IETF|HOST-RESOURCES-MIB.hrDeviceStatus]
+        MappingStrings:=WMiQualifierMetaData.Value;
+        if (MappingStrings<>'') and (MappingStrings[1]='[') then
+         MappingStrings:=Copy(MappingStrings, 2, Length(MappingStrings));
+
+        if (MappingStrings<>'') and (MappingStrings[Length(MappingStrings)]=']') then
+         MappingStrings:=Copy(MappingStrings, 1, Length(MappingStrings)-1);
+
+        for s in SplitString(MappingStrings,'|') do
+         Item.SubItems.Add(s);
+      end;
+  finally
+    ListViewPropsLinks.Items.EndUpdate;
+  end;
+  AutoResizeListView(ListViewPropsLinks);
+end;
+
+procedure TFrmWmiVwProps.LoadValues(Properties : TStringList);
 var
   i: integer;
 begin
   FDataLoaded := True;
+  WmiMetaData:=TWMiClassMetaData.Create(WmiNamespace, WmiClass);
+
+  FWQLProperties.Clear;
+  if (Properties=nil) or (Properties.Count=0) then
+  begin
+    for i:=0 to WmiMetaData.PropertiesCount-1 do
+      FWQLProperties.Add(WmiMetaData.Properties[i].Name)
+  end
+  else
+    for i:=0 to Properties.Count-1 do
+      FWQLProperties.Add(Properties[i]);
+
+
   FWQL.Add('Select');
   if FWQLProperties.Count = 0 then
     FWQL.Add(' * ')
@@ -240,6 +296,9 @@ begin
         FWQL.Add(FWQLProperties[i]);
 
   FWQL.Add(' From ' + FWmiClass);
+
+  LoadPropsLinks;
+
   FThread := TWMIQueryToListView.Create('.', '', '', FWmiNamespace, FWQL.Text, FWMIProperties, ListViewGrid, Log, FValues);
 end;
 
