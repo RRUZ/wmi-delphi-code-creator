@@ -59,6 +59,8 @@ Var
  CimType : Integer;
  Frm : TFrmWMIPropValue;
 begin
+ if FWMIProperties<>nil then
+ begin
    Key :=ValueList.Keys[ValueList.Row];
    Index:=FWMIProperties.IndexOf(Key);
    CimType:=Integer(FWMIProperties.Objects[Index]);
@@ -66,6 +68,7 @@ begin
    Frm.Caption:=Format('%s Type %s',[Key, CIMTypeStr(CimType)]);
    Frm.MemoValue.Text:= ValueList.Values[Key];
    Frm.Show;
+ end;
 end;
 
 end.
