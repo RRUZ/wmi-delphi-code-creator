@@ -87,6 +87,7 @@ type
     procedure BtnUrlClick(Sender: TObject);
     procedure ListViewGridData(Sender: TObject; Item: TListItem);
     procedure ListViewGridDblClick(Sender: TObject);
+    procedure ListViewPropsLinksDblClick(Sender: TObject);
   private
     FValues:   TList<TStrings>;
     FWmiClass: string;
@@ -101,8 +102,10 @@ type
     procedure Log(const msg: string);
     procedure SetWmiClass(const Value: string);
     procedure SetWmiNamespace(const Value: string);
-    procedure ShowDetails();
+    procedure ShowDetailsData();
+
     procedure LoadPropsLinks;//MappedStrings
+    procedure ShowDetailsProps;
   public
     property ContainValues: boolean Read FContainValues;
     property WQLProperties: TStrings Read FWQLProperties Write FWQLProperties;
@@ -121,7 +124,9 @@ uses
   CommCtrl,
   StrUtils,
   ShellAPi,
-  uListView_Helper, uPropValueList;
+  MSXML,
+  uListView_Helper,
+  uPropValueList;
 
 {$R *.dfm}
 
@@ -231,8 +236,62 @@ end;
 
 procedure TFrmWmiVwProps.ListViewGridDblClick(Sender: TObject);
 begin
-  ShowDetails();
+  ShowDetailsData();
 end;
+
+function GetURL(const SearchKey : string;NumberOfResults:integer=1) : string;
+const
+ ApplicationID= '73C8F474CA4D1202AD60747126813B731199ECEA';
+ URI='http://api.bing.net/xml.aspx?AppId=%s&Verstion=2.2&Market=en-US&Query=%s&Sources=web&web.count=%d&xmltype=elementbased';
+ COMPLETED=4;
+ OK       =200;
+var
+  XMLHTTPRequest  : IXMLHTTPRequest;
+  XMLDOMDocument2 : IXMLDOMDocument2;
+  XMLDOMNode      : IXMLDOMNode;
+  XMLDOMNodeList  : IXMLDOMNodeList;
+begin
+    Result:='';
+    XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As XMLHTTP;
+  try
+    XMLHTTPRequest.open('GET', Format(URI,[ApplicationID, SearchKey, NumberOfResults]), False, EmptyParam, EmptyParam);
+    XMLHTTPRequest.send('');
+    if (XMLHTTPRequest.readyState = COMPLETED) and (XMLHTTPRequest.status = OK) then
+    begin
+      XMLDOMDocument2 := XMLHTTPRequest.responseXML  As IXMLDOMDocument2;
+      XMLDOMDocument2.setProperty('SelectionNamespaces', 'xmlns:web="http://schemas.microsoft.com/LiveSearch/2008/04/XML/web"');
+      XMLDOMNodeList := XMLDOMDocument2.selectNodes('//web:WebResult');
+      if XMLDOMNodeList.length>0 then
+      begin
+        XMLDOMNode:=XMLDOMNodeList.item[0];
+        Result:= XMLDOMNode.selectSingleNode('./web:Url').Text
+      end;
+    end;
+  finally
+    XMLHTTPRequest := nil;
+  end;
+end;
+
+
+procedure TFrmWmiVwProps.ListViewPropsLinksDblClick(Sender: TObject);
+begin
+  ShowDetailsProps;
+end;
+{
+Var
+  Key, URL :string;
+begin
+ if (ListViewPropsLinks.Selected<>nil) and (ListViewPropsLinks.Selected.SubItems.Count>2) then
+ begin
+   //agregar lista de leccion de urls ? + twebrowser?
+
+   URL:= GetURL(Format('msdn "%s"  %s',[ListViewPropsLinks.Selected.SubItems[1], ListViewPropsLinks.Selected.SubItems[2]]));
+   if URL<>'' then
+    ShellExecute(Handle, 'open', PChar(URL), nil, nil, SW_SHOW);
+ end;
+
+end;
+}
 
 procedure TFrmWmiVwProps.LoadPropsLinks;
 var
@@ -260,6 +319,23 @@ begin
 
         for s in SplitString(MappingStrings,'|') do
          Item.SubItems.Add(s);
+
+        Item.ImageIndex:=-1;
+        if Item.SubItems.Count>0 then
+         if MatchText(Item.SubItems[0], ['WMI','MIF.DMTF']) then
+           Item.ImageIndex:=2
+         else
+         if MatchText(Item.SubItems[0], ['Win32Registry']) then
+           Item.ImageIndex:=1
+         else
+         if MatchText(Item.SubItems[0],['Win32API','Win32']) then
+           Item.ImageIndex:=0
+         else
+         if MatchText(Item.SubItems[0],['SMBIOS']) then
+           Item.ImageIndex:=3
+         else
+         if MatchText(Item.SubItems[0],['MIB.IETF']) then
+           Item.ImageIndex:=4;
       end;
   finally
     ListViewPropsLinks.Items.EndUpdate;
@@ -321,7 +397,7 @@ begin
 end;
 
 
-procedure TFrmWmiVwProps.ShowDetails;
+procedure TFrmWmiVwProps.ShowDetailsData;
 Var
  Frm  : TFrmValueList;
  i    : Integer;
@@ -339,6 +415,26 @@ begin
  Frm.Show();
 end;
 
+
+procedure TFrmWmiVwProps.ShowDetailsProps;
+Var
+ Frm  : TFrmValueList;
+ i    : Integer;
+begin
+ if not Assigned(ListViewPropsLinks.Selected) then exit;
+
+ Frm:=TFrmValueList.Create(nil);
+ Frm.WMIProperties:=nil;//FWMIProperties;
+ Frm.Caption:='Sources '+WmiClass+'.'+ListViewPropsLinks.Selected.Caption;
+  for i := 0 to ListViewPropsLinks.Columns.Count-1 do
+   if i=0 then
+    Frm.ValueList.InsertRow('Name', ListViewPropsLinks.Selected.Caption, True)
+   else
+   if (i-1)<ListViewPropsLinks.Selected.SubItems.Count then
+    Frm.ValueList.InsertRow(ListViewPropsLinks.Columns[i].Caption, ListViewPropsLinks.Selected.SubItems[i-1], True);
+
+ Frm.Show();
+end;
 
 procedure AutoResizeVirtualListView(const ListView: TListView;Values:TList<TStrings>);
 Var
