@@ -538,7 +538,6 @@ object FrmAbout: TFrmAbout
     Height = 173
     Color = clBtnFace
     ReadOnly = True
-    ScrollBars = ssBoth
     TabOrder = 1
   end
 end

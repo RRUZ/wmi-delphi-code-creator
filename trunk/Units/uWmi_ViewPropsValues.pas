@@ -27,7 +27,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, SynEdit, ExtCtrls,
   Generics.Collections, uWmi_Metadata,
-  ImgList, Contnrs, ActiveX, StdCtrls;
+  ImgList, Contnrs, ActiveX, StdCtrls, Vcl.Menus,
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup;
 
 type
   TWMIQueryCallbackLog = procedure(const msg: string) of object;
@@ -80,6 +81,11 @@ type
     BtnUrl: TButton;
     TabSheet2: TTabSheet;
     ListViewPropsLinks: TListView;
+    PopupActionBar1: TPopupActionBar;
+    Viewdetails1: TMenuItem;
+    PopupActionBar2: TPopupActionBar;
+    ViewDetails2: TMenuItem;
+    Checkforonlinedocumentation1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
