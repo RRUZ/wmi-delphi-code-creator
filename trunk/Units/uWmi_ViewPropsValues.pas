@@ -94,6 +94,7 @@ type
     procedure ListViewGridData(Sender: TObject; Item: TListItem);
     procedure ListViewGridDblClick(Sender: TObject);
     procedure ListViewPropsLinksDblClick(Sender: TObject);
+    procedure Checkforonlinedocumentation1Click(Sender: TObject);
   private
     FValues:   TList<TStrings>;
     FWmiClass: string;
@@ -126,11 +127,12 @@ type
 implementation
 
 uses
+  uMisc,
+  uOnlineResources,
   ComObj,
   CommCtrl,
   StrUtils,
   ShellAPi,
-  MSXML,
   uListView_Helper,
   uPropValueList;
 
@@ -175,6 +177,30 @@ end;
 procedure TFrmWmiVwProps.BtnUrlClick(Sender: TObject);
 begin
   ShellExecute(Handle, 'open', PChar(EditURL.Text), nil, nil, SW_SHOW);
+end;
+
+procedure TFrmWmiVwProps.Checkforonlinedocumentation1Click(Sender: TObject);
+Var
+  Frm : TFrmOnlineResources;
+  s   : string;
+  i   : Integer;
+begin
+  if ListViewPropsLinks.Selected=nil then exit;
+  if ListViewPropsLinks.Selected.SubItems.Count<2 then exit;
+
+  Frm:=TFrmOnlineResources.Create(nil);
+  s:='';
+  for i := 1 to ListViewPropsLinks.Selected.SubItems.Count-1 do
+   s:=s+' "'+ListViewPropsLinks.Selected.SubItems[i]+'"';
+  Frm.SearchKey:=Format('msdn %s',[s]);
+  Frm.GetResults;
+  if Frm.ListViewURL.Items.Count>0 then
+   Frm.Show
+  else
+  if (Frm.ListViewURL.Items.Count=0) and MsgQuestion('Related online information was not found, do you want to try with another search terms?') then
+   Frm.Show
+  else
+   Frm.Free;
 end;
 
 procedure TFrmWmiVwProps.FormActivate(Sender: TObject);
@@ -245,38 +271,6 @@ begin
   ShowDetailsData();
 end;
 
-function GetURL(const SearchKey : string;NumberOfResults:integer=1) : string;
-const
- ApplicationID= '73C8F474CA4D1202AD60747126813B731199ECEA';
- URI='http://api.bing.net/xml.aspx?AppId=%s&Verstion=2.2&Market=en-US&Query=%s&Sources=web&web.count=%d&xmltype=elementbased';
- COMPLETED=4;
- OK       =200;
-var
-  XMLHTTPRequest  : IXMLHTTPRequest;
-  XMLDOMDocument2 : IXMLDOMDocument2;
-  XMLDOMNode      : IXMLDOMNode;
-  XMLDOMNodeList  : IXMLDOMNodeList;
-begin
-    Result:='';
-    XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As XMLHTTP;
-  try
-    XMLHTTPRequest.open('GET', Format(URI,[ApplicationID, SearchKey, NumberOfResults]), False, EmptyParam, EmptyParam);
-    XMLHTTPRequest.send('');
-    if (XMLHTTPRequest.readyState = COMPLETED) and (XMLHTTPRequest.status = OK) then
-    begin
-      XMLDOMDocument2 := XMLHTTPRequest.responseXML  As IXMLDOMDocument2;
-      XMLDOMDocument2.setProperty('SelectionNamespaces', 'xmlns:web="http://schemas.microsoft.com/LiveSearch/2008/04/XML/web"');
-      XMLDOMNodeList := XMLDOMDocument2.selectNodes('//web:WebResult');
-      if XMLDOMNodeList.length>0 then
-      begin
-        XMLDOMNode:=XMLDOMNodeList.item[0];
-        Result:= XMLDOMNode.selectSingleNode('./web:Url').Text
-      end;
-    end;
-  finally
-    XMLHTTPRequest := nil;
-  end;
-end;
 
 
 procedure TFrmWmiVwProps.ListViewPropsLinksDblClick(Sender: TObject);

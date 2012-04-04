@@ -55,7 +55,8 @@ uses
   uWmiCSharpCode in 'Units\uWmiCSharpCode.pas',
   uDotNetFrameWork in 'Units\uDotNetFrameWork.pas',
   uWmiPropertyValue in 'Units\uWmiPropertyValue.pas' {FrmWMIPropValue},
-  Vcl.Styles.FormStyleHooks in 'Units\Vcl.Styles.Utils\Vcl.Styles.FormStyleHooks.pas';
+  Vcl.Styles.FormStyleHooks in 'Units\Vcl.Styles.Utils\Vcl.Styles.FormStyleHooks.pas',
+  uOnlineResources in 'Units\uOnlineResources.pas' {FrmOnlineResources};
 
 {$R *.res}
 

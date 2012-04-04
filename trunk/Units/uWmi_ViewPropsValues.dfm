@@ -123,6 +123,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           TabOrder = 0
           ViewStyle = vsReport
           OnDblClick = ListViewPropsLinksDblClick
+          ExplicitTop = 3
         end
       end
     end
@@ -195,7 +196,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C0101060008002C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106000800300010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -485,6 +486,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     object Checkforonlinedocumentation1: TMenuItem
       Caption = 'Check for online documentation'
       ImageIndex = 5
+      OnClick = Checkforonlinedocumentation1Click
     end
   end
 end
