@@ -205,6 +205,7 @@ begin
     begin
       SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
+      WebBrowserWmi.HandleNeeded;
       WebBrowserWmi.Navigate(Format(UrlWmiHelp, [WmiMetaClassInfo.WmiClass]));
       {
       while WebBrowserWmi.ReadyState <> READYSTATE_COMPLETE do

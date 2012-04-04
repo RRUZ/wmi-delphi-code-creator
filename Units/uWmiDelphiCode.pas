@@ -383,6 +383,7 @@ begin
     case ModeCodeGeneration of
       WmiCode_Scripting:
                           begin
+                            Padding:= StringOfChar(' ',2);
                             if Props.Count > 0 then
                               for i := 0 to Props.Count - 1 do
                                 if UseHelperFunctions and HelperCodeGen.HelperFuncts.ContainsKey(Props.Names[i]) and not WMiClassMetaData.Properties[i].IsArray then
@@ -437,6 +438,7 @@ begin
       WmiCode_Default,
       WmiCode_LateBinding:
                           begin
+                            Padding:= StringOfChar(' ',2);
                             if Props.Count > 0 then
                               for i := 0 to Props.Count - 1 do
                                 if UseHelperFunctions and HelperCodeGen.HelperFuncts.ContainsKey(Props.Names[i]) and not WMiClassMetaData.PropertyByName[Props.Names[i]].IsArray then
