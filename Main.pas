@@ -453,7 +453,8 @@ begin
   begin
    FrmWMISQL.NameSpaces:=FrmWmiClasses.ComboBoxNameSpaces.Items;
    if FrmWMISQL.CbNameSpaces.Text='' then
-    FrmWMISQL.CbNameSpaces.ItemIndex:=FrmWMISQL.CbNameSpaces.Items.IndexOf(FrmWmiClasses.ComboBoxNameSpaces.Text);
+    FrmWMISQL.SetNameSpaceIndex(FrmWMISQL.CbNameSpaces.Items.IndexOf(FrmWmiClasses.ComboBoxNameSpaces.Text));
+
     {
    if FrmWMISQL.SynSQLSyn1.TableNames.Count=0 then
      FrmWMISQL.SynSQLSyn1.TableNames.AddStrings(FrmWmiClasses.ComboBoxClasses.Items);

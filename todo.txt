@@ -3,6 +3,8 @@
   Add completion proposal to sql wmi
   save common WQL ?
 
+  improve web page (list features)
+
   Add lock option (read only)
    
   Add metadata resolver (functions) to code
