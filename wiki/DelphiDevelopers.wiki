@@ -373,5 +373,7 @@ http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wik
 
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/DelphiCode_Generator.PNG
 
+<li>Selection of method use to generate delphi code</li>
+http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/DelphiCode_Settings.PNG
 
 	
