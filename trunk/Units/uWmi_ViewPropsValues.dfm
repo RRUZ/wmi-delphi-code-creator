@@ -82,7 +82,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           TabOrder = 0
           ViewStyle = vsReport
           OnData = ListViewGridData
-          OnDblClick = ListViewGridDblClick
+          OnDblClick = ActionViewPropDetailsExecute
         end
       end
       object TabSheet2: TTabSheet
@@ -122,8 +122,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           SmallImages = listViewImages
           TabOrder = 0
           ViewStyle = vsReport
-          OnDblClick = ListViewPropsLinksDblClick
-          ExplicitTop = 3
+          OnDblClick = ActionViewDetailsPropsExecute
         end
       end
     end
@@ -196,7 +195,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C010106000800300010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106000800340010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -471,8 +470,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 216
     Top = 200
     object Viewdetails1: TMenuItem
-      Caption = 'View details'
-      OnClick = ListViewGridDblClick
+      Action = ActionViewPropDetails
     end
   end
   object PopupActionBar2: TPopupActionBar
@@ -480,13 +478,32 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 296
     Top = 208
     object ViewDetails2: TMenuItem
-      Caption = 'View Details'
-      OnClick = ListViewPropsLinksDblClick
+      Action = ActionViewDetailsProps
     end
     object Checkforonlinedocumentation1: TMenuItem
+      Action = ActionCheckOnlineDocs
+    end
+  end
+  object ActionManager1: TActionManager
+    Images = listViewImages
+    Left = 400
+    Top = 248
+    StyleName = 'Platform Default'
+    object ActionViewPropDetails: TAction
+      Caption = 'View Details'
+      OnExecute = ActionViewPropDetailsExecute
+      OnUpdate = ActionViewPropDetailsUpdate
+    end
+    object ActionViewDetailsProps: TAction
+      Caption = 'View Details Properties '
+      OnExecute = ActionViewDetailsPropsExecute
+      OnUpdate = ActionViewDetailsPropsUpdate
+    end
+    object ActionCheckOnlineDocs: TAction
       Caption = 'Check for online documentation'
       ImageIndex = 5
-      OnClick = Checkforonlinedocumentation1Click
+      OnExecute = ActionCheckOnlineDocsExecute
+      OnUpdate = ActionCheckOnlineDocsUpdate
     end
   end
 end

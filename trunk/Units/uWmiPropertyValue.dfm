@@ -25,8 +25,6 @@ object FrmWMIPropValue: TFrmWMIPropValue
     PopupMenu = PopupActionBar1
     ScrollBars = ssBoth
     TabOrder = 0
-    ExplicitWidth = 635
-    ExplicitHeight = 300
   end
   object PopupActionBar1: TPopupActionBar
     Left = 168

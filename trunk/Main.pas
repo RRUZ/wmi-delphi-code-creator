@@ -54,7 +54,7 @@ type
     PanelConsole: TPanel;
     Splitter4: TSplitter;
     ToolButtonGetValues: TToolButton;
-    TabSheetWmiDatabase: TTabSheet;
+    TabSheetWmiFinder: TTabSheet;
     ImageList1: TImageList;
     PageControl2: TPageControl;
     TabSheet3: TTabSheet;
@@ -179,7 +179,7 @@ begin
 
   ProgressBarWmi.Parent := StatusBar1;
   FrmWmiDatabase := TFrmWmiDatabase.Create(Self);
-  FrmWmiDatabase.Parent := TabSheetWmiDatabase;
+  FrmWmiDatabase.Parent := TabSheetWmiFinder;
   FrmWmiDatabase.BorderStyle := bsNone;
   FrmWmiDatabase.Align := alClient;
   //FrmWmiDatabase.Status:=SetMsg;
@@ -431,7 +431,7 @@ end;
 
 procedure TFrmMain.PageControlMainChange(Sender: TObject);
 begin
-  if PageControlMain.ActivePage = TabSheetWmiDatabase then
+  if PageControlMain.ActivePage = TabSheetWmiFinder then
    FrmWmiDatabase.NameSpaces:=FrmWmiClasses.ComboBoxNameSpaces.Items;
 end;
 

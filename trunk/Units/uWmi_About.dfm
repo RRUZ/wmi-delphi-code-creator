@@ -4,7 +4,7 @@ object FrmAbout: TFrmAbout
   ActiveControl = btnCheckUpdates
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'About'
+  Caption = 'About WMI Delphi Code Creator'
   ClientHeight = 316
   ClientWidth = 446
   Color = clBtnFace

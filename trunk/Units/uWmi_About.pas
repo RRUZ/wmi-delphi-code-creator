@@ -109,12 +109,16 @@ begin
   MemoCopyRights.Lines.Add(
     'Author Rodrigo Ruz rodrigo.ruz.v@gmail.com - © 2010-2012 all rights reserved.');
   MemoCopyRights.Lines.Add('');
+  MemoCopyRights.Lines.Add('Third Party libraries and tools used');
   MemoCopyRights.Lines.Add(
     'SynEdit http://synedit.svn.sourceforge.net/viewvc/synedit/ all rights reserved.');
+  MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add(
     'AsyncCalls 2.98 Copyright © 2008-2011 Andreas Hausladen all rights reserved.');
   MemoCopyRights.Lines.Add('http://andy.jgknet.de/blog/?page_id=100');
   MemoCopyRights.Lines.Add('');
+  MemoCopyRights.Lines.Add('Artistic Style 2.02 - http://sourceforge.net/projects/astyle/');
+  MemoCopyRights.Lines.Add('A Free, Fast and Small Automatic Formatter C, C++, C#, and Java Source Code');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('');
