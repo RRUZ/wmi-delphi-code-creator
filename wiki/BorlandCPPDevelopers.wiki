@@ -1,13 +1,930 @@
 #summary C++ Builder support
 
-= Introduction =
+http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/BorlandCppCode_Generator.PNG
 
-Add your content here.
+The C++ Builder code generator included in the WDCC has the next features
 
 
-= Details =
+    <li>Code formatter</li>
+    <li>The Code generated support local and remote WMI connections</li>
+    <li>Can generate C++ code compatible with all these compilers <strong>Borland C++ Builder 5 to Embarcadero C++ Builder XE2 </strong></li>
+    <li>Open the generated Borland C++ code directly in any of these  <a href="http://www.embarcadero.com/products/cbuilder">C++ Builder</a> IDE's 5, 6, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE, XE2</li>
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/BorlandCppCode_Compiler.PNG
+
+Sample of C++ Builder code generated to access Win32_SMBIOSMemory the WMI class
+
+{{{
+#pragma hdrstop
+#include <iostream>
+using namespace std;
+#include <wbemcli.h>
+#include <comdef.h> 
+
+//CREDENTIAL structure
+//http://msdn.microsoft.com/en-us/library/windows/desktop/aa374788%28v=vs.85%29.aspx
+#define CRED_MAX_USERNAME_LENGTH            513
+#define CRED_MAX_CREDENTIAL_BLOB_SIZE       512
+#define CREDUI_MAX_USERNAME_LENGTH CRED_MAX_USERNAME_LENGTH
+#define CREDUI_MAX_PASSWORD_LENGTH (CRED_MAX_CREDENTIAL_BLOB_SIZE / 2)
+
+// The Win32_SMBIOSMemory class represents the properties of a computer system's memory as seen through the System Management BIOS (SMBIOS) interface. The SMBIOS interface does not distinguish between non-volatile, volatile, and flash memories. As such, the CIM_Memory class is the parent class of all types of memory.
+
+#pragma argsused
+int main(int argc, char* argv[])
+{
+	wchar_t pszName[CREDUI_MAX_USERNAME_LENGTH+1] = L"user";
+	wchar_t pszPwd[CREDUI_MAX_PASSWORD_LENGTH+1]  = L"password";
+	BSTR strNetworkResource;
+	//To use a WMI remote connection set localconn to false and configure the values of the pszName, pszPwd and the name of the remote machine in strNetworkResource
+	bool localconn = true;	
+	strNetworkResource = localconn ?  L"\\\\.\\root\\CIMV2" : L"\\\\remote--machine\\root\\CIMV2";
+
+	COAUTHIDENTITY *userAcct =  NULL ;
+	COAUTHIDENTITY authIdent;
+
+	// Initialize COM. ------------------------------------------
+
+	HRESULT hres;
+	hres =  CoInitializeEx(0, COINIT_MULTITHREADED);
+	if (FAILED(hres))
+	{
+        cout << "Failed to initialize COM library. Error code = 0x"	<< hex << hres << endl;
+        cout << _com_error(hres).ErrorMessage() << endl;
+        cout << "press enter to exit" << endl;
+        cin.get();		
+        return 1;                  // Program has failed.
+	}
+
+	// Set general COM security levels --------------------------
+
+	if (localconn)
+		hres =  CoInitializeSecurity(
+			NULL,
+			-1,                          // COM authentication
+			NULL,                        // Authentication services
+			NULL,                        // Reserved
+			RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
+			RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation
+			NULL,                        // Authentication info
+			EOAC_NONE,                   // Additional capabilities
+			NULL                         // Reserved
+			);
+	else
+		hres =  CoInitializeSecurity(
+			NULL,
+			-1,                          // COM authentication
+			NULL,                        // Authentication services
+			NULL,                        // Reserved
+			RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
+			RPC_C_IMP_LEVEL_IDENTIFY,    // Default Impersonation
+			NULL,                        // Authentication info
+			EOAC_NONE,                   // Additional capabilities
+			NULL                         // Reserved
+			);
+			
+	if (FAILED(hres))
+	{
+        cout << "Failed to initialize security. Error code = 0x" << hex << hres << endl;
+        cout << _com_error(hres).ErrorMessage() << endl;
+        CoUninitialize();
+		cout << "press enter to exit" << endl;
+	    cin.get();		
+        return 1;                    // Program has failed.
+	}
+
+	// Obtain the initial locator to WMI -------------------------
+
+	IWbemLocator *pLoc = NULL;
+	hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
+
+	if (FAILED(hres))
+	{
+        cout << "Failed to create IWbemLocator object."	<< " Err code = 0x" << hex << hres << endl;
+        cout << _com_error(hres).ErrorMessage() << endl;
+        CoUninitialize();	    
+        cout << "press enter to exit" << endl;
+		cin.get();		
+        return 1;                 // Program has failed.
+	}
+
+	// Connect to WMI through the IWbemLocator::ConnectServer method
+
+	IWbemServices *pSvc = NULL;
+
+	if (localconn)	
+		hres = pLoc->ConnectServer(
+			 strNetworkResource,      // Object path of WMI namespace
+			 NULL,                    // User name. NULL = current user
+			 NULL,                    // User password. NULL = current
+			 0,                       // Locale. NULL indicates current
+			 NULL,                    // Security flags.
+			 0,                       // Authority (e.g. Kerberos)
+			 0,                       // Context object
+			 &pSvc                    // pointer to IWbemServices proxy
+			 );
+	else
+		hres = pLoc->ConnectServer(
+			strNetworkResource,  // Object path of WMI namespace
+			pszName,             // User name
+			pszPwd,              // User password
+			NULL,                // Locale
+			NULL,                // Security flags
+			NULL,				 // Authority
+			NULL,                // Context object
+			&pSvc                // IWbemServices proxy
+			);
+
+	if (FAILED(hres))
+	{
+        cout << "Could not connect. Error code = 0x" << hex << hres << endl;	
+        cout << _com_error(hres).ErrorMessage() << endl;
+        pLoc->Release();
+        CoUninitialize();
+	    cout << "press enter to exit" << endl;
+	    cin.get();			
+        return 1;                // Program has failed.
+	}
+
+	cout << "Connected to root\\CIMV2 WMI namespace" << endl;
+
+    // Set security levels on the proxy -------------------------
+	if (localconn)
+		hres = CoSetProxyBlanket(
+		   pSvc,                        // Indicates the proxy to set
+		   RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
+		   RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
+		   NULL,                        // Server principal name
+		   RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx
+		   RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
+		   NULL,                        // client identity
+		   EOAC_NONE                    // proxy capabilities
+		);
+	else
+	{
+		// Create COAUTHIDENTITY that can be used for setting security on proxy
+		memset(&authIdent, 0, sizeof(COAUTHIDENTITY));
+		authIdent.PasswordLength = wcslen (pszPwd);
+		authIdent.Password = (USHORT*)pszPwd;
+		authIdent.User = (USHORT*)pszName;
+		authIdent.UserLength = wcslen(pszName);
+		authIdent.Domain = 0;
+		authIdent.DomainLength = 0;
+		authIdent.Flags = SEC_WINNT_AUTH_IDENTITY_UNICODE;
+		userAcct = &authIdent;
+
+		hres = CoSetProxyBlanket(
+		   pSvc,                           // Indicates the proxy to set
+		   RPC_C_AUTHN_DEFAULT,            // RPC_C_AUTHN_xxx
+		   RPC_C_AUTHZ_DEFAULT,            // RPC_C_AUTHZ_xxx
+		   COLE_DEFAULT_PRINCIPAL,         // Server principal name
+		   RPC_C_AUTHN_LEVEL_PKT_PRIVACY,  // RPC_C_AUTHN_LEVEL_xxx
+		   RPC_C_IMP_LEVEL_IMPERSONATE,    // RPC_C_IMP_LEVEL_xxx
+		   userAcct,                       // client identity
+		   EOAC_NONE                       // proxy capabilities
+		);
+	}
+
+	if (FAILED(hres))
+	{
+        cout << "Could not set proxy blanket. Error code = 0x" << hex << hres << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;
+		pSvc->Release();
+		pLoc->Release();
+		CoUninitialize();
+		cout << "press enter to exit" << endl;
+		cin.get();		
+		return 1;               // Program has failed.
+	}
+
+	// Use the IWbemServices pointer to make requests of WMI ----
+
+	IEnumWbemClassObject* pEnumerator = NULL;
+	hres = pSvc->ExecQuery(	L"WQL",	L"SELECT * FROM Win32_SMBIOSMemory",
+	WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
+
+	if (FAILED(hres))
+	{
+		cout << "ExecQuery failed" << " Error code = 0x"	<< hex << hres << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;
+		pSvc->Release();
+		pLoc->Release();
+		CoUninitialize();
+		cout << "press enter to exit" << endl;
+		cin.get();		
+		return 1;               // Program has failed.
+	}
+    
+	// Secure the enumerator proxy
+	if (!localconn)
+	{
+		
+		hres = CoSetProxyBlanket(
+			pEnumerator,                    // Indicates the proxy to set
+			RPC_C_AUTHN_DEFAULT,            // RPC_C_AUTHN_xxx
+			RPC_C_AUTHZ_DEFAULT,            // RPC_C_AUTHZ_xxx
+			COLE_DEFAULT_PRINCIPAL,         // Server principal name
+			RPC_C_AUTHN_LEVEL_PKT_PRIVACY,  // RPC_C_AUTHN_LEVEL_xxx
+			RPC_C_IMP_LEVEL_IMPERSONATE,    // RPC_C_IMP_LEVEL_xxx
+			userAcct,                       // client identity
+			EOAC_NONE                       // proxy capabilities
+			);
+
+		if (FAILED(hres))
+		{
+			cout << "Could not set proxy blanket on enumerator. Error code = 0x" << hex << hres << endl;
+			cout << _com_error(hres).ErrorMessage() << endl;
+			pEnumerator->Release();
+			pSvc->Release();
+			pLoc->Release();
+			CoUninitialize();
+			cout << "press enter to exit" << endl;
+			cin.get();				
+			return 1;               // Program has failed.
+		}
+	}
+
+	// Get the data from the WQL sentence
+	IWbemClassObject *pclsObj = NULL;
+	ULONG uReturn = 0;
+
+	while (pEnumerator)
+	{
+		HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+
+		if(0 == uReturn || FAILED(hr))
+		  break;
+
+		VARIANT vtProp;
+
+                hr = pclsObj->Get(L"Caption", 0, &vtProp, 0, 0);// String
+                if (!FAILED(hr))
+                {
+                  if ((vtProp.vt==VT_NULL) || (vtProp.vt==VT_EMPTY))
+                    wcout << "Caption : " << ((vtProp.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
+                  else
+                  if ((vtProp.vt & VT_ARRAY))
+                    wcout << "Caption : " << "Array types not supported (yet)" << endl;
+                  else
+                    wcout << "Caption : " << vtProp.bstrVal << endl;
+                }
+                VariantClear(&vtProp);
+
+                hr = pclsObj->Get(L"PNPDeviceID", 0, &vtProp, 0, 0);// String
+                if (!FAILED(hr))
+                {
+                  if ((vtProp.vt==VT_NULL) || (vtProp.vt==VT_EMPTY))
+                    wcout << "PNPDeviceID : " << ((vtProp.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
+                  else
+                  if ((vtProp.vt & VT_ARRAY))
+                    wcout << "PNPDeviceID : " << "Array types not supported (yet)" << endl;
+                  else
+                    wcout << "PNPDeviceID : " << vtProp.bstrVal << endl;
+                }
+                VariantClear(&vtProp);
+
+                hr = pclsObj->Get(L"StatusInfo", 0, &vtProp, 0, 0);// Uint16
+                if (!FAILED(hr))
+                {
+                  if ((vtProp.vt==VT_NULL) || (vtProp.vt==VT_EMPTY))
+                    wcout << "StatusInfo : " << ((vtProp.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
+                  else
+                  if ((vtProp.vt & VT_ARRAY))
+                    wcout << "StatusInfo : " << "Array types not supported (yet)" << endl;
+                  else
+                    wcout << "StatusInfo : " << vtProp.uiVal << endl;
+                }
+                VariantClear(&vtProp);
+
+		
+		pclsObj->Release();
+		pclsObj=NULL;
+	}
+
+	// Cleanup
+
+	pSvc->Release();
+	pLoc->Release();
+	pEnumerator->Release();
+	if (pclsObj!=NULL)
+	 pclsObj->Release();
+
+	CoUninitialize();
+	cout << "press enter to exit" << endl;
+	cin.get();
+	return 0;   // Program successfully completed.
+}
+}}}
+
+Sample of C++Builder generated code to execute the Create method of the Win32_Process class
+
+{{{
+#include "stdafx.h"
+#define _WIN32_DCOM
+#include <iostream>
+using namespace std;
+#include <comdef.h>
+#include <Wbemidl.h>
+# pragma comment(lib, "wbemuuid.lib")
+
+
+//CREDENTIAL structure
+//http://msdn.microsoft.com/en-us/library/windows/desktop/aa374788%28v=vs.85%29.aspx
+#define CRED_MAX_USERNAME_LENGTH            513
+#define CRED_MAX_CREDENTIAL_BLOB_SIZE       512
+#define CREDUI_MAX_USERNAME_LENGTH CRED_MAX_USERNAME_LENGTH
+#define CREDUI_MAX_PASSWORD_LENGTH (CRED_MAX_CREDENTIAL_BLOB_SIZE / 2)
+
+// The Create method creates a new process. 
+// The method returns an integer value that can be interpretted as follows: 
+// 0 - Successful completion.
+// 2 - The user does not have access to the requested information.
+// 3 - The user does not have sufficient privilge.
+// 8 - Unknown failure.
+// 9 - The path specified does not exist.
+// 21 - The specified parameter is invalid.
+// Other - For integer values other than those listed above, refer to Win32 error code documentation.
+
+#pragma argsused
+int main(int argc, char* argv[])
+{
+	wchar_t pszName[CREDUI_MAX_USERNAME_LENGTH+1] = L"user";
+	wchar_t pszPwd[CREDUI_MAX_PASSWORD_LENGTH+1]  = L"password";
+	BSTR strNetworkResource;
+	//To use a WMI remote connection set localconn to false and configure the values of the pszName, pszPwd and the name of the remote machine in strNetworkResource
+	bool localconn = true;	
+	strNetworkResource = localconn ?  L"\\\\.\\root\\CIMV2" : L"\\\\remote--machine\\root\\CIMV2";
+
+	COAUTHIDENTITY *userAcct =  NULL ;
+	COAUTHIDENTITY authIdent;
+	
+	HRESULT hres;
+
+	// Initialize COM. ------------------------------------------
+
+	hres =  CoInitializeEx(0, COINIT_MULTITHREADED);
+	if (FAILED(hres))
+	{
+		cout << "Failed to initialize COM library. Error code = 0x" << hex << hres << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;
+		cout << "press enter to exit" << endl;
+		cin.get();			
+		return 1;                  // Program has failed.
+	}
+
+	// Set general COM security levels --------------------------
+
+	if (localconn)
+		hres =  CoInitializeSecurity(
+			NULL,
+			-1,                          // COM authentication
+			NULL,                        // Authentication services
+			NULL,                        // Reserved
+			RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
+			RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation
+			NULL,                        // Authentication info
+			EOAC_NONE,                   // Additional capabilities
+			NULL                         // Reserved
+			);
+	else
+		hres =  CoInitializeSecurity(
+			NULL,
+			-1,                          // COM authentication
+			NULL,                        // Authentication services
+			NULL,                        // Reserved
+			RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
+			RPC_C_IMP_LEVEL_IDENTIFY,    // Default Impersonation
+			NULL,                        // Authentication info
+			EOAC_NONE,                   // Additional capabilities
+			NULL                         // Reserved
+			);
+			
+                      
+	if (FAILED(hres))
+	{
+		cout << "Failed to initialize security. Error code = 0x" << hex << hres << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;
+		CoUninitialize();
+		cout << "press enter to exit" << endl;
+		cin.get();			
+		return 1;                      // Program has failed.
+	}
+    
+    // Obtain the initial locator to WMI -------------------------
+
+    IWbemLocator *pLoc = NULL;
+    hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
+ 
+	if (FAILED(hres))
+	{
+		cout << "Failed to create IWbemLocator object. " << "Err code = 0x" << hex << hres << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;
+		CoUninitialize();
+		cout << "press enter to exit" << endl;
+		cin.get();				
+		return 1;                 // Program has failed.
+	}
+
+    // Connect to WMI through the IWbemLocator::ConnectServer method
+
+    IWbemServices *pSvc = NULL;
+	
+    // Connect to the root\\CIMV2 namespace
+    // and obtain pointer pSvc to make IWbemServices calls.
+	if (localconn)	
+		hres = pLoc->ConnectServer(
+			 _bstr_t(strNetworkResource),      // Object path of WMI namespace
+			 NULL,                    // User name. NULL = current user
+			 NULL,                    // User password. NULL = current
+			 0,                       // Locale. NULL indicates current
+			 NULL,                    // Security flags.
+			 0,                       // Authority (e.g. Kerberos)
+			 0,                       // Context object
+			 &pSvc                    // pointer to IWbemServices proxy
+			 );
+	else
+		hres = pLoc->ConnectServer(
+			_bstr_t(strNetworkResource),  // Object path of WMI namespace
+			_bstr_t(pszName),             // User name
+			_bstr_t(pszPwd),              // User password
+			NULL,                // Locale
+			NULL,                // Security flags
+			NULL,				 // Authority
+			NULL,                // Context object
+			&pSvc                // IWbemServices proxy
+			);
+			
+			
+	if (FAILED(hres))
+	{
+		cout << "Could not connect. Error code = 0x" << hex << hres << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;
+		pLoc->Release();
+		CoUninitialize();
+		cout << "press enter to exit" << endl;
+		cin.get();					
+		return 1;                // Program has failed.
+	}
+
+	cout << "Connected to root\\CIMV2 WMI namespace" << endl;
+
+    // Set security levels on the proxy -------------------------
+	if (localconn)
+		hres = CoSetProxyBlanket(
+		   pSvc,                        // Indicates the proxy to set
+		   RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
+		   RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
+		   NULL,                        // Server principal name
+		   RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx
+		   RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
+		   NULL,                        // client identity
+		   EOAC_NONE                    // proxy capabilities
+		);
+	else
+	{
+		// Create COAUTHIDENTITY that can be used for setting security on proxy
+		memset(&authIdent, 0, sizeof(COAUTHIDENTITY));
+		authIdent.PasswordLength = wcslen (pszPwd);
+		authIdent.Password = (USHORT*)pszPwd;
+		authIdent.User = (USHORT*)pszName;
+		authIdent.UserLength = wcslen(pszName);
+		authIdent.Domain = 0;
+		authIdent.DomainLength = 0;
+		authIdent.Flags = SEC_WINNT_AUTH_IDENTITY_UNICODE;
+		userAcct = &authIdent;
+
+		hres = CoSetProxyBlanket(
+		   pSvc,                           // Indicates the proxy to set
+		   RPC_C_AUTHN_DEFAULT,            // RPC_C_AUTHN_xxx
+		   RPC_C_AUTHZ_DEFAULT,            // RPC_C_AUTHZ_xxx
+		   COLE_DEFAULT_PRINCIPAL,         // Server principal name
+		   RPC_C_AUTHN_LEVEL_PKT_PRIVACY,  // RPC_C_AUTHN_LEVEL_xxx
+		   RPC_C_IMP_LEVEL_IMPERSONATE,    // RPC_C_IMP_LEVEL_xxx
+		   userAcct,                       // client identity
+		   EOAC_NONE                       // proxy capabilities
+		);
+	}
+	
+	
+	if (FAILED(hres))
+	{
+		cout << "Could not set proxy blanket. Error code = 0x" << hex << hres << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;
+		pSvc->Release();
+		pLoc->Release();     
+		CoUninitialize();
+		cout << "press enter to exit" << endl;
+		cin.get();					
+		return 1;               // Program has failed.
+	}
+
+    // Use the IWbemServices pointer to make requests of WMI ----
+
+    BSTR MethodName = SysAllocString(L"Create");
+    BSTR ClassName = SysAllocString(L"Win32_Process");
+
+    IWbemClassObject* pClass = NULL;
+    hres = pSvc->GetObject(ClassName, 0, NULL, &pClass, NULL);
+
+    IWbemClassObject* pInParamsDefinition = NULL;
+    hres = pClass->GetMethod(MethodName, 0, &pInParamsDefinition, NULL);
+
+    IWbemClassObject* pClassInstance = NULL;
+    hres = pInParamsDefinition->SpawnInstance(0, &pClassInstance);
+
+    VARIANT varCommand;
+	
+
+	// Execute Method
+	IWbemClassObject* pOutParams = NULL;
+	hres = pSvc->ExecMethod(ClassName, MethodName, 0,
+	NULL, pClassInstance, &pOutParams, NULL);
+
+	if (FAILED(hres))
+	{
+		cout << "Could not execute method. Error code = 0x" << hex << hres << endl;
+		cout << _com_error(hres).ErrorMessage() << endl;
+		SysFreeString(ClassName);
+		SysFreeString(MethodName);
+		if (pClass)			
+		pClass->Release();
+		if (pInParamsDefinition)			
+		pInParamsDefinition->Release();
+		if (pOutParams)			
+		pOutParams->Release();
+		if (pSvc)			
+		pSvc->Release();
+		if (pLoc)			
+		pLoc->Release();     
+		CoUninitialize();
+		cout << "press enter to exit" << endl;
+		cin.get();			
+		return 1;               // Program has failed.
+	}
+
+
+	
+    VARIANT varReturnValue;
+    hres = pOutParams->Get(L"ProcessId", 0, &varReturnValue, NULL, 0);
+    if (!FAILED(hres))
+    {
+      if ((varReturnValue.vt==VT_NULL) || (varReturnValue.vt==VT_EMPTY))
+        wcout << "ProcessId : " << ((varReturnValue.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
+      else
+      if ((varReturnValue.vt & VT_ARRAY))
+        wcout << "ProcessId : " << "Array types not supported (yet)" << endl;
+      else
+        wcout << "ProcessId : " << varReturnValue.uintVal << endl;
+    }
+    VariantClear(&varReturnValue);
+
+    hres = pOutParams->Get(L"ReturnValue", 0, &varReturnValue, NULL, 0);
+    if (!FAILED(hres))
+    {
+      if ((varReturnValue.vt==VT_NULL) || (varReturnValue.vt==VT_EMPTY))
+        wcout << "ReturnValue : " << ((varReturnValue.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
+      else
+      if ((varReturnValue.vt & VT_ARRAY))
+        wcout << "ReturnValue : " << "Array types not supported (yet)" << endl;
+      else
+        wcout << "ReturnValue : " << varReturnValue.uintVal << endl;
+    }
+    VariantClear(&varReturnValue);
+
+	
+
+    // Clean up    
+    SysFreeString(ClassName);
+    SysFreeString(MethodName);
+    pClass->Release();
+    pInParamsDefinition->Release();
+    pOutParams->Release();
+    pLoc->Release();
+    pSvc->Release();
+    CoUninitialize();
+    cout << "press enter to exit" << endl;
+    cin.get();	
+    return 0;
+}
+}}}
+
+Sample of C++ Builder code generated to listen the __InstanceCreationEvent and the Win32_Process WMI class
+
+{{{
+#pragma hdrstop
+#include <iostream>
+#include <conio.h>
+using namespace std;
+#include <wbemcli.h>
+#include <comdef.h> 
+
+//CREDENTIAL structure
+//http://msdn.microsoft.com/en-us/library/windows/desktop/aa374788%28v=vs.85%29.aspx
+#define CRED_MAX_USERNAME_LENGTH            513
+#define CRED_MAX_CREDENTIAL_BLOB_SIZE       512
+#define CREDUI_MAX_USERNAME_LENGTH CRED_MAX_USERNAME_LENGTH
+#define CREDUI_MAX_PASSWORD_LENGTH (CRED_MAX_CREDENTIAL_BLOB_SIZE / 2)
+
+#ifndef EVENTSINK_H
+#define EVENTSINK_H
+
+class EventSink : public IWbemObjectSink
+{
+    LONG m_lRef;
+    bool bDone;
+
+public:
+    EventSink() { m_lRef = 0; }
+   ~EventSink() { bDone = true; }
+
+    virtual ULONG STDMETHODCALLTYPE AddRef();
+    virtual ULONG STDMETHODCALLTYPE Release();        
+    virtual HRESULT 
+        STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppv);
+
+    virtual HRESULT STDMETHODCALLTYPE Indicate( 
+            LONG lObjectCount,
+            IWbemClassObject __RPC_FAR *__RPC_FAR *apObjArray
+            );
+        
+    virtual HRESULT STDMETHODCALLTYPE SetStatus( 
+            /* [in] */ LONG lFlags,
+            /* [in] */ HRESULT hResult,
+            /* [in] */ BSTR strParam,
+            /* [in] */ IWbemClassObject __RPC_FAR *pObjParam
+            );
+};
+
+#endif    // end of EventSink.h
+
+ULONG __stdcall EventSink::AddRef()
+{
+    return InterlockedIncrement(&m_lRef);
+}
+
+ULONG __stdcall EventSink::Release()
+{
+    LONG lRef = InterlockedDecrement(&m_lRef);
+    if(lRef == 0)
+        delete this;
+    return lRef;
+}
+
+HRESULT __stdcall EventSink::QueryInterface(REFIID riid, void** ppv)
+{
+    if (riid == IID_IUnknown || riid == IID_IWbemObjectSink)
+    {
+        *ppv = (IWbemObjectSink *) this;
+        AddRef();
+        return WBEM_S_NO_ERROR;
+    }
+    else return E_NOINTERFACE;
+}
+
+
+HRESULT __stdcall EventSink::Indicate(long lObjectCount,
+    IWbemClassObject **apObjArray)
+{
+   HRESULT hr = S_OK;
+   _variant_t vtProp;
+
+    for (int i = 0; i < lObjectCount; i++)
+    {
+
+    hr = apObjArray[i]->Get(L"TargetInstance", 0, &vtProp, 0, 0);
+     if (!FAILED(hr))
+     {
+       IUnknown* str = vtProp;
+       hr = str->QueryInterface( IID_IWbemClassObject, reinterpret_cast< void** >( &apObjArray[i] ) );
+       if ( SUCCEEDED( hr ) )
+       {
+          _variant_t cn;
+         hr = apObjArray[i]->Get( L"Handle", 0, &cn, NULL, NULL );
+          if ( SUCCEEDED( hr ) )
+          {
+            if ((cn.vt==VT_NULL) || (cn.vt==VT_EMPTY))
+             wcout << "Handle : " << ((cn.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
+            else
+            if ((cn.vt & VT_ARRAY))
+             wcout << "Handle : " << "Array types not supported (yet)" << endl;
+            else
+             wcout << "Handle : " << cn.bstrVal << endl;
+          }
+          VariantClear(&cn);
+           
+         hr = apObjArray[i]->Get( L"Name", 0, &cn, NULL, NULL );
+          if ( SUCCEEDED( hr ) )
+          {
+            if ((cn.vt==VT_NULL) || (cn.vt==VT_EMPTY))
+             wcout << "Name : " << ((cn.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
+            else
+            if ((cn.vt & VT_ARRAY))
+             wcout << "Name : " << "Array types not supported (yet)" << endl;
+            else
+             wcout << "Name : " << cn.bstrVal << endl;
+          }
+          VariantClear(&cn);
+           
+    
+       }
+     }
+     VariantClear(&vtProp);
+		
+    }
+
+    return WBEM_S_NO_ERROR;
+}
+
+HRESULT __stdcall EventSink::SetStatus(
+            /* [in] */ LONG lFlags,
+            /* [in] */ HRESULT hResult,
+            /* [in] */ BSTR strParam,
+            /* [in] */ IWbemClassObject __RPC_FAR *pObjParam
+        )
+{
+    if(lFlags == WBEM_STATUS_COMPLETE)
+    {
+        printf("Call complete. hResult = 0x%X\n", hResult);
+    }
+    else if(lFlags == WBEM_STATUS_PROGRESS)
+    {
+        printf("Call in progress.\n");
+    }
+
+    return WBEM_S_NO_ERROR;
+}    // end of EventSink.cpp
+
+
+#pragma argsused
+int main(int argc, char* argv[])
+{
+    HRESULT hres;
+
+    // Step 1: --------------------------------------------------
+    // Initialize COM. ------------------------------------------
+
+    hres =  CoInitializeEx(0, COINIT_MULTITHREADED); 
+    if (FAILED(hres))
+    {
+        cout << "Failed to initialize COM library. Error code = 0x" 
+             << hex << hres << endl;
+        return 1;                  // Program has failed.
+    }
+
+    // Step 2: --------------------------------------------------
+    // Set general COM security levels --------------------------
+    // Note: If you are using Windows 2000, you need to specify -
+    // the default authentication credentials for a user by using
+    // a SOLE_AUTHENTICATION_LIST structure in the pAuthList ----
+    // parameter of CoInitializeSecurity ------------------------
+
+    hres =  CoInitializeSecurity(
+        NULL, 
+        -1,                          // COM negotiates service
+        NULL,                        // Authentication services
+        NULL,                        // Reserved
+        RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
+        RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
+        NULL,                        // Authentication info
+        EOAC_NONE,                   // Additional capabilities 
+        NULL                         // Reserved
+        );
+
+                      
+    if (FAILED(hres))
+    {
+        cout << "Failed to initialize security. Error code = 0x" 
+             << hex << hres << endl;
+        CoUninitialize();
+        return 1;                      // Program has failed.
+    }
+    
+    // Step 3: ---------------------------------------------------
+    // Obtain the initial locator to WMI -------------------------
+
+    IWbemLocator *pLoc = NULL;
+
+    hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
+ 
+    if (FAILED(hres))
+    {
+        cout << "Failed to create IWbemLocator object. "
+             << "Err code = 0x"
+             << hex << hres << endl;
+        CoUninitialize();
+        return 1;                 // Program has failed.
+    }
+
+    // Step 4: ---------------------------------------------------
+    // Connect to WMI through the IWbemLocator::ConnectServer method
+
+    IWbemServices *pSvc = NULL;
+	
+    // Connect to the local root\cimv2 namespace
+    // and obtain pointer pSvc to make IWbemServices calls.
+    hres = pLoc->ConnectServer(
+        L"root\\CIMV2", 
+        NULL,
+        NULL, 
+        0, 
+        NULL, 
+        0, 
+        0, 
+        &pSvc
+    );
+	    
+    if (FAILED(hres))
+    {
+        cout << "Could not connect. Error code = 0x" 
+             << hex << hres << endl;
+        pLoc->Release();     
+        CoUninitialize();
+        return 1;                // Program has failed.
+    }
+
+    cout << "Connected to root\\CIMV2 WMI namespace" << endl;
+
+
+    // Step 5: --------------------------------------------------
+    // Set security levels on the proxy -------------------------
+
+    hres = CoSetProxyBlanket(
+        pSvc,                        // Indicates the proxy to set
+        RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx 
+        RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx 
+        NULL,                        // Server principal name 
+        RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
+        RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
+        NULL,                        // client identity
+        EOAC_NONE                    // proxy capabilities 
+    );
+
+    if (FAILED(hres))
+    {
+        cout << "Could not set proxy blanket. Error code = 0x" << hex << hres << endl;
+        pSvc->Release();
+        pLoc->Release();     
+        CoUninitialize();
+        return 1;               // Program has failed.
+    }
+
+    // Step 6: -------------------------------------------------
+    // Receive event notifications -----------------------------
+
+    // Use an unsecured apartment for security
+    IUnsecuredApartment* pUnsecApp = NULL;
+
+    hres = CoCreateInstance(CLSID_UnsecuredApartment, NULL, CLSCTX_LOCAL_SERVER, IID_IUnsecuredApartment, (void**)&pUnsecApp);
+ 
+    EventSink* pSink = new EventSink;
+    pSink->AddRef();
+
+    IUnknown* pStubUnk = NULL; 
+    pUnsecApp->CreateObjectStub(pSink, &pStubUnk);
+
+    IWbemObjectSink* pStubSink = NULL;
+    pStubUnk->QueryInterface(IID_IWbemObjectSink, (void **) &pStubSink);
+
+    BSTR WQL;
+    WQL =L"Select * From __InstanceCreationEvent Within 1 "
+        L"Where TargetInstance ISA 'Win32_Process' "
+;
+	
+    // The ExecNotificationQueryAsync method will call
+    // The EventQuery::Indicate method when an event occurs
+    hres = pSvc->ExecNotificationQueryAsync(L"WQL", WQL, WBEM_FLAG_SEND_STATUS, NULL, pStubSink);
+
+    // Check for errors.
+    if (FAILED(hres))
+    {
+        printf("ExecNotificationQueryAsync failed with = 0x%X\n", hres);
+        pSvc->Release();
+        pLoc->Release();
+        pUnsecApp->Release();
+        pStubUnk->Release();
+        pSink->Release();
+        pStubSink->Release();
+        CoUninitialize();    
+        return 1;
+    }
+
+    // Wait for the event
+	cout << "Press any key to terminate" << endl;
+	while (!kbhit()) {}
+
+    hres = pSvc->CancelAsyncCall(pStubSink);
+
+    // Cleanup
+    // ========
+
+    pSvc->Release();
+    pLoc->Release();
+    pUnsecApp->Release();
+    pStubUnk->Release();
+    pSink->Release();
+    pStubSink->Release();
+    CoUninitialize();
+
+    return 0;   // Program successfully completed.	
+}
+}}}
