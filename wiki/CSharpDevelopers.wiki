@@ -1,13 +1,205 @@
 #summary C#/.Net support.
 
-= Introduction =
+http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/CSharpCode_Generator.PNG
 
-Add your content here.
+The C# code generator included in the WDCC has the next features
+
+    <li>Automatic detection of these IDE's VS2008, VS2010, VS11</li>
+    <li>Code formatter</li>
+    <li>The Code generated support local and remote WMI connections</li>
+    <li>Can generate C# code compatible with all these .Net Framework versions<strong> 2.0, 3.0, 3.5, 4.0</strong></li>
+    <li>Can open the generated C# code in any of these IDE's VS2008, VS2010, VS11</li>
+    <li>The generated C# code can be compiled using the C# compiler of the Net framework or selecting one of the Visual Studio versions installed</li>
+
+http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/CSharpCode_Compiler.PNG
 
 
-= Details =
+Sample of code generated to access the Win32_Process WMI class
+{{{
+using System;
+using System.Collections.Generic;
+using System.Management;
+using System.Text;
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+namespace GetWMI_Info
+{
+    class Program
+    {
+// The Win32_Process class represents a sequence of events on a Win32 system. Any sequence consisting of the interaction of one or more processors or interpreters, some executable code, and a set of inputs, is a descendent (or member) of this class.
+// Example: A client application running on a Win32 system.
+		
+        static void Main(string[] args)
+        {
+            try
+            {
+                string ComputerName = "localhost";
+                ManagementScope Scope;                
+
+                if (!ComputerName.Equals("localhost", StringComparison.OrdinalIgnoreCase)) 
+                {
+                    ConnectionOptions Conn = new ConnectionOptions();
+                    Conn.Username  = "";
+                    Conn.Password  = "";
+                    Conn.Authority = "ntlmdomain:DOMAIN";
+                    Scope = new ManagementScope(String.Format("\\\\{0}\\root\\CIMV2", ComputerName), Conn);
+                }
+                else
+                    Scope = new ManagementScope(String.Format("\\\\{0}\\root\\CIMV2", ComputerName), null);
+
+                Scope.Connect();
+                ObjectQuery Query = new ObjectQuery("SELECT * FROM Win32_Process");
+                ManagementObjectSearcher Searcher = new ManagementObjectSearcher(Scope, Query);
+
+                foreach (ManagementObject WmiObject in Searcher.Get())
+                {
+                    Console.WriteLine("{0,-35} {1,-40}","CommandLine",WmiObject["CommandLine"]);// String
+                    Console.WriteLine("{0,-35} {1,-40}","Handle",WmiObject["Handle"]);// String
+                    Console.WriteLine("{0,-35} {1,-40}","Name",WmiObject["Name"]);// String
+	                    
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(String.Format("Exception {0} Trace {1}",e.Message,e.StackTrace));
+            }
+            Console.WriteLine("Press Enter to exit");
+            Console.Read();
+        }
+    }
+}
+
+}}}
+
+
+Sample of C# code generated to execute the Create method of the Win32_Process WMI class.
+
+{{{
+using System;
+using System.Collections.Generic;
+using System.Management;
+using System.Text;
+
+namespace GetWMI_Info
+{
+    class Program
+    {
+// The Create method creates a new process. 
+// The method returns an integer value that can be interpretted as follows: 
+// 0 - Successful completion.
+// 2 - The user does not have access to the requested information.
+// 3 - The user does not have sufficient privilge.
+// 8 - Unknown failure.
+// 9 - The path specified does not exist.
+// 21 - The specified parameter is invalid.
+// Other - For integer values other than those listed above, refer to Win32 error code documentation.
+		
+        static void Main(string[] args)
+        {
+            try
+            {
+                string ComputerName = "localhost";
+                ManagementScope Scope;                
+
+                if (!ComputerName.Equals("localhost", StringComparison.OrdinalIgnoreCase)) 
+                {
+                    ConnectionOptions Conn = new ConnectionOptions();
+                    Conn.Username  = "";
+                    Conn.Password  = "";
+                    Conn.Authority = "ntlmdomain:DOMAIN";
+                    Scope = new ManagementScope(String.Format("\\\\{0}\\root\\CIMV2", ComputerName), Conn);
+                }
+                else
+                    Scope = new ManagementScope(String.Format("\\\\{0}\\root\\CIMV2", ComputerName), null);
+
+                Scope.Connect();
+                ObjectGetOptions Options      = new ObjectGetOptions();
+                ManagementPath Path           = new ManagementPath("Win32_Process");
+                ManagementClass  ClassInstance= new ManagementClass(Scope, Path, Options);
+                ManagementBaseObject inParams = ClassInstance.GetMethodParameters("Create");
+				
+                inParams["CommandLine"]="notepad.exe";
+  
+                ManagementBaseObject outParams= ClassInstance.InvokeMethod("Create", inParams ,null);
+                Console.WriteLine("{0,-35} {1,-40}","ProcessId",outParams["ProcessId"]);
+                Console.WriteLine("{0,-35} {1,-40}","ReturnValue",outParams["ReturnValue"]);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(String.Format("Exception {0} Trace {1}",e.Message,e.StackTrace));
+            }
+            Console.WriteLine("Press Enter to exit");
+            Console.Read();
+        }
+    }
+}
+}}}
+
+Sample of C# code generated to listen the __InstanceCreationEvent and Win32_Process class.
+
+{{{
+using System;
+using System.Collections.Generic;
+using System.Management;
+using System.Text;
+
+
+namespace GetWMI_Info
+{
+    public class EventWatcherAsync 
+    {
+        private void WmiEventHandler(object sender, EventArrivedEventArgs e)
+        {
+            Console.WriteLine("TargetInstance.CommandLine :    " + ((ManagementBaseObject)e.NewEvent.Properties["TargetInstance"].Value)["CommandLine"]);
+            Console.WriteLine("TargetInstance.Name :           " + ((ManagementBaseObject)e.NewEvent.Properties["TargetInstance"].Value)["Name"]);
+  
+        }
+
+        public EventWatcherAsync()
+        {
+            try
+            {
+                string ComputerName = "localhost";
+                string WmiQuery;
+                ManagementEventWatcher Watcher;
+                ManagementScope Scope;   
+             
+
+                if (!ComputerName.Equals("localhost", StringComparison.OrdinalIgnoreCase)) 
+                {
+                    ConnectionOptions Conn = new ConnectionOptions();
+                    Conn.Username  = "";
+                    Conn.Password  = "";
+                    Conn.Authority = "ntlmdomain:DOMAIN";
+                    Scope = new ManagementScope(String.Format("\\\\{0}\\root\\CIMV2", ComputerName), Conn);
+                }
+                else
+                    Scope = new ManagementScope(String.Format("\\\\{0}\\root\\CIMV2", ComputerName), null);
+                Scope.Connect();
+
+                WmiQuery ="Select * From __InstanceCreationEvent Within 1 "+
+                "Where TargetInstance ISA 'Win32_Process' ";
+
+                Watcher = new ManagementEventWatcher(Scope, new EventQuery(WmiQuery));
+                Watcher.EventArrived += new EventArrivedEventHandler(this.WmiEventHandler);
+                Watcher.Start();
+                Console.Read();
+                Watcher.Stop();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception {0} Trace {1}", e.Message, e.StackTrace);
+            }
+                        
+        }
+
+        public static void Main(string[] args)
+        {
+           Console.WriteLine("Listening {0}", "__InstanceCreationEvent");
+           Console.WriteLine("Press Enter to exit");
+           EventWatcherAsync eventWatcher = new EventWatcherAsync();
+           Console.Read();
+        }
+    }
+}
+}}}
