@@ -2,7 +2,7 @@
 
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/OxygeneCode_Generator.PNG
 
-Sample of code generated
+Sample of code generated to access the Win32_DiskDrive WMI class
 {{{
 namespace GetWMI_Info;
 
@@ -71,6 +71,165 @@ end;
 end.
 
 }}}
+
+Sample of generated code to listen the __InstanceCreationEvent a nd Win32_Process WMI class.
+
+{{{
+namespace GetWMI_Info;
+
+interface
+
+uses
+    System.Management;
+
+type
+  ConsoleApp = class
+  public
+    class method Main(args: array of string);
+    class method WmiEventHandler(sender: System.Object; e: EventArrivedEventArgs);
+  end;
+
+implementation
+
+
+class method ConsoleApp.WmiEventHandler(sender: System.Object; e: EventArrivedEventArgs);
+begin  
+  Console.WriteLine('TargetInstance.CommandLine : '  + ManagementBaseObject(e.NewEvent['TargetInstance'])['CommandLine']);
+  Console.WriteLine('TargetInstance.Name : '         + ManagementBaseObject(e.NewEvent['TargetInstance'])['Name']);
+  
+end;
+
+
+class method ConsoleApp.Main(args: array of string);
+const
+  sComputerName = 'localhost';
+var
+  WmiQuery: String;
+  Conn    : ConnectionOptions;
+  Scope   : System.Management.ManagementScope;
+  Watcher : ManagementEventWatcher;
+begin
+  Console.WriteLine('Listening Wmi Event - Press enter to exit');
+  try
+      
+	Conn  := new ConnectionOptions();
+    if sComputerName<>'localhost' then
+    begin
+      Conn.Username  := '';
+      Conn.Password  := '';
+      Conn.Authority := 'ntlmdomain:DOMAIN';
+      Scope := New ManagementScope(String.Format('\\{0}\root\CIMV2',sComputerName), Conn);
+    end
+    else
+    Scope := New ManagementScope(String.Format('\\{0}\root\CIMV2',sComputerName), nil);
+    Scope.Connect();
+	
+      WmiQuery:='Select * From __InstanceCreationEvent Within 1 '+
+        'Where TargetInstance ISA "Win32_Process" ';
+
+      Watcher := new ManagementEventWatcher(Scope, new EventQuery(WmiQuery));
+      Watcher.EventArrived += new EventArrivedEventHandler(WmiEventHandler);
+      Watcher.Start();
+	  Console.Read();
+      Watcher.Stop();
+ except on  E: Exception do
+    begin
+      Console.WriteLine('An error occurred while trying to execute the WMI event: '+E.Message);
+      Console.WriteLine('Trace '+E.StackTrace );
+	  Console.Read();
+    end;
+ end;
+end;
+
+end.
+}}}
+
+Sample of code generated to execute the Create method of the Win32_Process WMI class.
+
+{{{
+namespace GetWMI_Info;
+
+interface
+uses
+  System,
+  System.Management,
+  System.Text;
+
+type
+    ConsoleApp = class
+    private
+        class method Invoke_Win32_Process_Create;
+    public
+        class method Main;
+    end;
+
+implementation
+
+// The Create method creates a new process. 
+// The method returns an integer value that can be interpretted as follows: 
+// 0 - Successful completion.
+// 2 - The user does not have access to the requested information.
+// 3 - The user does not have sufficient privilge.
+// 8 - Unknown failure.
+// 9 - The path specified does not exist.
+// 21 - The specified parameter is invalid.
+// Other - For integer values other than those listed above, refer to Win32 error code documentation.
+
+class method ConsoleApp.Invoke_Win32_Process_Create;
+const
+  sComputerName = 'localhost';
+var
+  ClassInstance  : ManagementClass;
+  inParams       : ManagementBaseObject; 
+  outParams      : ManagementBaseObject; 
+  Scope          : ManagementScope;
+  Conn           : ConnectionOptions;   
+  Path           : ManagementPath;
+  Options        : ObjectGetOptions;
+begin
+  Conn := new ConnectionOptions();
+  if sComputerName<>'localhost' then
+  begin
+    Conn.Username  := '';
+    Conn.Password  := '';
+    Conn.Authority := 'ntlmdomain:DOMAIN';
+    Scope := New ManagementScope(String.Format('\\{0}\root\CIMV2',sComputerName), Conn);
+  end
+  else
+  Scope := New ManagementScope(String.Format('\\{0}\root\CIMV2',sComputerName), nil);
+  Scope.Connect();
+  
+  Options := New ObjectGetOptions();
+  Path    := New ManagementPath('Win32_Process');
+  ClassInstance := New ManagementClass(scope, Path, Options);
+  inParams       := classInstance.GetMethodParameters('Create');
+  inParams['CommandLine']:='notepad.exe';
+  
+  outParams      := classInstance.InvokeMethod('Create', inParams ,nil);
+  Console.WriteLine('{0,-35} {1,-40}','ProcessId',outParams['ProcessId']);
+  Console.WriteLine('{0,-35} {1,-40}','ReturnValue',outParams['ReturnValue']);
+
+end;
+
+
+class method ConsoleApp.Main;
+begin
+ try
+    Invoke_Win32_Process_Create;
+ except on  E: Exception do
+   begin
+     Console.WriteLine('An error occurred while trying to execute the WMI method: '+E.ToString());
+     Console.WriteLine('Trace '+E.StackTrace);
+   end;
+ end;
+ Console.WriteLine('Press Enter to exit');
+ Console.Read();
+end;
+
+
+end.
+}}}
+
 
 The Oxygene/Delphi prism code generator included in the WDCC has the next features
 
