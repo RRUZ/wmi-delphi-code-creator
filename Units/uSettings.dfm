@@ -430,10 +430,6 @@ object FrmSettings: TFrmSettings
             object TabSheet7: TTabSheet
               Caption = 'Syntax Highlighting'
               ImageIndex = 1
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 362
               object Label3: TLabel
                 Left = 491
                 Top = 8
@@ -712,5 +708,9 @@ object FrmSettings: TFrmSettings
   object OpenPictureDialog1: TOpenPictureDialog
     Left = 120
     Top = 198
+  end
+  object SynSQLSyn1: TSynSQLSyn
+    Left = 296
+    Top = 240
   end
 end

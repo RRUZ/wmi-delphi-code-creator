@@ -1,5 +1,8 @@
 //TODO
 {
+  Add completion proposal to sql wmi
+  save common WQL ?
+
   Add lock option (read only)
    
   Add metadata resolver (functions) to code
