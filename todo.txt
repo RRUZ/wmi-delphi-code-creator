@@ -18,6 +18,8 @@
 
    Add GUI textures + colors , include tectuers files.
 
+  add option to select prefered compiler
+  add option to select prefered IDE
 
   create relation map beteen classes , properties and WinApi using 
 

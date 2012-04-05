@@ -28,7 +28,7 @@ uses
   Dialogs, ComCtrls, SynEdit, ExtCtrls,
   Generics.Collections, uWmi_Metadata,
   ImgList, Contnrs, ActiveX, StdCtrls, Vcl.Menus,
-  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup;
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, Vcl.ActnList, Vcl.ActnMan;
 
 type
   TWMIQueryCallbackLog = procedure(const msg: string) of object;
@@ -86,15 +86,22 @@ type
     PopupActionBar2: TPopupActionBar;
     ViewDetails2: TMenuItem;
     Checkforonlinedocumentation1: TMenuItem;
+    ActionManager1: TActionManager;
+    ActionViewPropDetails: TAction;
+    ActionViewDetailsProps: TAction;
+    ActionCheckOnlineDocs: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnUrlClick(Sender: TObject);
     procedure ListViewGridData(Sender: TObject; Item: TListItem);
-    procedure ListViewGridDblClick(Sender: TObject);
-    procedure ListViewPropsLinksDblClick(Sender: TObject);
-    procedure Checkforonlinedocumentation1Click(Sender: TObject);
+    procedure ActionViewPropDetailsUpdate(Sender: TObject);
+    procedure ActionViewPropDetailsExecute(Sender: TObject);
+    procedure ActionCheckOnlineDocsUpdate(Sender: TObject);
+    procedure ActionViewDetailsPropsUpdate(Sender: TObject);
+    procedure ActionViewDetailsPropsExecute(Sender: TObject);
+    procedure ActionCheckOnlineDocsExecute(Sender: TObject);
   private
     FValues:   TList<TStrings>;
     FWmiClass: string;
@@ -113,6 +120,7 @@ type
 
     procedure LoadPropsLinks;//MappedStrings
     procedure ShowDetailsProps;
+    procedure CheckOnlineDoc;
   public
     property ContainValues: boolean Read FContainValues;
     property WQLProperties: TStrings Read FWQLProperties Write FWQLProperties;
@@ -174,12 +182,42 @@ begin
   end;
 end;
 
+procedure TFrmWmiVwProps.ActionCheckOnlineDocsExecute(Sender: TObject);
+begin
+  CheckOnlineDoc;
+end;
+
+procedure TFrmWmiVwProps.ActionCheckOnlineDocsUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled:=ListViewPropsLinks.Items.Count>0;
+end;
+
+procedure TFrmWmiVwProps.ActionViewDetailsPropsExecute(Sender: TObject);
+begin
+ ShowDetailsProps;
+end;
+
+procedure TFrmWmiVwProps.ActionViewDetailsPropsUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled:=ListViewPropsLinks.Items.Count>0;
+end;
+
+procedure TFrmWmiVwProps.ActionViewPropDetailsExecute(Sender: TObject);
+begin
+  ShowDetailsData();
+end;
+
+procedure TFrmWmiVwProps.ActionViewPropDetailsUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled:=FValues.Count>0;
+end;
+
 procedure TFrmWmiVwProps.BtnUrlClick(Sender: TObject);
 begin
   ShellExecute(Handle, 'open', PChar(EditURL.Text), nil, nil, SW_SHOW);
 end;
 
-procedure TFrmWmiVwProps.Checkforonlinedocumentation1Click(Sender: TObject);
+procedure TFrmWmiVwProps.CheckOnlineDoc;
 Var
   Frm : TFrmOnlineResources;
   s   : string;
@@ -265,33 +303,6 @@ begin
     end;
   end;
 end;
-
-procedure TFrmWmiVwProps.ListViewGridDblClick(Sender: TObject);
-begin
-  ShowDetailsData();
-end;
-
-
-
-procedure TFrmWmiVwProps.ListViewPropsLinksDblClick(Sender: TObject);
-begin
-  ShowDetailsProps;
-end;
-{
-Var
-  Key, URL :string;
-begin
- if (ListViewPropsLinks.Selected<>nil) and (ListViewPropsLinks.Selected.SubItems.Count>2) then
- begin
-   //agregar lista de leccion de urls ? + twebrowser?
-
-   URL:= GetURL(Format('msdn "%s"  %s',[ListViewPropsLinks.Selected.SubItems[1], ListViewPropsLinks.Selected.SubItems[2]]));
-   if URL<>'' then
-    ShellExecute(Handle, 'open', PChar(URL), nil, nil, SW_SHOW);
- end;
-
-end;
-}
 
 procedure TFrmWmiVwProps.LoadPropsLinks;
 var

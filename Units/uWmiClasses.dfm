@@ -30,7 +30,6 @@ object FrmWmiClasses: TFrmWmiClasses
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = -1
     DesignSize = (
       305
       635)
@@ -65,7 +64,6 @@ object FrmWmiClasses: TFrmWmiClasses
       DropDownCount = 20
       TabOrder = 1
       OnChange = ComboBoxClassesChange
-      ExplicitWidth = 201
     end
     object ComboBoxNameSpaces: TComboBox
       Left = 101
@@ -77,7 +75,6 @@ object FrmWmiClasses: TFrmWmiClasses
       DropDownCount = 20
       TabOrder = 0
       OnChange = ComboBoxNameSpacesChange
-      ExplicitWidth = 200
     end
     object CheckBoxSelAllProps: TCheckBox
       Left = 9
@@ -92,12 +89,11 @@ object FrmWmiClasses: TFrmWmiClasses
       Left = 9
       Top = 59
       Width = 290
-      Height = 73
+      Height = 81
       Anchors = [akLeft, akTop, akRight]
       ReadOnly = True
       ScrollBars = ssVertical
       TabOrder = 2
-      ExplicitWidth = 293
     end
     object ListViewProperties: TListView
       Left = 7
@@ -131,7 +127,6 @@ object FrmWmiClasses: TFrmWmiClasses
       TabOrder = 5
       ViewStyle = vsReport
       OnClick = ListViewPropertiesClick
-      ExplicitWidth = 295
     end
     object ButtonGetValues: TButton
       Left = 128
@@ -144,7 +139,6 @@ object FrmWmiClasses: TFrmWmiClasses
       Images = ImageList1
       TabOrder = 3
       OnClick = ButtonGetValuesClick
-      ExplicitWidth = 174
     end
   end
   object PanelCode: TPanel
@@ -156,7 +150,6 @@ object FrmWmiClasses: TFrmWmiClasses
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
-    ExplicitLeft = 311
   end
   object ImageList1: TImageList
     ColorDepth = cd32Bit
@@ -164,7 +157,7 @@ object FrmWmiClasses: TFrmWmiClasses
     Left = 423
     Top = 198
     Bitmap = {
-      494C010103007800300210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010103007800340210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       00030B140B72414841F6606360FE676967FF686968FF365D38EF264727CE6263
