@@ -1,13 +1,81 @@
 #summary Oxygene/Delphi Prism Support.
 
-= Introduction =
+http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/OxygeneCode_Generator.PNG
 
-Add your content here.
+Sample of code generated
+{{{
+namespace GetWMI_Info;
 
+interface
+uses
+  System,
+  System.Management,
+  System.Text;
 
-= Details =
+type
+    ConsoleApp = class
+    private
+        class method GetWin32_DiskDriveInfo;
+    public
+        class method Main;
+    end;
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+implementation
+
+class method ConsoleApp.Main;
+begin
+ try
+    GetWin32_DiskDriveInfo;    
+ except on E: Exception do
+  Console.WriteLine(String.Format('{0} Trace {1}', E.Message, E.StackTrace));
+ end;
+ Console.WriteLine('Press Enter to exit');
+ Console.Read();
+end;
+
+// The Win32_DiskDrive class represents a physical disk drive as seen by a computer running the Win32 operating system. Any interface to a Win32 physical disk drive is a descendent (or member) of this class. The features of the disk drive seen through this object correspond to the logical and management characteristics of the drive. In some cases, this may not reflect the actual physical characteristics of the device. Any object based on another logical device would not be a member of this class.
+// Example: IDE Fixed Disk.
+
+class method ConsoleApp.GetWin32_DiskDriveInfo;
+const
+  sComputerName = 'localhost';
+var
+  Searcher : ManagementObjectSearcher;
+  Scope    : ManagementScope;
+  Conn     : ConnectionOptions;  
+  Query    : ObjectQuery; 
+begin
+  Conn := new ConnectionOptions();
+  if sComputerName<>'localhost' then
+  begin
+    Conn.Username  := '';
+    Conn.Password  := '';
+    Conn.Authority := 'ntlmdomain:DOMAIN';
+    Scope := New ManagementScope(String.Format('\\{0}\root\CIMV2',sComputerName), Conn);
+  end
+  else
+  Scope := New ManagementScope(String.Format('\\{0}\root\CIMV2',sComputerName), nil);
+  
+  Scope.Connect();
+  Query := New ObjectQuery('SELECT * FROM Win32_DiskDrive'); 				
+  Searcher := new ManagementObjectSearcher(Scope, Query);
+    for WmiObject : ManagementObject  in Searcher.Get() do
+    begin
+     Console.WriteLine('{0,-35} {1,-40}','Index',WmiObject['Index']);// Uint32
+     Console.WriteLine('{0,-35} {1,-40}','Manufacturer',WmiObject['Manufacturer']);// String
+     Console.WriteLine('{0,-35} {1,-40}','MaxBlockSize',WmiObject['MaxBlockSize']);// Uint64
+	
+     Console.WriteLine('');
+    end;
+end;
+end.
+
+}}}
+
+The Oxygene/Delphi prism code generator included in the WDCC has the next features
+
+	<li>The Code generated support local and remote WMI connections</li>
+<li>The Delphi Prism/Oxygene generated code is compatible with all the versions up to 4.0.23.741 (in newer versions must work too)</li>
+<li>Open the generated Delphi Prism code directly in Visual Studio 2008, <a href="http://www.microsoft.com/visualstudio/en-us">Visual Studio</a> 2010 or <a href="http://monodevelop.com/">MonoDevelop</a>.</li>
+
+http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/OxygeneCode_Compiler.PNG
