@@ -1,7 +1,5 @@
 #summary Delphi Support.
 
-= Introduction =
-
 The Delphi code generator included in the WDCC can generate delphi code using 
 
 Late binding
@@ -373,7 +371,7 @@ http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wik
 
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/DelphiCode_Generator.PNG
 
-<li>Selection of method use to generate delphi code</li>
+<li>Selection of method used to generate delphi code</li>
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/DelphiCode_Settings.PNG
 
 	
