@@ -25,6 +25,7 @@ unit uMisc;
 interface
 
 uses
+ Vcl.DBGrids,
  ComObj,
  SysUtils,
  Forms,
@@ -43,6 +44,7 @@ function  GetWindowsDirectory : string;
 function  GetSpecialFolder(const CSIDL: integer) : string;
 function  IsWow64: boolean;
 function  CopyDir(const fromDir, toDir: string): boolean;
+procedure SetGridColumnWidths(DbGrid: TDBGrid);
 
 implementation
 
@@ -52,6 +54,47 @@ Uses
  WinApi.Windows,
  Vcl.Controls,
  Vcl.Dialogs;
+
+procedure SetGridColumnWidths(DbGrid: TDBGrid);
+const
+  BorderWidth = 10;
+  MaxWidth=150;
+var
+  LWidth, Index: integer;
+  ColsWidth:   Array of integer;
+begin
+  with DbGrid do
+  begin
+    Canvas.Font := Font;
+    SetLength(ColsWidth, Columns.Count);
+    for Index := 0 to Columns.Count - 1 do
+    begin
+      ColsWidth[Index] := Canvas.TextWidth(Fields[Index].FieldName) + BorderWidth;
+      if ColsWidth[Index]>MaxWidth then
+      ColsWidth[Index]:=MaxWidth;
+    end;
+
+    DataSource.DataSet.First;
+    while not DataSource.DataSet.Eof do
+    begin
+      for Index := 0 to Columns.Count - 1 do
+      begin
+        LWidth := Canvas.TextWidth(trim(Columns[Index]. Field.DisplayText)) + BorderWidth;
+        //LWidth := Canvas.TextWidth(trim(TDBGridH(DbGrid).GetColField(Index).DisplayText)) + BorderWidth;
+        if (LWidth > ColsWidth[Index]) and (LWidth<MaxWidth) then
+          ColsWidth[Index] := LWidth;
+      end;
+      DataSource.DataSet.Next;
+    end;
+    DataSource.DataSet.First;
+    for Index := 0 to Columns.Count - 1 do
+      if ColsWidth[Index] > 0 then
+        Columns[Index].Width := ColsWidth[Index];
+
+    SetLength(ColsWidth, 0);
+  end;
+end;
+
 
 function CopyDir(const fromDir, toDir: string): boolean;
 var

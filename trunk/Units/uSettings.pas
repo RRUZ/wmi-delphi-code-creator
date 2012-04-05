@@ -27,7 +27,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
   SynEditHighlighter, SynHighlighterPas, uCheckUpdate, SynHighlighterCpp,
-  SynHighlighterCS, Vcl.ExtDlgs;
+  SynHighlighterCS, Vcl.ExtDlgs, SynHighlighterSQL;
 
 type
   TSettings = class
@@ -206,6 +206,7 @@ type
     CheckBoxBack: TCheckBox;
     CheckBoxFormCustom: TCheckBox;
     OpenPictureDialog1: TOpenPictureDialog;
+    SynSQLSyn1: TSynSQLSyn;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -591,6 +592,38 @@ begin
       SetSynAttr(FCurrentTheme, TIDEHighlightElements.Symbol, SymbolAttri,DelphiVer);
     end;
 end;
+
+procedure RefreshSynSQLHighlighter(FCurrentTheme:TIDETheme;SynEdit: TSynEdit);
+var
+  DelphiVer : TDelphiVersions;
+begin
+    if not (SynEdit.Highlighter is TSynSQLSyn) then exit;
+    DelphiVer := DelphiXE;
+
+    RefreshSynEdit(FCurrentTheme, SynEdit);
+
+    with TSynSQLSyn(SynEdit.Highlighter) do
+    begin
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Comment, CommentAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Symbol, ConditionalCommentAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.ReservedWord, DataTypeAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.ReservedWord, DefaultPackageAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Identifier, DelimitedIdentifierAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Preprocessor, ExceptionAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Symbol, FunctionAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Identifier, IdentifierAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.ReservedWord, KeyAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Number, NumberAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.ReservedWord, PLSQLAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Whitespace, SpaceAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.ReservedWord, SQLPlusAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.String, StringAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Symbol, SymbolAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.Identifier, TableNameAttri,DelphiVer);
+      SetSynAttr(FCurrentTheme, TIDEHighlightElements.ReservedWord, VariableAttri,DelphiVer);
+    end;
+end;
+
 procedure ReadSettings(var Settings: TSettings);
 var
   iniFile: TIniFile;
@@ -873,7 +906,11 @@ begin
      RefreshSynPasHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
      RefreshSynCppHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
      RefreshSynCSharpHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
-   end
+     RefreshSynSQLHighlighter(FCurrentTheme,TSynEdit(Component.Components[i]));
+   end  {
+   else
+   if Component.Components[i] is TWinControl then
+   LoadCurrentTheme(Component.Components[i], ThemeName);    }
 end;
 
 
@@ -887,7 +924,10 @@ begin
    begin
     TSynEdit(Component.Components[i]).Font.Name:=FontName;
     TSynEdit(Component.Components[i]).Font.Size:=FontSize;
-   end
+   end   {
+   else
+   if Component.Components[i] is TWinControl then
+   LoadCurrentThemeFont(Component.Components[i], FontName, FontSize);}
 end;
 
 

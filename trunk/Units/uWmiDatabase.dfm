@@ -292,7 +292,7 @@ object FrmWmiDatabase: TFrmWmiDatabase
   object ClientDataSetWmi: TClientDataSet
     Aggregates = <>
     Params = <>
-    Left = 253
+    Left = 229
     Top = 282
   end
 end

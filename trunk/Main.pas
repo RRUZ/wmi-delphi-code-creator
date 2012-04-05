@@ -25,7 +25,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls,
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, uSqlWMI,
   SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmiDatabase, uWmi_Metadata,
   Menus, Buttons, uWmiClassTree, uWmiEvents, uWmiMethods, uWmiClasses, Consts,
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup;
@@ -62,6 +62,7 @@ type
     TabSheetTreeClasses: TTabSheet;
     TabSheetEvents: TTabSheet;
     PopupActionBar1: TPopupActionBar;
+    TabSheetWMISQL: TTabSheet;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure ToolButtonOnlineClick(Sender: TObject);
@@ -79,6 +80,7 @@ type
     FDataLoaded: boolean;
     FrmWMIExplorer  : TFrmWMITree;
     FrmWmiClassTree : TFrmWmiClassTree;
+    FrmWMISQL       : TFrmWMISQL;
 
     FrmWmiEvents          : TFrmWmiEvents;
     FrmWmiMethods         : TFrmWmiMethods;
@@ -186,6 +188,14 @@ begin
   FrmWmiDatabase.Log   :=SetLog;
   FrmWmiDatabase.Show;
 
+  FrmWMISQL:=TFrmWMISQL.Create(Self);
+  FrmWMISQL.Parent := TabSheetWMISQL;
+  FrmWMISQL.BorderStyle := bsNone;
+  FrmWMISQL.Align := alClient;
+  FrmWMISQL.Log   := SetLog;
+  FrmWMISQL.Show;
+
+
   FrmWMIExplorer := TFrmWMITree.Create(Self);
   FrmWMIExplorer.Parent := TabSheetWmiExplorer;
   FrmWMIExplorer.BorderStyle := bsNone;
@@ -206,6 +216,8 @@ begin
   FrmWmiClassTree.Parent := TabSheetTreeClasses;
   FrmWmiClassTree.Align := alClient;
   FrmWmiClassTree.Show;
+
+
 
   FrmWmiClasses  := TFrmWmiClasses.Create(Self);
   //FrmWmiClasses.CodeGenerator:=GenerateCode;
@@ -241,6 +253,9 @@ begin
 
   LoadCurrentTheme(Self,Settings.CurrentTheme);
   LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
+
+  LoadCurrentTheme(FrmWMISQL,Settings.CurrentTheme);
+  LoadCurrentThemeFont(FrmWMISQL,Settings.FontName,Settings.FontSize);
 
   AssignStdActionsPopUpMenu(Self, PopupActionBar1);
   ApplyVclStylesOwnerDrawFix(Self, True);
@@ -432,7 +447,18 @@ end;
 procedure TFrmMain.PageControlMainChange(Sender: TObject);
 begin
   if PageControlMain.ActivePage = TabSheetWmiFinder then
-   FrmWmiDatabase.NameSpaces:=FrmWmiClasses.ComboBoxNameSpaces.Items;
+   FrmWmiDatabase.NameSpaces:=FrmWmiClasses.ComboBoxNameSpaces.Items
+  else
+  if (PageControlMain.ActivePage = TabSheetWMISQL) and (FrmWMISQL.NameSpaces.Count=0) then
+  begin
+   FrmWMISQL.NameSpaces:=FrmWmiClasses.ComboBoxNameSpaces.Items;
+   if FrmWMISQL.CbNameSpaces.Text='' then
+    FrmWMISQL.CbNameSpaces.ItemIndex:=FrmWMISQL.CbNameSpaces.Items.IndexOf(FrmWmiClasses.ComboBoxNameSpaces.Text);
+    {
+   if FrmWMISQL.SynSQLSyn1.TableNames.Count=0 then
+     FrmWMISQL.SynSQLSyn1.TableNames.AddStrings(FrmWmiClasses.ComboBoxClasses.Items);
+     }
+  end;
 end;
 
 procedure TFrmMain.ToolButtonSearchClick(Sender: TObject);

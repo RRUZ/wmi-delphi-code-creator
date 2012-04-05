@@ -106,37 +106,6 @@ const
   WmiDatabaseName = 'WmiDatabase.xml';
 
 
-procedure SetGridColumnWidths(DbGrid: TDBGrid);
-const
-  BorderWidth = 10;
-var
-  LWidth, Index: integer;
-  ColsWidth:    array [0..9] of integer;
-begin
-  with DbGrid do
-  begin
-    Canvas.Font := Font;
-    for Index := 0 to Columns.Count - 1 do
-      ColsWidth[Index] := Canvas.TextWidth(Fields[Index].FieldName) + BorderWidth;
-    DataSource.DataSet.First;
-    while not DataSource.DataSet.Eof do
-    begin
-      for Index := 0 to Columns.Count - 1 do
-      begin
-        LWidth := Canvas.TextWidth(trim(Columns[Index].Field.DisplayText)) + BorderWidth;
-        if LWidth > ColsWidth[Index] then
-          ColsWidth[Index] := LWidth;
-      end;
-      DataSource.DataSet.Next;
-    end;
-    DataSource.DataSet.First;
-    for Index := 0 to Columns.Count - 1 do
-      if ColsWidth[Index] > 0 then
-        Columns[Index].Width := ColsWidth[Index];
-  end;
-end;
-
-
 procedure TFrmWmiDatabase.BuildWmiDatabase;
 var
   NameSpaceIndex:     integer;
@@ -267,7 +236,11 @@ begin
 
   if FileExists(FDatabaseFile) then
   begin
-    ClientDataSetWmi.LoadFromFile(FDatabaseFile);
+     ClientDataSetWmi.LoadFromFile(FDatabaseFile);
+     ClientDataSetWmi.DisableControls;
+     SetGridColumnWidths(DBGridWMI);
+     ClientDataSetWmi.EnableControls;
+
     MsgInformation('The WMI database has been restored from the disk');
   end
   else

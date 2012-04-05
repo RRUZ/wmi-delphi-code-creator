@@ -1,6 +1,7 @@
 program WmiDelphiCodeCreator;
 
 uses
+  ExceptionLog,
   Forms,
   Main in 'Main.pas' {FrmMain},
   uWmiTree in 'Units\uWmiTree.pas' {FrmWMITree},
@@ -56,7 +57,8 @@ uses
   uDotNetFrameWork in 'Units\uDotNetFrameWork.pas',
   uWmiPropertyValue in 'Units\uWmiPropertyValue.pas' {FrmWMIPropValue},
   Vcl.Styles.FormStyleHooks in 'Units\Vcl.Styles.Utils\Vcl.Styles.FormStyleHooks.pas',
-  uOnlineResources in 'Units\uOnlineResources.pas' {FrmOnlineResources};
+  uOnlineResources in 'Units\uOnlineResources.pas' {FrmOnlineResources},
+  uSqlWMI in 'Units\uSqlWMI.pas' {FrmWMISQL};
 
 {$R *.res}
 
