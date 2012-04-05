@@ -1,4 +1,4 @@
-#Free Pascal and Lazarus Support.
+#summary Free Pascal and Lazarus Support.
 
 = Introduction =
 
