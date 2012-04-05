@@ -1,13 +1,329 @@
 #summary Free Pascal and Lazarus Support.
 
-= Introduction =
+http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/FPCCode_Generator.PNG
 
-Add your content here.
+Sample of code generated to access the Win32_DiskDrive WMI class
+{{{
+{$mode objfpc} {$H+}
+
+uses
+  SysUtils,
+  ActiveX,
+  ComObj,
+  Variants;
+                
+
+				
+// The Win32_DiskDrive class represents a physical disk drive as seen by a computer running the Win32 operating system. Any interface to a Win32 physical disk drive is a descendent (or member) of this class. The features of the disk drive seen through this object correspond to the logical and management characteristics of the drive. In some cases, this may not reflect the actual physical characteristics of the device. Any object based on another logical device would not be a member of this class.
+// Example: IDE Fixed Disk.
+
+procedure  GetWin32_DiskDriveInfo;
+const
+  WbemUser            ='';
+  WbemPassword        ='';
+  WbemComputer        ='localhost';
+  wbemFlagForwardOnly = $00000020;
+var
+  FSWbemLocator : OLEVariant;
+  FWMIService   : OLEVariant;
+  FWbemObjectSet: OLEVariant;
+  FWbemObject   : Variant;
+  oEnum         : IEnumvariant;
+  sValue        : string;   
+begin;
+  FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+  FWMIService   := FSWbemLocator.ConnectServer(WbemComputer, 'root\CIMV2', WbemUser, WbemPassword);
+  FWbemObjectSet:= FWMIService.ExecQuery('SELECT * FROM Win32_DiskDrive','WQL',wbemFlagForwardOnly);
+  oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
+  while oEnum.Next(1, FWbemObject, nil) = 0 do
+  begin
+    sValue:= FWbemObject.Properties_.Item('Index').Value;
+    Writeln(Format('Index           %s',[sValue]));// Uint32
+    sValue:= FWbemObject.Properties_.Item('Manufacturer').Value;
+    Writeln(Format('Manufacturer    %s',[sValue]));// String
+    sValue:= FWbemObject.Properties_.Item('MaxBlockSize').Value;
+    Writeln(Format('MaxBlockSize    %s',[sValue]));// Uint64
+	    
+    Writeln('');
+    FWbemObject:=Unassigned;
+  end;
+end;
 
 
-= Details =
+begin
+ try
+    GetWin32_DiskDriveInfo;
+ except
+    on E:EOleException do
+        Writeln(Format('EOleException %s %x', [E.Message,E.ErrorCode]));      
+	on E:Exception do
+        Writeln(E.Classname, ':', E.Message);
+ end;
+ Writeln('Press Enter to exit');
+ Readln;    
+end.
+}}}
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+Sample of code generated to execute the Create method of the Win32_Process WMI class.
+
+{{{
+{$mode objfpc} {$H+}
+
+uses
+  SysUtils,
+  ActiveX,
+  ComObj;
+  
+// The Create method creates a new process. 
+// The method returns an integer value that can be interpretted as follows: 
+// 0 - Successful completion.
+// 2 - The user does not have access to the requested information.
+// 3 - The user does not have sufficient privilge.
+// 8 - Unknown failure.
+// 9 - The path specified does not exist.
+// 21 - The specified parameter is invalid.
+// Other - For integer values other than those listed above, refer to Win32 error code documentation.
+
+procedure  Invoke_Win32_Process_Create;
+const
+  WbemUser            ='';
+  WbemPassword        ='';
+  WbemComputer        ='localhost';
+var
+  FSWbemLocator   : OLEVariant;
+  FWMIService     : OLEVariant;
+  FWbemObjectSet  : OLEVariant;
+  FInParams       : OLEVariant;
+  FOutParams      : OLEVariant;
+  sValue          : string;
+begin
+  FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+  FWMIService   := FSWbemLocator.ConnectServer(WbemPassword, 'root\CIMV2', WbemUser, WbemPassword);
+  FWbemObjectSet:= FWMIService.Get('Win32_Process');
+  FInParams     := FWbemObjectSet.Methods_.Item('Create').InParameters.SpawnInstance_();  
+  FInParams.CommandLine:='notepad.exe';
+  
+  FOutParams    := FWMIService.ExecMethod('Win32_Process', 'Create', FInParams);
+  sValue:=FOutParams.ProcessId;
+  Writeln(Format('ProcessId             %s',[sValue]));
+  sValue:=FOutParams.ReturnValue;
+  Writeln(Format('ReturnValue           %s',[sValue]));
+  
+end;
+
+
+begin
+ try
+    Invoke_Win32_Process_Create;
+ except
+    on E:EOleException do
+        Writeln(Format('EOleException %s %x', [E.Message,E.ErrorCode]));   
+    on E:Exception do
+        Writeln(E.Classname, ':', E.Message);
+  end;
+ Writeln('Press Enter to exit');
+ Readln;      
+end.
+}}}
+
+
+Sample of code generated to listen the __InstanceCreationEvent and the Win32_Process WMI class.
+
+{{{
+{$mode objfpc} {$H+}
+
+uses
+  Windows,
+  Variants,
+  SysUtils,
+  ActiveX,
+  JwaWbemCli;
+
+const
+  RPC_C_AUTHN_LEVEL_DEFAULT = 0;
+  RPC_C_IMP_LEVEL_IMPERSONATE = 3;
+  RPC_C_AUTHN_WINNT = 10;
+  RPC_C_AUTHZ_NONE = 0;
+  RPC_C_AUTHN_LEVEL_CALL = 3;
+  EOAC_NONE = 0;
+
+type
+  TWmiEventSink = class(TInterfacedObject, IWbemObjectSink)
+  public
+    function Indicate(lObjectCount: Longint;  var apObjArray: IWbemClassObject): HRESULT; stdcall;
+    function SetStatus(lFlags: Longint; hResult: HRESULT; strParam: WideString; pObjParam: IWbemClassObject): HRESULT; stdcall;
+  end;
+
+function TWmiEventSink.Indicate(lObjectCount: Longint; var apObjArray: IWbemClassObject): HRESULT; stdcall;
+var
+  Instance      : IWbemClassObject;
+  pVal          : OleVariant;
+  pType         : Integer;
+  plFlavor      : Integer;
+  lFlags        : Longint;
+  sValue        : string;
+begin
+  Result := WBEM_S_NO_ERROR;
+  lFlags :=0;
+
+  if lObjectCount > 0 then
+  begin
+  
+	
+
+    if Succeeded(apObjArray.Get('TargetInstance', lFlags, pVal, pType, plFlavor)) then
+    begin      
+      Instance := IUnknown(pVal) as IWbemClassObject;
+      try
+        //You must convert to string the next types manually -> CIM_OBJECT, CIM_EMPTY, CIM_DATETIME, CIM_REFERENCE
+        if Succeeded(Instance.Get('CommandLine', 0, pVal, pType, plFlavor)) and ((pType<>CIM_OBJECT) and (pType<>CIM_EMPTY) and (pType<>CIM_DATETIME) and (pType<>CIM_REFERENCE) ) then 
+        begin
+          sValue:=pVal;
+          VarClear(pVal);
+          Writeln(Format('CommandLine %s',[sValue]));
+        end;
+
+        //You must convert to string the next types manually -> CIM_OBJECT, CIM_EMPTY, CIM_DATETIME, CIM_REFERENCE
+        if Succeeded(Instance.Get('Name', 0, pVal, pType, plFlavor)) and ((pType<>CIM_OBJECT) and (pType<>CIM_EMPTY) and (pType<>CIM_DATETIME) and (pType<>CIM_REFERENCE) ) then 
+        begin
+          sValue:=pVal;
+          VarClear(pVal);
+          Writeln(Format('Name %s',[sValue]));
+        end;
+
+	
+      finally
+        Instance := nil;
+      end;	  
+    end;
+
+
+  end;
+end;  
+
+
+function TWmiEventSink.SetStatus(lFlags: Longint; hResult: HRESULT; strParam: WideString; pObjParam: IWbemClassObject): HRESULT; stdcall;
+begin
+  Result := WBEM_S_NO_ERROR;
+end;
+
+//detect when a key was pressed in the console window
+function KeyPressed:Boolean;
+var
+  lpNumberOfEvents     : DWORD;
+  lpBuffer             : TInputRecord;
+  lpNumberOfEventsRead : DWORD;
+  nStdHandle           : THandle;
+begin
+  Result:=false;
+  nStdHandle := GetStdHandle(STD_INPUT_HANDLE);
+  lpNumberOfEvents:=0;
+  GetNumberOfConsoleInputEvents(nStdHandle,lpNumberOfEvents);
+  if lpNumberOfEvents<> 0 then
+  begin
+    PeekConsoleInput(nStdHandle,lpBuffer,1,lpNumberOfEventsRead);
+    if lpNumberOfEventsRead <> 0 then
+    begin
+      if lpBuffer.EventType = KEY_EVENT then
+      begin
+        if lpBuffer.Event.KeyEvent.bKeyDown then
+          Result:=true
+        else
+          FlushConsoleInputBuffer(nStdHandle);
+      end
+      else
+      FlushConsoleInputBuffer(nStdHandle);
+    end;
+  end;
+end;
+
+//Wmi async event
+procedure Test_IWbemServices_ExecNotificationQueryAsync;
+const
+  strLocale    = '';
+  strUser      = '';
+  strPassword  = '';
+  strNetworkResource = 'root\CIMV2';
+  strAuthority       = '';
+  WQL ='Select * From __InstanceCreationEvent Within 1 '+
+        'Where TargetInstance ISA "Win32_Process" ';
+
+var
+  FWbemLocator         : IWbemLocator;
+  FWbemServices        : IWbemServices;
+  FUnsecuredApartment  : IUnsecuredApartment;
+  ppStub               : IUnknown;
+  FWmiEventSink        : TWmiEventSink;
+  StubSink             : IWbemObjectSink;
+
+begin
+  // Set general COM security levels --------------------------
+  // Note: If you are using Windows 2000, you need to specify -
+  // the default authentication credentials for a user by using
+  // a SOLE_AUTHENTICATION_LIST structure in the pAuthList ----
+  // parameter of CoInitializeSecurity ------------------------
+  if Failed(CoInitializeSecurity(nil, -1, nil, nil, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, nil, EOAC_NONE, nil)) then Exit;
+  // Obtain the initial locator to WMI -------------------------
+  if Succeeded(CoCreateInstance(CLSID_WbemLocator, nil, CLSCTX_INPROC_SERVER, IID_IWbemLocator, FWbemLocator)) then
+  try
+    // Connect to WMI through the IWbemLocator::ConnectServer method
+    if Succeeded(FWbemLocator.ConnectServer(strNetworkResource, strUser, strPassword, strLocale,  WBEM_FLAG_CONNECT_USE_MAX_WAIT, strAuthority, nil, FWbemServices)) then
+    try
+      // Set security levels on the proxy -------------------------
+      if Failed(CoSetProxyBlanket(FWbemServices, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nil, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nil, EOAC_NONE)) then Exit;
+      if Succeeded(CoCreateInstance(CLSID_UnsecuredApartment, nil, CLSCTX_LOCAL_SERVER, IID_IUnsecuredApartment, FUnsecuredApartment)) then
+      try
+        FWmiEventSink := TWmiEventSink.Create;
+        if Succeeded(FUnsecuredApartment.CreateObjectStub(FWmiEventSink, ppStub)) then
+        try
+          if Succeeded(ppStub.QueryInterface(IID_IWbemObjectSink, StubSink)) then
+          try
+            if Succeeded(FWbemServices.ExecNotificationQueryAsync('WQL', WQL, WBEM_FLAG_SEND_STATUS, nil, StubSink)) then
+            begin
+              Writeln('Listening events...Press any key to exit');
+               while not KeyPressed do ;
+              FWbemServices.CancelAsyncCall(StubSink);
+            end;
+          finally
+            StubSink := nil;
+          end;
+        finally
+          ppStub := nil;
+        end;
+      finally
+        FUnsecuredApartment := nil;
+      end;
+    finally
+      FWbemServices := nil;
+    end;
+  finally
+    FWbemLocator := nil;
+  end;
+end;
+
+begin
+ try
+  // Initialize COM
+  if Succeeded(CoInitializeEx(nil, COINIT_MULTITHREADED)) then
+  try
+    Test_IWbemServices_ExecNotificationQueryAsync;
+  finally
+    CoUninitialize();
+  end;
+ except 
+    on E:Exception do
+        Writeln(E.Classname, ':', E.Message);
+ end;  
+  Readln;
+  
+end.    
+}}}
+
+
+The FPC code generator included in the WDCC has the next features 
+
+	<li>The Free Pascal code generated is compatible with these compiler versions 2.4.2, 2.4.4</li>
+	<li>The Code generated support local and remote WMI connections</li>
+	<li>Code formatter</li>
+	<li>Open the generated Free Pascal code directly in the <a href="http://www.lazarus.freepascal.org/">Lazarus</a> IDE.</li>
+http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/FPC_Compiler.PNG
