@@ -1,3 +1,24 @@
+{**************************************************************************************************}
+{                                                                                                  }
+{ Unit                                                                                      }
+{ unit for the WMI Delphi Code Creator                                                             }
+{                                                                                                  }
+{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
+{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
+{ License at http://www.mozilla.org/MPL/                                                           }
+{                                                                                                  }
+{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
+{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
+{ and limitations under the License.                                                               }
+{                                                                                                  }
+{ The Original Code is uSqlWMI.pas.                                                                }
+{                                                                                                  }
+{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
+{ All Rights Reserved.                                                                             }
+{                                                                                                  }
+{**************************************************************************************************}
+
 unit uSqlWMI;
 
 interface
@@ -7,7 +28,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Datasnap.DBClient, Vcl.Grids, Generics.Collections,
   Vcl.DBGrids, Vcl.StdCtrls, SynEditHighlighter, SynHighlighterSQL, uMisc, ActiveX,
   Vcl.ExtCtrls, SynEdit, uSynEditPopupEdit, uComboBox, Vcl.DBCtrls,
-  SynCompletionProposal;
+  SynCompletionProposal, Vcl.ComCtrls;
 
 type
   TWMIPropData = class
@@ -20,10 +41,10 @@ type
   end;
 
   TFrmWMISQL = class(TForm)
-    SynEdit1: TSynEdit;
+    SynEditWQL: TSynEdit;
     BtnExecuteWQL: TButton;
-    Panel1: TPanel;
-    Panel2: TPanel;
+    PanelTop: TPanel;
+    PanelNav: TPanel;
     SynSQLSyn1: TSynSQLSyn;
     CbNameSpaces: TComboBox;
     Label1: TLabel;
@@ -38,12 +59,27 @@ type
     EditPassword: TEdit;
     Label4: TLabel;
     SynCompletionProposal1: TSynCompletionProposal;
+    Splitter1: TSplitter;
+    PanelLeft: TPanel;
+    PanelRight: TPanel;
+    Splitter2: TSplitter;
+    CheckBoxAutoWQL: TCheckBox;
+    ComboBoxClasses: TComboBox;
+    LabelClasses: TLabel;
+    ListViewProperties: TListView;
+    LabelProperties: TLabel;
+    CheckBoxSelAllProps: TCheckBox;
     procedure BtnExecuteWQLClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure EditMachineExit(Sender: TObject);
     procedure EditUserExit(Sender: TObject);
     procedure EditPasswordExit(Sender: TObject);
+    procedure CbNameSpacesChange(Sender: TObject);
+    procedure CheckBoxAutoWQLClick(Sender: TObject);
+    procedure ListViewPropertiesClick(Sender: TObject);
+    procedure CheckBoxSelAllPropsClick(Sender: TObject);
+    procedure ComboBoxClassesChange(Sender: TObject);
   private
     FSWbemLocator : OLEVariant;
     FWMIService   : OLEVariant;
@@ -63,19 +99,26 @@ type
     procedure SetMachine(const Value: string);
     procedure SetPassWord(const Value: string);
     procedure SetUser(const Value: string);
+    procedure LoadClassInfo;
+    procedure LoadWmiClasses(const Namespace: string);
+    procedure GenerateSqlCode;
+  public
+    procedure SetNameSpaceIndex(Index : integer);
+    property Log   : TProcLog read FLog write FLog;
+    property NameSpaces : TStrings read GetNameSpaces Write SetNameSpaces;
     property User : string read FUser write SetUser;
     property Password : string read FPassword write SetPassWord;
     property Machine  : string read FMachine write SetMachine;
-  public
-    property Log   : TProcLog read FLog write FLog;
-    property NameSpaces : TStrings read GetNameSpaces Write SetNameSpaces;
   end;
 
 
 implementation
 
 uses
+ uGlobals,
+ uListView_Helper,
  MidasLib,
+ uSettings,
  uWmi_Metadata,
  uOleVariantEnum,
  System.Win.ComObj;
@@ -93,6 +136,36 @@ type
 procedure TFrmWMISQL.BtnExecuteWQLClick(Sender: TObject);
 begin
  RunWQL;
+end;
+
+procedure TFrmWMISQL.CbNameSpacesChange(Sender: TObject);
+begin
+  LoadWmiClasses(TComboBox(Sender).Text);
+  ComboBoxClasses.ItemIndex := 0;
+  LoadClassInfo;
+end;
+
+procedure TFrmWMISQL.CheckBoxAutoWQLClick(Sender: TObject);
+begin
+ if CheckBoxAutoWQL.Checked then
+  GenerateSqlCode;
+end;
+
+procedure TFrmWMISQL.CheckBoxSelAllPropsClick(Sender: TObject);
+var
+  LIndex: integer;
+begin
+  for LIndex := 0 to ListViewProperties.Items.Count - 1 do
+    ListViewProperties.Items[LIndex].Checked := CheckBoxSelAllProps.Checked;
+
+  if CheckBoxAutoWQL.Checked then
+    GenerateSqlCode;
+end;
+
+
+procedure TFrmWMISQL.ComboBoxClassesChange(Sender: TObject);
+begin
+  LoadClassInfo;
 end;
 
 procedure TFrmWMISQL.CreateStructure;
@@ -155,9 +228,157 @@ begin
   FFields.Free;
 end;
 
+procedure TFrmWMISQL.GenerateSqlCode;
+Var
+ c,LIndex : Integer;
+ LFields : string;
+begin
+ LFields:='';
+ c:=0;
+ for LIndex := 0 to ListViewProperties.Items.Count-1 do
+  if ListViewProperties.Items.Item[LIndex].Checked then
+  begin
+   LFields:=LFields+ListViewProperties.Items.Item[LIndex].Caption+',';
+   inc(c);
+  end;
+
+ if (LFields='') or (CheckBoxSelAllProps.Checked) or (c=ListViewProperties.Items.Count) then
+   LFields:='*'
+ else
+   Delete(LFields,Length(LFields),1);
+
+  SynEditWQL.Lines.Text:=Format('Select %s from %s',[LFields, ComboBoxClasses.Text]);
+end;
+
 function TFrmWMISQL.GetNameSpaces: TStrings;
 begin
    Result:=CbNameSpaces.Items;
+end;
+
+procedure TFrmWMISQL.ListViewPropertiesClick(Sender: TObject);
+   procedure SetCheck(const CheckBox : TCheckBox; const Value : boolean) ;
+   var
+     NotifyEvent : TNotifyEvent;
+   begin
+     with CheckBox do
+     begin
+       NotifyEvent := OnClick;
+       OnClick := nil;
+       Checked := Value;
+       OnClick := NotifyEvent;
+     end;
+   end;
+
+begin
+  if CheckBoxSelAllProps.Checked  then
+    SetCheck(CheckBoxSelAllProps, False);
+
+  if CheckBoxAutoWQL.Checked then
+    GenerateSqlCode;
+end;
+
+procedure TFrmWMISQL.LoadClassInfo;
+var
+  WmiMetaClassInfo : TWMiClassMetaData;
+  LIndex : integer;
+  LItem : TListItem;
+begin
+  if ComboBoxClasses.ItemIndex=-1 then exit;
+
+  try
+    WmiMetaClassInfo:=CachedWMIClasses.GetWmiClass(CbNameSpaces.Text, ComboBoxClasses.Text);
+
+    if Assigned(WmiMetaClassInfo) then
+    begin
+      //SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
+      {
+      MemoClassDescr.Text :=  WmiMetaClassInfo.Description;
+      if MemoClassDescr.Text = '' then
+        MemoClassDescr.Text := 'Class without description available';
+
+      LoadWmiProperties(WmiMetaClassInfo);
+      }
+
+      ListViewProperties.Items.BeginUpdate;
+      try
+        ListViewProperties.Items.Clear;
+
+        for LIndex := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
+        begin
+          LItem := ListViewProperties.Items.Add;
+          LItem.Caption := WmiMetaClassInfo.Properties[LIndex].Name;
+          LItem.SubItems.Add(WmiMetaClassInfo.Properties[LIndex].&Type);
+          LItem.SubItems.Add(WmiMetaClassInfo.Properties[LIndex].Description);
+          LItem.Checked := CheckBoxSelAllProps.Checked;
+          LItem.Data    := Pointer(WmiMetaClassInfo.Properties[LIndex].CimType); //Cimtype
+        end;
+
+        LabelProperties.Caption := Format('%d Properties of %s:%s',
+          [ListViewProperties.Items.Count, WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]);
+      finally
+        ListViewProperties.Items.EndUpdate;
+      end;
+      //SetMsg('');
+
+      for LIndex := 0 to ListViewProperties.Columns.Count - 1 do
+        AutoResizeColumn(ListViewProperties.Column[LIndex]);
+
+      ListViewProperties.Repaint;
+      if CheckBoxAutoWQL.Checked then
+        GenerateSqlCode;
+    end;
+  finally
+    //SetMsg('');
+  end;
+end;
+procedure TFrmWMISQL.LoadWmiClasses(const Namespace: string);
+var
+  FClasses: TStringList;
+begin
+  //SetMsg(Format('Loading Classes of %s', [Namespace]));
+
+  FClasses := TStringList.Create;
+  try
+    FClasses.Sorted := True;
+    FClasses.BeginUpdate;
+    try
+      try
+        if not ExistWmiClassesCache(Namespace) then
+        begin
+          GetListWmiClasses(Namespace, FClasses, [], ['abstract'], True);
+          SaveWMIClassesToCache(Namespace, FClasses);
+        end
+        else
+          LoadWMIClassesFromCache(Namespace, FClasses);
+      except
+        on E: EOleSysError do
+          if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
+            Log(Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
+          else
+            raise;
+      end;
+
+    finally
+      FClasses.EndUpdate;
+    end;
+
+    ComboBoxClasses.Items.BeginUpdate;
+    try
+      ComboBoxClasses.Items.Clear;
+      ComboBoxClasses.Items.AddStrings(FClasses);
+      {
+      if ComboBoxClasses.Items.Count>0 then
+       ComboBoxClasses.ItemIndex:=0;
+      }
+      LabelClasses.Caption := Format('Classes (%d)', [FClasses.Count]);
+    finally
+      ComboBoxClasses.Items.EndUpdate;
+    end;
+  finally
+    FClasses.Free;
+  end;
+
+  //SetMsg('');
 end;
 
 procedure TFrmWMISQL.RunWQL;
@@ -174,7 +395,7 @@ begin
     FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
     try
       FWMIService   := FSWbemLocator.ConnectServer(FMachine, CbNameSpaces.Text, FUser, FPassword);
-      FWbemObjectSet:= FWMIService.ExecQuery(SynEdit1.Lines.Text, 'WQL', wbemFlagForwardOnly);
+      FWbemObjectSet:= FWMIService.ExecQuery(SynEditWQL.Lines.Text, 'WQL', wbemFlagForwardOnly);
 
       oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
       while oEnum.Next(1, FWbemObject, iValue) = 0 do
@@ -253,6 +474,13 @@ begin
   FMachine := Value;
   EditMachine.Text:=Value;
 end;
+
+procedure TFrmWMISQL.SetNameSpaceIndex(Index: integer);
+begin
+  CbNameSpaces.ItemIndex:=Index;
+  CbNameSpacesChange(CbNameSpaces);
+end;
+
 
 procedure TFrmWMISQL.SetNameSpaces(const Value: TStrings);
 begin

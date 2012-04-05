@@ -69,6 +69,7 @@ type
     procedure LoadClassInfo;
     procedure GetValuesWmiProperties(const Namespace, WmiClass: string);
     procedure GenerateConsoleCode(WmiMetaClassInfo : TWMiClassMetaData);
+
   end;
 
 
@@ -306,7 +307,7 @@ procedure TFrmWmiClasses.ListViewPropertiesClick(Sender: TObject);
 
 begin
   if CheckBoxSelAllProps.Checked  then
-  SetCheck(CheckBoxSelAllProps, False);
+    SetCheck(CheckBoxSelAllProps, False);
   GenerateCode;
 end;
 
@@ -383,22 +384,22 @@ end;
 
 procedure TFrmWmiClasses.LoadWmiProperties(WmiMetaClassInfo: TWMiClassMetaData);
 var
-  i:     integer;
-  item:  TListItem;
+  LIndex:     integer;
+  LItem:  TListItem;
 begin
   //StatusBar1.SimpleText := Format('Loading Properties of %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]);
   ListViewProperties.Items.BeginUpdate;
   try
     ListViewProperties.Items.Clear;
 
-    for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
+    for LIndex := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
     begin
-      item := ListViewProperties.Items.Add;
-      item.Caption := WmiMetaClassInfo.Properties[i].Name;
-      item.SubItems.Add(WmiMetaClassInfo.Properties[i].&Type);
-      item.SubItems.Add(WmiMetaClassInfo.Properties[i].Description);
-      item.Checked := CheckBoxSelAllProps.Checked;
-      item.Data    := Pointer(WmiMetaClassInfo.Properties[i].CimType); //Cimtype
+      LItem := ListViewProperties.Items.Add;
+      LItem.Caption := WmiMetaClassInfo.Properties[LIndex].Name;
+      LItem.SubItems.Add(WmiMetaClassInfo.Properties[LIndex].&Type);
+      LItem.SubItems.Add(WmiMetaClassInfo.Properties[LIndex].Description);
+      LItem.Checked := CheckBoxSelAllProps.Checked;
+      LItem.Data    := Pointer(WmiMetaClassInfo.Properties[LIndex].CimType); //Cimtype
     end;
 
     LabelProperties.Caption := Format('%d Properties of %s:%s',
@@ -408,8 +409,8 @@ begin
   end;
   SetMsg('');
 
-  for i := 0 to ListViewProperties.Columns.Count - 1 do
-    AutoResizeColumn(ListViewProperties.Column[i]);
+  for LIndex := 0 to ListViewProperties.Columns.Count - 1 do
+    AutoResizeColumn(ListViewProperties.Column[LIndex]);
 
   ListViewProperties.Repaint;
 
@@ -421,6 +422,8 @@ begin
   FConsole := Value;
   FrmCodeEditor.Console:=Value;
 end;
+
+
 
 procedure TFrmWmiClasses.SetSettings(const Value: TSettings);
 begin
