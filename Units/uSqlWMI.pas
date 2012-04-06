@@ -28,7 +28,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Datasnap.DBClient, Vcl.Grids, Generics.Collections,
   Vcl.DBGrids, Vcl.StdCtrls, SynEditHighlighter, SynHighlighterSQL, uMisc, ActiveX,
   Vcl.ExtCtrls, SynEdit, uSynEditPopupEdit, uComboBox, Vcl.DBCtrls,
-  SynCompletionProposal, Vcl.ComCtrls;
+  SynCompletionProposal, Vcl.ComCtrls, Vcl.ImgList;
 
 type
   TWMIPropData = class
@@ -69,6 +69,7 @@ type
     ListViewProperties: TListView;
     LabelProperties: TLabel;
     CheckBoxSelAllProps: TCheckBox;
+    ImageList1: TImageList;
     procedure BtnExecuteWQLClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
