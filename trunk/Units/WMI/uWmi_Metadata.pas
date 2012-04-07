@@ -353,6 +353,8 @@ type
 
 
   function  VarStrNull(const V:OleVariant):string;
+  function  WbemDateToDateTime(const V : OleVariant): OleVariant;
+  function  VarDateTimeNull(const V : OleVariant): TDateTime;
   function  FormatWbemValue(const V:OleVariant;CIMType:Integer):string;
   function  CIMTypeStr(const CIMType:Integer):string;
   function  GetDefaultValueWmiType(const WmiType:string):string;
@@ -463,6 +465,16 @@ begin
   end;
 end;
 
+function WbemDateToDateTime(const V : OleVariant): OleVariant;
+var
+  Dt : OleVariant;
+begin
+  Result:=varNull;
+  if VarIsNull(V) then exit;
+  Dt:=CreateOleObject('WbemScripting.SWbemDateTime');
+  Dt.Value := V;
+  Result:=Dt.GetVarDate;
+end;
 
 
 function VarDateTimeNull(const V : OleVariant): TDateTime;
