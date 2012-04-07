@@ -28,7 +28,9 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Datasnap.DBClient, Vcl.Grids, Generics.Collections,
   Vcl.DBGrids, Vcl.StdCtrls, SynEditHighlighter, SynHighlighterSQL, uMisc, ActiveX,
   Vcl.ExtCtrls, SynEdit, uSynEditPopupEdit, uComboBox, Vcl.DBCtrls,
-  SynCompletionProposal, Vcl.ComCtrls, Vcl.ImgList;
+  SynCompletionProposal, Vcl.ComCtrls, uWmi_Metadata,
+ Vcl.ImgList, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan,
+  Vcl.Menus, Vcl.ActnPopup;
 
 type
   TWMIPropData = class
@@ -39,6 +41,11 @@ type
     property Name : string read FName write FName;
     property CimType : Integer read FCimType write FCimType;
   end;
+
+  TColumnWidthHelper = record
+    Index : integer;
+    MaxWidth : integer;
+   end;
 
   TFrmWMISQL = class(TForm)
     SynEditWQL: TSynEdit;
@@ -70,7 +77,10 @@ type
     LabelProperties: TLabel;
     CheckBoxSelAllProps: TCheckBox;
     ImageList1: TImageList;
-    procedure BtnExecuteWQLClick(Sender: TObject);
+    ActionManager1: TActionManager;
+    ActionRunWQL: TAction;
+    PopupActionBar1: TPopupActionBar;
+    ExecuteWQL1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure EditMachineExit(Sender: TObject);
@@ -81,7 +91,16 @@ type
     procedure ListViewPropertiesClick(Sender: TObject);
     procedure CheckBoxSelAllPropsClick(Sender: TObject);
     procedure ComboBoxClassesChange(Sender: TObject);
+    procedure SynCompletionProposal1Execute(Kind: SynCompletionType;
+      Sender: TObject; var CurrentInput: string; var x, y: Integer;
+      var CanExecute: Boolean);
+    procedure DBGridWMIDblClick(Sender: TObject);
+    procedure DBGridWMIDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure ActionRunWQLExecute(Sender: TObject);
+    procedure ActionRunWQLUpdate(Sender: TObject);
   private
+    ColumnWidthHelper : TColumnWidthHelper;
     FSWbemLocator : OLEVariant;
     FWMIService   : OLEVariant;
     FWbemObjectSet: OLEVariant;
@@ -103,6 +122,7 @@ type
     procedure LoadClassInfo;
     procedure LoadWmiClasses(const Namespace: string);
     procedure GenerateSqlCode;
+    procedure LoadProposal(WmiMetaClassInfo : TWMiClassMetaData);
   public
     procedure SetNameSpaceIndex(Index : integer);
     property Log   : TProcLog read FLog write FLog;
@@ -116,27 +136,28 @@ type
 implementation
 
 uses
+ Math,
  uGlobals,
  uListView_Helper,
  MidasLib,
  uSettings,
- uWmi_Metadata,
  uOleVariantEnum,
+ Vcl.Styles,
+ Vcl.Themes,
  System.Win.ComObj;
 
 {$R *.dfm}
-  {
-type
-  TDBGridH = class(TDBGrid);
-   }
-
-
 
 { TFrmWMISQL }
 
-procedure TFrmWMISQL.BtnExecuteWQLClick(Sender: TObject);
+procedure TFrmWMISQL.ActionRunWQLExecute(Sender: TObject);
 begin
  RunWQL;
+end;
+
+procedure TFrmWMISQL.ActionRunWQLUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled:=Length(SynEditWQL.Text)>0;
 end;
 
 procedure TFrmWMISQL.CbNameSpacesChange(Sender: TObject);
@@ -186,20 +207,65 @@ begin
     FFields.Items[FFields.Count-1].Name   :=colItem.Name;
     FFields.Items[FFields.Count-1].CimType:=colItem.cimtype;
 
-    {
-    PropertyMetaData:=TWMiPropertyMetaData.Create;
-    FCollectionPropertyMetaData.Add(PropertyMetaData);
-    PropertyMetaData.FName:=VarStrNull(colItem.Name);
-    PropertyMetaData.FType:=CIMTypeStr(colItem.cimtype);
-    PropertyMetaData.FCimType:=colItem.cimtype;
-    }
     with ClientDataSet1 do
-      FieldDefs.Add(colItem.Name, ftString, 255);
+     case FFields.Items[FFields.Count-1].CimType of
+      wbemCimtypeSint8,
+      wbemCimtypeUint8,
+      wbemCimtypeSint16,
+      wbemCimtypeUint16,
+      wbemCimtypeSint32,
+      wbemCimtypeUint32   : FieldDefs.Add(colItem.Name, ftInteger);
+
+      wbemCimtypeSint64,
+      wbemCimtypeUint64   : FieldDefs.Add(colItem.Name, ftLargeint);
+
+      wbemCimtypeReal32,
+      wbemCimtypeReal64   : FieldDefs.Add(colItem.Name, ftFloat);
+      wbemCimtypeBoolean  : FieldDefs.Add(colItem.Name, ftBoolean);
+
+      wbemCimtypeString   : FieldDefs.Add(colItem.Name, ftString, 255);
+      wbemCimtypeDatetime : FieldDefs.Add(colItem.Name, ftDateTime);
+      wbemCimtypeReference: ;
+      wbemCimtypeChar16   : FieldDefs.Add(colItem.Name, ftString, 255);
+      wbemCimtypeObject   : ;
+     else
+          ;
+     end;
 
   end;
 
   ClientDataSet1.CreateDataSet;
 end;
+
+procedure TFrmWMISQL.DBGridWMIDblClick(Sender: TObject);
+var
+ LPoint : TPoint;
+ LGridCoord: TGridCoord;
+begin
+  if not (dgTitles in DBGridWMI.Options) then Exit;
+  LPoint := DBGridWMI.ScreenToClient(Mouse.CursorPos) ;
+
+  LGridCoord := DBGridWMI.MouseCoord(LPoint.X, LPoint.Y) ;
+  if LGridCoord.Y <> 0 then Exit;
+
+  if dgIndicator in DBGridWMI.Options then
+    ColumnWidthHelper.Index := -1 + LGridCoord.x
+  else
+   ColumnWidthHelper.Index := LGridCoord.x;
+
+  if ColumnWidthHelper.Index < 0 then Exit;
+    ColumnWidthHelper.MaxWidth := -1;
+
+  DBGridWMI.Repaint;
+  DBGridWMI.Columns[ColumnWidthHelper.Index].Width := 4 + ColumnWidthHelper.MaxWidth;
+end;
+
+procedure TFrmWMISQL.DBGridWMIDrawColumnCell(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+ begin
+   if (DataCol = ColumnWidthHelper.Index) and Assigned(Column.Field) then
+     ColumnWidthHelper.MaxWidth := Max(ColumnWidthHelper.MaxWidth, DBGridWMI.Canvas.TextWidth(Column.Field.DisplayText)) ;
+ end;
 
 procedure TFrmWMISQL.EditMachineExit(Sender: TObject);
 begin
@@ -257,18 +323,19 @@ begin
 end;
 
 procedure TFrmWMISQL.ListViewPropertiesClick(Sender: TObject);
-   procedure SetCheck(const CheckBox : TCheckBox; const Value : boolean) ;
-   var
-     NotifyEvent : TNotifyEvent;
+
+ procedure SetCheck(const CheckBox : TCheckBox; const Value : boolean) ;
+ var
+   NotifyEvent : TNotifyEvent;
+ begin
+   with CheckBox do
    begin
-     with CheckBox do
-     begin
-       NotifyEvent := OnClick;
-       OnClick := nil;
-       Checked := Value;
-       OnClick := NotifyEvent;
-     end;
+     NotifyEvent := OnClick;
+     OnClick := nil;
+     Checked := Value;
+     OnClick := NotifyEvent;
    end;
+ end;
 
 begin
   if CheckBoxSelAllProps.Checked  then
@@ -316,6 +383,7 @@ begin
 
         LabelProperties.Caption := Format('%d Properties of %s:%s',
           [ListViewProperties.Items.Count, WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]);
+
       finally
         ListViewProperties.Items.EndUpdate;
       end;
@@ -323,6 +391,8 @@ begin
 
       for LIndex := 0 to ListViewProperties.Columns.Count - 1 do
         AutoResizeColumn(ListViewProperties.Column[LIndex]);
+
+      LoadProposal(WmiMetaClassInfo);
 
       ListViewProperties.Repaint;
       if CheckBoxAutoWQL.Checked then
@@ -332,6 +402,19 @@ begin
     //SetMsg('');
   end;
 end;
+
+procedure TFrmWMISQL.LoadProposal(WmiMetaClassInfo : TWMiClassMetaData);
+var
+ i : integer;
+begin
+ SynCompletionProposal1.ItemList.Clear;
+ SynCompletionProposal1.ItemList.Add('Select');
+
+ //SynCompletionProposal1.ItemList.AddStrings(ComboBoxClasses.Items);
+ for i:=0 to WmiMetaClassInfo.PropertiesCount-1 do
+   SynCompletionProposal1.ItemList.Add(WmiMetaClassInfo.Properties[i].Name);
+end;
+
 procedure TFrmWMISQL.LoadWmiClasses(const Namespace: string);
 var
   FClasses: TStringList;
@@ -417,33 +500,12 @@ begin
         FWbemPropertySet:= FWbemObject.Properties_;
         ClientDataSet1.Append;
          for F in FFields do
-         ClientDataSet1.FieldByName(F.Name).AsString:=FormatWbemValue(FWbemPropertySet.Item(F.Name, 0).Value, F.CimType);
-           {
-           case F.CimType of
-                wbemCimtypeSint8,
-                wbemCimtypeUint8,
-                wbemCimtypeSint16,
-                wbemCimtypeUint16,
-                wbemCimtypeSint32,
-                wbemCimtypeUint32,
-                wbemCimtypeSint64,
-                wbemCimtypeUint64   : ClientDataSet1.FieldByName(F.Name).AsString:=VarStrNull(FWbemPropertySet.Item(F.Name, 0).Value);
+         if F.CimType=wbemCimtypeDatetime then
+           ClientDataSet1.FieldByName(F.Name).Value:=WbemDateToDateTime(FWbemPropertySet.Item(F.Name, 0).Value)
+         else
+           ClientDataSet1.FieldByName(F.Name).Value:=FWbemPropertySet.Item(F.Name, 0).Value;
 
-                wbemCimtypeReal32,
-                wbemCimtypeReal64   : ClientDataSet1.FieldByName(F.Name).AsString:=VarStrNull(FWbemPropertySet.Item(F.Name, 0).Value);
-                wbemCimtypeBoolean  : ClientDataSet1.FieldByName(F.Name).AsString:=VarStrNull(FWbemPropertySet.Item(F.Name, 0).Value);
-
-                wbemCimtypeString   : ClientDataSet1.FieldByName(F.Name).AsString:=VarStrNull(FWbemPropertySet.Item(F.Name, 0).Value);
-                wbemCimtypeDatetime : ClientDataSet1.FieldByName(F.Name).AsString:=VarStrNull(FWbemPropertySet.Item(F.Name, 0).Value);
-                wbemCimtypeReference: ;
-                wbemCimtypeChar16   : ClientDataSet1.FieldByName(F.Name).AsString:=VarStrNull(FWbemPropertySet.Item(F.Name, 0).Value);
-                wbemCimtypeObject   : ;
-           else
-                ;
-           end;
-            }
         ClientDataSet1.Post;
-
         FWbemObject:=Unassigned;
       end;
     except
@@ -501,6 +563,23 @@ begin
   FUser := Value;
   EditUser.Text:=Value;
 end;
+
+procedure TFrmWMISQL.SynCompletionProposal1Execute(Kind: SynCompletionType;
+  Sender: TObject; var CurrentInput: string; var x, y: Integer;
+  var CanExecute: Boolean);
+begin
+  SynCompletionProposal1.ClBackground  :=SynSQLSyn1.WhitespaceAttribute.Background;
+  SynCompletionProposal1.ClSelect      :=SynEditWQL.ActiveLineColor;
+  SynCompletionProposal1.ClSelectedText:=SynSQLSyn1.TableNameAttri.Foreground;
+  SynCompletionProposal1.ClTitleBackground :=SynSQLSyn1.WhitespaceAttribute.Background;
+  SynCompletionProposal1.Font.Assign(SynEditWQL.Font);
+  SynCompletionProposal1.Font.Color:=SynSQLSyn1.SymbolAttri.Foreground;
+  SynCompletionProposal1.TitleFont.Assign(SynEditWQL.Font);
+end;
+      {
+initialization
+ TStyleManager.Engine.RegisterStyleHook(TSynBaseCompletionProposalForm, TFormStyleHook);
+       }
 
 end.
 

@@ -171,6 +171,7 @@ object FrmWMISQL: TFrmWMISQL
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
+        PopupMenu = PopupActionBar1
         TabOrder = 0
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
@@ -214,11 +215,10 @@ object FrmWMISQL: TFrmWMISQL
           Top = 22
           Width = 75
           Height = 27
+          Action = ActionRunWQL
           Caption = 'Execute'
-          ImageIndex = 0
           Images = ImageList1
           TabOrder = 0
-          OnClick = BtnExecuteWQLClick
         end
         object DBNavigator1: TDBNavigator
           Left = 480
@@ -272,6 +272,8 @@ object FrmWMISQL: TFrmWMISQL
       TitleFont.Height = -11
       TitleFont.Name = 'Tahoma'
       TitleFont.Style = []
+      OnDrawColumnCell = DBGridWMIDrawColumnCell
+      OnDblClick = DBGridWMIDblClick
     end
   end
   object SynSQLSyn1: TSynSQLSyn
@@ -303,6 +305,7 @@ object FrmWMISQL: TFrmWMISQL
     TitleFont.Name = 'MS Sans Serif'
     TitleFont.Style = [fsBold]
     Columns = <>
+    OnExecute = SynCompletionProposal1Execute
     ShortCut = 16416
     Editor = SynEditWQL
     Left = 472
@@ -313,7 +316,7 @@ object FrmWMISQL: TFrmWMISQL
     Left = 128
     Top = 296
     Bitmap = {
-      494C010101000800140010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010101000800180010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000010D0434052D0DD9042F
       0FFD041909B70005012600000000000000000000000000000000000000000000
@@ -451,5 +454,25 @@ object FrmWMISQL: TFrmWMISQL
       80030000000000008007000000000000801F000000000000807F000000000000
       80FF00000000000083FF00000000000000000000000000000000000000000000
       000000000000}
+  end
+  object ActionManager1: TActionManager
+    Images = ImageList1
+    Left = 656
+    Top = 32
+    StyleName = 'Platform Default'
+    object ActionRunWQL: TAction
+      Caption = 'Execute WQL'
+      ImageIndex = 0
+      OnExecute = ActionRunWQLExecute
+      OnUpdate = ActionRunWQLUpdate
+    end
+  end
+  object PopupActionBar1: TPopupActionBar
+    Images = ImageList1
+    Left = 752
+    Top = 24
+    object ExecuteWQL1: TMenuItem
+      Action = ActionRunWQL
+    end
   end
 end
