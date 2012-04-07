@@ -33,14 +33,6 @@ uses
   Vcl.Menus, Vcl.ActnPopup;
 
 type
-  TWMIPropData = class
-  private
-    FName: string;
-    FCimType: Integer;
-  public
-    property Name : string read FName write FName;
-    property CimType : Integer read FCimType write FCimType;
-  end;
 
   TColumnWidthHelper = record
     Index : integer;
@@ -48,6 +40,16 @@ type
    end;
 
   TFrmWMISQL = class(TForm)
+   type
+      TWMIPropData = class
+      private
+        FName: string;
+        FCimType: Integer;
+      public
+        property Name : string read FName write FName;
+        property CimType : Integer read FCimType write FCimType;
+      end;
+    var
     SynEditWQL: TSynEdit;
     BtnExecuteWQL: TButton;
     PanelTop: TPanel;
@@ -81,6 +83,10 @@ type
     ActionRunWQL: TAction;
     PopupActionBar1: TPopupActionBar;
     ExecuteWQL1: TMenuItem;
+    Panel1: TPanel;
+    Memo1: TMemo;
+    Splitter3: TSplitter;
+    CheckBoxAsync: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure EditMachineExit(Sender: TObject);
@@ -108,6 +114,7 @@ type
     FFields       : TObjectList<TWMIPropData>;
     oEnum         : IEnumvariant;
     iValue        : LongWord;
+    FRunningWQL   : Boolean;
     FLog: TProcLog;
     FUser: string;
     FMachine: string;
@@ -123,6 +130,7 @@ type
     procedure LoadWmiClasses(const Namespace: string);
     procedure GenerateSqlCode;
     procedure LoadProposal(WmiMetaClassInfo : TWMiClassMetaData);
+    procedure SetMsg(const Msg : string);
   public
     procedure SetNameSpaceIndex(Index : integer);
     property Log   : TProcLog read FLog write FLog;
@@ -137,6 +145,7 @@ implementation
 
 uses
  Math,
+ AsyncCalls,
  uGlobals,
  uListView_Helper,
  MidasLib,
@@ -151,13 +160,34 @@ uses
 { TFrmWMISQL }
 
 procedure TFrmWMISQL.ActionRunWQLExecute(Sender: TObject);
+var
+ AsyncCall: IAsyncCall;
+
+  procedure LRunWQL;
+  begin
+    RunWQL;
+  end;
+
 begin
- RunWQL;
+  FRunningWQL:=True;
+  try
+    if not CheckBoxAsync.Checked then
+      RunWQL
+    else
+    begin
+        AsyncCall := LocalAsyncCall(@LRunWQL);
+        while AsyncMultiSync([AsyncCall], True, 1) = WAIT_TIMEOUT do
+          Application.ProcessMessages;
+    end;
+  finally
+    FRunningWQL:=False;
+  end;
 end;
+
 
 procedure TFrmWMISQL.ActionRunWQLUpdate(Sender: TObject);
 begin
- TAction(Sender).Enabled:=Length(SynEditWQL.Text)>0;
+ TAction(Sender).Enabled:=(Length(SynEditWQL.Text)>0) and (FRunningWQL=False);
 end;
 
 procedure TFrmWMISQL.CbNameSpacesChange(Sender: TObject);
@@ -209,6 +239,7 @@ begin
 
     with ClientDataSet1 do
      case FFields.Items[FFields.Count-1].CimType of
+
       wbemCimtypeSint8,
       wbemCimtypeUint8,
       wbemCimtypeSint16,
@@ -225,11 +256,12 @@ begin
 
       wbemCimtypeString   : FieldDefs.Add(colItem.Name, ftString, 255);
       wbemCimtypeDatetime : FieldDefs.Add(colItem.Name, ftDateTime);
-      wbemCimtypeReference: ;
+
+      wbemCimtypeReference: FieldDefs.Add(colItem.Name, ftString, 255);
       wbemCimtypeChar16   : FieldDefs.Add(colItem.Name, ftString, 255);
-      wbemCimtypeObject   : ;
+      wbemCimtypeObject   : FieldDefs.Add(colItem.Name, ftString, 255);
      else
-          ;
+          FieldDefs.Add(colItem.Name, ftString, 255);
      end;
 
   end;
@@ -284,6 +316,7 @@ end;
 
 procedure TFrmWMISQL.FormCreate(Sender: TObject);
 begin
+  FRunningWQL:=False;
   FUser:='';
   FPassword:='';
   FMachine:='localhost';
@@ -474,12 +507,20 @@ Var
  FWbemPropertySet: OleVariant;
 begin
   FirstRecord:=True;
+
+  if ClientDataSet1.Active then ClientDataSet1.Close;
+    ClientDataSet1.FieldDefs.Clear;
+
   ClientDataSet1.DisableControls;
   try
     FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
     try
+      SetMsg(Format('Connecting to %s server', [FMachine]));
       FWMIService   := FSWbemLocator.ConnectServer(FMachine, CbNameSpaces.Text, FUser, FPassword);
+      SetMsg('Done');
+      SetMsg('Running WQL sentence');
       FWbemObjectSet:= FWMIService.ExecQuery(SynEditWQL.Lines.Text, 'WQL', wbemFlagForwardOnly);
+      SetMsg('Done');
 
       oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
       while oEnum.Next(1, FWbemObject, iValue) = 0 do
@@ -488,7 +529,9 @@ begin
         begin
           ClientDataSet1.EnableControls;
           try
+            SetMsg('Creating dataset');
             CreateStructure();
+            SetMsg('Done');
             SetGridColumnWidths(DBGridWMI);
           finally
             ClientDataSet1.DisableControls;
@@ -496,7 +539,7 @@ begin
           FirstRecord:=False;
           if not ClientDataSet1.Active then ClientDataSet1.Open;
         end;
-        //Writeln(Format('AsyncMDLReadsPersec    %d',[Integer(FWbemObject.AsyncMDLReadsPersec)]));// Uint32
+
         FWbemPropertySet:= FWbemObject.Properties_;
         ClientDataSet1.Append;
          for F in FFields do
@@ -508,14 +551,20 @@ begin
         ClientDataSet1.Post;
         FWbemObject:=Unassigned;
       end;
+
+      if not FirstRecord then
+       ClientDataSet1.EnableControls;
+
     except
       on E:EOleException do
       begin
+          Perform(WM_PAINT, 0, 0);
           MsgWarning(Format('EOleException %s %x', [E.Message,E.ErrorCode]));
           Log(Format('EOleException %s %x', [E.Message,E.ErrorCode]));
       end;
       on E:Exception do
       begin
+          Perform(WM_PAINT, 0, 0);
           MsgWarning(E.Classname + ':' + E.Message);
           Log(E.Classname + ':' + E.Message);
       end;
@@ -523,8 +572,15 @@ begin
 
     if not FirstRecord then
     begin
-      if not ClientDataSet1.Active then ClientDataSet1.Open;
-      SetGridColumnWidths(DBGridWMI);
+      ClientDataSet1.DisableControls;
+      try
+        SetMsg('Adjusting grid widths');
+        if not ClientDataSet1.Active then ClientDataSet1.Open;
+        SetGridColumnWidths(DBGridWMI);
+        SetMsg('Done');
+      finally
+         ClientDataSet1.EnableControls;
+      end;
     end;
 
   finally
@@ -536,6 +592,11 @@ procedure TFrmWMISQL.SetMachine(const Value: string);
 begin
   FMachine := Value;
   EditMachine.Text:=Value;
+end;
+
+procedure TFrmWMISQL.SetMsg(const Msg: string);
+begin
+  Memo1.Lines.Add(Format('%s %s',[FormatDateTime('hh:nn:ss.zzz', Now),Msg]));
 end;
 
 procedure TFrmWMISQL.SetNameSpaceIndex(Index: integer);

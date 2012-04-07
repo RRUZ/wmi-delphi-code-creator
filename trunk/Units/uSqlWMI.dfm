@@ -3,7 +3,7 @@ object FrmWMISQL: TFrmWMISQL
   Top = 0
   BorderStyle = bsNone
   Caption = 'FrmWMISQL'
-  ClientHeight = 432
+  ClientHeight = 545
   ClientWidth = 958
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,21 +20,23 @@ object FrmWMISQL: TFrmWMISQL
     Left = 301
     Top = 0
     Width = 5
-    Height = 432
+    Height = 545
     ExplicitLeft = 193
     ExplicitTop = 8
+    ExplicitHeight = 432
   end
   object PanelLeft: TPanel
     Left = 0
     Top = 0
     Width = 301
-    Height = 432
+    Height = 545
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitHeight = 432
     DesignSize = (
       301
-      432)
+      545)
     object Label1: TLabel
       Left = 10
       Top = 6
@@ -92,7 +94,7 @@ object FrmWMISQL: TFrmWMISQL
       Left = 10
       Top = 157
       Width = 274
-      Height = 270
+      Height = 383
       Anchors = [akLeft, akTop, akRight, akBottom]
       Checkboxes = True
       Columns = <
@@ -120,6 +122,7 @@ object FrmWMISQL: TFrmWMISQL
       TabOrder = 4
       ViewStyle = vsReport
       OnClick = ListViewPropertiesClick
+      ExplicitHeight = 270
     end
     object CheckBoxSelAllProps: TCheckBox
       Left = 10
@@ -137,11 +140,12 @@ object FrmWMISQL: TFrmWMISQL
     Left = 306
     Top = 0
     Width = 652
-    Height = 432
+    Height = 545
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
+    ExplicitHeight = 432
     object Splitter1: TSplitter
       Left = 5
       Top = 190
@@ -152,6 +156,15 @@ object FrmWMISQL: TFrmWMISQL
       ExplicitLeft = -7
       ExplicitTop = 185
       ExplicitWidth = 576
+    end
+    object Splitter3: TSplitter
+      Left = 5
+      Top = 452
+      Width = 642
+      Height = 5
+      Cursor = crVSplit
+      Align = alBottom
+      ExplicitTop = 341
     end
     object PanelTop: TPanel
       Left = 5
@@ -256,13 +269,23 @@ object FrmWMISQL: TFrmWMISQL
           TabOrder = 4
           OnExit = EditPasswordExit
         end
+        object CheckBoxAsync: TCheckBox
+          Left = 399
+          Top = 6
+          Width = 130
+          Height = 17
+          Caption = 'Run in Async mode'
+          Checked = True
+          State = cbChecked
+          TabOrder = 5
+        end
       end
     end
     object DBGridWMI: TDBGrid
       Left = 5
       Top = 195
       Width = 642
-      Height = 232
+      Height = 257
       Align = alClient
       DataSource = DataSource1
       ReadOnly = True
@@ -274,6 +297,35 @@ object FrmWMISQL: TFrmWMISQL
       TitleFont.Style = []
       OnDrawColumnCell = DBGridWMIDrawColumnCell
       OnDblClick = DBGridWMIDblClick
+    end
+    object Panel1: TPanel
+      Left = 5
+      Top = 457
+      Width = 642
+      Height = 83
+      Align = alBottom
+      BevelOuter = bvNone
+      TabOrder = 2
+      ExplicitTop = 344
+      object Memo1: TMemo
+        Left = 0
+        Top = 0
+        Width = 642
+        Height = 83
+        Align = alClient
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Consolas'
+        Font.Style = []
+        ParentFont = False
+        ScrollBars = ssBoth
+        TabOrder = 0
+        ExplicitLeft = 5
+        ExplicitTop = 5
+        ExplicitWidth = 632
+        ExplicitHeight = 73
+      end
     end
   end
   object SynSQLSyn1: TSynSQLSyn
@@ -316,7 +368,7 @@ object FrmWMISQL: TFrmWMISQL
     Left = 128
     Top = 296
     Bitmap = {
-      494C010101000800180010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010101000800200010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000010D0434052D0DD9042F
       0FFD041909B70005012600000000000000000000000000000000000000000000
