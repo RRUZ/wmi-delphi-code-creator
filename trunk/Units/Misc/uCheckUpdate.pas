@@ -85,6 +85,7 @@ implementation
 
 uses
   ShellAPI,
+  uUpdatesChanges,
   uMisc,
   ComObj,
   uWinInet;
@@ -185,8 +186,11 @@ begin
        Close;
       end
       else
+      {
       if MessageDlg(Format('Exist a new version available (%s) of the %s , Do you want download the new version?',[RemoteVersion, FApplicationName]),
       mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+      }
+      if CheckChangesUpdates(Format('Exist a new version available (%s) of the %s %sDo you want download the new version?',[RemoteVersion, FApplicationName,#13#10])) then
       begin
        if not Visible then
          Show;
@@ -292,10 +296,10 @@ begin
  try
    if FRemoteVersion='' then
      ReadRemoteInfo;
-          {
+
    if DebugHook<>0 then
      Result:=True
-   else  }
+   else
      Result:=(FRemoteVersion>FLocalVersion);
  except on E : Exception do
    begin
