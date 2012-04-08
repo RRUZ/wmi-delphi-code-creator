@@ -4,7 +4,7 @@
 			<ProjectVersion>13.4</ProjectVersion>
 			<MainSource>WmiDelphiCodeCreator.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
@@ -114,8 +114,8 @@
 			<DCC_DebugInformation>true</DCC_DebugInformation>
 			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
 			<VerInfo_MinorVer>4</VerInfo_MinorVer>
-			<VerInfo_Build>34</VerInfo_Build>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.4.4.34;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<VerInfo_Build>62</VerInfo_Build>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.4.4.62;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="$(MainSource)">
@@ -216,6 +216,10 @@
 				<Form>FrmWMISQL</Form>
 				<FormType>dfm</FormType>
 			</DCCReference>
+			<DCCReference Include="Units\Misc\uUpdatesChanges.pas">
+				<Form>FrmUpdateChanges</Form>
+				<FormType>dfm</FormType>
+			</DCCReference>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
@@ -277,10 +281,10 @@
 					<Platform value="Win32">True</Platform>
 				</Platforms>
 				<Deployment>
-					<DeployFile Configuration="Release" LocalName="WmiDelphiCodeCreator.exe" Class="ProjectOutput">
+					<DeployFile LocalName="WmiDelphiCodeCreator.exe" Class="ProjectOutput" Configuration="Release">
 						<Platform Name="Win32"/>
 					</DeployFile>
-					<DeployFile Configuration="Release" LocalName="WmiDelphiCodeCreator.rsm" Class="DebugSymbols">
+					<DeployFile LocalName="WmiDelphiCodeCreator.rsm" Class="DebugSymbols" Configuration="Release">
 						<Platform Name="Win32">
 							<RemoteName>WmiDelphiCodeCreator.rsm</RemoteName>
 						</Platform>
