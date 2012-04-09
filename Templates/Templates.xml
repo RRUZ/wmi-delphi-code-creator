@@ -12,7 +12,7 @@
     <WmiClassesSingleton>TemplateConsoleAppDelphiSingleton.pas</WmiClassesSingleton>
     <WmiMethodStatic>TemplateStaticMethodInvokerDelphi.pas</WmiMethodStatic>
     <WmiMethodNonStatic>TemplateNonStaticMethodInvokerDelphi.pas</WmiMethodNonStatic>
-	<WmiEvents>TemplateEventsDelphi.pas</WmiEvents>
+	<WmiEvents>TemplateEventsDelphiLate.pas</WmiEvents>
   </Lng_Delphi>  
   <Lng_Delphi Mode="WmiCode_COM">
     <WmiClasses>TemplateConsoleAppDelphi_COM.pas</WmiClasses>

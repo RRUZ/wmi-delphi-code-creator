@@ -29,10 +29,10 @@ uses
 
 const
   DelphiMaxTypesClassCodeGen    =3;
-  DelphiMaxTypesEventsCodeGen   =2;
+  DelphiMaxTypesEventsCodeGen   =3;
   DelphiMaxTypesMethodCodeGen   =3;
   DelphiWmiClassCodeSupported  : Array [0..DelphiMaxTypesClassCodeGen-1]  of TWmiCode = (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
-  DelphiWmiEventCodeSupported  : Array [0..DelphiMaxTypesEventsCodeGen-1] of TWmiCode = (WmiCode_Scripting, WmiCode_COM);
+  DelphiWmiEventCodeSupported  : Array [0..DelphiMaxTypesEventsCodeGen-1] of TWmiCode = (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
   DelphiWmiMethodCodeSupported : Array [0..DelphiMaxTypesMethodCodeGen-1] of TWmiCode = (WmiCode_Scripting, WmiCode_LateBinding, WmiCode_COM);
 
 type
@@ -169,6 +169,7 @@ begin
     StrCode:=TFile.ReadAllText(GetTemplateLocation(Lng_Delphi, ModeCodeGeneration, TWmiGenCode.WmiEvents));;
 
     case ModeCodeGeneration of
+     WmiCode_LateBinding,
      WmiCode_Default,
      WmiCode_Scripting :
                          begin
@@ -236,7 +237,7 @@ begin
                               StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
                          end;
 
-     WmiCode_LateBinding:StrCode := '//Not implemented, please select another method for code generation in the Settings option';
+    // WmiCode_LateBinding:StrCode := '//Not implemented, please select another method for code generation in the Settings option';
 
      WmiCode_COM:        begin
                             WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
