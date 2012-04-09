@@ -38,6 +38,10 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheetProps: TTabSheet
         Caption = 'Properties'
         TabVisible = False
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object ListViewWmi: TListView
           Left = 0
           Top = 0
@@ -67,6 +71,10 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheet1: TTabSheet
         Caption = 'Properties'
         ImageIndex = 2
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object ListViewGrid: TListView
           Left = 0
           Top = 0
@@ -88,6 +96,10 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheet2: TTabSheet
         Caption = 'Properties Links'
         ImageIndex = 2
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object ListViewPropsLinks: TListView
           Left = 0
           Top = 0
@@ -195,7 +207,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C010106000800400010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106000800480010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -483,6 +495,15 @@ object FrmWmiVwProps: TFrmWmiVwProps
     object Checkforonlinedocumentation1: TMenuItem
       Action = ActionCheckOnlineDocs
     end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object OpeninWindowsRegistry1: TMenuItem
+      Action = ActionOpenRegistry
+    end
+    object OpenSMBIOSReferenceSpecification1: TMenuItem
+      Action = ActionSMBIOS
+    end
   end
   object ActionManager1: TActionManager
     Images = listViewImages
@@ -504,6 +525,18 @@ object FrmWmiVwProps: TFrmWmiVwProps
       ImageIndex = 5
       OnExecute = ActionCheckOnlineDocsExecute
       OnUpdate = ActionCheckOnlineDocsUpdate
+    end
+    object ActionOpenRegistry: TAction
+      Caption = 'Open in Windows Registry'
+      ImageIndex = 1
+      OnExecute = ActionOpenRegistryExecute
+      OnUpdate = ActionOpenRegistryUpdate
+    end
+    object ActionSMBIOS: TAction
+      Caption = 'Open SMBIOS Reference Specification'
+      ImageIndex = 3
+      OnExecute = ActionSMBIOSExecute
+      OnUpdate = ActionSMBIOSUpdate
     end
   end
 end

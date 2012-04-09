@@ -36,6 +36,7 @@ type
     BtnCancel: TButton;
     WebBrowser1: TWebBrowser;
     btnDetails: TButton;
+    Panel2: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
     procedure BtnOkClick(Sender: TObject);
@@ -59,10 +60,11 @@ implementation
 uses
  Vcl.Styles,
  Vcl.Themes,
+ Vcl.GraphUtil,
  MsHtml,
- ComObj,
- ActiveX,
- MSXML;
+ System.Win.ComObj,
+ Winapi.ActiveX,
+ Winapi.msxml;
 
 {$R *.dfm}
 
@@ -99,11 +101,11 @@ procedure TFrmUpdateChanges.btnDetailsClick(Sender: TObject);
 begin
  if ClientHeight<200 then
  begin
-  Height:=Height+200;
+  Height:=Height+210;
   Load;
  end
  else
-  Height:=Height-200;
+  Height:=Height-210;
 end;
 
 function TFrmUpdateChanges.Execute: Boolean;
@@ -183,17 +185,18 @@ var
   BackColor       : string;
   LColor          : TColor;
 begin
-  if SameText(TStyleManager.ActiveStyle.Name,'Windows') then
+
+  if not TStyleManager.IsCustomStyleActive then
     LColor:=clWhite
   else
     LColor:=StyleServices.GetSystemColor(clWindow);
-  BackColor:= Format('#%.2x%.2x%.2x',[GetRValue(LColor), GetGValue(LColor), GetBValue(LColor)]) ;
+  BackColor:= ColorToWebColorStr(LColor);
 
-  if SameText(TStyleManager.ActiveStyle.Name,'Windows') then
+  if not TStyleManager.IsCustomStyleActive then
     LColor:=clBlack
   else
     LColor:=StyleServices.GetSystemColor(clWindowText);
-  FontColor:= Format('#%.2x%.2x%.2x',[GetRValue(LColor), GetGValue(LColor), GetBValue(LColor)]) ;
+  FontColor:= ColorToWebColorStr(LColor);
 
    WebBrowser1.HandleNeeded;
    WebBrowser1.Navigate('about:blank');

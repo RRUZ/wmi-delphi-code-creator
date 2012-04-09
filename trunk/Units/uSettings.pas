@@ -408,12 +408,6 @@ begin
    TStyleManager.SetStyle(StyleName)
   else
    TStyleManager.SetStyle(TStyleManager.SystemStyle.Name);
-       {
-  if CompareText(StyleName,'Windows')=0 then
-   TStyleManager.SetStyle(TStyleManager.SystemStyle.Name)
-  else
-   RegisterAndSetVCLStyle( IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+'Styles\'+StyleName+'.vsf');
-       }
 end;
 
 function GetCurrentTheme(const ThemeName:string):TIDETheme;
@@ -1066,7 +1060,7 @@ begin
    ImageVCLStyle.Picture:=nil;
 
    StyleName:=ComboBoxVCLStyle.Text;
-   if (StyleName<>'') and (CompareText('Windows',StyleName)<>0) then
+   if (StyleName<>'') and (not SameText('Windows',StyleName)) then
    begin
     LBitmap:=TBitmap.Create;
     try
@@ -1215,7 +1209,6 @@ begin
   try
     ComboBoxVCLStyle.Items.BeginUpdate;
     ComboBoxVCLStyle.Items.Clear;
-    //ComboBoxVCLStyle.Items.Add('Windows');
     for Style in TStyleManager.StyleNames do
       ComboBoxVCLStyle.Items.Add(Style);
   finally

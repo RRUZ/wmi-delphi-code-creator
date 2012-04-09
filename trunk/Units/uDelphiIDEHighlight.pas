@@ -473,20 +473,20 @@ begin
         for Element in [Low(TIDEHighlightElements)..High(TIDEHighlightElements)] do
         begin
             ChildNode := RootNode.AddChild(GetEnumName(TypeInfo(TIDEHighlightElements),integer(Element)));
-               oNode  := ChildNode.AddChild('Bold');
-               oNode.Text:=BoolToStr(ATheme[Element].Bold,True);
-               oNode  := ChildNode.AddChild('Italic');
-               oNode.Text:=BoolToStr(ATheme[Element].Italic,True);
-               oNode  := ChildNode.AddChild('Underline');
-               oNode.Text:=BoolToStr(ATheme[Element].Underline,True);
-               oNode  := ChildNode.AddChild('DefaultForeground');
-               oNode.Text:=BoolToStr(ATheme[Element].DefaultForeground,True);
-               oNode  := ChildNode.AddChild('DefaultBackground');
-               oNode.Text:=BoolToStr(ATheme[Element].DefaultBackground,True);
-               oNode  := ChildNode.AddChild('ForegroundColorNew');
-               oNode.Text:=ATheme[Element].ForegroundColorNew;
-               oNode  := ChildNode.AddChild('BackgroundColorNew');
-               oNode.Text:=ATheme[Element].BackgroundColorNew;
+             oNode  := ChildNode.AddChild('Bold');
+             oNode.Text:=BoolToStr(ATheme[Element].Bold,True);
+             oNode  := ChildNode.AddChild('Italic');
+             oNode.Text:=BoolToStr(ATheme[Element].Italic,True);
+             oNode  := ChildNode.AddChild('Underline');
+             oNode.Text:=BoolToStr(ATheme[Element].Underline,True);
+             oNode  := ChildNode.AddChild('DefaultForeground');
+             oNode.Text:=BoolToStr(ATheme[Element].DefaultForeground,True);
+             oNode  := ChildNode.AddChild('DefaultBackground');
+             oNode.Text:=BoolToStr(ATheme[Element].DefaultBackground,True);
+             oNode  := ChildNode.AddChild('ForegroundColorNew');
+             oNode.Text:=ATheme[Element].ForegroundColorNew;
+             oNode  := ChildNode.AddChild('BackgroundColorNew');
+             oNode.Text:=ATheme[Element].BackgroundColorNew;
             {
             ChildNode := RootNode.AddChild(GetEnumName(TypeInfo(TIDEHighlightElements),integer(Element)));
             ChildNode.Attributes['Bold'] := BoolToStr(ATheme[Element].Bold,True);
@@ -501,8 +501,9 @@ begin
     //Result:=Format('%s%s_%s.theme.xml',[IncludeTrailingPathDelimiter(Path),Name,DelphiVersionsNames[DelphiVersion]]);
     Result:=Format('%s%s.theme.xml',[IncludeTrailingPathDelimiter(Path),Name]);
     Doc.SaveToFile(Result);
+
   finally
-   Doc:=nil;
+    Doc:=nil;
   end;
 end;
 
