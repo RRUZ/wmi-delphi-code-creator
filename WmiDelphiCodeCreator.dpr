@@ -58,7 +58,8 @@ uses
   Vcl.Styles.FormStyleHooks in 'Units\Vcl.Styles.Utils\Vcl.Styles.FormStyleHooks.pas',
   uOnlineResources in 'Units\uOnlineResources.pas' {FrmOnlineResources},
   uSqlWMI in 'Units\uSqlWMI.pas' {FrmWMISQL},
-  uUpdatesChanges in 'Units\Misc\uUpdatesChanges.pas' {FrmUpdateChanges};
+  uUpdatesChanges in 'Units\Misc\uUpdatesChanges.pas' {FrmUpdateChanges},
+  WbemScripting_TLB in 'Units\WMI\WbemScripting_TLB.pas';
 
 {$R *.res}
 

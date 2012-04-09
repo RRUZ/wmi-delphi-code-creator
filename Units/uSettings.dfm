@@ -36,6 +36,10 @@ object FrmSettings: TFrmSettings
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -144,6 +148,10 @@ object FrmSettings: TFrmSettings
       object TabSheet2: TTabSheet
         Caption = 'Object Pascal Code generation'
         ImageIndex = 1
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 99
@@ -242,6 +250,10 @@ object FrmSettings: TFrmSettings
       end
       object TabSheet1: TTabSheet
         Caption = 'GUI Settings'
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel3: TPanel
           Left = 0
           Top = 0
@@ -261,6 +273,10 @@ object FrmSettings: TFrmSettings
             TabOrder = 0
             object TabSheet6: TTabSheet
               Caption = 'Themes (Vcl Styles)'
+              ExplicitLeft = 0
+              ExplicitTop = 0
+              ExplicitWidth = 0
+              ExplicitHeight = 0
               object Label9: TLabel
                 Left = 3
                 Top = 22
@@ -430,6 +446,10 @@ object FrmSettings: TFrmSettings
             object TabSheet7: TTabSheet
               Caption = 'Syntax Highlighting'
               ImageIndex = 1
+              ExplicitLeft = 0
+              ExplicitTop = 0
+              ExplicitWidth = 0
+              ExplicitHeight = 0
               object Label3: TLabel
                 Left = 491
                 Top = 8
@@ -549,6 +569,10 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -561,6 +585,10 @@ object FrmSettings: TFrmSettings
       object TabSheet8: TTabSheet
         Caption = 'Compiler Options'
         ImageIndex = 5
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label18: TLabel
           Left = 8
           Top = 16
@@ -595,6 +623,10 @@ object FrmSettings: TFrmSettings
       object TabSheet5: TTabSheet
         Caption = 'Templates'
         ImageIndex = 4
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label15: TLabel
           Left = 11
           Top = 10

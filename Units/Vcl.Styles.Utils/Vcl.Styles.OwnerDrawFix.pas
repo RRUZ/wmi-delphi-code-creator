@@ -46,8 +46,8 @@ type
   private
     procedure ComboBoxDrawItem(Control: TWinControl; Index: Integer;  Rect: TRect; State: TOwnerDrawState);
     procedure ListBoxDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
-    procedure ListViewDrawItem(Sender: TCustomListView; Item: TListItem; Rect: TRect; State: TOwnerDrawState);
-    procedure ListViewMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    //procedure ListViewDrawItem(Sender: TCustomListView; Item: TListItem; Rect: TRect; State: TOwnerDrawState);
+    //procedure ListViewMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   end;
 
 
@@ -157,7 +157,7 @@ begin
   end;
 end;
 
-
+{
 procedure TVclStylesOwnerDrawFix.ListViewDrawItem(Sender: TCustomListView;
   Item: TListItem; Rect: TRect; State: TOwnerDrawState);
 var
@@ -254,7 +254,7 @@ begin
   if X<=13 then
    TListView(Sender).Selected.Checked:=not TListView(Sender).Selected.Checked;
 end;
-
+}
 initialization
  VclStylesOwnerDrawFix:=TVclStylesOwnerDrawFix.Create;
 finalization

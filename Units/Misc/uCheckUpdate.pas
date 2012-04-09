@@ -92,17 +92,8 @@ uses
 
 Type
    TProcCallBack= procedure(BytesRead:Integer) of object;
-      {
-const
-  sRemoteVersionFile       = 'http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Version.xml';
-  sApplicationName         = 'WMI Delphi Code Creator';
-  sXPathVersionNumber      = '/versioninfo/@versionapp';
-  sXPathUrlInstaller       = '/versioninfo/@url';
-  sXPathInstallerFileName  = '/versioninfo/@installerfilename';
-   }
+
 {$R *.dfm}
-
-
 
 { TFrmCheckUpdate }
 procedure TFrmCheckUpdate.BtnCheckUpdatesClick(Sender: TObject);
@@ -218,6 +209,7 @@ end;
 
 procedure TFrmCheckUpdate.FormCreate(Sender: TObject);
 begin
+
    FRemoteVersion:='';
    FErrorUpdate  :=False;
    FCheckExternal:=False;
@@ -296,10 +288,11 @@ begin
  try
    if FRemoteVersion='' then
      ReadRemoteInfo;
-
+     {
    if DebugHook<>0 then
      Result:=True
    else
+     }
      Result:=(FRemoteVersion>FLocalVersion);
  except on E : Exception do
    begin

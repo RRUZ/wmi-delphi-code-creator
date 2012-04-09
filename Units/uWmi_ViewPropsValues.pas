@@ -23,24 +23,32 @@ unit uWmi_ViewPropsValues;
 
 interface
 
+{.$DEFINE USE_ASYNCWMIQUERY}
+
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, SynEdit, ExtCtrls,
   Generics.Collections, uWmi_Metadata,
-  ImgList, Contnrs, ActiveX, StdCtrls, Vcl.Menus,
+  ImgList, Contnrs, ActiveX, StdCtrls, Vcl.Menus, {$IFDEF USE_ASYNCWMIQUERY} WbemScripting_TLB, {$ENDIF}
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, Vcl.ActnList, Vcl.ActnMan;
+
+{$IFNDEF USE_ASYNCWMIQUERY}
+const
+   WM_WMI_THREAD_FINISHED = WM_USER + 666;
+{$ENDIF}
 
 type
   TWMIQueryCallbackLog = procedure(const msg: string) of object;
 
+{$IFNDEF USE_ASYNCWMIQUERY}
   TWMIQueryToListView = class(TThread)
   private
     Success:   HResult;
     FEnum:     IEnumvariant;
-    FSWbemLocator: olevariant;
-    FWMIService: olevariant;
-    FWbemObjectSet: olevariant;
-    FWbemObject: olevariant;
+    FSWbemLocator: OleVariant;
+    FWMIService: OleVariant;
+    FWbemObjectSet: OleVariant;
+    FWbemObject: OleVariant;
     FWQL:      string;
     FServer:   string;
     FUser:     string;
@@ -51,6 +59,7 @@ type
     FCallback: TWMIQueryCallbackLog;
     FMsg:      string;
     FValues:   TList<TStrings>;
+    FParentHandle : THandle;
     procedure CreateColumns;
     procedure SetListViewSize;
     procedure AdjustColumnsWidth;
@@ -58,10 +67,11 @@ type
   public
     constructor Create(const Server, User, PassWord, NameSpace, WQL: string;
       ListWMIProperties : TStrings;
-      ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>); overload;
+      ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>; ParentHandle : THandle); overload;
     destructor Destroy; override;
     procedure Execute; override;
   end;
+{$ENDIF}
 
   TFrmWmiVwProps = class(TForm)
     ListViewWmi: TListView;
@@ -90,6 +100,11 @@ type
     ActionViewPropDetails: TAction;
     ActionViewDetailsProps: TAction;
     ActionCheckOnlineDocs: TAction;
+    ActionOpenRegistry: TAction;
+    OpeninWindowsRegistry1: TMenuItem;
+    N1: TMenuItem;
+    ActionSMBIOS: TAction;
+    OpenSMBIOSReferenceSpecification1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -102,15 +117,27 @@ type
     procedure ActionViewDetailsPropsUpdate(Sender: TObject);
     procedure ActionViewDetailsPropsExecute(Sender: TObject);
     procedure ActionCheckOnlineDocsExecute(Sender: TObject);
+    procedure ActionOpenRegistryUpdate(Sender: TObject);
+    procedure ActionOpenRegistryExecute(Sender: TObject);
+    procedure ActionSMBIOSUpdate(Sender: TObject);
+    procedure ActionSMBIOSExecute(Sender: TObject);
   private
-    FValues:   TList<TStrings>;
+
+    {$IFDEF USE_ASYNCWMIQUERY}
+    FSWbemLocator : ISWbemLocator;
+    FWMIService   : ISWbemServices;
+    FSink         : TSWbemSink;
+    {$ELSE}
+    FThreadFinished : Boolean;
+    FThread: TWMIQueryToListView;
+    {$ENDIF}
+    FValues:   TObjectList<TStrings>;
     FWmiClass: string;
     FWmiNamespace: string;
     FWQL:    TStrings;
     FWQLProperties: TStrings;
     FDataLoaded: boolean;
     FContainValues: boolean;
-    FThread: TWMIQueryToListView;
     FWMIProperties: TStrings;
     WmiMetaData : TWMiClassMetaData;
     procedure Log(const msg: string);
@@ -121,6 +148,21 @@ type
     procedure LoadPropsLinks;//MappedStrings
     procedure ShowDetailsProps;
     procedure CheckOnlineDoc;
+
+   {$IFDEF USE_ASYNCWMIQUERY}
+    procedure RunAsyncWQL;
+    procedure CreateColumns;
+    procedure EventReceived(ASender: TObject; const objWbemObject: ISWbemObject; const objWbemAsyncContext: ISWbemNamedValueSet);
+    procedure EventCompleted(ASender: TObject; iHResult: WbemErrorEnum;
+                                                      const objWbemErrorObject: ISWbemObject;
+                                                      const objWbemAsyncContext: ISWbemNamedValueSet);
+
+    procedure EventProgress(ASender: TObject; iUpperBound: Integer; iCurrent: Integer;
+                                                     const strMessage: WideString;
+                                                     const objWbemAsyncContext: ISWbemNamedValueSet);
+   {$ELSE}
+   procedure OnWMIThreadFinished(var Msg: TMessage); message WM_WMI_THREAD_FINISHED;
+   {$ENDIF}
   public
     property ContainValues: boolean Read FContainValues;
     property WQLProperties: TStrings Read FWQLProperties Write FWQLProperties;
@@ -141,19 +183,56 @@ uses
   CommCtrl,
   StrUtils,
   ShellAPi,
+  Registry,
   uListView_Helper,
   uPropValueList;
 
 {$R *.dfm}
 
 
+procedure AutoResizeVirtualListView(const ListView: TListView;Values:TList<TStrings>; MaxWitdh : Integer=200);
+Var
+ i, j        : Integer;
+ TopIndex    : Integer;
+ BottomIndex : Integer;
+ psz         : string;
+ cw,lw       : Integer;
+
+begin
+ if ListView.Items.Count>0 then
+ begin
+  TopIndex   :=ListView.Perform(LVM_GETTOPINDEX,0,0);
+  BottomIndex:=TopIndex+ListView.Perform(LVM_GETCOUNTPERPAGE,0,0);
+  if BottomIndex>ListView.Items.Count-1 then
+   BottomIndex:=ListView.Items.Count;
+
+  for j:=0 to ListView.Columns.Count-1 do
+  begin
+    cw:=ListView.Columns.Items[j].Width;
+
+    for i :=TopIndex to BottomIndex do
+    begin
+     psz:=Values[i].Strings[j];
+     lw :=ListView_GetStringWidth(ListView.Handle, PChar(psz));
+     if lw>cw then
+      cw:=lw;
+
+     if cw>MaxWitdh then
+     begin
+      cw:=MaxWitdh;
+      break;
+     end;
+    end;
+
+    if ListView.Columns.Items[j].Width<>cw then
+     ListView.Columns.Items[j].Width:=cw+20;
+  end;
+ end;
+end;
+
 procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList);
 var
   Frm: TFrmWmiVwProps;
-  {
-  WmiMetaData : TWMiClassMetaData;
-  i           : Integer;
-  }
 begin
   if (WmiClass <> '') and (Namespace <> '') then
   begin
@@ -161,22 +240,6 @@ begin
     Frm.WmiClass     := WmiClass;
     Frm.WmiNamespace := Namespace;
     Frm.Caption      := 'Properties Values for the class ' + WmiClass;
-       {
-    Frm.WQLProperties.Clear;
-    if (Properties=nil) or (Properties.Count=0) then
-    begin
-     WmiMetaData:=TWMiClassMetaData.Create(NameSpace,WmiClass);
-     try
-      for i:=0 to WmiMetaData.PropertiesCount-1 do
-        Frm.WQLProperties.Add(WmiMetaData.Properties[i].Name)
-     finally
-      WmiMetaData.Free;
-     end;
-    end
-    else
-      for i:=0 to Properties.Count-1 do
-        Frm.WQLProperties.Add(Properties[i]);
-    }
     Frm.LoadValues(Properties);
     Frm.Show();
   end;
@@ -190,6 +253,44 @@ end;
 procedure TFrmWmiVwProps.ActionCheckOnlineDocsUpdate(Sender: TObject);
 begin
  TAction(Sender).Enabled:=ListViewPropsLinks.Items.Count>0;
+end;
+
+procedure TFrmWmiVwProps.ActionOpenRegistryExecute(Sender: TObject);
+var
+ Key : string;
+ Reg : TRegistry;
+begin
+  if (ListViewPropsLinks.Selected<>nil) and (ListViewPropsLinks.Selected.SubItems.Count>1) and (SameText('Win32Registry', ListViewPropsLinks.Selected.SubItems[0])) then
+  begin
+    Key:=ListViewPropsLinks.Selected.SubItems[1];
+    Reg:=TRegistry.Create;
+    try
+      Reg.RootKey:=HKEY_CURRENT_USER;
+      if Reg.OpenKey('Software\Microsoft\Windows\CurrentVersion\Applets\Regedit', false) then
+      begin
+       Reg.WriteString('Lastkey', Key);
+      end;
+    finally
+      Reg.Free;
+    end;
+    ShellExecute(Handle, 'open', 'regedit.exe', nil, nil, SW_SHOW);
+  end;
+end;
+
+procedure TFrmWmiVwProps.ActionOpenRegistryUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled:=(ListViewPropsLinks.Selected<>nil) and (ListViewPropsLinks.Selected.SubItems.Count>0) and (SameText('Win32Registry', ListViewPropsLinks.Selected.SubItems[0]));
+
+end;
+
+procedure TFrmWmiVwProps.ActionSMBIOSExecute(Sender: TObject);
+begin
+ ShellExecute(Handle, 'open', PChar('http://dmtf.org/sites/default/files/standards/documents/DSP0134_2.7.1.pdf'), nil, nil, SW_SHOW);
+end;
+
+procedure TFrmWmiVwProps.ActionSMBIOSUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled:=(ListViewPropsLinks.Selected<>nil) and (ListViewPropsLinks.Selected.SubItems.Count>0) and (SameText('SMBIOS', ListViewPropsLinks.Selected.SubItems[0]));
 end;
 
 procedure TFrmWmiVwProps.ActionViewDetailsPropsExecute(Sender: TObject);
@@ -235,11 +336,95 @@ begin
   if Frm.ListViewURL.Items.Count>0 then
    Frm.Show
   else
-  if (Frm.ListViewURL.Items.Count=0) and MsgQuestion('Related online information was not found, do you want to try with another search terms?') then
+  if (Frm.ListViewURL.Items.Count=0) and MsgQuestion('Related online information was not found. Do you want try with another search terms?') then
    Frm.Show
   else
    Frm.Free;
 end;
+
+{$IFDEF USE_ASYNCWMIQUERY}
+
+procedure TFrmWmiVwProps.CreateColumns;
+var
+  LIndex    : integer;
+  ListColumn: TListColumn;
+begin
+  ListViewGrid.Items.BeginUpdate;
+  try
+    for LIndex := 0 to FWMIProperties.Count - 1 do
+    begin
+      ListColumn := ListViewGrid.Columns.Add;
+      ListColumn.Caption := FWMIProperties[LIndex];
+      ListColumn.Width:=80;
+    end;
+  finally
+    ListViewGrid.Items.EndUpdate;
+  end;
+end;
+
+
+procedure TFrmWmiVwProps.EventCompleted(ASender: TObject;
+  iHResult: WbemErrorEnum; const objWbemErrorObject: ISWbemObject;
+  const objWbemAsyncContext: ISWbemNamedValueSet);
+begin
+  if FValues.Count = 0 then
+    Log('Does not exist instances for this wmi class')
+  else
+  begin
+    Log(Format('%d records found', [FValues.Count]));
+    AutoResizeVirtualListView(ListViewGrid, FValues);
+  end;
+end;
+
+procedure TFrmWmiVwProps.EventProgress(ASender: TObject; iUpperBound,
+  iCurrent: Integer; const strMessage: WideString;
+  const objWbemAsyncContext: ISWbemNamedValueSet);
+begin
+  Log(strMessage);
+end;
+
+procedure TFrmWmiVwProps.EventReceived(ASender: TObject;
+  const objWbemObject: ISWbemObject;
+  const objWbemAsyncContext: ISWbemNamedValueSet);
+var
+ Props        : ISWbemPropertySet;
+ PropItem     : OleVariant;
+ oEnumProp    : IEnumVariant;
+ iValue       : Cardinal;
+ CimType      : Integer;
+ RowData      : TStrings;
+ i            : Integer;
+begin
+  Props:= objWbemObject.Properties_;
+  oEnumProp := IUnknown(Props._NewEnum) as IEnumVariant;
+
+  if FWMIProperties.Count = 0 then
+  begin
+    while oEnumProp.Next(1, PropItem, iValue) = 0 do
+    begin
+      CimType:=PropItem.CIMType;
+      FWMIProperties.AddObject(PropItem.Name, TObject(CimType));
+      PropItem := Unassigned;
+    end;
+
+    FWMIProperties.AddObject('Object Path', TObject(wbemCimtypeString));
+    CreateColumns;
+  end;
+
+  RowData:=TStringList.Create;
+  if Assigned(FValues) then
+    FValues.Add(RowData);
+
+  for i := 0 to FWMIProperties.Count - 1 -1 do
+    RowData.Add(FormatWbemValue(Props.Item(FWMIProperties[i],0).Get_Value, Integer(FWMIProperties.Objects[i])));
+
+  RowData.Add(VarStrNull(objWbemObject.Path_.RelPath));
+  ListViewGrid.Items.Count:=FValues.Count;
+
+  Log(Format('%d records retrieved', [FValues.Count]));
+  Props := nil;
+end;
+{$ENDIF}
 
 procedure TFrmWmiVwProps.FormActivate(Sender: TObject);
 begin
@@ -254,34 +439,48 @@ end;
 
 procedure TFrmWmiVwProps.FormCreate(Sender: TObject);
 begin
+{$IFDEF USE_ASYNCWMIQUERY}
+  FSWbemLocator :=nil;
+  FWMIService   :=nil;
+  FSink         :=nil;
+{$ELSE}
+  FThreadFinished:=False;
+  FThread := nil;
+{$ENDIF}
+
   WmiMetaData:=nil;
   FDataLoaded := False;
   FWQLProperties := TStringList.Create;
   FWQL    := TStringList.Create;
   FContainValues := False;
-  FThread := nil;
   ListViewGrid.DoubleBuffered := True;
-  FValues:=TList<TStrings>.Create;
+  FValues:=TObjectList<TStrings>.Create(True);
   FWMIProperties:=TStringList.Create;
   //NullStrictConvert:=False;
 end;
 
 procedure TFrmWmiVwProps.FormDestroy(Sender: TObject);
-Var
- i : integer;
 begin
+{$IFDEF USE_ASYNCWMIQUERY}
+  if (FSink<>nil) then
+  begin
+    FSink.Cancel;
+    FSink.Disconnect;
+    FreeAndNil(FSink);
+    FSWbemLocator:=nil;
+    FWMIService  :=nil;
+  end;
+{$ELSE}
+  if (not FThreadFinished) and Assigned(FThread) and not FThread.Terminated then
+    FThread.Terminate;
+{$ENDIF}
+
   FWMIProperties.Free;
   FWQLProperties.Free;
   FWQL.Free;
+
   if WmiMetaData<>nil then
     WmiMetaData.Free;
-
-   if Assigned(FThread) and not FThread.Terminated then
-    FThread.Terminate;
-    //FThread.Free;
-
- for i:=0 to FValues.Count-1 do
-   FValues[i].Free;
 
   FValues.Free;
 end;
@@ -306,7 +505,7 @@ end;
 
 procedure TFrmWmiVwProps.LoadPropsLinks;
 var
-  i, j : integer;
+  i : integer;
   WMiQualifierMetaData : TWMiQualifierMetaData;
   Item : TListItem;
   s, MappingStrings : string;
@@ -385,14 +584,38 @@ begin
   FWQL.Add(' From ' + FWmiClass);
 
   LoadPropsLinks;
-
-  FThread := TWMIQueryToListView.Create('.', '', '', FWmiNamespace, FWQL.Text, FWMIProperties, ListViewGrid, Log, FValues);
+{$IFDEF USE_ASYNCWMIQUERY}
+  RunAsyncWQL;
+{$ELSE}
+  FThread := TWMIQueryToListView.Create('.', '', '', FWmiNamespace, FWQL.Text, FWMIProperties, ListViewGrid, Log, FValues, Handle)
+{$ENDIF}
 end;
 
 procedure TFrmWmiVwProps.Log(const msg: string);
 begin
   StatusBar1.SimpleText := msg;
 end;
+
+{$IFNDEF USE_ASYNCWMIQUERY}
+procedure TFrmWmiVwProps.OnWMIThreadFinished(var Msg: TMessage);
+begin
+ FThreadFinished:=True;
+end;
+{$ENDIF}
+
+
+{$IFDEF USE_ASYNCWMIQUERY}
+procedure TFrmWmiVwProps.RunAsyncWQL;
+begin
+  FSWbemLocator := CoSWbemLocator.Create;
+  FWMIService   := FSWbemLocator.ConnectServer(wbemLocalhost, 'root\CIMV2', '', '', '', '', 0, nil);
+  FSink     := TSWbemSink.Create(Self);
+  FSink.OnObjectReady := EventReceived;
+  FSink.OnCompleted   := EventCompleted;
+  FSink.OnProgress    := EventProgress;
+  FWMIService.ExecQueryAsync(FSink.DefaultInterface, FWQL.Text,'WQL', wbemFlagSendStatus , nil, nil);
+end;
+{$ENDIF}
 
 procedure TFrmWmiVwProps.SetWmiClass(const Value: string);
 begin
@@ -447,62 +670,9 @@ begin
  Frm.Show();
 end;
 
-procedure AutoResizeVirtualListView(const ListView: TListView;Values:TList<TStrings>);
-Var
- i, j        : Integer;
- TopIndex    : Integer;
- BottomIndex : Integer;
- psz         : string;
- cw,lw       : Integer;
- //pszText     : Array[0..4096-1] of Char;
- //pItem       : TLVItem;
-
-begin
- if ListView.Items.Count>0 then
- begin
-  TopIndex   :=ListView.Perform(LVM_GETTOPINDEX,0,0);
-  BottomIndex:=TopIndex+ListView.Perform(LVM_GETCOUNTPERPAGE,0,0);
-  if BottomIndex>ListView.Items.Count-1 then
-   BottomIndex:=ListView.Items.Count;
-
-  for j:=0 to ListView.Columns.Count-1 do
-  begin
-    cw:=ListView.Columns.Items[j].Width;
-
-    for i :=TopIndex to BottomIndex do
-    begin
-      {
-     if j=0 then
-      psz:=ListView.Items.Item[i].Caption
-     else
-     begin
-      ZeroMemory(@pItem, SizeOf(pItem));
-      pItem.pszText    := pszText;
-      pItem.cchTextMax := Length(pszText);
-      pItem.mask       := LVIF_TEXT;
-      pItem.iItem      := i;
-      pItem.iSubItem   := j;
-      ListView_GetItem(ListView.Handle, pItem);
-      psz:=pszText;
-      OutputDebugString(pchar(psz));
-     end;
-       }
-     psz:=Values[i].Strings[j];
-
-     lw :=ListView_GetStringWidth(ListView.Handle, PChar(psz));
-     if lw>cw then
-      cw:=lw;
-    end;
-
-    if ListView.Columns.Items[j].Width<>cw then
-     ListView.Columns.Items[j].Width:=cw+20;
-  end;
- end;
-end;
+{$IFNDEF USE_ASYNCWMIQUERY}
 
 { TWMIQueryToListView }
-
-
 procedure TWMIQueryToListView.AdjustColumnsWidth;
 begin
   //AutoResizeListView(FListView);
@@ -511,17 +681,17 @@ end;
 
 constructor TWMIQueryToListView.Create(const Server, User, PassWord, NameSpace, WQL: string;
       ListWMIProperties : TStrings;
-      ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>);
+      ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>; ParentHandle : THandle);
 begin
   inherited Create(False);
   FreeOnTerminate := True;
+  FParentHandle:=ParentHandle;
   FListView := ListView;
   FWQL      := WQL;
   FServer   := Server;
   FUser     := User;
   FPassword := PassWord;
   FNameSpace := NameSpace;
-  //FList           := TList.Create;
   FProperties := ListWMIProperties;
   FCallback := CallBack;
   FValues   := Values;
@@ -555,7 +725,6 @@ begin
   FWMIService    := Unassigned;
   FWbemObjectSet := Unassigned;
   FWbemObject    := Unassigned;
-  //FProperties.Free;
   inherited;
 end;
 
@@ -570,21 +739,18 @@ var
   RowData : TStringList;
   CimType : integer;
 begin
-  Success := CoInitialize(nil); //CoInitializeEx(nil, COINIT_MULTITHREADED);
+  Success := CoInitializeEx(nil, COINIT_MULTITHREADED);//CoInitialize(nil); //CoInitializeEx(nil, COINIT_MULTITHREADED);
   try
     FCount := 0;
     FMsg   := 'Executing WMI Query';
     Synchronize(SendMsg);
-
     FProperties.Clear;
     FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
     FWMIService := FSWbemLocator.ConnectServer(wbemLocalhost, FNameSpace, '', '');
     FWbemObjectSet := FWMIService.ExecQuery(FWQL, 'WQL', wbemFlagForwardOnly);
     FEnum := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
-
     FMsg := 'Fetching results';
     Synchronize(SendMsg);
-    //NullStrictConvert:=False;
 
     while (not Terminated) and (FEnum.Next(1, FWbemObject, iValue) = 0) do
     begin
@@ -601,7 +767,6 @@ begin
           FProperties.AddObject(PropItem.Name, TObject(CimType));
           PropItem := Unassigned;
         end;
-
 
         FProperties.AddObject('Object Path', TObject(wbemCimtypeString));
         Synchronize(CreateColumns);
@@ -632,9 +797,16 @@ begin
       Synchronize(SendMsg);
 
       FWbemObject := Unassigned;
+
       Props := Unassigned;
     end;
-    //NullStrictConvert:=True;
+
+    if Terminated then
+    begin
+      FSWbemLocator  := Unassigned;
+      FWMIService    := Unassigned;
+      FWbemObjectSet := Unassigned;
+    end;
 
     if not Terminated then
     begin
@@ -651,7 +823,6 @@ begin
         Synchronize(AdjustColumnsWidth);
       end;
     end;
-
   finally
     PropItem := Unassigned;
     Props    := Unassigned;
@@ -659,9 +830,9 @@ begin
       S_OK, S_FALSE: CoUninitialize;
     end;
   end;
+
+  SendMessage(FParentHandle, WM_WMI_THREAD_FINISHED,0,0);
 end;
-
-
 
 procedure TWMIQueryToListView.SendMsg;
 begin
@@ -673,5 +844,6 @@ procedure TWMIQueryToListView.SetListViewSize;
 begin
   FListView.Items.Count:=FValues.Count;
 end;
+{$ENDIF}
 
 end.

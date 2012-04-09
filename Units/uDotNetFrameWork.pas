@@ -112,13 +112,12 @@ function NetFrameworkInstalled(const NetFrameWorkId:TDotNetVersions): Boolean;
 var
   Reg: TRegistry;
 begin
-Result := False;
   Reg := TRegistry.Create(KEY_READ);
   try
-  Reg.RootKey := HKEY_LOCAL_MACHINE;
-  Result := Reg.KeyExists(DotNetRegPaths[NetFrameWorkId]);
+    Reg.RootKey := HKEY_LOCAL_MACHINE;
+    Result := Reg.KeyExists(DotNetRegPaths[NetFrameWorkId]);
   finally
-  Reg.Free;
+   Reg.Free;
   end
 end;
 

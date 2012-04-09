@@ -114,8 +114,8 @@
 			<DCC_DebugInformation>true</DCC_DebugInformation>
 			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
 			<VerInfo_MinorVer>4</VerInfo_MinorVer>
-			<VerInfo_Build>62</VerInfo_Build>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.4.4.62;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<VerInfo_Build>81</VerInfo_Build>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.4.4.81;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="$(MainSource)">
@@ -220,6 +220,7 @@
 				<Form>FrmUpdateChanges</Form>
 				<FormType>dfm</FormType>
 			</DCCReference>
+			<DCCReference Include="Units\WMI\WbemScripting_TLB.pas"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
@@ -232,8 +233,8 @@
 				<CfgParent>Base</CfgParent>
 			</BuildConfiguration>
 		</ItemGroup>
-		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
-		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
 		<ProjectExtensions>
 			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
 			<Borland.ProjectType/>
@@ -245,7 +246,7 @@
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">1</VersionInfo>
 						<VersionInfo Name="Release">2</VersionInfo>
-						<VersionInfo Name="Build">204</VersionInfo>
+						<VersionInfo Name="Build">209</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -257,7 +258,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription"/>
-						<VersionInfoKeys Name="FileVersion">1.1.2.204</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.1.2.209</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright"/>
 						<VersionInfoKeys Name="LegalTrademarks"/>
@@ -281,10 +282,10 @@
 					<Platform value="Win32">True</Platform>
 				</Platforms>
 				<Deployment>
-					<DeployFile LocalName="WmiDelphiCodeCreator.exe" Class="ProjectOutput" Configuration="Release">
+					<DeployFile Class="ProjectOutput" Configuration="Release" LocalName="WmiDelphiCodeCreator.exe">
 						<Platform Name="Win32"/>
 					</DeployFile>
-					<DeployFile LocalName="WmiDelphiCodeCreator.rsm" Class="DebugSymbols" Configuration="Release">
+					<DeployFile Class="DebugSymbols" Configuration="Release" LocalName="WmiDelphiCodeCreator.rsm">
 						<Platform Name="Win32">
 							<RemoteName>WmiDelphiCodeCreator.rsm</RemoteName>
 						</Platform>
@@ -376,7 +377,7 @@
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
 		</ProjectExtensions>
-		<Import Condition="Exists('$(MSBuildProjectName).deployproj')" Project="$(MSBuildProjectName).deployproj"/>
+		<Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
 	</Project>
 
 <!-- EurekaLog First Line
