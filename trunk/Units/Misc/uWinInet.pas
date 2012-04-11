@@ -28,7 +28,6 @@ uses
 type
    TuWinInetProcCallBack= procedure(BytesRead:Integer) of object;
 
-
 function  GetRemoteFileSize(const Url : string): Integer;
 procedure WinInet_HttpGet(const Url: string;Stream:TStream;CallBack:TuWinInetProcCallBack);overload;
 function  WinInet_HttpGet(const Url: string;CallBack:TuWinInetProcCallBack): string;overload;

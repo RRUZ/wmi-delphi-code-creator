@@ -122,7 +122,6 @@ begin
 end;
 
 
-//from ImgList.GetRGBColor
 function GetRGBColor(Value: TColor): DWORD;
 begin
   Result := ColorToRGB(Value);
@@ -133,7 +132,6 @@ begin
       Result := CLR_DEFAULT;
   end;
 end;
-
 
 procedure New_Draw(Self: TObject; Index: integer; Canvas: TCanvas;
   X, Y: integer; Style: cardinal; Enabled: boolean);

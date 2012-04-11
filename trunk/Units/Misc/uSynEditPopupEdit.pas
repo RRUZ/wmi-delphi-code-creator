@@ -204,14 +204,14 @@ end;
 
 procedure TSynEdit.FillPopupMenu(APopupMenu : TPopupMenu);
 var
-  i        : integer;
+  LIndex   : integer;
   MenuItem : TMenuItem;
 begin
   if Assigned(FActnList) then
-  for i := 0 to FActnList.ActionCount-1 do
+  for LIndex := 0 to FActnList.ActionCount-1 do
   begin
     MenuItem:=TMenuItem.Create(APopupMenu);
-    MenuItem.Action  :=FActnList.Actions[i];
+    MenuItem.Action  :=FActnList.Actions[LIndex];
     APopupMenu.Items.Add(MenuItem);
   end;
 end;

@@ -34,8 +34,6 @@ uses
   SysUtils,
   Windows;
 
-
-
 function CreateOxygeneProject(const FileName, Path, ProjectTemplate: string;
   var NewFileName: string): boolean;
 var

@@ -62,7 +62,7 @@ end;
 
 procedure TComboBox.DropDown;
 var
-  Index: integer;
+  LIndex: integer;
 begin
   inherited DropDown;
   ItemWidth := 0;
@@ -70,9 +70,9 @@ begin
     Self.Perform(CB_SETDROPPEDWIDTH, FDropDownFixedWidth, 0)
   else
   begin
-    for Index := 0 to Items.Count - 1 do
-      if (GetTextWidth(Items[Index]) > ItemWidth) then
-        ItemWidth := GetTextWidth(Items[Index]) + 8;
+    for LIndex := 0 to Items.Count - 1 do
+      if (GetTextWidth(Items[LIndex]) > ItemWidth) then
+        ItemWidth := GetTextWidth(Items[LIndex]) + 8;
     Self.Perform(CB_SETDROPPEDWIDTH, ItemWidth, 0);
   end;
 end;

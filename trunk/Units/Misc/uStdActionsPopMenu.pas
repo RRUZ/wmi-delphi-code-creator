@@ -106,13 +106,13 @@ end;
 
 procedure AssignStdActionsPopUpMenu(ParentComponent: TComponent;PopupMenu:TPopupMenu);
 var
- i : integer;
+ Lindex : integer;
 begin
- for i:=0 to ParentComponent.ComponentCount-1 do
-   if (ParentComponent.Components[i] is TCustomEdit) and (TCustomEditH(ParentComponent.Components[i]).PopupMenu=nil) then
-    TCustomEditH(ParentComponent.Components[i]).PopupMenu:=PopupMenu
+ for Lindex:=0 to ParentComponent.ComponentCount-1 do
+   if (ParentComponent.Components[Lindex] is TCustomEdit) and (TCustomEditH(ParentComponent.Components[Lindex]).PopupMenu=nil) then
+    TCustomEditH(ParentComponent.Components[Lindex]).PopupMenu:=PopupMenu
    else
-    AssignStdActionsPopUpMenu(ParentComponent.Components[i], PopupMenu);
+    AssignStdActionsPopUpMenu(ParentComponent.Components[Lindex], PopupMenu);
 end;
 
 

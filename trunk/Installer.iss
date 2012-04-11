@@ -179,6 +179,7 @@ Source: Templates\TemplateConsoleAppOxygen.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsBorlandCpp.cpp; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsCSharp.cs; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsDelphi.pas; DestDir: {app}\Templates\
+Source: Templates\TemplateEventsDelphiLate.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsDelphi_COM.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsFPC.pas; DestDir: {app}\Templates\
 Source: Templates\TemplateEventsMicrosoft.cpp; DestDir: {app}\Templates\

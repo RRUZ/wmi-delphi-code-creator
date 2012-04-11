@@ -1,6 +1,6 @@
 object FrmCodeEditor: TFrmCodeEditor
-  Left = 0
-  Top = 0
+  Left = 699
+  Top = 284
   Align = alClient
   BorderStyle = bsNone
   ClientHeight = 475
@@ -62,8 +62,6 @@ object FrmCodeEditor: TFrmCodeEditor
     ParentShowHint = False
     ShowHint = True
     Spacing = 0
-    ExplicitTop = 0
-    ExplicitWidth = 640
   end
   object SynEditCode: TSynEdit
     Left = 0
@@ -91,9 +89,6 @@ object FrmCodeEditor: TFrmCodeEditor
     Gutter.ShowLineNumbers = True
     Gutter.GradientStartColor = 4539717
     Gutter.GradientEndColor = 2565927
-    ExplicitTop = 0
-    ExplicitWidth = 640
-    ExplicitHeight = 380
   end
   object ActionManager1: TActionManager
     ActionBars = <
@@ -225,7 +220,7 @@ object FrmCodeEditor: TFrmCodeEditor
     Left = 432
     Top = 152
     Bitmap = {
-      494C01010B001800680010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010B0018006C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       00000000000000000000000000000000000000000003000000100000001A0000
       001A0000001A0000001A00000017000000110000000B00000007000000070000

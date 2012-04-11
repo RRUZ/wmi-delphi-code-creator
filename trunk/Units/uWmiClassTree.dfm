@@ -13,6 +13,7 @@ object FrmWmiClassTree: TFrmWmiClassTree
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
   DesignSize = (
     534
     507)
@@ -41,7 +42,7 @@ object FrmWmiClassTree: TFrmWmiClassTree
     Height = 21
     Style = csDropDownList
     TabOrder = 0
-    OnChange = CbNamespacesChange
+    OnChange = BtnFillTreeClick
   end
   object TreeViewClasses: TTreeView
     Left = 8
@@ -72,7 +73,5 @@ object FrmWmiClassTree: TFrmWmiClassTree
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 3
-    ExplicitTop = 433
-    ExplicitWidth = 500
   end
 end

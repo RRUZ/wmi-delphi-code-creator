@@ -70,23 +70,6 @@ begin
   end;
 end;
 
-
-function CopyDir(const fromDir, toDir: string): boolean;
-var
-  lpFileOp: TSHFileOpStruct;
-begin
-  ZeroMemory(@lpFileOp, SizeOf(lpFileOp));
-  with lpFileOp do
-  begin
-    wFunc  := FO_COPY;
-    fFlags := FOF_FILESONLY + FOF_NOCONFIRMATION;
-    pFrom  := PChar(fromDir + #0);
-    pTo    := PChar(toDir);
-  end;
-  Result := (ShFileOperation(lpFileOp) = S_OK);
-end;
-
-
 function CreateBorlandCppiProject(const DestPath, SourcePath: string): boolean;
 begin
   Result := CopyDir(IncludeTrailingPathDelimiter(SourcePath) + '*.*', DestPath);

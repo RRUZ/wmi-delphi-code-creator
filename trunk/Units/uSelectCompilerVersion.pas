@@ -165,10 +165,6 @@ var
     end;
   end;
 
-
-
-
-
 begin
   case FLanguageSource of
 
