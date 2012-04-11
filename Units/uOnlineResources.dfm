@@ -1,6 +1,6 @@
 object FrmOnlineResources: TFrmOnlineResources
-  Left = 0
-  Top = 0
+  Left = 826
+  Top = 300
   Caption = 'Online Resources'
   ClientHeight = 300
   ClientWidth = 635
@@ -40,10 +40,6 @@ object FrmOnlineResources: TFrmOnlineResources
     TabOrder = 0
     ViewStyle = vsReport
     OnDblClick = ListViewURLDblClick
-    ExplicitLeft = -60
-    ExplicitTop = -37
-    ExplicitWidth = 695
-    ExplicitHeight = 337
   end
   object Panel1: TPanel
     Left = 0
@@ -52,9 +48,6 @@ object FrmOnlineResources: TFrmOnlineResources
     Height = 41
     Align = alTop
     TabOrder = 1
-    ExplicitLeft = 136
-    ExplicitTop = 40
-    ExplicitWidth = 185
     object EditSearch: TEdit
       Left = 8
       Top = 14

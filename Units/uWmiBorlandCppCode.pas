@@ -27,8 +27,6 @@ uses
  uWmiGenCode,
  Classes;
 
-
-
 type
   TBorlandCppWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
   public

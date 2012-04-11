@@ -65,7 +65,6 @@ begin
     else
       MsgWarning(Format('Could not find %s', [ExeFile]));
   end;
-
 end;
 
 
@@ -111,37 +110,12 @@ begin
   end;
 end;
 
-function GetLocalAppDataFolder: string;
-const
-  CSIDL_LOCAL_APPDATA = $001C;
-var
-  ppMalloc: IMalloc;
-  ppidl:    PItemIdList;
-begin
-  ppidl := nil;
-  try
-    if SHGetMalloc(ppMalloc) = S_OK then
-    begin
-      SHGetSpecialFolderLocation(0, CSIDL_LOCAL_APPDATA, ppidl);
-      SetLength(Result, MAX_PATH);
-      if not SHGetPathFromIDList(ppidl, PChar(Result)) then
-        RaiseLastOSError;
-      SetLength(Result, lStrLen(PChar(Result)));
-    end;
-  finally
-    if ppidl <> nil then
-      ppMalloc.Free(ppidl);
-  end;
-end;
-
-
 function GetLazarusLocalFolder: string;
 begin
-  Result := Format('%slazarus', [IncludeTrailingPathDelimiter(GetLocalAppDataFolder)]);
+  Result := Format('%slazarus', [IncludeTrailingPathDelimiter(GetSpecialFolder(CSIDL_LOCAL_APPDATA))]);
   if not DirectoryExists(Result) then
     Result := '';
 end;
-
 
 function GetConfigLazarusValue(const AValue: string): string;
 var

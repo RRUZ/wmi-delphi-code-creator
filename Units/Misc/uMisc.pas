@@ -60,38 +60,38 @@ const
   BorderWidth = 10;
   MaxWidth=150;
 var
-  LWidth, Index: integer;
-  ColsWidth:   Array of integer;
+  LWidth, LIndex: integer;
+  LColumnsW: Array of integer;
 begin
   with DbGrid do
   begin
     Canvas.Font := Font;
-    SetLength(ColsWidth, Columns.Count);
-    for Index := 0 to Columns.Count - 1 do
+    SetLength(LColumnsW, Columns.Count);
+    for LIndex := 0 to Columns.Count - 1 do
     begin
-      ColsWidth[Index] := Canvas.TextWidth(Fields[Index].FieldName) + BorderWidth;
-      if ColsWidth[Index]>MaxWidth then
-      ColsWidth[Index]:=MaxWidth;
+      LColumnsW[LIndex] := Canvas.TextWidth(Fields[LIndex].FieldName) + BorderWidth;
+      if LColumnsW[LIndex]>MaxWidth then
+      LColumnsW[LIndex]:=MaxWidth;
     end;
 
     DataSource.DataSet.First;
     while not DataSource.DataSet.Eof do
     begin
-      for Index := 0 to Columns.Count - 1 do
+      for LIndex := 0 to Columns.Count - 1 do
       begin
-        LWidth := Canvas.TextWidth(trim(Columns[Index]. Field.DisplayText)) + BorderWidth;
+        LWidth := Canvas.TextWidth(trim(Columns[LIndex]. Field.DisplayText)) + BorderWidth;
         //LWidth := Canvas.TextWidth(trim(TDBGridH(DbGrid).GetColField(Index).DisplayText)) + BorderWidth;
-        if (LWidth > ColsWidth[Index]) and (LWidth<MaxWidth) then
-          ColsWidth[Index] := LWidth;
+        if (LWidth > LColumnsW[LIndex]) and (LWidth<MaxWidth) then
+          LColumnsW[LIndex] := LWidth;
       end;
       DataSource.DataSet.Next;
     end;
     DataSource.DataSet.First;
-    for Index := 0 to Columns.Count - 1 do
-      if ColsWidth[Index] > 0 then
-        Columns[Index].Width := ColsWidth[Index];
+    for LIndex := 0 to Columns.Count - 1 do
+      if LColumnsW[LIndex] > 0 then
+        Columns[LIndex].Width := LColumnsW[LIndex];
 
-    SetLength(ColsWidth, 0);
+    SetLength(LColumnsW, 0);
   end;
 end;
 
@@ -149,24 +149,21 @@ begin
   Result := StrPas(lpBuffer);
 end;
 
-
-
 function GetSpecialFolder(const CSIDL: integer) : string;
 var
   lpszPath : PWideChar;
 begin
-    lpszPath := StrAlloc(MAX_PATH);
-    try
-       ZeroMemory(lpszPath, MAX_PATH);
-      if SHGetSpecialFolderPath(0, lpszPath, CSIDL, False)  then
-        Result := lpszPath
-      else
-        Result := '';
-    finally
-      StrDispose(lpszPath);
-    end;
+  lpszPath := StrAlloc(MAX_PATH);
+  try
+     ZeroMemory(lpszPath, MAX_PATH);
+    if SHGetSpecialFolderPath(0, lpszPath, CSIDL, False)  then
+      Result := lpszPath
+    else
+      Result := '';
+  finally
+    StrDispose(lpszPath);
+  end;
 end;
-
 
 function GetFileVersion(const FileName: string): string;
 var
@@ -175,8 +172,6 @@ begin
   FSO    := CreateOleObject('Scripting.FileSystemObject');
   Result := FSO.GetFileVersion(FileName);
 end;
-
-
 
 procedure MsgWarning(const Msg: string);
 begin
@@ -192,7 +187,6 @@ function  MsgQuestion(const Msg: string):Boolean;
 begin
   Result:= MessageDlg(Msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes;
 end;
-
 
 procedure CaptureConsoleOutput(const lpCommandLine: string; OutPutList: TStrings);
 const

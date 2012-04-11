@@ -15,16 +15,19 @@ type
     LabelStatus: TLabel;
     ProgressBar1: TProgressBar;
     procedure BtnFillTreeClick(Sender: TObject);
-    procedure CbNamespacesChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
+    Working : Boolean;
     procedure FillTree(const Namesoace:string);
     procedure SetStaus(const Msg:string);
+    procedure Fill;
   public
   end;
 
 implementation
 
 uses
+  AsyncCalls,
   ComObj,
   ActiveX,
   uWmi_Metadata;
@@ -33,12 +36,28 @@ uses
 
 procedure TFrmWmiClassTree.BtnFillTreeClick(Sender: TObject);
 begin
-  FillTree(CbNamespaces.Text);
+ Fill;
 end;
 
-procedure TFrmWmiClassTree.CbNamespacesChange(Sender: TObject);
-begin
+
+procedure TFrmWmiClassTree.Fill;
+var
+  AsyncCall: IAsyncCall;
+
+ Procedure Foo;
+ begin
   FillTree(CbNamespaces.Text);
+ end;
+
+begin
+  if Working then exit;
+  Working:=True;
+
+  AsyncCall := LocalAsyncCall(@Foo);
+  while AsyncMultiSync([AsyncCall], True, 1) = WAIT_TIMEOUT do
+    Application.ProcessMessages;
+
+  Working:=False;
 end;
 
 procedure TFrmWmiClassTree.FillTree(const Namesoace: string);
@@ -98,6 +117,11 @@ begin
      SetStaus('');
      ProgressBar1.Position:=0;
    end;
+end;
+
+procedure TFrmWmiClassTree.FormCreate(Sender: TObject);
+begin
+  Working:=False;
 end;
 
 procedure TFrmWmiClassTree.SetStaus(const Msg: string);

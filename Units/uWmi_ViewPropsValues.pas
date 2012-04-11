@@ -772,14 +772,6 @@ begin
         Synchronize(CreateColumns);
       end;
 
-      {
-      FValues.Clear;
-      for i := 0 to FProperties.Count - 1 -1 do
-      //  FValues.Add(Props.Item(FProperties[i]).Value);
-      FValues.Add(VarStrNull(Props.Item(FProperties[i]).Value));
-      FValues.Add(VarStrNull(FWbemObject.Path_.RelPath));
-      }
-
 
       RowData:=TStringList.Create;
       if Assigned(FValues) then

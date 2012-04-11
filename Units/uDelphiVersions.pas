@@ -58,24 +58,6 @@ const
   DelphiOldColorsCount =16;
 
 
-{ BGR
-Color0=$000000
-Color1=$000080
-Color2=$008000
-Color3=$008080
-Color4=$800000
-Color5=$800080
-Color6=$808000
-Color7=$C0C0C0
-Color8=$808080
-Color9=$0000FF
-Color10=$00FF00
-Color11=$00FFFF
-Color12=$FF0000
-Color13=$FF00FF
-Color14=$FFFF00
-Color15=$FFFFFF
-}
   DelphiOldColorsList: array[0..DelphiOldColorsCount-1] of TColor =
   (
     $000000,$000080,$008000,$008080,
@@ -83,14 +65,6 @@ Color15=$FFFFFF
     $808080,$0000FF,$00FF00,$00FFFF,
     $FF0000,$FF00FF,$FFFF00,$FFFFFF
   )
-     {
-  (
-    $000000,$800000,$008000,$808000,
-    $000080,$800080,$008080,$C0C0C0,
-    $808080,$FF0000,$00FF00,$FFFF00,
-    $0000FF,$FF00FF,$00FFFF,$FFFFFF
-  )
-   }
   ;
   {$ENDIF}
 
@@ -186,11 +160,11 @@ uses
 {$IFDEF OLDEVERSIONS_SUPPORT}
 function DelphiIsOldVersion(DelphiVersion:TDelphiVersions) : Boolean;
 var
- i  : integer;
+ LIndex  : integer;
 begin
  Result:=False;
-  for i:=0  to DelphiOldVersions-1 do
-    if DelphiVersion=DelphiOldVersionNumbers[i] then
+  for LIndex:=0  to DelphiOldVersions-1 do
+    if DelphiVersion=DelphiOldVersionNumbers[LIndex] then
     begin
        Result:=True;
        exit;
@@ -237,19 +211,19 @@ end;
 
 function ProcessFileName(PID: DWORD): string;
 var
-  Handle: THandle;
+  hProcess: THandle;
 begin
   Result := '';
-  Handle := OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ, False, PID);
-  if Handle <> 0 then
+  hProcess := OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ, False, PID);
+  if hProcess <> 0 then
     try
       SetLength(Result, MAX_PATH);
-      if GetModuleFileNameEx(Handle, 0, PChar(Result), MAX_PATH) > 0 then
+      if GetModuleFileNameEx(hProcess, 0, PChar(Result), MAX_PATH) > 0 then
         SetLength(Result, StrLen(PChar(Result)))
       else
         Result := '';
     finally
-      CloseHandle(Handle);
+      CloseHandle(hProcess);
     end;
 end;
 

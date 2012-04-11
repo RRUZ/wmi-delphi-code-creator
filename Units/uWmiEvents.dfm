@@ -1,6 +1,6 @@
 object FrmWmiEvents: TFrmWmiEvents
-  Left = 0
-  Top = 0
+  Left = 506
+  Top = 274
   BorderStyle = bsNone
   Caption = 'FrmWmiEvents'
   ClientHeight = 472

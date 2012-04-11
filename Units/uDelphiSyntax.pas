@@ -18,16 +18,11 @@
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
-
-
 unit uDelphiSyntax;
 
 interface
 
-
 function EscapeDelphiReservedWord(const AWord: string): string;
-
-
 
 implementation
 
@@ -53,12 +48,12 @@ const
 
 function EscapeDelphiReservedWord(const AWord: string): string;
 var
-  i: integer;
+  LIndex: integer;
 begin
   Result := Trim(AWord);
 
-  for i := 0 to NumReservedWords - 1 do
-    if CompareText(Result, DelphiReservedWords[i]) = 0 then
+  for LIndex := 0 to NumReservedWords - 1 do
+    if CompareText(Result, DelphiReservedWords[LIndex]) = 0 then
     begin
       //Result:=  EscapeChr+Result;
       //Result:=Format('{$IFDEF FPC}_%s{$ELSE}&%s{$ENDIF}',[Result,Result]);

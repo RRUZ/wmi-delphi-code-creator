@@ -44,15 +44,15 @@ uses
 procedure AutoResizeColumn(const Column: TListColumn;
   const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
 var
-  Width: integer;
+  LWidth: integer;
 begin
   case Mode of
     LVSCW_AUTOSIZE_BESTFIT:
     begin
       Column.Width := LVSCW_AUTOSIZE;
-      Width := Column.Width;
+      LWidth := Column.Width;
       Column.Width := LVSCW_AUTOSIZE_USEHEADER;
-      if Width > Column.Width then
+      if LWidth > Column.Width then
         Column.Width := LVSCW_AUTOSIZE;
     end;
 
@@ -64,19 +64,19 @@ end;
 procedure AutoResizeColumns(const Columns: array of TListColumn;
   const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
 var
-  i: integer;
+  LIndex: integer;
 begin
-  for i := Low(Columns) to High(Columns) do
-    AutoResizeColumn(Columns[i], Mode);
+  for LIndex := Low(Columns) to High(Columns) do
+    AutoResizeColumn(Columns[LIndex], Mode);
 end;
 
 procedure AutoResizeListView(const ListView: TListView;
   const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
 var
-  i: integer;
+  LIndex: integer;
 begin
-  for i := 0 to ListView.Columns.Count - 1 do
-    AutoResizeColumn(ListView.Columns[i], Mode);
+  for LIndex := 0 to ListView.Columns.Count - 1 do
+    AutoResizeColumn(ListView.Columns[LIndex], Mode);
 end;
 
 

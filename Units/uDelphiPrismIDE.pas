@@ -26,7 +26,6 @@ interface
 Uses
   Classes;
 
-
 function IsDelphiPrismInstalled: boolean;
 function GetDelphiPrismCompilerFileName: string;
 function GetDelphiPrismCompilerFolder: string;
@@ -88,9 +87,6 @@ begin
       MsgWarning(Format('Could not find %s', [ExeFile]));
   end;
 end;
-
-
-
 
 function IsMonoDevelopInstalled: boolean;
 var
@@ -166,9 +162,6 @@ begin
   end;
 end;
 
-
-
-
 function IsDelphiPrismAttachedtoVS2008: boolean;
 begin
   if IsWow64 then
@@ -184,10 +177,6 @@ begin
   else
     Result := RegKeyExists(DelphiPrismVS2010x86, HKEY_LOCAL_MACHINE);
 end;
-
-
-
-
 
 function GetDelphiPrismRegValue(const Value: string): string;
 begin
