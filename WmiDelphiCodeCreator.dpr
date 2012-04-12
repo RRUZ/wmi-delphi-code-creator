@@ -1,6 +1,7 @@
 program WmiDelphiCodeCreator;
 
 uses
+  ExceptionLog,
   Forms,
   Main in 'Main.pas' {FrmMain},
   uWmiTree in 'Units\uWmiTree.pas' {FrmWMITree},
@@ -37,8 +38,6 @@ uses
   Vcl.Styles.Ext in 'Units\Vcl.Styles.Utils\Vcl.Styles.Ext.pas',
   Vcl.Styles.OwnerDrawFix in 'Units\Vcl.Styles.Utils\Vcl.Styles.OwnerDrawFix.pas',
   AsyncCalls in 'Units\ThirdParty\AsyncCalls.pas',
-  PngFunctions in 'Units\ThirdParty\PngFunctions.pas',
-  PngImageList in 'Units\ThirdParty\PngImageList.pas',
   uXE2Patches in 'Units\Vcl.Styles.Utils\uXE2Patches.pas',
   uWmi_Metadata in 'Units\WMI\uWmi_Metadata.pas',
   Vcl.Styles.WebBrowser in 'Units\Vcl.Styles.Utils\Vcl.Styles.WebBrowser.pas',

@@ -36,10 +36,6 @@ object FrmSettings: TFrmSettings
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -148,10 +144,6 @@ object FrmSettings: TFrmSettings
       object TabSheet2: TTabSheet
         Caption = 'Object Pascal Code generation'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 99
@@ -283,13 +275,6 @@ object FrmSettings: TFrmSettings
                 Width = 45
                 Height = 13
                 Caption = 'VCL Style'
-              end
-              object ImageVCLStyle: TImage
-                Left = 3
-                Top = 68
-                Width = 246
-                Height = 261
-                Transparent = True
               end
               object CheckBoxDisableVClStylesNC: TCheckBox
                 Left = 0
@@ -442,14 +427,18 @@ object FrmSettings: TFrmSettings
                 TabOrder = 4
                 OnClick = CheckBoxFormCustomClick
               end
+              object PanelPreview: TPanel
+                Left = 3
+                Top = 80
+                Width = 257
+                Height = 257
+                BevelOuter = bvNone
+                TabOrder = 5
+              end
             end
             object TabSheet7: TTabSheet
               Caption = 'Syntax Highlighting'
               ImageIndex = 1
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object Label3: TLabel
                 Left = 491
                 Top = 8
@@ -623,10 +612,6 @@ object FrmSettings: TFrmSettings
       object TabSheet5: TTabSheet
         Caption = 'Templates'
         ImageIndex = 4
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label15: TLabel
           Left = 11
           Top = 10

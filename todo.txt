@@ -3,14 +3,12 @@
   Add completion proposal to sql wmi
   save common WQL ?
 
-  improve web page (list features)
-
   Add lock option (read only)
    
   Add metadata resolver (functions) to code
    delphi done
    fpc done
-   oxygen
+   oxygen 
    C#
    c++
 
@@ -21,14 +19,10 @@
    C#
    c++
 
-   Add GUI textures + colors , include tectuers files.
 
   add option to select prefered compiler
   add option to select prefered IDE
-
-  create relation map beteen classes , properties and WinApi using 
-
-
+  create relation map between classes , properties and WinApi using 
 
  
   Add detection of additional compilers
