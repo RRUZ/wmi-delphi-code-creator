@@ -4,7 +4,7 @@
 			<ProjectVersion>13.4</ProjectVersion>
 			<MainSource>WmiDelphiCodeCreator.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Release</Config>
+			<Config Condition="'$(Config)'==''">Debug</Config>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
@@ -91,6 +91,7 @@
 			<DCC_RemoteDebug>true</DCC_RemoteDebug>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<DCC_Define>EUREKALOG;EUREKALOG_VER6;$(DCC_Define)</DCC_Define>
 			<DCC_DebugDCUs>true</DCC_DebugDCUs>
 			<VerInfo_MajorVer>999</VerInfo_MajorVer>
 			<Manifest_File>ManAdmin.manifest</Manifest_File>
@@ -184,8 +185,6 @@
 			<DCCReference Include="Units\Vcl.Styles.Utils\Vcl.Styles.Ext.pas"/>
 			<DCCReference Include="Units\Vcl.Styles.Utils\Vcl.Styles.OwnerDrawFix.pas"/>
 			<DCCReference Include="Units\ThirdParty\AsyncCalls.pas"/>
-			<DCCReference Include="Units\ThirdParty\PngFunctions.pas"/>
-			<DCCReference Include="Units\ThirdParty\PngImageList.pas"/>
 			<DCCReference Include="Units\Vcl.Styles.Utils\uXE2Patches.pas"/>
 			<DCCReference Include="Units\WMI\uWmi_Metadata.pas"/>
 			<DCCReference Include="Units\Vcl.Styles.Utils\Vcl.Styles.WebBrowser.pas"/>
@@ -282,10 +281,10 @@
 					<Platform value="Win32">True</Platform>
 				</Platforms>
 				<Deployment>
-					<DeployFile Class="ProjectOutput" Configuration="Release" LocalName="WmiDelphiCodeCreator.exe">
+					<DeployFile Configuration="Release" LocalName="WmiDelphiCodeCreator.exe" Class="ProjectOutput">
 						<Platform Name="Win32"/>
 					</DeployFile>
-					<DeployFile Class="DebugSymbols" Configuration="Release" LocalName="WmiDelphiCodeCreator.rsm">
+					<DeployFile Configuration="Release" LocalName="WmiDelphiCodeCreator.rsm" Class="DebugSymbols">
 						<Platform Name="Win32">
 							<RemoteName>WmiDelphiCodeCreator.rsm</RemoteName>
 						</Platform>
@@ -383,7 +382,7 @@
 <!-- EurekaLog First Line
 [Exception Log]
 EurekaLog Version=6104
-Activate=0
+Activate=1
 Activate Handle=1
 Save Log File=1
 Foreground Tab=0

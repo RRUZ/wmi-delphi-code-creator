@@ -26,7 +26,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
-  SynEditHighlighter, SynHighlighterPas, uCheckUpdate, SynHighlighterCpp,
+  SynEditHighlighter, SynHighlighterPas, uCheckUpdate, SynHighlighterCpp, Vcl.Styles.Ext,
   SynHighlighterCS, Vcl.ExtDlgs, SynHighlighterSQL;
 
 type
@@ -151,7 +151,6 @@ type
     Label9: TLabel;
     CbFormatter: TComboBox;
     Label10: TLabel;
-    ImageVCLStyle: TImage;
     CheckBoxUpdates: TCheckBox;
     CheckBoxDisableVClStylesNC: TCheckBox;
     TabSheet5: TTabSheet;
@@ -207,6 +206,7 @@ type
     CheckBoxFormCustom: TCheckBox;
     OpenPictureDialog1: TOpenPictureDialog;
     SynSQLSyn1: TSynSQLSyn;
+    PanelPreview: TPanel;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -227,6 +227,8 @@ type
     procedure BtnSetNCImageClick(Sender: TObject);
     procedure BtnSetBackImageClick(Sender: TObject);
   private
+    FPreview:TVclStylesPreview;
+    LStyle    : TCustomStyleExt;
     FSettings: TSettings;
     //FCurrentTheme:  TIDETheme;
     FForm: TForm;
@@ -290,9 +292,6 @@ uses
   IniFiles,
   uWmiDelphiCode,
   uWmiGenCode,
-  PngFunctions,
-  Vcl.Imaging.pngimage,
-  Vcl.Styles.Ext,
   Vcl.Styles,
   Vcl.Themes,
   uMisc;
@@ -302,6 +301,9 @@ const
 
 Var
   DummyFrm : TFrmSettings;
+
+type
+ TVclStylesPreviewClass = class(TVclStylesPreview);
 
 function GetUpdaterInstance : TFrmCheckUpdate;
 begin
@@ -1042,7 +1044,6 @@ begin
   LoadCurrentTheme(Self,TComboBox(Sender).Text);
 end;
 
-
 procedure TFrmSettings.ComboBoxVCLStyleChange(Sender: TObject);
 begin
   //LoadVCLStyle(ComboBoxVCLStyle.Text);
@@ -1052,41 +1053,20 @@ end;
 procedure TFrmSettings.DrawSeletedVCLStyle;
 var
   StyleName : string;
-  LBitmap   : TBitmap;
-  LStyle    : TCustomStyleExt;
   SourceInfo: TSourceInfo;
-  LPng      : TPngImage;
 begin
-   ImageVCLStyle.Picture:=nil;
-
    StyleName:=ComboBoxVCLStyle.Text;
    if (StyleName<>'') and (not SameText('Windows',StyleName)) then
    begin
-    LBitmap:=TBitmap.Create;
-    try
-       LBitmap.PixelFormat:=pf32bit;
-       LBitmap.Width :=ImageVCLStyle.ClientRect.Width;
-       LBitmap.Height:=ImageVCLStyle.ClientRect.Height;
-       SourceInfo:=TStyleManager.StyleSourceInfo[StyleName];
-       LStyle:=TCustomStyleExt.Create(TStream(SourceInfo.Data));
-       try
-         DrawSampleWindow(LStyle, LBitmap.Canvas, ImageVCLStyle.ClientRect, StyleName);
+     if LStyle<>nil then
+      FreeAndNil(LStyle);
 
-         ConvertToPNG(LBitmap, LPng);
-         try
-           ImageVCLStyle.Picture.Assign(LPng);
-           //LPng.SaveToFile(ChangeFileExt(ParamStr(0),'.png'));
-         finally
-           LPng.Free;
-         end;
-
-         //ImageVCLStyle.Picture.Assign(LBitmap);
-       finally
-         LStyle.Free;
-       end;
-    finally
-      LBitmap.Free;
-    end;
+     TStyleManager.StyleNames;//call DiscoverStyleResources
+     SourceInfo:=TStyleManager.StyleSourceInfo[StyleName];
+     LStyle:=TCustomStyleExt.Create(TStream(SourceInfo.Data));
+     FPreview.Caption:=StyleName;
+     FPreview.Style:=LStyle;
+     TVclStylesPreviewClass(FPreview).Paint;
    end;
 end;
 
@@ -1094,6 +1074,13 @@ procedure TFrmSettings.FormCreate(Sender: TObject);
 var
   i : TSourceLanguages;
 begin
+  LStyle:=Nil;
+
+  FPreview:=TVclStylesPreview.Create(Self);
+  FPreview.Parent:=PanelPreview;
+  FPreview.BoundsRect := PanelPreview.ClientRect;
+
+
   for i := Low(TSourceLanguages) to High(TSourceLanguages) do
   begin
     ComboBoxLanguageSel.Items.AddObject(ListSourceLanguages[i], TObject(i));
@@ -1115,6 +1102,10 @@ end;
 
 procedure TFrmSettings.FormDestroy(Sender: TObject);
 begin
+  FPreview.Free;
+  if LStyle<>nil then
+    LStyle.Free;
+
   FSettings.Free;
 end;
 
