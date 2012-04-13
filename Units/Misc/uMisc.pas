@@ -104,7 +104,7 @@ begin
   with lpFileOp do
   begin
     wFunc  := FO_COPY;
-    fFlags := FOF_NOCONFIRMMKDIR;
+    fFlags := FOF_NOCONFIRMMKDIR or FOF_NOCONFIRMATION;
     pFrom  := PChar(fromDir + #0);
     pTo    := PChar(toDir);
   end;
