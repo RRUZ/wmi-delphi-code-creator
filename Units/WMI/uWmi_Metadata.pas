@@ -2054,6 +2054,7 @@ begin
       end;
 
        //get data of in params
+
         Parameters:= colItem.InParameters;
         if not VarIsNull(Parameters) and not VarIsClear(Parameters) then
         begin

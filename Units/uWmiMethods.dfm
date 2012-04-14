@@ -1,8 +1,8 @@
 object FrmWmiMethods: TFrmWmiMethods
   Left = 429
-  Top = 298
+  Top = 269
   BorderStyle = bsNone
-  ClientHeight = 504
+  ClientHeight = 533
   ClientWidth = 998
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,7 +20,7 @@ object FrmWmiMethods: TFrmWmiMethods
     Left = 393
     Top = 0
     Width = 5
-    Height = 504
+    Height = 533
     Beveled = True
     ExplicitLeft = 405
     ExplicitHeight = 473
@@ -29,13 +29,14 @@ object FrmWmiMethods: TFrmWmiMethods
     Left = 0
     Top = 0
     Width = 393
-    Height = 504
+    Height = 533
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitHeight = 504
     DesignSize = (
       393
-      504)
+      533)
     object Label4: TLabel
       Left = 11
       Top = 18
@@ -105,7 +106,7 @@ object FrmWmiMethods: TFrmWmiMethods
       Left = 10
       Top = 216
       Width = 368
-      Height = 247
+      Height = 276
       Anchors = [akLeft, akTop, akRight, akBottom]
       Checkboxes = True
       Columns = <
@@ -135,6 +136,7 @@ object FrmWmiMethods: TFrmWmiMethods
       TabOrder = 6
       ViewStyle = vsReport
       OnClick = ListViewMethodsParamsClick
+      ExplicitHeight = 247
     end
     object MemoMethodDescr: TMemo
       Left = 11
@@ -157,13 +159,14 @@ object FrmWmiMethods: TFrmWmiMethods
     end
     object ButtonGenerateCodeInvoker: TButton
       Left = 248
-      Top = 469
+      Top = 498
       Width = 130
       Height = 25
       Anchors = [akLeft, akBottom]
       Caption = 'Generate Code'
       TabOrder = 8
       OnClick = ButtonGenerateCodeInvokerClick
+      ExplicitTop = 469
     end
     object ComboBoxPaths: TComboBox
       Left = 103
@@ -189,10 +192,11 @@ object FrmWmiMethods: TFrmWmiMethods
     Left = 398
     Top = 0
     Width = 600
-    Height = 504
+    Height = 533
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
+    ExplicitHeight = 504
   end
 end

@@ -60,7 +60,9 @@ uses
   uUpdatesChanges in 'Units\Misc\uUpdatesChanges.pas' {FrmUpdateChanges},
   WbemScripting_TLB in 'Units\WMI\WbemScripting_TLB.pas',
   uLog in 'Units\uLog.pas' {FrmLog},
-  Vcl.Styles.ColorTabs in 'Units\Vcl.Styles.Utils\Vcl.Styles.ColorTabs.pas';
+  Vcl.Styles.ColorTabs in 'Units\Vcl.Styles.Utils\Vcl.Styles.ColorTabs.pas',
+  uSqlWMIContainer in 'Units\uSqlWMIContainer.pas' {FrmSqlWMIContainer},
+  uWmiInfo in 'Units\uWmiInfo.pas' {FrmWMIInfo};
 
 {$R *.res}
 

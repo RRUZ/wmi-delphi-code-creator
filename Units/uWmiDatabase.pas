@@ -85,7 +85,7 @@ type
     procedure Status(const Msg: string);
     procedure SetNameSpaces(const Value: TStrings);
   public
-    property Log   : TProcLog read FLog write FLog;
+    property SetLog   : TProcLog read FLog write FLog;
   end;
 
 implementation
@@ -258,7 +258,7 @@ begin
     PanelStatus.Height:=0;
   end;
 
-  Log(FormatDateTime('hh:nn:ss.zzz', Now - d));
+  SetLog(FormatDateTime('hh:nn:ss.zzz', Now - d));
   DBGridWMI.Enabled      := True;
   ComboBoxSearch2.Enabled := True;
   EditSearch.Enabled     :=True;

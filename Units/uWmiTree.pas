@@ -25,11 +25,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, SynEditHighlighter, ImgList, uWmi_Metadata, uMisc,
+  Dialogs, SynEditHighlighter, ImgList, uWmi_Metadata, uMisc, uSettings,
   XMLDoc,  XMLIntf, OleCtrls, SHDocVw, SynEdit, ComCtrls, StdCtrls, ExtCtrls, Vcl.Styles.WebBrowser;
 
 const
-  NamespaceImageIndex = 0;
+  //NamespaceImageIndex = 0;
   ClassImageIndex     = 1;
   MethodImageIndex    = 2;
   PropertyImageIndex  = 3;
@@ -37,9 +37,9 @@ const
   ParameterInImageIndex = 5;
   ParameterOutImageIndex = 6;
 
-  LevelNameSpace = 0;
-  LevelClass     = 1;
-  LevelPropertyMethod = 2;
+  //LevelNameSpace = 0;
+  LevelClass     = 0;
+  LevelPropertyMethod = 1;
 
 type
   TWebBrowser=class(TVclStylesWebBrowser);
@@ -63,20 +63,23 @@ type
     procedure FormCreate(Sender: TObject);
     procedure TreeViewWmiClassesChange(Sender: TObject; xNode: TTreeNode);
     procedure FindDialog1Find(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
     DataLoaded : Boolean;
     FSetMsg: TProcLog;
     FSetLog: TProcLog;
-    procedure FreeTreeClasses;
+    FNamespace: string;
+    FSettings: TSettings;
     procedure LoadXMLWMIClass(const Xml: string);
     procedure DOMShow(ATree: TTreeView; Anode: IXMLNode; TNode: TTreeNode);
-    procedure LoadNameSpaces;
+    procedure LoadWMIClasses;
+    procedure SetSettings(const Value: TSettings);
   public
     procedure LoadClassInfo(WmiMetaClassInfo : TWMiClassMetaData);
     property SetMsg : TProcLog read FSetMsg Write FSetMsg;
     property SetLog : TProcLog read FSetLog Write FSetLog;
+    property Namespace : string read FNamespace write FNamespace;
+    property Settings : TSettings read FSettings Write SetSettings;
   end;
 
 function FindTextTreeView(const AText: string;
@@ -86,35 +89,33 @@ implementation
 
 uses
   uxtheme,
-  uSettings,
   uGlobals,
   ComObj,
   StrUtils;
 
 {$R *.dfm}
 
-function FindTextTreeView(const AText: string;
-  ATree: TTreeView; StartNode: TTreeNode = nil): TTreeNode;
+function FindTextTreeView(const AText: string;  ATree: TTreeView; StartNode: TTreeNode = nil): TTreeNode;
 var
-  Node: TTreeNode;
+  LNode: TTreeNode;
 begin
   Result := nil;
   if ATree.Items.Count = 0 then
     Exit;
 
   if StartNode = nil then
-    Node := ATree.Items[0]
+    LNode := ATree.Items[0]
   else
-    Node := StartNode;
+    LNode := StartNode;
 
-  while Node <> nil do
+  while LNode <> nil do
   begin
-    if CompareText(Node.Text, AText) = 0 then
+    if SameText(LNode.Text, AText) then
     begin
-      Result := Node;
+      Result := LNode;
       Break;
     end;
-    Node := Node.GetNext;
+    LNode := LNode.GetNext;
   end;
 end;
 
@@ -163,39 +164,22 @@ procedure TFrmWMITree.FormCreate(Sender: TObject);
 
 begin
   DataLoaded :=False;
-  AddImage(1, NamespaceImageIndex, 'Namespace');
-  AddImage(2, ClassImageIndex, 'WMI Class');
-  AddImage(3, MethodImageIndex, 'WMI Method');
-  AddImage(4, PropertyImageIndex, 'WMI Property');
-  AddImage(5, QualifierImageIndex, 'Qualifier');
-  AddImage(6, ParameterInImageIndex, 'In Parameter');
-  AddImage(7, ParameterOutImageIndex, 'Out Parameter');
+  //AddImage(1, NamespaceImageIndex, 'Namespace');
+  AddImage(1, ClassImageIndex, 'WMI Class');
+  AddImage(2, MethodImageIndex, 'WMI Method');
+  AddImage(3, PropertyImageIndex, 'WMI Property');
+  AddImage(4, QualifierImageIndex, 'Qualifier');
+  AddImage(5, ParameterInImageIndex, 'In Parameter');
+  AddImage(6, ParameterOutImageIndex, 'Out Parameter');
 
   PanelClassInfo.Height := 0;
-
-end;
-
-procedure TFrmWMITree.FormDestroy(Sender: TObject);
-begin
-  FreeTreeClasses;
 end;
 
 procedure TFrmWMITree.FormShow(Sender: TObject);
 begin
  if not DataLoaded then
-  LoadNameSpaces;
+  LoadWMIClasses;
 end;
-
-procedure TFrmWMITree.FreeTreeClasses;
-var
-  i: integer;
-begin
-  for i := 0 to TreeViewWmiClasses.Items.Count - 1 do
-    if TreeViewWmiClasses.Items[i].Level = LevelNameSpace then
-      if Assigned(TreeViewWmiClasses.Items[i].Data) then
-        TStringList(TreeViewWmiClasses.Items[i].Data).Free;
-end;
-
 
 procedure TFrmWMITree.LoadClassInfo(WmiMetaClassInfo : TWMiClassMetaData);
 var
@@ -209,7 +193,6 @@ begin
   try
     if Assigned(WmiMetaClassInfo)  then
     begin
-      if @FSetMsg<>nil then
       SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
       WebBrowserWmi.HandleNeeded;
@@ -231,9 +214,7 @@ begin
         MemoQualifiers.Lines.EndUpdate;
       end;
 
-      Node := FindTextTreeView(WmiMetaClassInfo.WmiNameSpace, TreeViewWmiClasses);
-      if Assigned(Node) then
-        Node := FindTextTreeView(WmiMetaClassInfo.WmiClass, TreeViewWmiClasses, Node);
+      Node := FindTextTreeView(WmiMetaClassInfo.WmiClass, TreeViewWmiClasses, nil);
 
       if Assigned(Node) and (Node.Count = 0) then
         //only if not has child node add the info
@@ -311,31 +292,57 @@ begin
   end;
 end;
 
-procedure TFrmWMITree.LoadNameSpaces;
+procedure TFrmWMITree.LoadWMIClasses;
 var
- LIndex      : Integer;
- FNameSpaces : TStrings;
- Node        : TTreeNode;
+  LClasses : TStringList;
+  LIndex   : integer;
+  LNode    : TTreeNode;
 begin
- FNameSpaces:=TStringList.Create;
- try
-    FNameSpaces.AddStrings(CachedWMIClasses.NameSpaces);
+  PanelClassInfo.Height := 0;
+  LClasses := TStringList.Create;
+  try
+    LClasses.Sorted := True;
+    LClasses.BeginUpdate;
+    try
+      try
+        if not ExistWmiClassesCache(FNamespace) then
+        begin
+          GetListWmiClasses(FNamespace, LClasses, [], ['abstract'], True);
+          SaveWMIClassesToCache(FNamespace , LClasses);
+        end
+        else
+          LoadWMIClassesFromCache(FNamespace, LClasses);
+      except
+        on E: EOleSysError do
+          if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
+            SetLog(Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
+          else
+            raise;
+      end;
+
+    finally
+      LClasses.EndUpdate;
+    end;
+
     TreeViewWmiClasses.Items.BeginUpdate;
     try
-      for LIndex := 0 to FNameSpaces.Count - 1 do
+      for LIndex := 0 to LClasses.Count - 1 do
       begin
-        Node := TreeViewWmiClasses.Items.Add(nil, FNameSpaces[LIndex]);
-        Node.ImageIndex := NamespaceImageIndex;
-        Node.SelectedIndex := NamespaceImageIndex;
+        LNode := TreeViewWmiClasses.Items.AddChild(nil, LClasses[LIndex]);
+        LNode.ImageIndex := ClassImageIndex;
+        LNode.SelectedIndex := ClassImageIndex;
       end;
     finally
       TreeViewWmiClasses.Items.EndUpdate;
     end;
- finally
-   FNameSpaces.Free;
- end;
- DataLoaded:=True;
+
+
+  finally
+    LClasses.Free;
+  end;
+    DataLoaded:=True;
 end;
+
 
 procedure TFrmWMITree.DOMShow(ATree: TTreeView; Anode: IXMLNode; TNode: TTreeNode);
 var
@@ -400,119 +407,52 @@ begin
   end;
 end;
 
+procedure TFrmWMITree.SetSettings(const Value: TSettings);
+begin
+  FSettings := Value;
+  MemoWmiMOF.Color:=FSettings.BackGroundColor;
+  MemoWmiMOF.Font.Color:=FSettings.ForeGroundColor;
+  MemoQualifiers.Color:=MemoWmiMOF.Color;
+  MemoQualifiers.Font.Color:=MemoWmiMOF.Font.Color;
+end;
+
 procedure TFrmWMITree.TreeViewWmiClassesChange(Sender: TObject; xNode: TTreeNode);
 var
   Node :   TTreeNode;
-  NodeC:   TTreeNode;
   WMiClassMetaData : TWMiClassMetaData;
-  i : integer;
-  FClasses: TStringList;
 begin
-  //MemoDescr.Lines.Clear;
   Node := TreeViewWmiClasses.Selected;
-  //With FrmMain.FrmWmiClasses do
+  if Assigned(Node) and (Node.Level = LevelClass)  then
   begin
-    if Assigned(Node) and (Node.Level = LevelNameSpace) and (Node.Count = 0) then
+    PanelClassInfo.Height := 220;
+    WMiClassMetaData:= CachedWMIClasses.GetWmiClass(FNamespace, Node.Text);
+    LoadClassInfo(WMiClassMetaData);
+  end
+  else
+  if Assigned(Node) and (Node.Level = LevelPropertyMethod) then
+  begin
+    {
+    //'Property %s : %s'
+    if StartsText('Property', Node.Text) then
     begin
-      PanelClassInfo.Height := 0;
-      {
-      ComboBoxNameSpaces.ItemIndex :=
-        ComboBoxNameSpaces.Items.IndexOf(Node.Text);
-      LoadWmiClasses(ComboBoxNameSpaces.Text);
-
-      ComboBoxClasses.ItemIndex := 0;
-      LoadClassInfo;
-      GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
-      }
-
-      FClasses := TStringList.Create;
-      try
-        FClasses.Sorted := True;
-        FClasses.BeginUpdate;
-        try
-          try
-            if not ExistWmiClassesCache(Node.Text) then
-            begin
-              GetListWmiClasses(Node.Text, FClasses, [], ['abstract'], True);
-              SaveWMIClassesToCache(Node.Text , FClasses);
-            end
-            else
-              LoadWMIClassesFromCache(Node.Text, FClasses);
-          except
-            on E: EOleSysError do
-              if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-                SetLog(Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
-              else
-                raise;
-          end;
-
-        finally
-          FClasses.EndUpdate;
-        end;
-
-        TreeViewWmiClasses.Items.BeginUpdate;
-        try
-          for i := 0 to FClasses.Count - 1 do
-          begin
-            NodeC := TreeViewWmiClasses.Items.AddChild(Node, FClasses[i]);
-            NodeC.ImageIndex := ClassImageIndex;
-            NodeC.SelectedIndex := ClassImageIndex;
-          end;
-        finally
-          TreeViewWmiClasses.Items.EndUpdate;
-        end;
-
-
-      finally
-        FClasses.Free;
-      end;
-
-
-
-
+      sValue := StringReplace(Node.Text, 'Property ', '', [rfReplaceAll]);
+      sValue := Trim(Copy(sValue, 1, Pos(':', sValue) - 1));
+      MemoDescr.Lines.Text := GetWmiPropertyDescription(Node.Parent.Parent.Text, Node.Parent.Text, sValue);
     end
     else
-    if Assigned(Node) and (Node.Level = LevelClass) and (Assigned(Node.Parent)) then
+    if StartsText('Method', Node.Text) then
     begin
-      PanelClassInfo.Height := 220;
-      {
-      ComboBoxNameSpaces.ItemIndex :=
-        ComboBoxNameSpaces.Items.IndexOf(Node.Parent.Text);
-      LoadWmiClasses(ComboBoxNameSpaces.Text);
-      ComboBoxClasses.ItemIndex := ComboBoxClasses.Items.IndexOf(Node.Text);
-      ComboBoxClassesChange(ComboBoxClasses);
-      }
-      WMiClassMetaData:= CachedWMIClasses.GetWmiClass(Node.Parent.Text, Node.Text); //TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
-      //MemoDescr.Lines.Text :=WMiClassMetaData.DescriptionEx;
-      LoadClassInfo(WMiClassMetaData);
-      //GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
-    end
-    else
-    if Assigned(Node) and (Node.Level = LevelPropertyMethod) then
-    begin
-      {
-      //'Property %s : %s'
-      if StartsText('Property', Node.Text) then
-      begin
-        sValue := StringReplace(Node.Text, 'Property ', '', [rfReplaceAll]);
-        sValue := Trim(Copy(sValue, 1, Pos(':', sValue) - 1));
-        MemoDescr.Lines.Text := GetWmiPropertyDescription(Node.Parent.Parent.Text, Node.Parent.Text, sValue);
-      end
-      else
-      if StartsText('Method', Node.Text) then
-      begin
-        sValue := Trim(StringReplace(Node.Text, 'Method', '', [rfReplaceAll]));
-        MemoDescr.Lines.Text := GetWmiMethodDescription(
-          Node.Parent.Parent.Text, Node.Parent.Text, sValue);
-      end;
-      }
-    end
-    else
-    if Assigned(Node) and (Node.Level = LevelNameSpace) then
-      PanelClassInfo.Height := 0
-    else
-      PanelClassInfo.Height := 220;
-  end;
+      sValue := Trim(StringReplace(Node.Text, 'Method', '', [rfReplaceAll]));
+      MemoDescr.Lines.Text := GetWmiMethodDescription(
+        Node.Parent.Parent.Text, Node.Parent.Text, sValue);
+    end;
+    }
+  end
+  else
+  if Assigned(Node) and (Node.Level < LevelClass) then
+    PanelClassInfo.Height := 0
+  else
+    PanelClassInfo.Height := 220;
 end;
 
 

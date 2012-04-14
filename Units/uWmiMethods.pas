@@ -197,7 +197,7 @@ var
 begin
   if (ComboBoxClassesMethods.Text = '') or (ComboBoxMethods.Text = '') then
     exit;
-  if @FSetLog<>nil then  
+
   SetLog(Format('Generating code for %s:%s',[WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
   Namespace := ComboBoxNamespaceMethods.Text;
@@ -351,7 +351,7 @@ begin
   ComboBoxMethods.Items.BeginUpdate;
   try
     ComboBoxMethods.Items.Clear;
-    WmiMetaClassInfo:=CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text,ComboBoxClassesMethods.Text);
+    WmiMetaClassInfo:=CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text);
 
     if ComboBoxClassesMethods.Text <> '' then
     begin
@@ -408,24 +408,19 @@ procedure TFrmWmiMethods.LoadParametersMethodInfo(
   WmiMetaClassInfo: TWMiClassMetaData);
 var
   i:    integer;
-  Index : Integer;
   Item: TListItem;
+  s   : string;
+  LWMiMethodMetaData : TWMiMethodMetaData;
 begin
   if not Assigned(WmiMetaClassInfo) then exit;
-  Index:=-1;
   ListViewMethodsParams.Items.BeginUpdate;
   try
     ListViewMethodsParams.Items.Clear;
     if (ComboBoxClassesMethods.Text <> '') and (ComboBoxMethods.Text <> '') then
     begin
-      for i:=0 to WmiMetaClassInfo.MethodsCount-1 do
-       if SameText(WmiMetaClassInfo.Methods[i].Name,ComboBoxMethods.Text) then
-       begin
-         Index:=i;
-         break;
-       end;
 
-      if not WmiMetaClassInfo.Methods[Index].IsStatic and CheckBoxPath.Checked then
+      LWMiMethodMetaData:=WmiMetaClassInfo.MethodByName[ComboBoxMethods.Text];
+      if not LWMiMethodMetaData.IsStatic and CheckBoxPath.Checked then
       begin
         GetWmiClassPath(WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass, ComboBoxPaths.Items);
         if ComboBoxPaths.Items.Count > 0 then
@@ -434,22 +429,24 @@ begin
       else
         ComboBoxPaths.Items.Clear;
 
-      MemoMethodDescr.Text := WmiMetaClassInfo.Methods[Index].Description;
+      MemoMethodDescr.Text := LWMiMethodMetaData.Description;
 
       if MemoMethodDescr.Text = '' then
         MemoMethodDescr.Text := 'Method without description available';
     end;
 
-    if Index>=0 then
-    for i := 0 to WmiMetaClassInfo.Methods[Index].InParameters.Count - 1 do
+    for i := 0 to LWMiMethodMetaData.InParameters.Count - 1 do
     begin
       Item := ListViewMethodsParams.Items.Add;
-      Item.Caption := WmiMetaClassInfo.Methods[Index].InParameters[i].Name;
-      Item.Data    := Pointer(WmiMetaClassInfo.Methods[Index].InParameters[i].CimType);
-      Item.SubItems.Add(WmiMetaClassInfo.Methods[Index].InParameters[i].&Type);
-      Item.SubItems.Add(GetDefaultValueWmiType(WmiMetaClassInfo.Methods[Index].InParameters[i].&Type));
-      Item.SubItems.Add(WmiMetaClassInfo.Methods[Index].InParameters[i].Description);
+      Item.Caption := LWMiMethodMetaData.InParameters[i].Name;
+      Item.Data    := Pointer(LWMiMethodMetaData.InParameters[i].CimType);
+
+      Item.SubItems.Add(LWMiMethodMetaData.InParameters[i].&Type);
+      s:=GetDefaultValueWmiType(LWMiMethodMetaData.InParameters[i].&Type);
+      Item.SubItems.Add(s);
+      Item.SubItems.Add(LWMiMethodMetaData.InParameters[i].Description);
     end;
+
   finally
     ListViewMethodsParams.Items.EndUpdate;
   end;
@@ -461,7 +458,6 @@ end;
 procedure TFrmWmiMethods.LoadWmiMethods(const Namespace: string;
   FirstTime: Boolean);
 begin
-  if @FSetMsg<>nil then
   SetMsg(Format('Loading classes with methods in %s', [Namespace]));
   try
     if not ExistWmiClassesMethodsCache(Namespace) then
@@ -496,7 +492,6 @@ begin
 
     LoadMethodInfo(FirstTime);
   finally
-  if @FSetMsg<>nil then
     SetMsg('');
   end;
 end;
