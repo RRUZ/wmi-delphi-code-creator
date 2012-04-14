@@ -58,6 +58,7 @@ type
     procedure EditValueMethodParamExit(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FSetMsg: TProcLog;
     FSetLog: TProcLog;
@@ -65,6 +66,7 @@ type
     FConsole: TMemo;
     FrmCodeEditorMethod   : TFrmCodeEditor;
     FItem:      TListitem;
+    DataLoaded : Boolean;
     procedure UMEditValueParam(var msg: TMessage); message UM_EDITPARAMVALUE;
     procedure SetSettings(const Value: TSettings);
     procedure SetConsole(const Value: TMemo);
@@ -72,8 +74,9 @@ type
     procedure LoadParametersMethodInfo(WmiMetaClassInfo : TWMiClassMetaData);
     procedure GenerateMethodInvoker(WmiMetaClassInfo : TWMiClassMetaData);
     procedure GenerateCode;
-  public
+    procedure LoadNameSpaces;
     procedure LoadWmiMethods(const Namespace: string; FirstTime : Boolean=False);
+  public
     property SetMsg : TProcLog read FSetMsg Write FSetMsg;
     property SetLog : TProcLog read FSetLog Write FSetLog;
     property Settings : TSettings read FSettings Write SetSettings;
@@ -168,6 +171,12 @@ begin
   FrmCodeEditorMethod.SourceLanguage:=Lng_Delphi;
 end;
 
+procedure TFrmWmiMethods.FormShow(Sender: TObject);
+begin
+ if not DataLoaded then
+  LoadNameSpaces;
+end;
+
 procedure TFrmWmiMethods.GenerateCode;
 begin
     if ComboBoxClassesMethods.ItemIndex>=0 then
@@ -188,7 +197,7 @@ var
 begin
   if (ComboBoxClassesMethods.Text = '') or (ComboBoxMethods.Text = '') then
     exit;
-
+  if @FSetLog<>nil then  
   SetLog(Format('Generating code for %s:%s',[WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
   Namespace := ComboBoxNamespaceMethods.Text;
@@ -382,6 +391,19 @@ begin
   GenerateCode;
 end;
 
+procedure TFrmWmiMethods.LoadNameSpaces;
+begin
+    ComboBoxNamespaceMethods.Items.AddStrings(CachedWMIClasses.NameSpaces);
+
+    if FSettings.LastWmiNameSpaceMethods<>'' then
+      ComboBoxNamespaceMethods.ItemIndex := ComboBoxNamespaceMethods.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
+    else
+      ComboBoxNamespaceMethods.ItemIndex := 0;
+    LoadWmiMethods(ComboBoxNamespaceMethods.Text, True);
+
+    DataLoaded:=True;
+end;
+
 procedure TFrmWmiMethods.LoadParametersMethodInfo(
   WmiMetaClassInfo: TWMiClassMetaData);
 var
@@ -439,6 +461,7 @@ end;
 procedure TFrmWmiMethods.LoadWmiMethods(const Namespace: string;
   FirstTime: Boolean);
 begin
+  if @FSetMsg<>nil then
   SetMsg(Format('Loading classes with methods in %s', [Namespace]));
   try
     if not ExistWmiClassesMethodsCache(Namespace) then
@@ -473,6 +496,7 @@ begin
 
     LoadMethodInfo(FirstTime);
   finally
+  if @FSetMsg<>nil then
     SetMsg('');
   end;
 end;

@@ -1,7 +1,11 @@
 program WmiDelphiCodeCreator;
 
 uses
+  ExceptionLog,
   Forms,
+  Vcl.Themes,
+  Vcl.Styles,
+  uGlobals in 'Units\uGlobals.pas',
   Main in 'Main.pas' {FrmMain},
   uWmiTree in 'Units\uWmiTree.pas' {FrmWMITree},
   uDelphiSyntax in 'Units\uDelphiSyntax.pas',
@@ -25,13 +29,10 @@ uses
   uWmiBorlandCppCode in 'Units\uWmiBorlandCppCode.pas',
   uBorlandCppVersions in 'Units\uBorlandCppVersions.pas',
   uBorlandCppIDE in 'Units\uBorlandCppIDE.pas',
-  Vcl.Themes,
-  Vcl.Styles,
   uCodeEditor in 'Units\uCodeEditor.pas' {FrmCodeEditor},
   uWmiEvents in 'Units\uWmiEvents.pas' {FrmWmiEvents},
   uWmiMethods in 'Units\uWmiMethods.pas' {FrmWmiMethods},
   uWmiClasses in 'Units\uWmiClasses.pas' {FrmWmiClasses},
-  uGlobals in 'Units\uGlobals.pas',
   uWmiVsCppCode in 'Units\uWmiVsCppCode.pas',
   uVisualStudio in 'Units\uVisualStudio.pas',
   Vcl.Styles.Ext in 'Units\Vcl.Styles.Utils\Vcl.Styles.Ext.pas',
@@ -57,7 +58,9 @@ uses
   uOnlineResources in 'Units\uOnlineResources.pas' {FrmOnlineResources},
   uSqlWMI in 'Units\uSqlWMI.pas' {FrmWMISQL},
   uUpdatesChanges in 'Units\Misc\uUpdatesChanges.pas' {FrmUpdateChanges},
-  WbemScripting_TLB in 'Units\WMI\WbemScripting_TLB.pas';
+  WbemScripting_TLB in 'Units\WMI\WbemScripting_TLB.pas',
+  uLog in 'Units\uLog.pas' {FrmLog},
+  Vcl.Styles.ColorTabs in 'Units\Vcl.Styles.Utils\Vcl.Styles.ColorTabs.pas';
 
 {$R *.res}
 
@@ -65,7 +68,6 @@ procedure UpdateApp;
 var
   Frm: TFrmCheckUpdate;
 begin
-
   Frm := GetUpdaterInstance;
   try
     Frm.CheckExternal:=True;

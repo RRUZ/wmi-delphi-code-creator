@@ -86,7 +86,6 @@ type
     procedure SetNameSpaces(const Value: TStrings);
   public
     property Log   : TProcLog read FLog write FLog;
-    property NameSpaces : TStrings read FNameSpaces Write SetNameSpaces;
   end;
 
 implementation
@@ -96,6 +95,7 @@ implementation
 uses
   ComObj,
   MidasLib,
+  uGlobals,
   uWmi_Metadata,
   uWmi_ViewPropsValues,
   AsyncCalls,
@@ -117,9 +117,9 @@ var
 begin
   ClientDataSetWmi.DisableControls;
   ProgressBarClasses.Position:=0;
-  ProgressBarNamespaces.Max:=NameSpaces.Count;
+  ProgressBarNamespaces.Max:=FNameSpaces.Count;
   try
-    for NameSpaceIndex := 0 to NameSpaces.Count - 1 do
+    for NameSpaceIndex := 0 to FNameSpaces.Count - 1 do
     begin
       ProgressBarNamespaces.Position:=NameSpaceIndex+1;
       Status('Scanning namespace ' + FNameSpaces[NameSpaceIndex]);
@@ -353,6 +353,7 @@ procedure TFrmWmiDatabase.FormCreate(Sender: TObject);
 begin
   PanelStatus.Height:=0;
   FNameSpaces   := TStringList.Create;
+  FNameSpaces.AddStrings(CachedWMIClasses.NameSpaces);
   FDatabaseFile := GetWMICFolderCache + WmiDatabaseName;
   FHistoryFile  := GetWMICFolderCache + 'WmiFiltersHistory.txt';
 

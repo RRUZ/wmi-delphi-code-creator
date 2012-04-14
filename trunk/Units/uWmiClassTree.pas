@@ -16,11 +16,14 @@ type
     ProgressBar1: TProgressBar;
     procedure BtnFillTreeClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     Working : Boolean;
+    DataLoaded : Boolean;
     procedure FillTree(const Namesoace:string);
     procedure SetStaus(const Msg:string);
     procedure Fill;
+    procedure LoadNamespaces;
   public
   end;
 
@@ -30,6 +33,7 @@ uses
   AsyncCalls,
   ComObj,
   ActiveX,
+  uGLobals,
   uWmi_Metadata;
 
 {$R *.dfm}
@@ -122,7 +126,22 @@ end;
 procedure TFrmWmiClassTree.FormCreate(Sender: TObject);
 begin
   Working:=False;
+  DataLoaded:=False;
 end;
+
+procedure TFrmWmiClassTree.FormShow(Sender: TObject);
+begin
+ if not DataLoaded then
+  LoadNamespaces;
+end;
+
+procedure TFrmWmiClassTree.LoadNamespaces;
+begin
+ CbNamespaces.Items.AddStrings(CachedWMIClasses.NameSpaces);
+ CbNamespaces.ItemIndex:=0;
+ DataLoaded:=True;
+end;
+
 
 procedure TFrmWmiClassTree.SetStaus(const Msg: string);
 begin

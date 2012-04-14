@@ -25,75 +25,49 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, uSqlWMI,
-  SynEdit, ImgList, ToolWin, uWmiTree, uSettings, uWmiDatabase, uWmi_Metadata,
-  Menus, Buttons, uWmiClassTree, uWmiEvents, uWmiMethods, uWmiClasses, Consts,
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls,   Rtti, Generics.Collections,
+  SynEdit, ImgList, ToolWin,  uSettings, Menus, Buttons,  Vcl.Styles.ColorTabs,
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup;
-
 
 type
   TFrmMain = class(TForm)
     PanelMain: TPanel;
-    PageControlMain: TPageControl;
-    TabSheetWmiClasses: TTabSheet;
-    TabSheetWmiExplorer: TTabSheet;
-    TabSheetMethods: TTabSheet;
     StatusBar1: TStatusBar;
     ToolBar1:  TToolBar;
-    ToolButtonSearch: TToolButton;
     ToolButtonAbout: TToolButton;
     ToolButton4: TToolButton;
-    ToolButtonOnline: TToolButton;
-    TabSheet6: TTabSheet;
-    MemoLog:   TMemo;
-    ProgressBarWmi: TProgressBar;
     MemoConsole: TMemo;
-    TabSheetCodeGen: TTabSheet;
-    PanelCodeGen: TPanel;
-    PageControlCodeGen: TPageControl;
     PanelConsole: TPanel;
-    Splitter4: TSplitter;
-    ToolButtonGetValues: TToolButton;
-    TabSheetWmiFinder: TTabSheet;
     ImageList1: TImageList;
     PageControl2: TPageControl;
     TabSheet3: TTabSheet;
     ToolButtonSettings: TToolButton;
-    TabSheetTreeClasses: TTabSheet;
-    TabSheetEvents: TTabSheet;
     PopupActionBar1: TPopupActionBar;
-    TabSheetWMISQL: TTabSheet;
+    TreeViewTasks: TTreeView;
+    Splitter1: TSplitter;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    PageControl3: TPageControl;
+    TabSheetTask: TTabSheet;
+    TabSheet2: TTabSheet;
+    MemoLog: TMemo;
+    Splitter2: TSplitter;
     procedure FormCreate(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
-    procedure ToolButtonOnlineClick(Sender: TObject);
     procedure ToolButtonAboutClick(Sender: TObject);
-    procedure StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel;
-      const Rect: TRect);
-    procedure ToolButtonSearchClick(Sender: TObject);
-    procedure PageControlMainChange(Sender: TObject);
-    procedure ToolButtonGetValuesClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ToolButtonSettingsClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure TreeViewTasksChange(Sender: TObject; Node: TTreeNode);
   private
-    FrmWmiDatabase: TFrmWmiDatabase;
-    FDataLoaded: boolean;
-    FrmWMIExplorer  : TFrmWMITree;
-    FrmWmiClassTree : TFrmWmiClassTree;
-    FrmWMISQL       : TFrmWMISQL;
-
-    FrmWmiEvents          : TFrmWmiEvents;
-    FrmWmiMethods         : TFrmWmiMethods;
     FSettings: TSettings;
-
-    procedure LoadWmiMetaData;
+    Ctx : TRttiContext;
+    RegisteredInstances : TDictionary<string,TForm>;
+    procedure RegisterTask(const ParentTask, Name : string;ImageIndex:Integer; LinkObject : TRttiType);
     procedure SetLog(const Log :string);
-  public
-    FrmWmiClasses         : TFrmWmiClasses;
     procedure SetMsg(const Msg: string);
+  public
     property Settings : TSettings read FSettings;
   end;
-
 
 var
   FrmMain: TFrmMain;
@@ -101,6 +75,17 @@ var
 implementation
 
 uses
+  uMisc,
+  uWmi_Metadata,
+  uLog,
+  uGlobals,
+  uSqlWMI,
+  uWmiClasses,
+  uWmiDatabase,
+  uWmiClassTree,
+  uWmiEvents,
+  uWmiMethods,
+  uWmiTree,
   ComObj,
   ShellApi,
   uStdActionsPopMenu,
@@ -112,17 +97,8 @@ uses
 
 {$R *.dfm}
 
-procedure TFrmMain.FormActivate(Sender: TObject);
-begin
-  if not FDataLoaded then
-    LoadWmiMetaData;
-end;
-
 procedure TFrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  FrmWmiEvents.Close();
-  FrmWmiMethods.Close();
-  FrmWmiClasses.Close();
   WriteSettings(Settings);
 end;
 
@@ -133,12 +109,14 @@ begin
   {$WARN SYMBOL_PLATFORM ON}
   FillPopupActionBar(PopupActionBar1);
 
+  Ctx:=TRttiContext.Create;
+  RegisteredInstances:=TDictionary<string, TForm>.Create;
+
   FSettings :=TSettings.Create;
   SetLog('Reading settings');
 
   ReadSettings(FSettings);
   LoadVCLStyle(Settings.VCLStyle);
-
 
   if FSettings.DisableVClStylesNC then
   begin
@@ -170,238 +148,42 @@ begin
 
   end;
 
+  RegisterTask('','Code Generation', 30, nil);
+  RegisterTask('Code Generation','WMI Class Code Generation', 40, Ctx.GetType(TFrmWmiClasses));
+  RegisterTask('Code Generation','WMI Methods Code Generation', 41,  Ctx.GetType(TFrmWmiMethods));
+  RegisterTask('Code Generation','WMI Events Code Generation', 45, Ctx.GetType(TFrmWmiEvents));
+  RegisterTask('','WMI Explorer', 29, Ctx.GetType(TFrmWMITree));
+  RegisterTask('','WMI Classes Tree', 43, Ctx.GetType(TFrmWmiClassTree));
+  RegisterTask('','WMI Finder', 57, Ctx.GetType(TFrmWmiDatabase));
+  RegisterTask('','WQL', 56, Ctx.GetType(TFrmWMISQL));
+  RegisterTask('','Events Monitor', 28, nil);
+  RegisterTask('','Log', 32, Ctx.GetType(TFrmLog));
+
+  TreeViewTasks.Items[0].Expand(True);
+
   MemoConsole.Color:=Settings.BackGroundColor;
   MemoConsole.Font.Color:=Settings.ForeGroundColor;
-
   MemoLog.Color:=MemoConsole.Color;
   MemoLog.Font.Color:=MemoConsole.Font.Color;
 
-  FDataLoaded := False;
-  StatusBar1.Panels[2].Text := Format('WMI installed version %s      ', [GetWmiVersion]);
-
-  ProgressBarWmi.Parent := StatusBar1;
-  FrmWmiDatabase := TFrmWmiDatabase.Create(Self);
-  FrmWmiDatabase.Parent := TabSheetWmiFinder;
-  FrmWmiDatabase.BorderStyle := bsNone;
-  FrmWmiDatabase.Align := alClient;
-  //FrmWmiDatabase.Status:=SetMsg;
-  FrmWmiDatabase.Log   :=SetLog;
-  FrmWmiDatabase.Show;
-
-  FrmWMISQL:=TFrmWMISQL.Create(Self);
-  FrmWMISQL.Parent := TabSheetWMISQL;
-  FrmWMISQL.BorderStyle := bsNone;
-  FrmWMISQL.Align := alClient;
-  FrmWMISQL.Log   := SetLog;
-  FrmWMISQL.Show;
-
-
-  FrmWMIExplorer := TFrmWMITree.Create(Self);
-  FrmWMIExplorer.Parent := TabSheetWmiExplorer;
-  FrmWMIExplorer.BorderStyle := bsNone;
-  FrmWMIExplorer.Align := alClient;
-
-  FrmWMIExplorer.MemoDescr.Color:=Settings.BackGroundColor;
-  FrmWMIExplorer.MemoDescr.Font.Color:=MemoConsole.Font.Color;
-  FrmWMIExplorer.MemoWmiMOF.Color:=Settings.BackGroundColor;
-  FrmWMIExplorer.MemoWmiMOF.Font.Color:=MemoConsole.Font.Color;
-  FrmWMIExplorer.MemoQualifiers.Color:=Settings.BackGroundColor;
-  FrmWMIExplorer.MemoQualifiers.Font.Color:=MemoConsole.Font.Color;
-  FrmWMIExplorer.SetMsg:=SetMsg;
-  FrmWMIExplorer.SetLog:=SetLog;
-
-  FrmWMIExplorer.Show;
-
-  FrmWmiClassTree := TFrmWmiClassTree.Create(Self);
-  FrmWmiClassTree.Parent := TabSheetTreeClasses;
-  FrmWmiClassTree.Align := alClient;
-  FrmWmiClassTree.Show;
-
-
-
-  FrmWmiClasses  := TFrmWmiClasses.Create(Self);
-  //FrmWmiClasses.CodeGenerator:=GenerateCode;
-  FrmWmiClasses.Parent := TabSheetWmiClasses;
-  FrmWmiClasses.Align  := alClient;
-  FrmWmiClasses.Show;
-  FrmWmiClasses.Settings:=Settings;
-  FrmWmiClasses.Console:=MemoConsole;
-  FrmWmiClasses.SetLog:=SetLog;
-  FrmWmiClasses.SetMsg:=SetMsg;
-  //FrmWmiClasses.CompilerType:=Ct_Delphi;
-
-  FrmWmiMethods  := TFrmWmiMethods.Create(Self);
-  //FrmCodeEditorMethod.CodeGenerator:=GenerateCode;
-  FrmWmiMethods.Parent := TabSheetMethods;
-  FrmWmiMethods.Align  := alClient;
-  FrmWmiMethods.Show;
-  FrmWmiMethods.Settings:=Settings;
-  FrmWmiMethods.Console:=MemoConsole;
-  FrmWmiMethods.SetLog:=SetLog;
-  FrmWmiMethods.SetMsg:=SetMsg;
-  //FrmCodeEditorMethod.CompilerType:=Ct_Delphi;
-
-  FrmWmiEvents  := TFrmWmiEvents.Create(Self);
-  FrmWmiEvents.Parent := TabSheetEvents;
-  FrmWmiEvents.Align  := alClient;
-  FrmWmiEvents.Settings:=Settings;
-  FrmWmiEvents.SetLog:=SetLog;
-  FrmWmiEvents.Console:=MemoConsole;
-  FrmWmiEvents.Show;
-  //FrmWmiEvents.CompilerType:=Ct_Delphi;
-  //FrmWmiEvents.CodeGenerator:=GenerateCode;
-
-  LoadCurrentTheme(Self,Settings.CurrentTheme);
-  LoadCurrentThemeFont(Self,Settings.FontName,Settings.FontSize);
-
-  LoadCurrentTheme(FrmWMISQL,Settings.CurrentTheme);
-  LoadCurrentThemeFont(FrmWMISQL,Settings.FontName,Settings.FontSize);
-
+  StatusBar1.Panels[2].Text := Format('WMI installed version %s', [GetWmiVersion]);
   AssignStdActionsPopUpMenu(Self, PopupActionBar1);
   ApplyVclStylesOwnerDrawFix(Self, True);
 end;
 
 
 procedure TFrmMain.FormDestroy(Sender: TObject);
+Var
+ Pair : TPair<string,TForm>;
 begin
-  FrmWmiClasses.Free;
-  FrmWmiEvents.Free;
-  FrmWmiMethods.Free;
-
-  FrmWMIExplorer.Free;
-  FrmWmiClassTree.Free;
-  Settings.Free;
-end;
-
-procedure TFrmMain.LoadWmiMetaData;
-var
-  i:    integer;
-  Node: TTreeNode;
-  // GWmiNamespaces : IAsyncCall;
-  FNameSpaces: TStringList;
-  Frm:  TFrmAbout;
-begin
-  FDataLoaded := True;
-  FNameSpaces := TStringList.Create;
-  Frm := TFrmAbout.Create(Self);
-  try
-
-    {$WARN SYMBOL_PLATFORM OFF}
-    if (DebugHook=0) and (SameText(Settings.VCLStyle,'Windows') or Settings.DisableVClStylesNC) then
-    Frm.Show;
-    {$WARN SYMBOL_PLATFORM ON}
-
-    SetMsg('Loading Namespaces');
-    ProgressBarWmi.Visible := True;
-    FNameSpaces.Sorted     := True;
-    //FNameSpaces.Clear;
-    FNameSpaces.BeginUpdate;
-    Self.Enabled := False;
-    try
-      try
-        if not ExistWmiNameSpaceCache then
-        begin
-          GetListWMINameSpaces('root', FNameSpaces);
-          SaveWMINameSpacesToCache(FNameSpaces);
-        end
-        else
-          LoadWMINameSpacesFromCache(FNameSpaces);
-
-          FrmWmiClassTree.CbNamespaces.Items.Clear;
-          FrmWmiClassTree.CbNamespaces.Items.AddStrings(FNameSpaces);
-          FrmWmiClassTree.CbNamespaces.ItemIndex:=0;
-
-               {
-
-           GWmiNamespaces := AsyncCall(@GetListWMINameSpaces, ['root', FNameSpaces]);
-           while AsyncMultiSync([GWmiNamespaces], True, 100) = WAIT_TIMEOUT do
-             Application.ProcessMessages;
-                  }
-        FrmWmiClasses.LabelNamespace.Caption := Format('Namespaces (%d)', [FNameSpaces.Count]);
-      except
-        on E: EOleSysError do
-
-          if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-            SetLog(
-              Format('Access denied  %s %s  Code : %x', ['GetListWMINameSpaces', E.Message, E.ErrorCode]))
-          else
-            raise;
-      end;
-
-    finally
-      Self.Enabled := True;
-      FNameSpaces.EndUpdate;
-      ProgressBarWmi.Visible := False;
-    end;
-
-    FrmWmiClasses.ComboBoxNameSpaces.Items.BeginUpdate;
-    try
-      FrmWmiClasses.ComboBoxNameSpaces.Items.AddStrings(FNameSpaces);
-    finally
-      FrmWmiClasses.ComboBoxNameSpaces.Items.EndUpdate;
-    end;
-
-    FrmWmiEvents.ComboBoxNamespacesEvents.Items.BeginUpdate;
-    try
-      FrmWmiEvents.ComboBoxNamespacesEvents.Items.AddStrings(FNameSpaces);
-    finally
-      FrmWmiEvents.ComboBoxNamespacesEvents.Items.EndUpdate;
-    end;
-
-    FrmWmiMethods.ComboBoxNamespaceMethods.Items.BeginUpdate;
-    try
-      FrmWmiMethods.ComboBoxNamespaceMethods.Items.AddStrings(FNameSpaces);
-    finally
-      FrmWmiMethods.ComboBoxNamespaceMethods.Items.EndUpdate;
-    end;
-
-
-    FrmWMIExplorer.TreeViewWmiClasses.Items.BeginUpdate;
-    try
-      for i := 0 to FNameSpaces.Count - 1 do
-      begin
-        Node := FrmWMIExplorer.TreeViewWmiClasses.Items.Add(nil, FNameSpaces[i]);
-        Node.ImageIndex := NamespaceImageIndex;
-        Node.SelectedIndex := NamespaceImageIndex;
-      end;
-    finally
-      FrmWMIExplorer.TreeViewWmiClasses.Items.EndUpdate;
-    end;
-
-    if Settings.LastWmiNameSpace<>'' then
-      FrmWmiClasses.ComboBoxNameSpaces.ItemIndex := FrmWmiClasses.ComboBoxNameSpaces.Items.IndexOf(Settings.LastWmiNameSpace)
-    else
-      FrmWmiClasses.ComboBoxNameSpaces.ItemIndex := 0;
-
-    FrmWmiClasses.LoadWmiClasses(FrmWmiClasses.ComboBoxNameSpaces.Text);
-    if Settings.LastWmiClass<>'' then
-      FrmWmiClasses.ComboBoxClasses.ItemIndex := FrmWmiClasses.ComboBoxClasses.Items.IndexOf(Settings.LastWmiClass)
-    else
-      FrmWmiClasses.ComboBoxClasses.ItemIndex := 0;
-
-
-    FrmWmiClasses.LoadClassInfo;
-
-    if Settings.LastWmiNameSpaceEvents<>'' then
-      FrmWmiEvents.ComboBoxNamespacesEvents.ItemIndex := FrmWmiEvents.ComboBoxNamespacesEvents.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
-    else
-      FrmWmiEvents.ComboBoxNamespacesEvents.ItemIndex := 0;
-
-    FrmWmiEvents.LoadWmiEvents(FrmWmiEvents.ComboBoxNamespacesEvents.Text, True);
-
-    if Settings.LastWmiNameSpaceMethods<>'' then
-      FrmWmiMethods.ComboBoxNamespaceMethods.ItemIndex := FrmWmiMethods.ComboBoxNamespaceMethods.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
-    else
-      FrmWmiMethods.ComboBoxNamespaceMethods.ItemIndex := 0;
-
-    FrmWmiMethods.LoadWmiMethods(FrmWmiMethods.ComboBoxNamespaceMethods.Text, True);
-
-    SetMsg('');
-  finally
-    FNameSpaces.Free;
-    //Frm.Close;
-    //Frm.Free;
+  for Pair in  RegisteredInstances do
+  begin
+   Pair.Value.Close;
+   Pair.Value.Free;
   end;
+
+  RegisteredInstances.Free;
+  Settings.Free;
 end;
 
 procedure TFrmMain.SetLog(const Log: string);
@@ -415,22 +197,6 @@ begin
   StatusBar1.Update;
 end;
 
-procedure TFrmMain.StatusBar1DrawPanel(StatusBar: TStatusBar;
-  Panel: TStatusPanel; const Rect: TRect);
-begin
-  if Panel = StatusBar.Panels[1] then
-    ProgressBarWmi.Top := Rect.Top;
-  ProgressBarWmi.Left := Rect.Left;
-  ProgressBarWmi.Width  := Rect.Right - Rect.Left - 15;
-  ProgressBarWmi.Height := Rect.Bottom - Rect.Top;
-end;
-
-procedure TFrmMain.ToolButtonOnlineClick(Sender: TObject);
-begin
-  ShellExecute(Handle, 'open', PChar(Format(UrlWmiHelp, [FrmWmiClasses.ComboBoxClasses.Text])), nil,
-    nil, SW_SHOW);
-end;
-
 procedure TFrmMain.ToolButtonAboutClick(Sender: TObject);
 var
   Frm: TFrmAbout;
@@ -439,33 +205,42 @@ begin
   Frm.ShowModal();
 end;
 
-procedure TFrmMain.ToolButtonGetValuesClick(Sender: TObject);
+function GetNodeByText(ATree : TTreeView; const AValue:String; AVisible: Boolean=False): TTreeNode;
+var
+ Node: TTreeNode;
 begin
-  FrmWmiClasses.GetValuesWmiProperties(FrmWmiClasses.ComboBoxNameSpaces.Text, FrmWmiClasses.ComboBoxClasses.Text);
-end;
-
-procedure TFrmMain.PageControlMainChange(Sender: TObject);
-begin
-  if PageControlMain.ActivePage = TabSheetWmiFinder then
-   FrmWmiDatabase.NameSpaces:=FrmWmiClasses.ComboBoxNameSpaces.Items
-  else
-  if (PageControlMain.ActivePage = TabSheetWMISQL) and (FrmWMISQL.NameSpaces.Count=0) then
+  Result := nil;
+  if ATree.Items.Count = 0 then Exit;
+  Node := ATree.Items[0];
+  while Node <> nil do
   begin
-   FrmWMISQL.NameSpaces:=FrmWmiClasses.ComboBoxNameSpaces.Items;
-   if FrmWMISQL.CbNameSpaces.Text='' then
-    FrmWMISQL.SetNameSpaceIndex(FrmWMISQL.CbNameSpaces.Items.IndexOf(FrmWmiClasses.ComboBoxNameSpaces.Text));
-
-    {
-   if FrmWMISQL.SynSQLSyn1.TableNames.Count=0 then
-     FrmWMISQL.SynSQLSyn1.TableNames.AddStrings(FrmWmiClasses.ComboBoxClasses.Items);
-     }
+    if SameText(Node.Text,AValue) then
+    begin
+      Result := Node;
+      if AVisible then
+        Result.MakeVisible;
+      Break;
+    end;
+    Node := Node.GetNext;
   end;
 end;
 
-procedure TFrmMain.ToolButtonSearchClick(Sender: TObject);
+procedure TFrmMain.RegisterTask(const ParentTask, Name: string; ImageIndex: Integer;
+  LinkObject: TRttiType);
+Var
+ PNode : TTreeNode;
+ Node  : TTreeNode;
 begin
-  PageControlMain.ActivePage := TabSheetWmiExplorer;
-  FrmWMIExplorer.FindDialog1.Execute(Handle);
+   if ParentTask='' then
+    Node:=TreeViewTasks.Items.AddObject(nil, Name, LinkObject)
+   else
+   begin
+    PNode:=GetNodeByText(TreeViewTasks, ParentTask);
+    Node:=TreeViewTasks.Items.AddChildObject(PNode, Name, LinkObject);
+   end;
+
+   Node.ImageIndex    :=ImageIndex;//add BN ??
+   Node.SelectedIndex :=ImageIndex;
 end;
 
 procedure TFrmMain.ToolButtonSettingsClick(Sender: TObject);
@@ -483,10 +258,70 @@ begin
   end;
 end;
 
+procedure TFrmMain.TreeViewTasksChange(Sender: TObject; Node: TTreeNode);
+var
+  LRttiInstanceType : TRttiInstanceType;
+  LValue : TValue;
+  LRttiProperty : TRttiProperty;
+  LForm : TForm;
+  LIndex : integer;
+  ProcLog :  TProcLog;
+begin
+  if Node.Text<>'' then
+  begin
+     TabSheetTask.Caption:=Node.Text;
+
+     for LIndex := 0 to TabSheetTask.ControlCount-1 do
+      if (TabSheetTask.Controls[LIndex] is TForm) and (TForm(TabSheetTask.Controls[LIndex]).Visible) then
+      begin
+       TForm(TabSheetTask.Controls[LIndex]).Hide;
+       break;
+      end;
+
+     if RegisteredInstances.ContainsKey(Node.Text) then
+        RegisteredInstances.Items[Node.Text].Show
+     else
+     if Node.Data<>nil then
+     begin
+        LRttiInstanceType:=TRttiInstanceType(Node.Data);
+        LValue:=LRttiInstanceType.GetMethod('Create').Invoke(LRttiInstanceType.MetaclassType,[Self]);
+        LForm:=TForm(LValue.AsObject);
+        LForm.Parent:=TabSheetTask;
+        LForm.BorderStyle:=bsNone;
+        LForm.Align:=alClient;
+
+        LRttiProperty:=LRttiInstanceType.GetProperty('Console');
+        if LRttiProperty<>nil then
+         LRttiProperty.SetValue(LForm, MemoConsole);
+
+        ProcLog:=SetMsg;
+        LRttiProperty:=LRttiInstanceType.GetProperty('SetMsg');
+        if LRttiProperty<>nil then
+         LRttiProperty.SetValue(LForm, TValue.From<TProcLog>(ProcLog));
+
+        ProcLog:=SetLog;
+        LRttiProperty:=LRttiInstanceType.GetProperty('SetLog');
+        if LRttiProperty<>nil then
+         LRttiProperty.SetValue(LForm, TValue.From<TProcLog>(ProcLog));
+
+        LRttiProperty:=LRttiInstanceType.GetProperty('Settings');
+        if LRttiProperty<>nil then
+         LRttiProperty.SetValue(LForm, FSettings);
+
+        LForm.Show;
+        RegisteredInstances.Add(Node.Text, LForm);
+     end;
+  end;
+
+end;
+
+
 initialization
 
 if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then
  TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TScrollingStyleHook);
 
+  TCustomStyleEngine.RegisterStyleHook(TCustomTabControl, TTabColorControlStyleHook);
+  TCustomStyleEngine.RegisterStyleHook(TTabControl, TTabColorControlStyleHook);
 
 end.

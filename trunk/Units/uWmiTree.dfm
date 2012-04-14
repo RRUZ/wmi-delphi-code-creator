@@ -14,6 +14,7 @@ object FrmWMITree: TFrmWMITree
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object PanelTreeMain: TPanel
@@ -27,16 +28,6 @@ object FrmWMITree: TFrmWMITree
     TabOrder = 0
     ExplicitWidth = 1096
     ExplicitHeight = 603
-    object Splitter7: TSplitter
-      Left = 917
-      Top = 34
-      Width = 5
-      Height = 377
-      Align = alRight
-      ExplicitLeft = 797
-      ExplicitTop = 29
-      ExplicitHeight = 389
-    end
     object Splitter3: TSplitter
       Left = 5
       Top = 411
@@ -58,12 +49,11 @@ object FrmWMITree: TFrmWMITree
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
-      ExplicitWidth = 1086
     end
     object TreeViewWmiClasses: TTreeView
       Left = 5
       Top = 34
-      Width = 912
+      Width = 1102
       Height = 377
       Align = alClient
       Images = ImageList1
@@ -74,23 +64,6 @@ object FrmWMITree: TFrmWMITree
       ExplicitWidth = 896
       ExplicitHeight = 339
     end
-    object MemoDescr: TMemo
-      Left = 922
-      Top = 34
-      Width = 185
-      Height = 377
-      Align = alRight
-      Font.Charset = ANSI_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'Consolas'
-      Font.Style = []
-      ParentFont = False
-      ScrollBars = ssBoth
-      TabOrder = 2
-      ExplicitLeft = 906
-      ExplicitHeight = 339
-    end
     object PanelClassInfo: TPanel
       Left = 5
       Top = 416
@@ -99,7 +72,7 @@ object FrmWMITree: TFrmWMITree
       Align = alBottom
       BevelOuter = bvNone
       BorderWidth = 5
-      TabOrder = 3
+      TabOrder = 2
       ExplicitTop = 378
       ExplicitWidth = 1086
       object PageControl2: TPageControl
@@ -113,7 +86,6 @@ object FrmWMITree: TFrmWMITree
         ExplicitWidth = 1076
         object TabSheetMOFClass: TTabSheet
           Caption = 'MOF Class Definition'
-          ExplicitWidth = 1068
           object MemoWmiMOF: TMemo
             Left = 0
             Top = 0
@@ -129,7 +101,6 @@ object FrmWMITree: TFrmWMITree
             ParentFont = False
             ScrollBars = ssBoth
             TabOrder = 0
-            ExplicitWidth = 1068
           end
         end
         object TabSheetXMLClass: TTabSheet
@@ -142,11 +113,12 @@ object FrmWMITree: TFrmWMITree
           object TreeView1: TTreeView
             Left = 0
             Top = 0
-            Width = 1068
+            Width = 1084
             Height = 182
             Align = alClient
             Indent = 19
             TabOrder = 0
+            ExplicitWidth = 1068
           end
         end
         object TabSheet3: TTabSheet
@@ -159,13 +131,13 @@ object FrmWMITree: TFrmWMITree
           object WebBrowserWmi: TWebBrowser
             Left = 0
             Top = 0
-            Width = 1068
+            Width = 1084
             Height = 182
             Align = alClient
             TabOrder = 0
-            ExplicitWidth = 962
+            ExplicitWidth = 1068
             ControlData = {
-              4C000000626E0000CF1200000000000000000000000000000000000000000000
+              4C00000009700000CF1200000000000000000000000000000000000000000000
               000000004C000000000000000000000001000000E0D057007335CF11AE690800
               2B2E12620A000000000000004C0000000114020000000000C000000000000046
               8000000000000000000000000000000000000000000000000000000000000000
@@ -182,7 +154,7 @@ object FrmWMITree: TFrmWMITree
           object MemoQualifiers: TMemo
             Left = 0
             Top = 0
-            Width = 1068
+            Width = 1084
             Height = 182
             Align = alClient
             Color = 4598550
@@ -209,7 +181,7 @@ object FrmWMITree: TFrmWMITree
     Left = 176
     Top = 128
     Bitmap = {
-      494C010107000800680010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010107000800700010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

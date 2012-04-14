@@ -45,11 +45,9 @@ type
   TWebBrowser=class(TVclStylesWebBrowser);
   TFrmWMITree = class(TForm)
     PanelTreeMain:  TPanel;
-    Splitter7:      TSplitter;
     Splitter3:      TSplitter;
     PanelLegend:    TPanel;
     TreeViewWmiClasses: TTreeView;
-    MemoDescr:      TMemo;
     PanelClassInfo: TPanel;
     PageControl2:   TPageControl;
     TabSheetMOFClass: TTabSheet;
@@ -66,12 +64,15 @@ type
     procedure TreeViewWmiClassesChange(Sender: TObject; xNode: TTreeNode);
     procedure FindDialog1Find(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
+    DataLoaded : Boolean;
     FSetMsg: TProcLog;
     FSetLog: TProcLog;
     procedure FreeTreeClasses;
     procedure LoadXMLWMIClass(const Xml: string);
     procedure DOMShow(ATree: TTreeView; Anode: IXMLNode; TNode: TTreeNode);
+    procedure LoadNameSpaces;
   public
     procedure LoadClassInfo(WmiMetaClassInfo : TWMiClassMetaData);
     property SetMsg : TProcLog read FSetMsg Write FSetMsg;
@@ -88,8 +89,7 @@ uses
   uSettings,
   uGlobals,
   ComObj,
-  StrUtils,
-  Main;
+  StrUtils;
 
 {$R *.dfm}
 
@@ -162,7 +162,7 @@ procedure TFrmWMITree.FormCreate(Sender: TObject);
   end;
 
 begin
-
+  DataLoaded :=False;
   AddImage(1, NamespaceImageIndex, 'Namespace');
   AddImage(2, ClassImageIndex, 'WMI Class');
   AddImage(3, MethodImageIndex, 'WMI Method');
@@ -178,6 +178,12 @@ end;
 procedure TFrmWMITree.FormDestroy(Sender: TObject);
 begin
   FreeTreeClasses;
+end;
+
+procedure TFrmWMITree.FormShow(Sender: TObject);
+begin
+ if not DataLoaded then
+  LoadNameSpaces;
 end;
 
 procedure TFrmWMITree.FreeTreeClasses;
@@ -203,6 +209,7 @@ begin
   try
     if Assigned(WmiMetaClassInfo)  then
     begin
+      if @FSetMsg<>nil then
       SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
       WebBrowserWmi.HandleNeeded;
@@ -298,9 +305,36 @@ begin
     end;
 
   finally
-    SetMsg('');
+    if @FSetMsg<>nil then
+      SetMsg('');
     //FrmMain.ProgressBarWmi.Visible := False;
   end;
+end;
+
+procedure TFrmWMITree.LoadNameSpaces;
+var
+ LIndex      : Integer;
+ FNameSpaces : TStrings;
+ Node        : TTreeNode;
+begin
+ FNameSpaces:=TStringList.Create;
+ try
+    FNameSpaces.AddStrings(CachedWMIClasses.NameSpaces);
+    TreeViewWmiClasses.Items.BeginUpdate;
+    try
+      for LIndex := 0 to FNameSpaces.Count - 1 do
+      begin
+        Node := TreeViewWmiClasses.Items.Add(nil, FNameSpaces[LIndex]);
+        Node.ImageIndex := NamespaceImageIndex;
+        Node.SelectedIndex := NamespaceImageIndex;
+      end;
+    finally
+      TreeViewWmiClasses.Items.EndUpdate;
+    end;
+ finally
+   FNameSpaces.Free;
+ end;
+ DataLoaded:=True;
 end;
 
 procedure TFrmWMITree.DOMShow(ATree: TTreeView; Anode: IXMLNode; TNode: TTreeNode);
@@ -449,7 +483,7 @@ begin
       ComboBoxClassesChange(ComboBoxClasses);
       }
       WMiClassMetaData:= CachedWMIClasses.GetWmiClass(Node.Parent.Text, Node.Text); //TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]);
-      MemoDescr.Lines.Text :=WMiClassMetaData.DescriptionEx;
+      //MemoDescr.Lines.Text :=WMiClassMetaData.DescriptionEx;
       LoadClassInfo(WMiClassMetaData);
       //GenerateConsoleCode(TWMiClassMetaData(ComboBoxClasses.Items.Objects[ComboBoxClasses.ItemIndex]));
     end

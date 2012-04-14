@@ -63,12 +63,15 @@ type
     procedure ComboBoxCondExit(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure EditValueEventExit(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FItem:      TListitem;
     FrmCodeEditorEvent  : TFrmCodeEditor;
     FSettings : TSettings;
     FSetLog: TProcLog;
     FConsole: TMemo;
+    DataLoaded : Boolean;
+    FSetMsg: TProcLog;
     procedure UMEditEventValue(var msg: TMessage); message UM_EDITEVENTVALUE;
     procedure UMEditEventCond(var msg: TMessage); message UM_EDITEVENTCOND;
     procedure LoadEventsInfo;
@@ -77,9 +80,11 @@ type
     procedure GenerateCode;
     procedure SetSettings(const Value: TSettings);
     procedure SetConsole(const Value: TMemo);
+    procedure LoadNameSpaces;
   public
     procedure LoadWmiEvents(const Namespace: string; FirstTime : Boolean=False);
     property Settings : TSettings read FSettings Write SetSettings;
+    property SetMsg : TProcLog read FSetMsg Write FSetMsg;
     property SetLog : TProcLog read FSetLog Write FSetLog;
     property Console : TMemo read FConsole write SetConsole;
   end;
@@ -148,7 +153,6 @@ begin
   TEdit(Sender).Visible := True;
 end;
 
-
 procedure TFrmWmiEvents.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Settings.LastWmiNameSpaceEvents:=ComboBoxNamespacesEvents.Text;
@@ -156,17 +160,23 @@ begin
   Settings.LastWmiEventIntrinsic:=RadioButtonIntrinsic.Checked;
   if RadioButtonIntrinsic.Checked then
    Settings.LastWmiEventTargetInstance:=ComboBoxTargetInstance.Text;
-
 end;
 
 procedure TFrmWmiEvents.FormCreate(Sender: TObject);
 begin
+  DataLoaded:=False;
   FrmCodeEditorEvent  := TFrmCodeEditor.Create(Self);
   FrmCodeEditorEvent.CodeGenerator:=GenerateCode;
   FrmCodeEditorEvent.Parent := PanelEventCode;
   FrmCodeEditorEvent.OldParent:= PanelEventCode;
   FrmCodeEditorEvent.Show;
   FrmCodeEditorEvent.SourceLanguage:=Lng_Delphi;
+end;
+
+procedure TFrmWmiEvents.FormShow(Sender: TObject);
+begin
+ if not DataLoaded then
+  LoadNameSpaces;
 end;
 
 procedure TFrmWmiEvents.GenerateCode;
@@ -195,7 +205,7 @@ begin
   Namespace := ComboBoxNamespacesEvents.Text;
   WmiEvent  := ComboBoxEvents.Text;
   WmiTargetInstance := ComboBoxTargetInstance.Text;
-
+  if @FSetLog<>nil then
   SetLog(Format('Generating code for %s:%s',[Namespace, WmiEvent]));
 
   if not TryStrToInt(EditEventWait.Text, PollSeconds) then
@@ -392,6 +402,19 @@ begin
    GenerateCode;
 end;
 
+
+procedure TFrmWmiEvents.LoadNameSpaces;
+begin
+  ComboBoxNamespacesEvents.Items.AddStrings(CachedWMIClasses.NameSpaces);
+
+  if Settings.LastWmiNameSpaceEvents<>'' then
+    ComboBoxNamespacesEvents.ItemIndex := ComboBoxNamespacesEvents.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
+  else
+    ComboBoxNamespacesEvents.ItemIndex := 0;
+
+  LoadWmiEvents(ComboBoxNamespacesEvents.Text, True);
+  DataLoaded:=True;
+end;
 
 procedure TFrmWmiEvents.LoadTargetInstanceProps;
 var
