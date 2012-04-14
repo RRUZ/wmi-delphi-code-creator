@@ -61,7 +61,6 @@ type
     DBGridWMI: TDBGrid;
     ClientDataSet1: TClientDataSet;
     DataSource1: TDataSource;
-    DBNavigator1: TDBNavigator;
     EditMachine: TEdit;
     Label2: TLabel;
     Label3: TLabel;
@@ -122,6 +121,8 @@ type
     FMachine: string;
     FPassword: string;
     FSettings : TSettings;
+    FSetMsg: TProcLog;
+    FSetLog: TProcLog;
     procedure SetNameSpaces(const Value: TStrings);
     function GetNameSpaces: TStrings;
     procedure CreateStructure;
@@ -137,12 +138,13 @@ type
     procedure LoadNamespaces;
 
   public
-    procedure SetNameSpaceIndex(Index : integer);
-    property Log   : TProcLog read FLog write FLog;
+    property SetLog : TProcLog read FSetLog Write FSetLog;
+
     property NameSpaces : TStrings read GetNameSpaces Write SetNameSpaces;
     property User : string read FUser write SetUser;
     property Password : string read FPassword write SetPassWord;
     property Machine  : string read FMachine write SetMachine;
+    procedure SetNameSpaceIndex(Index : integer);
   end;
 
 
@@ -495,7 +497,7 @@ begin
       except
         on E: EOleSysError do
           if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-            Log(Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
+            SetLog(Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
           else
             raise;
       end;
@@ -585,13 +587,13 @@ begin
       begin
           Perform(WM_PAINT, 0, 0);
           MsgWarning(Format('EOleException %s %x', [E.Message,E.ErrorCode]));
-          Log(Format('EOleException %s %x', [E.Message,E.ErrorCode]));
+          SetLog(Format('EOleException %s %x', [E.Message,E.ErrorCode]));
       end;
       on E:Exception do
       begin
           Perform(WM_PAINT, 0, 0);
           MsgWarning(E.Classname + ':' + E.Message);
-          Log(E.Classname + ':' + E.Message);
+          SetLog(E.Classname + ':' + E.Message);
       end;
     end;
 

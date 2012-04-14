@@ -62,7 +62,6 @@ type
     procedure SetSettings(const Value: TSettings);
     procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
     procedure LoadNameSpaces;
-
   public
     property SetMsg : TProcLog read FSetMsg Write FSetMsg;
     property SetLog : TProcLog read FSetLog Write FSetLog;
@@ -328,13 +327,11 @@ var
   WmiMetaClassInfo : TWMiClassMetaData;
 begin
   if ComboBoxClasses.ItemIndex=-1 then exit;
-
   try
     WmiMetaClassInfo:=CachedWMIClasses.GetWmiClass(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
 
     if Assigned(WmiMetaClassInfo) then
     begin
-     if @FSetMsg<>nil then
        SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
       MemoClassDescr.Text :=  WmiMetaClassInfo.Description;
       if MemoClassDescr.Text = '' then
@@ -379,7 +376,6 @@ procedure TFrmWmiClasses.LoadWmiClasses(const Namespace: string);
 var
   FClasses: TStringList;
 begin
- if @FSetMsg<>nil then
   SetMsg(Format('Loading Classes of %s', [Namespace]));
 
   FClasses := TStringList.Create;
@@ -422,7 +418,6 @@ begin
   finally
     FClasses.Free;//New ¡¡¡ Added without FrmWMIExplorer
   end;
-  if @FSetMsg<>nil then
    SetMsg('');
 end;
 
@@ -453,8 +448,7 @@ begin
     ListViewProperties.Items.EndUpdate;
   end;
 
-  if @FSetMsg<>nil then
-    SetMsg('');
+  SetMsg('');
 
   for LIndex := 0 to ListViewProperties.Columns.Count - 1 do
     AutoResizeColumn(ListViewProperties.Column[LIndex]);

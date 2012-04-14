@@ -1,6 +1,6 @@
 object FrmWMISQL: TFrmWMISQL
-  Left = 598
-  Top = 197
+  Left = 485
+  Top = 215
   BorderStyle = bsNone
   Caption = 'FrmWMISQL'
   ClientHeight = 545
@@ -173,7 +173,7 @@ object FrmWMISQL: TFrmWMISQL
       TabOrder = 0
       object SynEditWQL: TSynEdit
         Left = 1
-        Top = 1
+        Top = 58
         Width = 640
         Height = 126
         Align = alClient
@@ -191,21 +191,23 @@ object FrmWMISQL: TFrmWMISQL
         Gutter.Font.Style = []
         Gutter.ShowLineNumbers = True
         Highlighter = SynSQLSyn1
+        ExplicitTop = 1
       end
       object PanelNav: TPanel
         Left = 1
-        Top = 127
+        Top = 1
         Width = 640
         Height = 57
-        Align = alBottom
+        Align = alTop
         BevelOuter = bvNone
         TabOrder = 1
+        ExplicitTop = 20
         object Label2: TLabel
           Left = 8
           Top = 6
-          Width = 39
+          Width = 22
           Height = 13
-          Caption = 'Machine'
+          Caption = 'Host'
         end
         object Label3: TLabel
           Left = 135
@@ -231,22 +233,12 @@ object FrmWMISQL: TFrmWMISQL
           Images = ImageList1
           TabOrder = 0
         end
-        object DBNavigator1: TDBNavigator
-          Left = 480
-          Top = 22
-          Width = 104
-          Height = 25
-          DataSource = DataSource1
-          VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast]
-          Kind = dbnHorizontal
-          TabOrder = 1
-        end
         object EditMachine: TEdit
           Left = 8
           Top = 25
           Width = 121
           Height = 21
-          TabOrder = 2
+          TabOrder = 1
           Text = 'localhost'
           OnExit = EditMachineExit
         end
@@ -255,7 +247,7 @@ object FrmWMISQL: TFrmWMISQL
           Top = 25
           Width = 121
           Height = 21
-          TabOrder = 3
+          TabOrder = 2
           OnExit = EditUserExit
         end
         object EditPassword: TEdit
@@ -264,7 +256,7 @@ object FrmWMISQL: TFrmWMISQL
           Width = 121
           Height = 21
           PasswordChar = '*'
-          TabOrder = 4
+          TabOrder = 3
           OnExit = EditPasswordExit
         end
         object CheckBoxAsync: TCheckBox
@@ -275,7 +267,7 @@ object FrmWMISQL: TFrmWMISQL
           Caption = 'Run in Async mode'
           Checked = True
           State = cbChecked
-          TabOrder = 5
+          TabOrder = 4
         end
       end
     end
@@ -361,7 +353,7 @@ object FrmWMISQL: TFrmWMISQL
     Left = 128
     Top = 296
     Bitmap = {
-      494C010101000800280010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010101000800300010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000010D0434052D0DD9042F
       0FFD041909B70005012600000000000000000000000000000000000000000000

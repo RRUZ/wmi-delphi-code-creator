@@ -79,13 +79,14 @@ uses
   uWmi_Metadata,
   uLog,
   uGlobals,
-  uSqlWMI,
+  uSqlWMIContainer,
   uWmiClasses,
   uWmiDatabase,
   uWmiClassTree,
   uWmiEvents,
   uWmiMethods,
   uWmiTree,
+  uWmiInfo,
   ComObj,
   ShellApi,
   uStdActionsPopMenu,
@@ -103,6 +104,9 @@ begin
 end;
 
 procedure TFrmMain.FormCreate(Sender: TObject);
+Var
+ LNameSpaces : TStrings;
+ LIndex      : Integer;
 begin
   {$WARN SYMBOL_PLATFORM OFF}
   ReportMemoryLeaksOnShutdown:=DebugHook<>0;
@@ -148,18 +152,30 @@ begin
 
   end;
 
-  RegisterTask('','Code Generation', 30, nil);
-  RegisterTask('Code Generation','WMI Class Code Generation', 40, Ctx.GetType(TFrmWmiClasses));
-  RegisterTask('Code Generation','WMI Methods Code Generation', 41,  Ctx.GetType(TFrmWmiMethods));
-  RegisterTask('Code Generation','WMI Events Code Generation', 45, Ctx.GetType(TFrmWmiEvents));
-  RegisterTask('','WMI Explorer', 29, Ctx.GetType(TFrmWMITree));
+  //RegisterTask('','Code Generation', 30, nil);
+  RegisterTask('','WMI Class Code Generation', 40, Ctx.GetType(TFrmWmiClasses));
+  RegisterTask('','WMI Methods Code Generation', 41,  Ctx.GetType(TFrmWmiMethods));
+  RegisterTask('','WMI Events Code Generation', 45, Ctx.GetType(TFrmWmiEvents));
+  //RegisterTask('','WMI Explorer', 29, Ctx.GetType(TFrmWMITree));
   RegisterTask('','WMI Classes Tree', 43, Ctx.GetType(TFrmWmiClassTree));
   RegisterTask('','WMI Finder', 57, Ctx.GetType(TFrmWmiDatabase));
-  RegisterTask('','WQL', 56, Ctx.GetType(TFrmWMISQL));
+  RegisterTask('','WQL', 56, Ctx.GetType(TFrmSqlWMIContainer));
   RegisterTask('','Events Monitor', 28, nil);
   RegisterTask('','Log', 32, Ctx.GetType(TFrmLog));
+  RegisterTask('','WMI Metadata', 31, Ctx.GetType(TFrmWMIInfo));
 
-  TreeViewTasks.Items[0].Expand(True);
+  try
+    LNameSpaces:=TStringList.Create;
+    LNameSpaces.AddStrings(CachedWMIClasses.NameSpaces);
+    for LIndex := 0 to LNameSpaces.Count-1 do
+      RegisterTask('WMI Metadata', LNameSpaces[LIndex], 60, Ctx.GetType(TFrmWMITree));
+  finally
+    LNameSpaces.Free;
+  end;
+
+
+  TreeViewTasks.FullExpand;
+  TreeViewTasks.Selected:=TreeViewTasks.Items[0];
 
   MemoConsole.Color:=Settings.BackGroundColor;
   MemoConsole.Font.Color:=Settings.ForeGroundColor;
@@ -308,6 +324,11 @@ begin
         if LRttiProperty<>nil then
          LRttiProperty.SetValue(LForm, FSettings);
 
+        LRttiProperty:=LRttiInstanceType.GetProperty('NameSpace');
+        if LRttiProperty<>nil then
+         LRttiProperty.SetValue(LForm, Node.Text);
+
+
         LForm.Show;
         RegisteredInstances.Add(Node.Text, LForm);
      end;
@@ -320,8 +341,8 @@ initialization
 
 if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then
  TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TScrollingStyleHook);
-
+    {
   TCustomStyleEngine.RegisterStyleHook(TCustomTabControl, TTabColorControlStyleHook);
   TCustomStyleEngine.RegisterStyleHook(TTabControl, TTabColorControlStyleHook);
-
+    }
 end.
