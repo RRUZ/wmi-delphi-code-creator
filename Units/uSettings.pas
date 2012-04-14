@@ -26,7 +26,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
-  SynEditHighlighter, SynHighlighterPas, uCheckUpdate, SynHighlighterCpp, Vcl.Styles.Ext,
+  SynEditHighlighter, SynHighlighterPas, uCheckUpdate, SynHighlighterCpp, Vcl.Styles.Ext,Vcl.Styles.ColorTabs,
   SynHighlighterCS, Vcl.ExtDlgs, SynHighlighterSQL;
 
 type
@@ -160,7 +160,6 @@ type
     Label12: TLabel;
     Label13: TLabel;
     EditAStyle: TEdit;
-    Panel3: TPanel;
     PageControl2: TPageControl;
     TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;

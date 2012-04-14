@@ -49,7 +49,9 @@ type
     procedure ListViewPropertiesClick(Sender: TObject);
     procedure CheckBoxSelAllPropsClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormShow(Sender: TObject);
   private
+    DataLoaded : Boolean;
     FSetMsg: TProcLog;
     FSetLog: TProcLog;
     FrmCodeEditor         : TFrmCodeEditor;
@@ -59,12 +61,14 @@ type
     procedure SetConsole(const Value: TMemo);
     procedure SetSettings(const Value: TSettings);
     procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
+    procedure LoadNameSpaces;
+
   public
     property SetMsg : TProcLog read FSetMsg Write FSetMsg;
     property SetLog : TProcLog read FSetLog Write FSetLog;
-    property Settings : TSettings read FSettings Write SetSettings;
     property Console : TMemo read FConsole write SetConsole;
 
+    property  Settings : TSettings read FSettings Write  SetSettings;
     procedure LoadWmiClasses(const Namespace: string);
     procedure LoadClassInfo;
     procedure GetValuesWmiProperties(const Namespace, WmiClass: string);
@@ -125,12 +129,13 @@ end;
 
 procedure TFrmWmiClasses.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  Settings.LastWmiNameSpace:=ComboBoxNameSpaces.Text;
-  Settings.LastWmiClass:=ComboBoxClasses.Text;
+  FSettings.LastWmiNameSpace:=ComboBoxNameSpaces.Text;
+  FSettings.LastWmiClass:=ComboBoxClasses.Text;
 end;
 
 procedure TFrmWmiClasses.FormCreate(Sender: TObject);
 begin
+  DataLoaded:=False;
   FrmCodeEditor  := TFrmCodeEditor.Create(Self);
   FrmCodeEditor.CodeGenerator:=GenerateCode;
   FrmCodeEditor.Parent := PanelCode;
@@ -141,6 +146,12 @@ begin
   //FrmCodeEditor.Settings:=Settings;
   //FrmCodeEditor.Console:=MemoConsole;
   FrmCodeEditor.SourceLanguage:=Lng_Delphi;
+end;
+
+procedure TFrmWmiClasses.FormShow(Sender: TObject);
+begin
+ if not DataLoaded then
+  LoadNameSpaces;
 end;
 
 procedure TFrmWmiClasses.GenerateCode;
@@ -159,6 +170,7 @@ var
 begin
   if not Assigned(WmiMetaClassInfo) then Exit;
 
+  if @FSetLog<>nil then
   SetLog(Format('Generating code for %s:%s',[WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
   //Object Pascal console Code
@@ -186,8 +198,8 @@ begin
                     WmiCodeGenerator:=TDelphiWmiClassCodeGenerator.Create;
                     try
                       WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      WmiCodeGenerator.UseHelperFunctions:=Settings.DelphiWmiClassHelperFuncts;
-                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiClassCodeGenMode);
+                      WmiCodeGenerator.UseHelperFunctions:=FSettings.DelphiWmiClassHelperFuncts;
+                      WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(FSettings.DelphiWmiClassCodeGenMode);
                       WmiCodeGenerator.GenerateCode(Props);
                       FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
@@ -201,7 +213,7 @@ begin
                     WmiCodeGenerator:=TFPCWmiClassCodeGenerator.Create;
                     try
                       WmiCodeGenerator.WMiClassMetaData  :=WmiMetaClassInfo;
-                      WmiCodeGenerator.UseHelperFunctions:=Settings.FPCWmiClassHelperFuncts;
+                      WmiCodeGenerator.UseHelperFunctions:=FSettings.FPCWmiClassHelperFuncts;
                       WmiCodeGenerator.GenerateCode(Props);
                       FrmCodeEditor.SourceCode:=WmiCodeGenerator.OutPutCode;
                     finally
@@ -322,7 +334,8 @@ begin
 
     if Assigned(WmiMetaClassInfo) then
     begin
-      SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
+     if @FSetMsg<>nil then
+       SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
       MemoClassDescr.Text :=  WmiMetaClassInfo.Description;
       if MemoClassDescr.Text = '' then
         MemoClassDescr.Text := 'Class without description available';
@@ -330,14 +343,43 @@ begin
       LoadWmiProperties(WmiMetaClassInfo);
     end;
   finally
-    SetMsg('');
+    if @FSetMsg<>nil then
+      SetMsg('');
   end;
+end;
+
+procedure TFrmWmiClasses.LoadNameSpaces;
+var
+ FNameSpaces : TStrings;
+begin
+ FNameSpaces:=TStringList.Create;
+ try
+   FNameSpaces.AddStrings(CachedWMIClasses.NameSpaces);
+   ComboBoxNameSpaces.Items.AddStrings(FNameSpaces);
+
+    if FSettings.LastWmiNameSpace<>'' then
+      ComboBoxNameSpaces.ItemIndex := ComboBoxNameSpaces.Items.IndexOf(FSettings.LastWmiNameSpace)
+    else
+      ComboBoxNameSpaces.ItemIndex := 0;
+
+    LoadWmiClasses(ComboBoxNameSpaces.Text);
+    if FSettings.LastWmiClass<>'' then
+      ComboBoxClasses.ItemIndex := ComboBoxClasses.Items.IndexOf(FSettings.LastWmiClass)
+    else
+      ComboBoxClasses.ItemIndex := 0;
+
+    LoadClassInfo;
+ finally
+   FNameSpaces.Free;
+ end;
+ DataLoaded:=True;
 end;
 
 procedure TFrmWmiClasses.LoadWmiClasses(const Namespace: string);
 var
   FClasses: TStringList;
 begin
+ if @FSetMsg<>nil then
   SetMsg(Format('Loading Classes of %s', [Namespace]));
 
   FClasses := TStringList.Create;
@@ -356,8 +398,11 @@ begin
       except
         on E: EOleSysError do
           if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-            SetLog(
-              Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
+          begin
+            if @FSetLog<>nil then
+              SetLog(
+                Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
+          end
           else
             raise;
       end;
@@ -377,8 +422,8 @@ begin
   finally
     FClasses.Free;//New ¡¡¡ Added without FrmWMIExplorer
   end;
-
-  SetMsg('');
+  if @FSetMsg<>nil then
+   SetMsg('');
 end;
 
 
@@ -407,7 +452,9 @@ begin
   finally
     ListViewProperties.Items.EndUpdate;
   end;
-  SetMsg('');
+
+  if @FSetMsg<>nil then
+    SetMsg('');
 
   for LIndex := 0 to ListViewProperties.Columns.Count - 1 do
     AutoResizeColumn(ListViewProperties.Column[LIndex]);
@@ -431,8 +478,8 @@ begin
   FrmCodeEditor.Settings:=Value;
   FrmCodeEditor.SourceLanguage:=TSourceLanguages(Value.DefaultLanguage);
 
-  LoadCurrentTheme(FrmCodeEditor, Settings.CurrentTheme);
-  LoadCurrentThemeFont(FrmCodeEditor ,Settings.FontName,Settings.FontSize);
+  LoadCurrentTheme(FrmCodeEditor, FSettings.CurrentTheme);
+  LoadCurrentThemeFont(FrmCodeEditor ,FSettings.FontName,FSettings.FontSize);
 end;
 
 

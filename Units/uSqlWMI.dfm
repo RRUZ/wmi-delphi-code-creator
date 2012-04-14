@@ -1,6 +1,6 @@
 object FrmWMISQL: TFrmWMISQL
-  Left = 0
-  Top = 0
+  Left = 598
+  Top = 197
   BorderStyle = bsNone
   Caption = 'FrmWMISQL'
   ClientHeight = 545
@@ -14,6 +14,7 @@ object FrmWMISQL: TFrmWMISQL
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter2: TSplitter
@@ -33,7 +34,6 @@ object FrmWMISQL: TFrmWMISQL
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 432
     DesignSize = (
       301
       545)
@@ -122,7 +122,6 @@ object FrmWMISQL: TFrmWMISQL
       TabOrder = 4
       ViewStyle = vsReport
       OnClick = ListViewPropertiesClick
-      ExplicitHeight = 270
     end
     object CheckBoxSelAllProps: TCheckBox
       Left = 10
@@ -145,7 +144,6 @@ object FrmWMISQL: TFrmWMISQL
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
-    ExplicitHeight = 432
     object Splitter1: TSplitter
       Left = 5
       Top = 190
@@ -306,7 +304,6 @@ object FrmWMISQL: TFrmWMISQL
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 2
-      ExplicitTop = 344
       object Memo1: TMemo
         Left = 0
         Top = 0
@@ -321,10 +318,6 @@ object FrmWMISQL: TFrmWMISQL
         ParentFont = False
         ScrollBars = ssBoth
         TabOrder = 0
-        ExplicitLeft = 5
-        ExplicitTop = 5
-        ExplicitWidth = 632
-        ExplicitHeight = 73
       end
     end
   end
@@ -368,7 +361,7 @@ object FrmWMISQL: TFrmWMISQL
     Left = 128
     Top = 296
     Bitmap = {
-      494C010101000800200010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010101000800280010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000010D0434052D0DD9042F
       0FFD041909B70005012600000000000000000000000000000000000000000000

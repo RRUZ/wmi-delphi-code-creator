@@ -1,6 +1,6 @@
 object FrmWmiMethods: TFrmWmiMethods
-  Left = 0
-  Top = 0
+  Left = 429
+  Top = 298
   BorderStyle = bsNone
   ClientHeight = 504
   ClientWidth = 998
@@ -13,6 +13,7 @@ object FrmWmiMethods: TFrmWmiMethods
   OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter5: TSplitter

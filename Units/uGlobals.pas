@@ -33,12 +33,18 @@ type
  TWmiClassesDictionary = TDictionary<string, TWmiClassesList>;
  TCachedWMIClasses=class
   strict private
+    class var FNameSpaces : TStrings;
     class var FRegisteredNameSpaces: TWmiClassesDictionary;
+    class constructor Create;
     class destructor Destroy;
     class function RegisterWmiClass(const NameSpace, WmiClass: string): TWMiClassMetaData;
+  private
+    class function GetNameSpaces: TStrings; static;
   public
     class property RegisteredNameSpaces: TWmiClassesDictionary read FRegisteredNameSpaces;
     class function GetWmiClass(const NameSpace, WmiClass: string) : TWMiClassMetaData;
+
+    class property NameSpaces : TStrings read GetNameSpaces;
  end;
 
 var
@@ -47,17 +53,39 @@ var
 implementation
 
 uses
+ uSettings,
  SysUtils;
 
 
 { TCachedWMIWmiNameSpaces }
+class constructor TCachedWMIClasses.Create;
+begin
+ FNameSpaces:=TStringList.Create;
+ FRegisteredNameSpaces:=nil;
+end;
+
 class destructor TCachedWMIClasses.Destroy;
 var
   LItem: TPair<string, TWmiClassesList>;
 begin
+  FNameSpaces.Free;
+  if FRegisteredNameSpaces<>nil then
   for LItem in FRegisteredNameSpaces do
     LItem.Value.Free;
   FreeAndNil(FRegisteredNameSpaces);
+end;
+
+class function TCachedWMIClasses.GetNameSpaces: TStrings;
+begin
+  if not ExistWmiNameSpaceCache then
+  begin
+    GetListWMINameSpaces('root', FNameSpaces);
+    SaveWMINameSpacesToCache(FNameSpaces);
+  end
+  else
+    LoadWMINameSpacesFromCache(FNameSpaces);
+
+   Result:=FNameSpaces;
 end;
 
 class function TCachedWMIClasses.GetWmiClass(
@@ -105,6 +133,17 @@ begin
   end;
 
 end;
+
+{
+        if not ExistWmiNameSpaceCache then
+        begin
+          GetListWMINameSpaces('root', FNameSpaces);
+          SaveWMINameSpacesToCache(FNameSpaces);
+        end
+        else
+          LoadWMINameSpacesFromCache(FNameSpaces);
+
+}
 
 initialization
   CachedWMIClasses:=TCachedWMIClasses.Create;

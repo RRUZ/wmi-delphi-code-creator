@@ -28,8 +28,8 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Datasnap.DBClient, Vcl.Grids, Generics.Collections,
   Vcl.DBGrids, Vcl.StdCtrls, SynEditHighlighter, SynHighlighterSQL, uMisc, ActiveX,
   Vcl.ExtCtrls, SynEdit, uSynEditPopupEdit, uComboBox, Vcl.DBCtrls,
-  SynCompletionProposal, Vcl.ComCtrls, uWmi_Metadata,
- Vcl.ImgList, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan,
+  SynCompletionProposal, Vcl.ComCtrls, uWmi_Metadata, uSettings,
+  Vcl.ImgList, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan,
   Vcl.Menus, Vcl.ActnPopup;
 
 type
@@ -40,6 +40,7 @@ type
    end;
 
   TFrmWMISQL = class(TForm)
+    procedure FormShow(Sender: TObject);
    type
       TWMIPropData = class
       private
@@ -115,10 +116,12 @@ type
     oEnum         : IEnumvariant;
     iValue        : LongWord;
     FRunningWQL   : Boolean;
+    DataLoaded : Boolean;
     FLog: TProcLog;
     FUser: string;
     FMachine: string;
     FPassword: string;
+    FSettings : TSettings;
     procedure SetNameSpaces(const Value: TStrings);
     function GetNameSpaces: TStrings;
     procedure CreateStructure;
@@ -131,6 +134,8 @@ type
     procedure GenerateSqlCode;
     procedure LoadProposal(WmiMetaClassInfo : TWMiClassMetaData);
     procedure SetMsg(const Msg : string);
+    procedure LoadNamespaces;
+
   public
     procedure SetNameSpaceIndex(Index : integer);
     property Log   : TProcLog read FLog write FLog;
@@ -149,7 +154,6 @@ uses
  uGlobals,
  uListView_Helper,
  MidasLib,
- uSettings,
  uOleVariantEnum,
  Vcl.Styles,
  Vcl.Themes,
@@ -316,16 +320,29 @@ end;
 
 procedure TFrmWMISQL.FormCreate(Sender: TObject);
 begin
+  DataLoaded :=False;
+  FSettings:=TSettings.Create;
   FRunningWQL:=False;
   FUser:='';
   FPassword:='';
   FMachine:='localhost';
   FFields:=TObjectList<TWMIPropData>.Create(True);
+
+  ReadSettings(FSettings);
+  LoadCurrentTheme(Self, FSettings.CurrentTheme);
+  LoadCurrentThemeFont(Self, FSettings.FontName, FSettings.FontSize);
 end;
 
 procedure TFrmWMISQL.FormDestroy(Sender: TObject);
 begin
+  FSettings.Free;
   FFields.Free;
+end;
+
+procedure TFrmWMISQL.FormShow(Sender: TObject);
+begin
+ if not DataLoaded then
+  LoadNamespaces;
 end;
 
 procedure TFrmWMISQL.GenerateSqlCode;
@@ -435,6 +452,14 @@ begin
     //SetMsg('');
   end;
 end;
+
+procedure TFrmWMISQL.LoadNamespaces;
+begin
+ NameSpaces:=CachedWMIClasses.NameSpaces;
+ SetNameSpaceIndex(0);
+ DataLoaded:=True;
+end;
+
 
 procedure TFrmWMISQL.LoadProposal(WmiMetaClassInfo : TWMiClassMetaData);
 var

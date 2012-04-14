@@ -14,6 +14,7 @@ object FrmWmiClassTree: TFrmWmiClassTree
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnShow = FormShow
   DesignSize = (
     534
     507)

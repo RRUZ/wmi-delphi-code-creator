@@ -1,0 +1,33 @@
+object FrmLog: TFrmLog
+  Left = 631
+  Top = 226
+  BorderStyle = bsNone
+  Caption = 'Log'
+  ClientHeight = 503
+  ClientWidth = 859
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object MemoLog: TMemo
+    Left = 0
+    Top = 0
+    Width = 859
+    Height = 503
+    Align = alClient
+    Color = clBlack
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -12
+    Font.Name = 'Consolas'
+    Font.Style = []
+    ParentFont = False
+    ScrollBars = ssBoth
+    TabOrder = 0
+  end
+end

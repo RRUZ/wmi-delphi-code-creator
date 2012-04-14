@@ -1,6 +1,6 @@
 object FrmWmiClasses: TFrmWmiClasses
-  Left = 0
-  Top = 0
+  Left = 479
+  Top = 161
   BorderStyle = bsNone
   ClientHeight = 635
   ClientWidth = 1113
@@ -13,6 +13,7 @@ object FrmWmiClasses: TFrmWmiClasses
   OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
@@ -157,7 +158,7 @@ object FrmWmiClasses: TFrmWmiClasses
     Left = 423
     Top = 198
     Bitmap = {
-      494C010103007800340210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010103007800440210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       00030B140B72414841F6606360FE676967FF686968FF365D38EF264727CE6263
