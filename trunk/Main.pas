@@ -172,10 +172,8 @@ begin
     LNameSpaces.Free;
   end;
 
-
   TreeViewTasks.FullExpand;
   //TreeViewTasks.Selected:=TreeViewTasks.Items[0];
-
   MemoConsole.Color:=Settings.BackGroundColor;
   MemoConsole.Font.Color:=Settings.ForeGroundColor;
   MemoLog.Color:=MemoConsole.Color;
@@ -333,7 +331,6 @@ begin
         LRttiProperty:=LRttiInstanceType.GetProperty('NameSpace');
         if LRttiProperty<>nil then
          LRttiProperty.SetValue(LForm, Node.Text);
-
 
         LForm.Show;
         RegisteredInstances.Add(Node.Text, LForm);
