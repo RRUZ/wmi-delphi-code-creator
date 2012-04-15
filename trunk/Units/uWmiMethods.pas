@@ -179,6 +179,9 @@ end;
 
 procedure TFrmWmiMethods.GenerateCode;
 begin
+   if (Parent<>nil) and (Parent is TTabSheet) then
+     TTabSheet(Parent).Caption:=Format('WMI Methods %s CodeGen',[FrmCodeEditorMethod.ComboBoxLanguageSel.Text]);;
+
     if ComboBoxClassesMethods.ItemIndex>=0 then
       GenerateMethodInvoker(CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text,ComboBoxClassesMethods.Text));
 end;

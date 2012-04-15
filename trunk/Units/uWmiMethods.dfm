@@ -33,7 +33,6 @@ object FrmWmiMethods: TFrmWmiMethods
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 504
     DesignSize = (
       393
       533)
@@ -136,7 +135,6 @@ object FrmWmiMethods: TFrmWmiMethods
       TabOrder = 6
       ViewStyle = vsReport
       OnClick = ListViewMethodsParamsClick
-      ExplicitHeight = 247
     end
     object MemoMethodDescr: TMemo
       Left = 11
@@ -166,7 +164,6 @@ object FrmWmiMethods: TFrmWmiMethods
       Caption = 'Generate Code'
       TabOrder = 8
       OnClick = ButtonGenerateCodeInvokerClick
-      ExplicitTop = 469
     end
     object ComboBoxPaths: TComboBox
       Left = 103
@@ -197,6 +194,5 @@ object FrmWmiMethods: TFrmWmiMethods
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
-    ExplicitHeight = 504
   end
 end

@@ -1,9 +1,9 @@
-object FrmWMiClassesContainer: TFrmWMiClassesContainer
-  Left = 465
-  Top = 182
-  Caption = 'FrmWMiClassesContainer'
-  ClientHeight = 597
-  ClientWidth = 984
+object FrmWmiEventsContainer: TFrmWmiEventsContainer
+  Left = 326
+  Top = 122
+  Caption = 'FrmWmiEventsContainer'
+  ClientHeight = 637
+  ClientWidth = 1289
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,7 +18,7 @@ object FrmWMiClassesContainer: TFrmWMiClassesContainer
   object ActionToolBar1: TActionToolBar
     Left = 0
     Top = 0
-    Width = 984
+    Width = 1289
     Height = 26
     ActionManager = ActionManager1
     Caption = 'ActionToolBar1'
@@ -34,15 +34,17 @@ object FrmWMiClassesContainer: TFrmWMiClassesContainer
     Font.Style = []
     ParentFont = False
     Spacing = 0
+    ExplicitWidth = 984
   end
   object PageControl1: TPageControl
     Left = 0
     Top = 26
-    Width = 984
-    Height = 571
+    Width = 1289
+    Height = 611
     Align = alClient
     TabOrder = 1
-    ExplicitTop = 32
+    ExplicitWidth = 984
+    ExplicitHeight = 571
   end
   object ActionManager1: TActionManager
     ActionBars = <

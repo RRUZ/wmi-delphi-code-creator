@@ -44,7 +44,6 @@ const
 type
   TWebBrowser=class(TVclStylesWebBrowser);
   TFrmWMITree = class(TForm)
-    PanelTreeMain:  TPanel;
     Splitter3:      TSplitter;
     PanelLegend:    TPanel;
     TreeViewWmiClasses: TTreeView;
