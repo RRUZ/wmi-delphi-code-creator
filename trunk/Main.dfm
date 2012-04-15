@@ -20,6 +20,7 @@ object FrmMain: TFrmMain
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object PanelMain: TPanel
@@ -95,6 +96,10 @@ object FrmMain: TFrmMain
         object TabSheet2: TTabSheet
           Caption = 'Log'
           ImageIndex = 35
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object MemoLog: TMemo
             Left = 0
             Top = 0
@@ -230,7 +235,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C010148007800BC0210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010148007800C40210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003001000001002000000000000030
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

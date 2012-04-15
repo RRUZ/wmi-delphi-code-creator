@@ -1,9 +1,9 @@
-object FrmSqlWMIContainer: TFrmSqlWMIContainer
-  Left = 413
-  Top = 179
-  Caption = 'FrmSqlWMIContainer'
-  ClientHeight = 576
-  ClientWidth = 1207
+object FrmWMiClassesContainer: TFrmWMiClassesContainer
+  Left = 465
+  Top = 182
+  Caption = 'FrmWMiClassesContainer'
+  ClientHeight = 597
+  ClientWidth = 984
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,7 +18,7 @@ object FrmSqlWMIContainer: TFrmSqlWMIContainer
   object ActionToolBar1: TActionToolBar
     Left = 0
     Top = 0
-    Width = 1207
+    Width = 984
     Height = 26
     ActionManager = ActionManager1
     Caption = 'ActionToolBar1'
@@ -38,18 +38,49 @@ object FrmSqlWMIContainer: TFrmSqlWMIContainer
   object PageControl1: TPageControl
     Left = 0
     Top = 26
-    Width = 1207
-    Height = 550
+    Width = 984
+    Height = 571
     Align = alClient
     TabOrder = 1
-    ExplicitTop = 32
+  end
+  object ActionManager1: TActionManager
+    ActionBars = <
+      item
+        Items = <
+          item
+            Action = ActionNew
+            Caption = '&New'
+            ImageIndex = 2
+          end
+          item
+            Action = ActionDelete
+            Caption = '&Delete'
+            ImageIndex = 3
+          end>
+        ActionBar = ActionToolBar1
+      end>
+    Images = ImageList1
+    Left = 192
+    Top = 120
+    StyleName = 'Platform Default'
+    object ActionNew: TAction
+      Caption = 'New'
+      ImageIndex = 2
+      OnExecute = ActionNewExecute
+    end
+    object ActionDelete: TAction
+      Caption = 'Delete'
+      ImageIndex = 3
+      OnExecute = ActionDeleteExecute
+      OnUpdate = ActionDeleteUpdate
+    end
   end
   object ImageList1: TImageList
     ColorDepth = cd32Bit
     Left = 208
     Top = 248
     Bitmap = {
-      494C010104000800280010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010104000800300010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -319,37 +350,5 @@ object FrmSqlWMIContainer: TFrmSqlWMIContainer
       0000800000000000F81F000000000000F81F000000000000F81F008000000000
       F81F81C100000000F81FC3E3FFFFFFFF00000000000000000000000000000000
       000000000000}
-  end
-  object ActionManager1: TActionManager
-    ActionBars = <
-      item
-        Items = <
-          item
-            Action = ActionNew
-            Caption = '&New'
-            ImageIndex = 2
-          end
-          item
-            Action = ActionDelete
-            Caption = '&Delete'
-            ImageIndex = 3
-          end>
-        ActionBar = ActionToolBar1
-      end>
-    Images = ImageList1
-    Left = 264
-    Top = 224
-    StyleName = 'Platform Default'
-    object ActionNew: TAction
-      Caption = 'New'
-      ImageIndex = 2
-      OnExecute = ActionNewExecute
-    end
-    object ActionDelete: TAction
-      Caption = 'Delete'
-      ImageIndex = 3
-      OnExecute = ActionDeleteExecute
-      OnUpdate = ActionDeleteUpdate
-    end
   end
 end

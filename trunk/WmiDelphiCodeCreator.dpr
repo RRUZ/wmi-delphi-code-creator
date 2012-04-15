@@ -62,7 +62,8 @@ uses
   uLog in 'Units\uLog.pas' {FrmLog},
   Vcl.Styles.ColorTabs in 'Units\Vcl.Styles.Utils\Vcl.Styles.ColorTabs.pas',
   uSqlWMIContainer in 'Units\uSqlWMIContainer.pas' {FrmSqlWMIContainer},
-  uWmiInfo in 'Units\uWmiInfo.pas' {FrmWMIInfo};
+  uWmiInfo in 'Units\uWmiInfo.pas' {FrmWMIInfo},
+  uWMIClassesContainer in 'Units\uWMIClassesContainer.pas' {FrmWMiClassesContainer};
 
 {$R *.res}
 

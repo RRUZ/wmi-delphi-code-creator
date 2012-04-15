@@ -336,6 +336,12 @@ begin
       TreeViewWmiClasses.Items.EndUpdate;
     end;
 
+    if TreeViewWmiClasses.Items.Count>0 then
+    begin
+     TreeViewWmiClasses.Selected:=TreeViewWmiClasses.Items.Item[0];
+     TreeViewWmiClasses.Selected.Expand(True);
+    end;
+
 
   finally
     LClasses.Free;
