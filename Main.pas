@@ -58,6 +58,7 @@ type
     procedure ToolButtonSettingsClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure TreeViewTasksChange(Sender: TObject; Node: TTreeNode);
+    procedure FormShow(Sender: TObject);
   private
     FSettings: TSettings;
     Ctx : TRttiContext;
@@ -80,7 +81,7 @@ uses
   uLog,
   uGlobals,
   uSqlWMIContainer,
-  uWmiClasses,
+  uWMIClassesContainer,
   uWmiDatabase,
   uWmiClassTree,
   uWmiEvents,
@@ -153,29 +154,29 @@ begin
   end;
 
   //RegisterTask('','Code Generation', 30, nil);
-  RegisterTask('','WMI Class Code Generation', 40, Ctx.GetType(TFrmWmiClasses));
+  RegisterTask('','WMI Class Code Generation', 40, Ctx.GetType(TFrmWMiClassesContainer));
   RegisterTask('','WMI Methods Code Generation', 41,  Ctx.GetType(TFrmWmiMethods));
   RegisterTask('','WMI Events Code Generation', 45, Ctx.GetType(TFrmWmiEvents));
   //RegisterTask('','WMI Explorer', 29, Ctx.GetType(TFrmWMITree));
   RegisterTask('','WMI Classes Tree', 43, Ctx.GetType(TFrmWmiClassTree));
   RegisterTask('','WMI Finder', 57, Ctx.GetType(TFrmWmiDatabase));
   RegisterTask('','WQL', 56, Ctx.GetType(TFrmSqlWMIContainer));
-  RegisterTask('','Events Monitor', 28, nil);
-  RegisterTask('','Log', 32, Ctx.GetType(TFrmLog));
-  RegisterTask('','WMI Metadata', 31, Ctx.GetType(TFrmWMIInfo));
+  //RegisterTask('','Events Monitor', 28, nil);
+  //RegisterTask('','Log', 32, Ctx.GetType(TFrmLog));
+  RegisterTask('','CIM Repository', 31, Ctx.GetType(TFrmWMIInfo));
 
+  LNameSpaces:=TStringList.Create;
   try
-    LNameSpaces:=TStringList.Create;
     LNameSpaces.AddStrings(CachedWMIClasses.NameSpaces);
     for LIndex := 0 to LNameSpaces.Count-1 do
-      RegisterTask('WMI Metadata', LNameSpaces[LIndex], 60, Ctx.GetType(TFrmWMITree));
+      RegisterTask('CIM Repository', LNameSpaces[LIndex], 60, Ctx.GetType(TFrmWMITree));
   finally
     LNameSpaces.Free;
   end;
 
 
   TreeViewTasks.FullExpand;
-  TreeViewTasks.Selected:=TreeViewTasks.Items[0];
+  //TreeViewTasks.Selected:=TreeViewTasks.Items[0];
 
   MemoConsole.Color:=Settings.BackGroundColor;
   MemoConsole.Font.Color:=Settings.ForeGroundColor;
@@ -200,6 +201,12 @@ begin
 
   RegisteredInstances.Free;
   Settings.Free;
+end;
+
+procedure TFrmMain.FormShow(Sender: TObject);
+begin
+ if TreeViewTasks.Selected=nil then
+   TreeViewTasks.Selected:=TreeViewTasks.Items[0];
 end;
 
 procedure TFrmMain.SetLog(const Log: string);

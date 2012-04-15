@@ -55,6 +55,7 @@ object FrmWMITree: TFrmWMITree
       Width = 1102
       Height = 377
       Align = alClient
+      HideSelection = False
       Images = ImageList1
       Indent = 19
       ReadOnly = True
@@ -123,10 +124,6 @@ object FrmWMITree: TFrmWMITree
         object TabSheet3: TTabSheet
           Caption = 'Online Help'
           ImageIndex = 2
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object WebBrowserWmi: TWebBrowser
             Left = 0
             Top = 0
@@ -146,10 +143,6 @@ object FrmWMITree: TFrmWMITree
         object TabSheet4: TTabSheet
           Caption = 'Class Qualifiers'
           ImageIndex = 3
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object MemoQualifiers: TMemo
             Left = 0
             Top = 0
@@ -180,7 +173,7 @@ object FrmWMITree: TFrmWMITree
     Left = 176
     Top = 128
     Bitmap = {
-      494C010107000800740010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010107000800780010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

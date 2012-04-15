@@ -1,6 +1,6 @@
 {**************************************************************************************************}
 {                                                                                                  }
-{ Unit uSqlWMIContainer                                                                            }
+{ Unit uWMIClassesContainer                                                                        }
 { unit for the WMI Delphi Code Creator                                                             }
 {                                                                                                  }
 { The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
@@ -11,54 +11,62 @@
 { ANY KIND, either express or implied. See the License for the specific language governing rights  }
 { and limitations under the License.                                                               }
 {                                                                                                  }
-{ The Original Code is uSqlWMIContainer.pas.                                                       }
+{ The Original Code is uWMIClassesContainer.pas.                                                   }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
 { Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
-unit uSqlWMIContainer;
+unit uWMIClassesContainer;
 
 interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.ToolWin, Vcl.ActnMan, uMisc,  Vcl.Styles.ColorTabs,
-  Vcl.ActnCtrls, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ImgList;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uMisc, Vcl.StdCtrls, Vcl.ToolWin,
+  Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ImgList, Vcl.ActnList, uSettings,
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ComCtrls;
 
 type
-  TFrmSqlWMIContainer = class(TForm)
-    ActionToolBar1: TActionToolBar;
-    PageControl1: TPageControl;
-    ImageList1: TImageList;
+  TFrmWMiClassesContainer = class(TForm)
     ActionManager1: TActionManager;
     ActionNew: TAction;
     ActionDelete: TAction;
-    procedure ActionNewExecute(Sender: TObject);
-    procedure ActionDeleteUpdate(Sender: TObject);
+    ImageList1: TImageList;
+    ActionToolBar1: TActionToolBar;
+    PageControl1: TPageControl;
     procedure ActionDeleteExecute(Sender: TObject);
-    procedure FormShow(Sender: TObject);
+    procedure ActionDeleteUpdate(Sender: TObject);
+    procedure ActionNewExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
+    { Private declarations }
     FSetLog: TProcLog;
     DataLoaded : Boolean;
-    { Private declarations }
+    FSetMsg: TProcLog;
+    FConsole: TMemo;
+    FSettings: TSettings;
     procedure CreateNewInstance;
   public
+    property SetMsg : TProcLog read FSetMsg Write FSetMsg;
     property SetLog : TProcLog read FSetLog Write FSetLog;
+    property Console : TMemo read FConsole write FConsole;
+    property Settings : TSettings read FSettings Write  FSettings;
   end;
+
 
 implementation
 
 uses
- uSqlWMI;
+  uWmiClasses;
 
 {$R *.dfm}
 
-{ TFrmSqlWMIContainer }
+{ TFrmWMiClassesContainer }
 
-procedure TFrmSqlWMIContainer.ActionDeleteExecute(Sender: TObject);
+procedure TFrmWMiClassesContainer.ActionDeleteExecute(Sender: TObject);
 Var
  LTabSheet : TTabSheet;
 begin
@@ -74,44 +82,44 @@ begin
  end;
 end;
 
-procedure TFrmSqlWMIContainer.ActionDeleteUpdate(Sender: TObject);
+procedure TFrmWMiClassesContainer.ActionDeleteUpdate(Sender: TObject);
 begin
  TAction(Sender).Enabled:=PageControl1.PageCount>0;
 end;
 
-procedure TFrmSqlWMIContainer.ActionNewExecute(Sender: TObject);
+procedure TFrmWMiClassesContainer.ActionNewExecute(Sender: TObject);
 begin
  CreateNewInstance;
 end;
 
-procedure TFrmSqlWMIContainer.CreateNewInstance;
+procedure TFrmWMiClassesContainer.CreateNewInstance;
 Var
  LTabSheet : TTabSheet;
- LForm     : TFrmWMISQL;
+ LForm     : TFrmWmiClasses;
 begin
  LTabSheet:=TTabSheet.Create(PageControl1);
- LTabSheet.Caption:=Format('SQL WMI %d',[PageControl1.PageCount+1]);
+ LTabSheet.Caption:=Format('WMI Class CodeGen %d',[PageControl1.PageCount+1]);
  LTabSheet.PageControl:=PageControl1;
 
- LForm:=TFrmWMISQL.Create(LTabSheet);
+ LForm:=TFrmWmiClasses.Create(LTabSheet);
  LForm.Parent:=LTabSheet;
  LForm.BorderStyle:=bsNone;
  LForm.Align:=alClient;
  LForm.SetLog:=FSetLog;
-
-
+ LForm.SetMsg:=FSetMsg;
+ LForm.Settings:=FSettings;
+ LForm.Console:=FConsole;
  LForm.Show;
  PageControl1.ActivePage:=LTabSheet;
-
  DataLoaded:=True;
 end;
 
-procedure TFrmSqlWMIContainer.FormCreate(Sender: TObject);
+procedure TFrmWMiClassesContainer.FormCreate(Sender: TObject);
 begin
   DataLoaded:=False;
 end;
 
-procedure TFrmSqlWMIContainer.FormShow(Sender: TObject);
+procedure TFrmWMiClassesContainer.FormShow(Sender: TObject);
 begin
  if not DataLoaded then
   CreateNewInstance;

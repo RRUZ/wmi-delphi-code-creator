@@ -72,7 +72,6 @@ type
     procedure LoadClassInfo;
     procedure GetValuesWmiProperties(const Namespace, WmiClass: string);
     procedure GenerateConsoleCode(WmiMetaClassInfo : TWMiClassMetaData);
-
   end;
 
 
@@ -155,6 +154,9 @@ end;
 
 procedure TFrmWmiClasses.GenerateCode;
 begin
+   if (Parent<>nil) and (Parent is TTabSheet) then
+     TTabSheet(Parent).Caption:=Format('WMI Class %s CodeGen',[FrmCodeEditor.ComboBoxLanguageSel.Text]);;
+
    if ComboBoxClasses.ItemIndex>=0 then
      GenerateConsoleCode(CachedWMIClasses.GetWmiClass(ComboBoxNameSpaces.Text, ComboBoxClasses.Text));
 end;
