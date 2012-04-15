@@ -84,12 +84,10 @@ uses
   uWMIClassesContainer,
   uWmiDatabase,
   uWmiClassTree,
-  uWmiEvents,
-  uWmiMethods,
+  uWMIEventsContainer,
+  uWMIMethodsContainer,
   uWmiTree,
   uWmiInfo,
-  ComObj,
-  ShellApi,
   uStdActionsPopMenu,
   Vcl.Styles.FormStyleHooks,
   Vcl.Styles.OwnerDrawFix,
@@ -110,7 +108,7 @@ Var
  LIndex      : Integer;
 begin
   {$WARN SYMBOL_PLATFORM OFF}
-  ReportMemoryLeaksOnShutdown:=DebugHook<>0;
+  //ReportMemoryLeaksOnShutdown:=DebugHook<>0;
   {$WARN SYMBOL_PLATFORM ON}
   FillPopupActionBar(PopupActionBar1);
 
@@ -155,10 +153,10 @@ begin
 
   //RegisterTask('','Code Generation', 30, nil);
   RegisterTask('','WMI Class Code Generation', 40, Ctx.GetType(TFrmWMiClassesContainer));
-  RegisterTask('','WMI Methods Code Generation', 41,  Ctx.GetType(TFrmWmiMethods));
-  RegisterTask('','WMI Events Code Generation', 45, Ctx.GetType(TFrmWmiEvents));
+  RegisterTask('','WMI Methods Code Generation', 41,  Ctx.GetType(TFrmWmiMethodsContainer));
+  RegisterTask('','WMI Events Code Generation', 45, Ctx.GetType(TFrmWmiEventsContainer));
   //RegisterTask('','WMI Explorer', 29, Ctx.GetType(TFrmWMITree));
-  RegisterTask('','WMI Classes Tree', 43, Ctx.GetType(TFrmWmiClassTree));
+  RegisterTask('','WMI Classes Tree', 47, Ctx.GetType(TFrmWmiClassTree));
   RegisterTask('','WMI Finder', 57, Ctx.GetType(TFrmWmiDatabase));
   RegisterTask('','WQL', 56, Ctx.GetType(TFrmSqlWMIContainer));
   //RegisterTask('','Events Monitor', 28, nil);
@@ -169,7 +167,7 @@ begin
   try
     LNameSpaces.AddStrings(CachedWMIClasses.NameSpaces);
     for LIndex := 0 to LNameSpaces.Count-1 do
-      RegisterTask('CIM Repository', LNameSpaces[LIndex], 60, Ctx.GetType(TFrmWMITree));
+      RegisterTask('CIM Repository', LNameSpaces[LIndex], 58, Ctx.GetType(TFrmWMITree));
   finally
     LNameSpaces.Free;
   end;
@@ -293,6 +291,7 @@ begin
   if Node.Text<>'' then
   begin
      TabSheetTask.Caption:=Node.Text;
+     TabSheetTask.ImageIndex:=Node.ImageIndex;
 
      for LIndex := 0 to TabSheetTask.ControlCount-1 do
       if (TabSheetTask.Controls[LIndex] is TForm) and (TForm(TabSheetTask.Controls[LIndex]).Visible) then

@@ -181,6 +181,9 @@ end;
 
 procedure TFrmWmiEvents.GenerateCode;
 begin
+   if (Parent<>nil) and (Parent is TTabSheet) then
+     TTabSheet(Parent).Caption:=Format('WMI Events %s CodeGen',[FrmCodeEditorEvent.ComboBoxLanguageSel.Text]);;
+
  if ComboBoxEvents.ItemIndex>=0 then
   GenerateEventCode(CachedWMIClasses.GetWmiClass(ComboBoxNamespacesEvents.Text , ComboBoxEvents.Text));
 end;

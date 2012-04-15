@@ -1,7 +1,6 @@
 program WmiDelphiCodeCreator;
 
 uses
-  ExceptionLog,
   Forms,
   Vcl.Themes,
   Vcl.Styles,
@@ -63,7 +62,9 @@ uses
   Vcl.Styles.ColorTabs in 'Units\Vcl.Styles.Utils\Vcl.Styles.ColorTabs.pas',
   uSqlWMIContainer in 'Units\uSqlWMIContainer.pas' {FrmSqlWMIContainer},
   uWmiInfo in 'Units\uWmiInfo.pas' {FrmWMIInfo},
-  uWMIClassesContainer in 'Units\uWMIClassesContainer.pas' {FrmWMiClassesContainer};
+  uWMIClassesContainer in 'Units\uWMIClassesContainer.pas' {FrmWMiClassesContainer},
+  uWMIEventsContainer in 'Units\uWMIEventsContainer.pas' {FrmWmiEventsContainer},
+  uWMIMethodsContainer in 'Units\uWMIMethodsContainer.pas' {FrmWmiMethodsContainer};
 
 {$R *.res}
 
@@ -85,6 +86,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TFrmMain, FrmMain);
+  Application.CreateForm(TFrmWmiMethodsContainer, FrmWmiMethodsContainer);
   if FrmMain.Settings.CheckForUpdates then
    UpdateApp;
 

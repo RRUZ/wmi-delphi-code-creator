@@ -36,13 +36,6 @@
   Store cache x machine
   Create code based in plugins and interfaces
 
-  refactor GUI based in tree
-   Show wmi classes and task for class detecting possibles operations (show values, create code, event , invoke method)
-   Code gen
-     c++
-     delphi
-     fpc
-   Database
-   Tree (hierarchy)
+
   plugin handle
 }

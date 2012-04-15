@@ -16,151 +16,143 @@ object FrmWMITree: TFrmWMITree
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object PanelTreeMain: TPanel
+  object Splitter3: TSplitter
     Left = 0
-    Top = 0
+    Top = 416
     Width = 1112
-    Height = 641
-    Align = alClient
+    Height = 5
+    Cursor = crVSplit
+    Align = alBottom
+    ExplicitLeft = 10
+    ExplicitTop = 423
+    ExplicitWidth = 988
+  end
+  object PanelClassInfo: TPanel
+    Left = 0
+    Top = 421
+    Width = 1112
+    Height = 220
+    Align = alBottom
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 0
-    ExplicitWidth = 1096
-    ExplicitHeight = 603
-    object Splitter3: TSplitter
-      Left = 5
-      Top = 411
-      Width = 1102
-      Height = 5
-      Cursor = crVSplit
-      Align = alBottom
-      ExplicitLeft = 10
-      ExplicitTop = 423
-      ExplicitWidth = 988
-    end
-    object PanelLegend: TPanel
+    ExplicitLeft = 5
+    ExplicitTop = 416
+    ExplicitWidth = 1102
+    object PageControl2: TPageControl
       Left = 5
       Top = 5
       Width = 1102
-      Height = 29
-      Align = alTop
-      BevelOuter = bvNone
-      Color = clWhite
-      ParentBackground = False
-      TabOrder = 0
-    end
-    object TreeViewWmiClasses: TTreeView
-      Left = 5
-      Top = 34
-      Width = 1102
-      Height = 377
+      Height = 210
+      ActivePage = TabSheetMOFClass
       Align = alClient
-      HideSelection = False
-      Images = ImageList1
-      Indent = 19
-      ReadOnly = True
-      TabOrder = 1
-      OnChange = TreeViewWmiClassesChange
-      ExplicitWidth = 896
-      ExplicitHeight = 339
-    end
-    object PanelClassInfo: TPanel
-      Left = 5
-      Top = 416
-      Width = 1102
-      Height = 220
-      Align = alBottom
-      BevelOuter = bvNone
-      BorderWidth = 5
-      TabOrder = 2
-      ExplicitTop = 378
-      ExplicitWidth = 1086
-      object PageControl2: TPageControl
-        Left = 5
-        Top = 5
-        Width = 1092
-        Height = 210
-        ActivePage = TabSheetMOFClass
-        Align = alClient
-        TabOrder = 0
-        ExplicitWidth = 1076
-        object TabSheetMOFClass: TTabSheet
-          Caption = 'MOF Class Definition'
-          object MemoWmiMOF: TMemo
-            Left = 0
-            Top = 0
-            Width = 1084
-            Height = 182
-            Align = alClient
-            Color = 4598550
-            Font.Charset = ANSI_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Consolas'
-            Font.Style = []
-            ParentFont = False
-            ScrollBars = ssBoth
-            TabOrder = 0
-          end
+      TabOrder = 0
+      ExplicitWidth = 1092
+      object TabSheetMOFClass: TTabSheet
+        Caption = 'MOF Class Definition'
+        ExplicitWidth = 1084
+        object MemoWmiMOF: TMemo
+          Left = 0
+          Top = 0
+          Width = 1094
+          Height = 182
+          Align = alClient
+          Color = 4598550
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWhite
+          Font.Height = -12
+          Font.Name = 'Consolas'
+          Font.Style = []
+          ParentFont = False
+          ScrollBars = ssBoth
+          TabOrder = 0
+          ExplicitWidth = 1084
         end
-        object TabSheetXMLClass: TTabSheet
-          Caption = 'XML Class Definition'
-          ImageIndex = 1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
-          object TreeView1: TTreeView
-            Left = 0
-            Top = 0
-            Width = 1084
-            Height = 182
-            Align = alClient
-            Indent = 19
-            TabOrder = 0
-            ExplicitWidth = 1068
-          end
+      end
+      object TabSheetXMLClass: TTabSheet
+        Caption = 'XML Class Definition'
+        ImageIndex = 1
+        object TreeView1: TTreeView
+          Left = 0
+          Top = 0
+          Width = 1094
+          Height = 182
+          Align = alClient
+          Indent = 19
+          TabOrder = 0
         end
-        object TabSheet3: TTabSheet
-          Caption = 'Online Help'
-          ImageIndex = 2
-          object WebBrowserWmi: TWebBrowser
-            Left = 0
-            Top = 0
-            Width = 1084
-            Height = 182
-            Align = alClient
-            TabOrder = 0
-            ExplicitWidth = 1068
-            ControlData = {
-              4C00000009700000CF1200000000000000000000000000000000000000000000
-              000000004C000000000000000000000001000000E0D057007335CF11AE690800
-              2B2E12620A000000000000004C0000000114020000000000C000000000000046
-              8000000000000000000000000000000000000000000000000000000000000000
-              00000000000000000100000000000000000000000000000000000000}
-          end
+      end
+      object TabSheet3: TTabSheet
+        Caption = 'Online Help'
+        ImageIndex = 2
+        ExplicitWidth = 1084
+        object WebBrowserWmi: TWebBrowser
+          Left = 0
+          Top = 0
+          Width = 1084
+          Height = 182
+          Align = alClient
+          TabOrder = 0
+          ExplicitWidth = 1068
+          ControlData = {
+            4C00000009700000CF1200000000000000000000000000000000000000000000
+            000000004C000000000000000000000000000000000000000000000000000000
+            000000000A000000000000004C0000000114020000000000C000000000000046
+            8000000000000000000000000000000000000000000000000000000000000000
+            00000000000000000100000000000000000000000000000000000000}
         end
-        object TabSheet4: TTabSheet
-          Caption = 'Class Qualifiers'
-          ImageIndex = 3
-          object MemoQualifiers: TMemo
-            Left = 0
-            Top = 0
-            Width = 1084
-            Height = 182
-            Align = alClient
-            Color = 4598550
-            Font.Charset = ANSI_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Consolas'
-            Font.Style = []
-            ParentFont = False
-            TabOrder = 0
-          end
+      end
+      object TabSheet4: TTabSheet
+        Caption = 'Class Qualifiers'
+        ImageIndex = 3
+        object MemoQualifiers: TMemo
+          Left = 0
+          Top = 0
+          Width = 1094
+          Height = 182
+          Align = alClient
+          Color = 4598550
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWhite
+          Font.Height = -12
+          Font.Name = 'Consolas'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
         end
       end
     end
+  end
+  object PanelLegend: TPanel
+    Left = 0
+    Top = 0
+    Width = 1112
+    Height = 29
+    Align = alTop
+    BevelOuter = bvNone
+    Color = clWhite
+    ParentBackground = False
+    TabOrder = 1
+    ExplicitLeft = 5
+    ExplicitTop = 5
+    ExplicitWidth = 1102
+  end
+  object TreeViewWmiClasses: TTreeView
+    Left = 0
+    Top = 29
+    Width = 1112
+    Height = 387
+    Align = alClient
+    HideSelection = False
+    Images = ImageList1
+    Indent = 19
+    ReadOnly = True
+    TabOrder = 2
+    OnChange = TreeViewWmiClassesChange
+    ExplicitLeft = 5
+    ExplicitTop = 5
+    ExplicitWidth = 1102
+    ExplicitHeight = 377
   end
   object FindDialog1: TFindDialog
     OnFind = FindDialog1Find
@@ -173,7 +165,7 @@ object FrmWMITree: TFrmWMITree
     Left = 176
     Top = 128
     Bitmap = {
-      494C010107000800780010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101070008007C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
