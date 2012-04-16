@@ -40,8 +40,6 @@ object FrmSettings: TFrmSettings
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
-        ExplicitWidth = 567
-        ExplicitHeight = 388
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -150,6 +148,8 @@ object FrmSettings: TFrmSettings
       object TabSheet2: TTabSheet
         Caption = 'Object Pascal Code generation'
         ImageIndex = 1
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 567
         ExplicitHeight = 388
         object Label4: TLabel
@@ -251,6 +251,8 @@ object FrmSettings: TFrmSettings
       object TabSheet1: TTabSheet
         BorderWidth = 8
         Caption = 'GUI Settings'
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 567
         ExplicitHeight = 388
         object PageControl2: TPageControl
@@ -267,6 +269,8 @@ object FrmSettings: TFrmSettings
           ExplicitHeight = 378
           object TabSheet6: TTabSheet
             Caption = 'Themes (Vcl Styles)'
+            ExplicitLeft = 0
+            ExplicitTop = 0
             ExplicitWidth = 549
             ExplicitHeight = 350
             object Label9: TLabel
@@ -439,6 +443,8 @@ object FrmSettings: TFrmSettings
           object TabSheet7: TTabSheet
             Caption = 'Syntax Highlighting'
             ImageIndex = 1
+            ExplicitLeft = 0
+            ExplicitTop = 0
             ExplicitWidth = 543
             ExplicitHeight = 344
             object Label3: TLabel
@@ -559,6 +565,8 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 567
         ExplicitHeight = 388
         object CheckBoxShowImplMethods: TCheckBox
@@ -573,6 +581,8 @@ object FrmSettings: TFrmSettings
       object TabSheet8: TTabSheet
         Caption = 'Compiler Options'
         ImageIndex = 5
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 567
         ExplicitHeight = 388
         object Label18: TLabel
@@ -609,6 +619,8 @@ object FrmSettings: TFrmSettings
       object TabSheet5: TTabSheet
         Caption = 'Templates'
         ImageIndex = 4
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 567
         ExplicitHeight = 388
         object Label15: TLabel
@@ -666,8 +678,6 @@ object FrmSettings: TFrmSettings
     Height = 35
     Align = alBottom
     TabOrder = 1
-    ExplicitTop = 428
-    ExplicitWidth = 587
     object ButtonApply: TButton
       Left = 6
       Top = 6

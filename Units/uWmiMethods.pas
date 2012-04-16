@@ -436,18 +436,19 @@ begin
 
       if MemoMethodDescr.Text = '' then
         MemoMethodDescr.Text := 'Method without description available';
-    end;
 
-    for i := 0 to LWMiMethodMetaData.InParameters.Count - 1 do
-    begin
-      Item := ListViewMethodsParams.Items.Add;
-      Item.Caption := LWMiMethodMetaData.InParameters[i].Name;
-      Item.Data    := Pointer(LWMiMethodMetaData.InParameters[i].CimType);
+      for i := 0 to LWMiMethodMetaData.InParameters.Count - 1 do
+      begin
+        Item := ListViewMethodsParams.Items.Add;
+        Item.Caption := LWMiMethodMetaData.InParameters[i].Name;
+        Item.Data    := Pointer(LWMiMethodMetaData.InParameters[i].CimType);
 
-      Item.SubItems.Add(LWMiMethodMetaData.InParameters[i].&Type);
-      s:=GetDefaultValueWmiType(LWMiMethodMetaData.InParameters[i].&Type);
-      Item.SubItems.Add(s);
-      Item.SubItems.Add(LWMiMethodMetaData.InParameters[i].Description);
+        Item.SubItems.Add(LWMiMethodMetaData.InParameters[i].&Type);
+        s:=GetDefaultValueWmiType(LWMiMethodMetaData.InParameters[i].&Type);
+        Item.SubItems.Add(s);
+        Item.SubItems.Add(LWMiMethodMetaData.InParameters[i].Description);
+      end;
+
     end;
 
   finally

@@ -25,9 +25,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls,   Rtti, Generics.Collections,
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls,   Rtti, Generics.Collections, uHostsAdmin,
   SynEdit, ImgList, ToolWin,  uSettings, Menus, Buttons,  Vcl.Styles.ColorTabs,
-  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup;
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, Vcl.ActnList, Vcl.ActnMan;
 
 type
   TFrmMain = class(TForm)
@@ -52,6 +52,16 @@ type
     TabSheet2: TTabSheet;
     MemoLog: TMemo;
     Splitter2: TSplitter;
+    ActionManager1: TActionManager;
+    ActionRegisterHost: TAction;
+    RegisterHost1: TMenuItem;
+    ActionConnect: TAction;
+    ConnecttoHost1: TMenuItem;
+    ActionPing: TAction;
+    PingHost1: TMenuItem;
+    ToolButton1: TToolButton;
+    ActionDisconnect: TAction;
+    DisconnectHost1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure ToolButtonAboutClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -59,11 +69,20 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure TreeViewTasksChange(Sender: TObject; Node: TTreeNode);
     procedure FormShow(Sender: TObject);
+    procedure ActionRegisterHostUpdate(Sender: TObject);
+    procedure ActionRegisterHostExecute(Sender: TObject);
+    procedure ActionConnectUpdate(Sender: TObject);
+    procedure ActionConnectExecute(Sender: TObject);
+    procedure ActionPingUpdate(Sender: TObject);
+    procedure ActionPingExecute(Sender: TObject);
+    procedure ActionDisconnectUpdate(Sender: TObject);
   private
     FSettings: TSettings;
     Ctx : TRttiContext;
     RegisteredInstances : TDictionary<string,TForm>;
+    ListWINHosts : TObjectList<TWMIHost>;
     procedure RegisterTask(const ParentTask, Name : string;ImageIndex:Integer; LinkObject : TRttiType);
+    procedure RegisterWMIHosts;
     procedure SetLog(const Log :string);
     procedure SetMsg(const Msg: string);
   public
@@ -76,6 +95,7 @@ var
 implementation
 
 uses
+
   uMisc,
   uWmi_Metadata,
   uLog,
@@ -88,14 +108,110 @@ uses
   uWMIMethodsContainer,
   uWmiTree,
   uWmiInfo,
-  uStdActionsPopMenu,
   Vcl.Styles.FormStyleHooks,
-  Vcl.Styles.OwnerDrawFix,
   Vcl.Styles.Ext,
   Vcl.Themes,
   uWmi_About;
 
+Const
+  HostCIMStr =  'CIM Repository (%s)';
+
 {$R *.dfm}
+
+function GetNodeByText(ATree : TTreeView; const AValue:String; AVisible: Boolean=False): TTreeNode;
+var
+ Node: TTreeNode;
+begin
+  Result := nil;
+  if ATree.Items.Count = 0 then Exit;
+  Node := ATree.Items[0];
+  while Node <> nil do
+  begin
+    if SameText(Node.Text,AValue) then
+    begin
+      Result := Node;
+      if AVisible then
+        Result.MakeVisible;
+      Break;
+    end;
+    Node := Node.GetNext;
+  end;
+end;
+
+procedure TFrmMain.ActionConnectExecute(Sender: TObject);
+Var
+ LForm      : TFrmWMIInfo;
+ LWMIHost   : TWMIHost;
+ LNameSpaces: TStrings;
+ LIndex     : Integer;
+ LNode      : TTreeNode;
+begin
+  LWMIHost:=TWMIHost(TreeViewTasks.Selected.Data);
+  if LWMIHost.Form=nil then
+  begin
+    if Ping(LWMIHost.Host, 4, 32, MemoConsole.Lines) then
+    begin
+      LForm:=TFrmWMIInfo.Create(Self);
+      LForm.Parent:=TabSheetTask;
+      LForm.BorderStyle:=bsNone;
+      LForm.Align:=alClient;
+      LForm.SetLog:=SetLog;
+      LForm.WMIHost:=LWMIHost;
+      LWMIHost.Form:=LForm;
+      LWMIHost.Form.Show;
+
+      LNameSpaces:=TStringList.Create;
+      SetMsg(Format('Getting WMI namespaces from [%s]',[LWMIHost.Host]));
+      try
+        LNameSpaces.AddStrings(CachedWMIClasses.GetNameSpacesHost(LWMIHost.Host, LWMIHost.User, LWMIHost.Password));
+        for LIndex := 0 to LNameSpaces.Count-1 do
+          RegisterTask(Format(HostCIMStr, [LWMIHost.Host]), LNameSpaces[LIndex], 58, Ctx.GetType(TFrmWMITree));
+
+        LNode:=GetNodeByText(TreeViewTasks, Format(HostCIMStr, [LWMIHost.Host]));
+        if LNode<>nil then
+          LNode.Expand(True);
+      finally
+        LNameSpaces.Free;
+        SetMsg('');
+      end;
+    end
+    else
+    MsgWarning('Was not possible establish a connection with the host');
+  end;
+end;
+
+procedure TFrmMain.ActionConnectUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled:=(TreeViewTasks.Selected<>nil) and (TObject(TreeViewTasks.Selected.Data) is TWMIHost) and (TWMIHost(TreeViewTasks.Selected.Data).Form=nil);
+end;
+
+procedure TFrmMain.ActionDisconnectUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled:=(TreeViewTasks.Selected<>nil) and (TObject(TreeViewTasks.Selected.Data) is TWMIHost) and (TWMIHost(TreeViewTasks.Selected.Data).Form<>nil);
+end;
+
+procedure TFrmMain.ActionPingExecute(Sender: TObject);
+begin
+ Ping(TWMIHost(TreeViewTasks.Selected.Data).Host, 4, 32, MemoConsole.Lines);
+end;
+
+procedure TFrmMain.ActionPingUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled:=(TreeViewTasks.Selected<>nil) and (TObject(TreeViewTasks.Selected.Data) is TWMIHost);
+end;
+
+procedure TFrmMain.ActionRegisterHostExecute(Sender: TObject);
+Var
+ Frm : TFrmHostAdmin;
+begin
+ Frm:=TFrmHostAdmin.Create(Self);
+ Frm.ShowModal;
+end;
+
+procedure TFrmMain.ActionRegisterHostUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled:=True;
+end;
 
 procedure TFrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -106,11 +222,13 @@ procedure TFrmMain.FormCreate(Sender: TObject);
 Var
  LNameSpaces : TStrings;
  LIndex      : Integer;
+ LHost       : string;
 begin
   {$WARN SYMBOL_PLATFORM OFF}
   //ReportMemoryLeaksOnShutdown:=DebugHook<>0;
   {$WARN SYMBOL_PLATFORM ON}
-  FillPopupActionBar(PopupActionBar1);
+  //FillPopupActionBar(PopupActionBar1);
+  ListWINHosts:=nil;
 
   Ctx:=TRttiContext.Create;
   RegisteredInstances:=TDictionary<string, TForm>.Create;
@@ -130,8 +248,8 @@ begin
   else
   if FSettings.ActivateCustomForm then
   begin
-   TStyleManager.Engine.RegisterStyleHook(TCustomForm, TFormStyleHookBackround);
-   TStyleManager.Engine.RegisterStyleHook(TForm, TFormStyleHookBackround);
+    TStyleManager.Engine.RegisterStyleHook(TCustomForm, TFormStyleHookBackround);
+    TStyleManager.Engine.RegisterStyleHook(TForm, TFormStyleHookBackround);
 
    if FSettings.CustomFormNC then
    begin
@@ -161,16 +279,21 @@ begin
   RegisterTask('','WQL', 56, Ctx.GetType(TFrmSqlWMIContainer));
   //RegisterTask('','Events Monitor', 28, nil);
   //RegisterTask('','Log', 32, Ctx.GetType(TFrmLog));
-  RegisterTask('','CIM Repository', 31, Ctx.GetType(TFrmWMIInfo));
+  RegisterTask('','CIM Repository (localhost)', 31, Ctx.GetType(TFrmWMIInfo));
 
   LNameSpaces:=TStringList.Create;
   try
     LNameSpaces.AddStrings(CachedWMIClasses.NameSpaces);
     for LIndex := 0 to LNameSpaces.Count-1 do
-      RegisterTask('CIM Repository', LNameSpaces[LIndex], 58, Ctx.GetType(TFrmWMITree));
+      RegisterTask('CIM Repository (localhost)', LNameSpaces[LIndex], 58, Ctx.GetType(TFrmWMITree));
   finally
     LNameSpaces.Free;
   end;
+              {
+  for LHost in GetWMIRegisteredHosts do
+   RegisterTask('',Format('CIM Repository (%s)', [LHost]), 31, nil);
+              }
+  RegisterWMIHosts;
 
   TreeViewTasks.FullExpand;
   //TreeViewTasks.Selected:=TreeViewTasks.Items[0];
@@ -180,8 +303,10 @@ begin
   MemoLog.Font.Color:=MemoConsole.Font.Color;
 
   StatusBar1.Panels[2].Text := Format('WMI installed version %s', [GetWmiVersion]);
+  {
   AssignStdActionsPopUpMenu(Self, PopupActionBar1);
   ApplyVclStylesOwnerDrawFix(Self, True);
+ }
 end;
 
 
@@ -189,6 +314,9 @@ procedure TFrmMain.FormDestroy(Sender: TObject);
 Var
  Pair : TPair<string,TForm>;
 begin
+ if ListWINHosts<>nil then
+  FreeAndNil(ListWINHosts);
+
   for Pair in  RegisteredInstances do
   begin
    Pair.Value.Close;
@@ -224,25 +352,7 @@ begin
   Frm.ShowModal();
 end;
 
-function GetNodeByText(ATree : TTreeView; const AValue:String; AVisible: Boolean=False): TTreeNode;
-var
- Node: TTreeNode;
-begin
-  Result := nil;
-  if ATree.Items.Count = 0 then Exit;
-  Node := ATree.Items[0];
-  while Node <> nil do
-  begin
-    if SameText(Node.Text,AValue) then
-    begin
-      Result := Node;
-      if AVisible then
-        Result.MakeVisible;
-      Break;
-    end;
-    Node := Node.GetNext;
-  end;
-end;
+
 
 procedure TFrmMain.RegisterTask(const ParentTask, Name: string; ImageIndex: Integer;
   LinkObject: TRttiType);
@@ -260,6 +370,24 @@ begin
 
    Node.ImageIndex    :=ImageIndex;//add BN ??
    Node.SelectedIndex :=ImageIndex;
+end;
+
+
+procedure TFrmMain.RegisterWMIHosts;
+Var
+ Node : TTreeNode;
+ LWMIRegisterdHosts : TWMIHost;
+begin
+   if ListWINHosts<>nil then
+     FreeAndNil(ListWINHosts);
+   ListWINHosts:=GetListWMIRegisteredHosts;
+
+   for LWMIRegisterdHosts in ListWINHosts do
+   begin
+     Node:=TreeViewTasks.Items.AddObject(nil, Format(HostCIMStr, [LWMIRegisterdHosts.Host]), LWMIRegisterdHosts);
+     Node.ImageIndex    :=31;//add BN ??
+     Node.SelectedIndex :=31;
+   end;
 end;
 
 procedure TFrmMain.ToolButtonSettingsClick(Sender: TObject);
@@ -284,7 +412,7 @@ var
   LRttiProperty : TRttiProperty;
   LForm : TForm;
   LIndex : integer;
-  ProcLog :  TProcLog;
+  LProc :  TProcLog;
 begin
   if Node.Text<>'' then
   begin
@@ -298,43 +426,97 @@ begin
        break;
       end;
 
-     if RegisteredInstances.ContainsKey(Node.Text) then
-        RegisteredInstances.Items[Node.Text].Show
-     else
-     if Node.Data<>nil then
+     if (Node.Data<>nil) and (Node.Parent<>nil) and (TObject(Node.Parent.Data) is TWMIHost) then
      begin
-        LRttiInstanceType:=TRttiInstanceType(Node.Data);
-        LValue:=LRttiInstanceType.GetMethod('Create').Invoke(LRttiInstanceType.MetaclassType,[Self]);
-        LForm:=TForm(LValue.AsObject);
-        LForm.Parent:=TabSheetTask;
-        LForm.BorderStyle:=bsNone;
-        LForm.Align:=alClient;
+       if RegisteredInstances.ContainsKey(Node.Parent.Text+Node.Text) then
+          RegisteredInstances.Items[Node.Parent.Text+Node.Text].Show
+       else
+       if Node.Data<>nil then
+       begin
+          LRttiInstanceType:=TRttiInstanceType(Node.Data);
+          LValue:=LRttiInstanceType.GetMethod('Create').Invoke(LRttiInstanceType.MetaclassType,[Self]);
+          LForm:=TForm(LValue.AsObject);
+          LForm.Parent:=TabSheetTask;
+          LForm.BorderStyle:=bsNone;
+          LForm.Align:=alClient;
 
-        LRttiProperty:=LRttiInstanceType.GetProperty('Console');
-        if LRttiProperty<>nil then
-         LRttiProperty.SetValue(LForm, MemoConsole);
+          LRttiProperty:=LRttiInstanceType.GetProperty('Console');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, MemoConsole);
 
-        ProcLog:=SetMsg;
-        LRttiProperty:=LRttiInstanceType.GetProperty('SetMsg');
-        if LRttiProperty<>nil then
-         LRttiProperty.SetValue(LForm, TValue.From<TProcLog>(ProcLog));
+          LProc:=SetMsg;
+          LRttiProperty:=LRttiInstanceType.GetProperty('SetMsg');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, TValue.From<TProcLog>(LProc));
 
-        ProcLog:=SetLog;
-        LRttiProperty:=LRttiInstanceType.GetProperty('SetLog');
-        if LRttiProperty<>nil then
-         LRttiProperty.SetValue(LForm, TValue.From<TProcLog>(ProcLog));
+          LProc:=SetLog;
+          LRttiProperty:=LRttiInstanceType.GetProperty('SetLog');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, TValue.From<TProcLog>(LProc));
 
-        LRttiProperty:=LRttiInstanceType.GetProperty('Settings');
-        if LRttiProperty<>nil then
-         LRttiProperty.SetValue(LForm, FSettings);
+          LRttiProperty:=LRttiInstanceType.GetProperty('Settings');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, FSettings);
 
-        LRttiProperty:=LRttiInstanceType.GetProperty('NameSpace');
-        if LRttiProperty<>nil then
-         LRttiProperty.SetValue(LForm, Node.Text);
+          LRttiProperty:=LRttiInstanceType.GetProperty('NameSpace');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, Node.Text);
 
-        LForm.Show;
-        RegisteredInstances.Add(Node.Text, LForm);
+          LRttiProperty:=LRttiInstanceType.GetProperty('WMIHost');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, TWMIHost(Node.Parent.Data));
+
+          LForm.Show;
+          RegisteredInstances.Add(Node.Parent.Text+Node.Text, LForm);
+       end;
+     end
+     else
+     if (Node.Data<>nil) and (TObject(Node.Data) is TWMIHost) then
+     begin
+       if TWMIHost(Node.Data).Form<>nil then
+         TWMIHost(Node.Data).Form.Show;
+     end
+     else
+     begin
+       if RegisteredInstances.ContainsKey(Node.Text) then
+          RegisteredInstances.Items[Node.Text].Show
+       else
+       if Node.Data<>nil then
+       begin
+          LRttiInstanceType:=TRttiInstanceType(Node.Data);
+          LValue:=LRttiInstanceType.GetMethod('Create').Invoke(LRttiInstanceType.MetaclassType,[Self]);
+          LForm:=TForm(LValue.AsObject);
+          LForm.Parent:=TabSheetTask;
+          LForm.BorderStyle:=bsNone;
+          LForm.Align:=alClient;
+
+          LRttiProperty:=LRttiInstanceType.GetProperty('Console');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, MemoConsole);
+
+          LProc:=SetMsg;
+          LRttiProperty:=LRttiInstanceType.GetProperty('SetMsg');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, TValue.From<TProcLog>(LProc));
+
+          LProc:=SetLog;
+          LRttiProperty:=LRttiInstanceType.GetProperty('SetLog');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, TValue.From<TProcLog>(LProc));
+
+          LRttiProperty:=LRttiInstanceType.GetProperty('Settings');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, FSettings);
+
+          LRttiProperty:=LRttiInstanceType.GetProperty('NameSpace');
+          if LRttiProperty<>nil then
+           LRttiProperty.SetValue(LForm, Node.Text);
+
+          LForm.Show;
+          RegisteredInstances.Add(Node.Text, LForm);
+       end;
      end;
+
   end;
 
 end;
