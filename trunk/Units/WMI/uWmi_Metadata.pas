@@ -301,6 +301,7 @@ type
     FWmiClassXML: string;
     FIsSingleton : Boolean;
     FIsAssociation: boolean;
+    FHost, FUser, FPassword : string;
     {$IFDEF USEXML}
     procedure LoadWmiClassDataXML;
     {$ENDIF}
@@ -323,6 +324,7 @@ type
     property XmlDoc : OleVariant read FXmlDoc;
     {$ENDIF}
     constructor Create(const ANameSpace,AClass:string); overload;
+    constructor Create(const ANameSpace,AClass, Host, User, Password:string); overload;
     Destructor  Destroy; override;
     property URI     : string read FURI;
     property Description     : string read FDescription;
@@ -364,9 +366,12 @@ type
   function  GetWmiVersion:string;
   procedure GetListWMINameSpaces(const List :TStrings);  cdecl; overload;
   procedure GetListWMINameSpaces(const RootNameSpace:String;const List :TStrings;ReportException:Boolean=True); cdecl; overload;
+  procedure GetListWMINameSpaces(const RootNameSpace, Host, User, Password:String;const List :TStrings;ReportException:Boolean=True); cdecl; overload;
 
   procedure GetListWmiClasses(const NameSpace:String;Const List :TStrings); cdecl; overload;
   procedure GetListWmiClasses(const NameSpace:String;const List :TStrings;const IncludeQualifiers,ExcludeQualifiers: Array of string;ExcludeEvents:Boolean); cdecl; overload;
+  procedure GetListWmiClasses(const NameSpace, Host , User, Password:String;const List :TStrings;const IncludeQualifiers,ExcludeQualifiers: Array of string;ExcludeEvents:Boolean); cdecl;overload;
+
   procedure GetListWmiParentClasses(const NameSpace:string;Const List :TStrings);
   procedure GetListWmiSubClasses(const NameSpace,WmiClass:String;Const List :TStrings);
 
@@ -684,7 +689,29 @@ begin
   colItems       :=Unassigned;
 end;
 
-
+procedure GetListWMINameSpaces(const RootNameSpace, Host, User, Password:String;const List :TStrings;ReportException:Boolean=True); cdecl; overload;
+var
+  objSWbemLocator : OleVariant;
+  objWMIService   : OleVariant;
+  colItems        : OLEVariant;
+  colItem         : OLEVariant;
+  sValue          : string;
+begin
+ try
+  objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+  objWMIService   := objSWbemLocator.ConnectServer(Host, RootNameSpace, User, Password);
+  colItems        := objWMIService.InstancesOf('__NAMESPACE');
+  for colItem in GetOleVariantEnum(colItems) do
+  begin
+    sValue:=VarStrNull(colItem.Name);
+    List.Add(RootNameSpace+'\'+sValue);
+    GetListWMINameSpaces(RootNameSpace+'\'+sValue, Host, User, Password ,List, ReportException);
+  end;
+ except
+     if ReportException then
+     raise;
+ end;
+end;
 
 procedure  GetListWMINameSpaces(const RootNameSpace:String;const List :TStrings;ReportException:Boolean=True); cdecl;overload;//recursive function
 var
@@ -805,6 +832,8 @@ begin
   colItems       :=Unassigned;
 end;
 
+
+
 procedure  GetListWmiDynamicAndStaticClasses(const NameSpace:String;const List :TStrings);
 var
   objSWbemLocator   : OLEVariant;
@@ -833,9 +862,7 @@ begin
   objClassQualifier :=Unassigned;
 end;
 
-
-
-procedure  GetListWmiClasses(const NameSpace:String;const List :TStrings;const IncludeQualifiers,ExcludeQualifiers: Array of string;ExcludeEvents:Boolean);overload;
+procedure  GetListWmiClasses(const NameSpace, Host , User, Password:String;const List :TStrings;const IncludeQualifiers,ExcludeQualifiers: Array of string;ExcludeEvents:Boolean);overload;
 var
   objSWbemLocator   : OLEVariant;
   objWMIService     : OLEVariant;
@@ -847,7 +874,7 @@ var
   Ok                : Boolean;
 begin
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
-  objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
+  objWMIService   := objSWbemLocator.ConnectServer(Host, NameSpace, User, Password);
   colClasses      := objWMIService.SubclassesOf();
   for objClass in GetOleVariantEnum(colClasses) do
   begin
@@ -884,6 +911,11 @@ begin
   colClasses        :=Unassigned;
   objClass          :=Unassigned;
   objClassQualifier :=Unassigned;
+end;
+
+procedure  GetListWmiClasses(const NameSpace:String;const List :TStrings;const IncludeQualifiers,ExcludeQualifiers: Array of string;ExcludeEvents:Boolean);overload;
+begin
+    GetListWmiClasses(NameSpace, 'localhost', '', '', List, IncludeQualifiers, ExcludeQualifiers, ExcludeEvents)
 end;
 
 procedure  GetListWmiDynamicClasses(const NameSpace:String;const List :TStrings);
@@ -1676,6 +1708,30 @@ begin
   FCollectionSystemPropertyMetaData := TList<TWMiPropertyMetaData>.Create;
   FCollectionQualifierMetaData := TList<TWMiQualifierMetaData>.Create;
   FURI               := Format(UrlWmiHelp,[AClass]);
+  FHost:='localhost';
+  FUser:='';
+  FPassword:='';
+  LoadWmiClassData;
+end;
+
+constructor TWMiClassMetaData.Create(const ANameSpace, AClass, Host, User,
+  Password: string);
+begin
+  inherited Create;
+  FNameSpace    := ANameSpace;
+  FClass        := AClass;
+  {$IFDEF USEXML}
+  FXmlDoc       := CreateOleObject('Msxml2.DOMDocument.6.0');
+  FXmlDoc.Async := false;
+  {$ENDIF}
+  FCollectionMethodMetaData    := TList<TWMiMethodMetaData>.Create;
+  FCollectionPropertyMetaData  := TList<TWMiPropertyMetaData>.Create;
+  FCollectionSystemPropertyMetaData := TList<TWMiPropertyMetaData>.Create;
+  FCollectionQualifierMetaData := TList<TWMiQualifierMetaData>.Create;
+  FURI               := Format(UrlWmiHelp,[AClass]);
+  FHost:=Host;
+  FUser:=User;
+  FPassword:=Password;
   LoadWmiClassData;
 end;
 
@@ -1859,7 +1915,7 @@ var
   Value             : string;
 begin
   objSWbemLocator  := CreateOleObject('WbemScripting.SWbemLocator');
-  objWMIService    := objSWbemLocator.ConnectServer(wbemLocalhost, FNameSpace, '', '');
+  objWMIService    := objSWbemLocator.ConnectServer(FHost, FNameSpace, FUser, FPassword);
   objSWbemObjectSet:= objWMIService.Get(FClass, wbemFlagUseAmendedQualifiers);
 
   //Get MOF definition

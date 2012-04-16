@@ -255,17 +255,24 @@ type
   procedure ReadSettings(var Settings: TSettings);
   procedure WriteSettings(const Settings: TSettings);
 
-  function ExistWmiClassesCache(const namespace: string): boolean;
+  function ExistWmiClassesCache(const namespace: string): boolean;overload;
+  function ExistWmiClassesCache(const Host, Namespace: string): boolean;overload;
   function ExistWmiClassesMethodsCache(const namespace: string): boolean;
-  function ExistWmiNameSpaceCache: boolean;
+  function ExistWmiNameSpaceCache: boolean;overload;
+  function ExistWmiNameSpaceCache(const Host:String): boolean;overload;
 
-  procedure LoadWMINameSpacesFromCache(List: TStrings);
-  procedure SaveWMINameSpacesToCache(List: TStrings);
+  procedure LoadWMINameSpacesFromCache(List: TStrings);overload;
+  procedure LoadWMINameSpacesFromCache(const Host: string;List: TStrings);overload;
+  procedure SaveWMINameSpacesToCache(List: TStrings);overload;
+  procedure SaveWMINameSpacesToCache(const Host: string; List: TStrings);overload;
 
-  procedure LoadWMIClassesFromCache(const namespace: string; List: TStrings);
+  procedure LoadWMIClassesFromCache(const namespace: string; List: TStrings);overload;
+  procedure LoadWMIClassesFromCache(const Host, Namespace: string; List: TStrings);overload;
+
   procedure LoadWMIClassesMethodsFromCache(const namespace: string; List: TStrings);
 
-  procedure SaveWMIClassesToCache(const namespace: string; List: TStrings);
+  procedure SaveWMIClassesToCache(const Namespace: string; List: TStrings);overload;
+  procedure SaveWMIClassesToCache(const Host, Namespace: string; List: TStrings);overload;
   procedure SaveWMIClassesMethodsToCache(const namespace: string; List: TStrings);
 
   function GetWMICFolderCache : string;
@@ -331,6 +338,16 @@ begin
   Result   := FileExists(FileName);
 end;
 
+function ExistWmiClassesCache(const Host, Namespace: string): boolean;
+var
+  FileName: string;
+begin
+  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
+  FileName := GetWMICFolderCache +Host+FileName + '.wmic';
+  Result   := FileExists(FileName);
+end;
+
+
 function ExistWmiClassesMethodsCache(const namespace: string): boolean;
 var
   FileName: string;
@@ -345,9 +362,21 @@ begin
   Result :=FileExists(GetWMICFolderCache+ 'Namespaces.wmic');
 end;
 
+function ExistWmiNameSpaceCache(const Host:String): boolean;
+begin
+  Result :=FileExists(GetWMICFolderCache+Host+'Namespaces.wmic');
+end;
+
+
+
 procedure LoadWMINameSpacesFromCache(List: TStrings);
 begin
   List.LoadFromFile(GetWMICFolderCache + 'Namespaces.wmic');
+end;
+
+procedure LoadWMINameSpacesFromCache(const Host: string;List: TStrings);
+begin
+  List.LoadFromFile(GetWMICFolderCache + Host + 'Namespaces.wmic');
 end;
 
 procedure LoadWMIClassesFromCache(const namespace: string; List: TStrings);
@@ -358,6 +387,16 @@ begin
   FileName := GetWMICFolderCache + FileName + '.wmic';
   List.LoadFromFile(FileName);
 end;
+
+procedure LoadWMIClassesFromCache(const Host, Namespace: string; List: TStrings);
+var
+  FileName: string;
+begin
+  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
+  FileName := GetWMICFolderCache + Host + FileName + '.wmic';
+  List.LoadFromFile(FileName);
+end;
+
 
 procedure LoadWMIClassesMethodsFromCache(const namespace: string;
   List: TStrings);
@@ -388,11 +427,26 @@ begin
   List.SaveToFile(FileName);
 end;
 
+procedure SaveWMIClassesToCache(const Host, Namespace: string; List: TStrings);
+var
+  FileName: string;
+begin
+  FileName := StringReplace(namespace, '\', '%', [rfReplaceAll]);
+  FileName := GetWMICFolderCache +Host + FileName + '.wmic';
+  List.SaveToFile(FileName);
+end;
+
+
+
 procedure SaveWMINameSpacesToCache(List: TStrings);
 begin
   List.SaveToFile(GetWMICFolderCache + 'Namespaces.wmic');
 end;
 
+procedure SaveWMINameSpacesToCache(const Host: string; List: TStrings);
+begin
+  List.SaveToFile(GetWMICFolderCache +Host+ 'Namespaces.wmic');
+end;
 
 
 procedure RegisterVCLStyle(const StyleFileName: string);

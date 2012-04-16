@@ -64,7 +64,8 @@ uses
   uWmiInfo in 'Units\uWmiInfo.pas' {FrmWMIInfo},
   uWMIClassesContainer in 'Units\uWMIClassesContainer.pas' {FrmWMiClassesContainer},
   uWMIEventsContainer in 'Units\uWMIEventsContainer.pas' {FrmWmiEventsContainer},
-  uWMIMethodsContainer in 'Units\uWMIMethodsContainer.pas' {FrmWmiMethodsContainer};
+  uWMIMethodsContainer in 'Units\uWMIMethodsContainer.pas' {FrmWmiMethodsContainer},
+  uHostsAdmin in 'Units\uHostsAdmin.pas' {FrmHostAdmin};
 
 {$R *.res}
 

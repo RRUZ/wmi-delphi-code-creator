@@ -45,10 +45,13 @@ function  GetSpecialFolder(const CSIDL: integer) : string;
 function  IsWow64: boolean;
 function  CopyDir(const fromDir, toDir: string): boolean;
 procedure SetGridColumnWidths(DbGrid: TDBGrid);
+function  Ping(const Address:string;Retries,BufferSize:Word;Log : TStrings) : Boolean;
 
 implementation
 
 Uses
+ ActiveX,
+ Variants,
  ShlObj,
  ShellAPi,
  WinApi.Windows,
@@ -270,4 +273,105 @@ begin
   end;
 end;
 
+function GetStatusCodeStr(statusCode:integer) : string;
+begin
+  case statusCode of
+    0     : Result:='Success';
+    11001 : Result:='Buffer Too Small';
+    11002 : Result:='Destination Net Unreachable';
+    11003 : Result:='Destination Host Unreachable';
+    11004 : Result:='Destination Protocol Unreachable';
+    11005 : Result:='Destination Port Unreachable';
+    11006 : Result:='No Resources';
+    11007 : Result:='Bad Option';
+    11008 : Result:='Hardware Error';
+    11009 : Result:='Packet Too Big';
+    11010 : Result:='Request Timed Out';
+    11011 : Result:='Bad Request';
+    11012 : Result:='Bad Route';
+    11013 : Result:='TimeToLive Expired Transit';
+    11014 : Result:='TimeToLive Expired Reassembly';
+    11015 : Result:='Parameter Problem';
+    11016 : Result:='Source Quench';
+    11017 : Result:='Option Too Big';
+    11018 : Result:='Bad Destination';
+    11032 : Result:='Negotiating IPSEC';
+    11050 : Result:='General Failure'
+    else
+    result:='Unknow';
+  end;
+end;
+
+function  Ping(const Address:string;Retries,BufferSize:Word;Log : TStrings) : Boolean;
+var
+  FSWbemLocator : OLEVariant;
+  FWMIService   : OLEVariant;
+  FWbemObjectSet: OLEVariant;
+  FWbemObject   : OLEVariant;
+  oEnum         : IEnumvariant;
+  iValue        : LongWord;
+  i             : Integer;
+
+  PacketsReceived : Integer;
+  Minimum         : Integer;
+  Maximum         : Integer;
+  Average         : Integer;
+begin;
+  Result:=False;
+  PacketsReceived:=0;
+  Minimum        :=0;
+  Maximum        :=0;
+  Average        :=0;
+  Log.Add('');
+  Log.Add(Format('Pinging %s with %d bytes of data:',[Address,BufferSize]));
+  FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+  FWMIService   := FSWbemLocator.ConnectServer('localhost', 'root\CIMV2', '', '');
+  //FWMIService   := FSWbemLocator.ConnectServer('192.168.52.130', 'root\CIMV2', 'user', 'password');
+  for i := 0 to Retries-1 do
+  begin
+    FWbemObjectSet:= FWMIService.ExecQuery(Format('SELECT * FROM Win32_PingStatus where Address=%s AND BufferSize=%d',[QuotedStr(Address),BufferSize]),'WQL',0);
+    oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
+    if oEnum.Next(1, FWbemObject, iValue) = 0 then
+    begin
+      if FWbemObject.StatusCode=0 then
+      begin
+        if FWbemObject.ResponseTime>0 then
+          Log.Add(Format('Reply from %s: bytes=%s time=%sms TTL=%s',[FWbemObject.ProtocolAddress,FWbemObject.ReplySize,FWbemObject.ResponseTime,FWbemObject.TimeToLive]))
+        else
+          Log.Add(Format('Reply from %s: bytes=%s time=<1ms TTL=%s',[FWbemObject.ProtocolAddress,FWbemObject.ReplySize,FWbemObject.TimeToLive]));
+
+        Inc(PacketsReceived);
+
+        if FWbemObject.ResponseTime>Maximum then
+        Maximum:=FWbemObject.ResponseTime;
+
+        if Minimum=0 then
+        Minimum:=Maximum;
+
+        if FWbemObject.ResponseTime<Minimum then
+        Minimum:=FWbemObject.ResponseTime;
+
+        Average:=Average+FWbemObject.ResponseTime;
+      end
+      else
+      if not VarIsNull(FWbemObject.StatusCode) then
+        Log.Add(Format('Reply from %s: %s',[FWbemObject.ProtocolAddress,GetStatusCodeStr(FWbemObject.StatusCode)]))
+      else
+        Log.Add(Format('Reply from %s: %s',[Address,'Error processing request']));
+    end;
+    FWbemObject:=Unassigned;
+    FWbemObjectSet:=Unassigned;
+    //Sleep(500);
+  end;
+
+  Log.Add('');
+  Log.Add(Format('Ping statistics for %s:',[Address]));
+  Log.Add(Format('    Packets: Sent = %d, Received = %d, Lost = %d (%d%% loss),',[Retries,PacketsReceived,Retries-PacketsReceived,Round((Retries-PacketsReceived)*100/Retries)]));
+  if PacketsReceived>0 then
+  begin
+   Log.Add('Approximate round trip times in milli-seconds:');
+   Log.Add(Format('    Minimum = %dms, Maximum = %dms, Average = %dms',[Minimum,Maximum,Round(Average/PacketsReceived)]));
+   Result:=(Retries=PacketsReceived);
+  end;
+end;
 end.

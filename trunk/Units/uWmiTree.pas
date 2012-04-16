@@ -25,7 +25,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, SynEditHighlighter, ImgList, uWmi_Metadata, uMisc, uSettings,
+  Dialogs, SynEditHighlighter, ImgList, uWmi_Metadata, uMisc, uSettings, uHostsAdmin,
   XMLDoc,  XMLIntf, OleCtrls, SHDocVw, SynEdit, ComCtrls, StdCtrls, ExtCtrls, Vcl.Styles.WebBrowser;
 
 const
@@ -69,6 +69,7 @@ type
     FSetLog: TProcLog;
     FNamespace: string;
     FSettings: TSettings;
+    FWMIHost: TWMIHost;
     procedure LoadXMLWMIClass(const Xml: string);
     procedure DOMShow(ATree: TTreeView; Anode: IXMLNode; TNode: TTreeNode);
     procedure LoadWMIClasses;
@@ -79,6 +80,7 @@ type
     property SetLog : TProcLog read FSetLog Write FSetLog;
     property Namespace : string read FNamespace write FNamespace;
     property Settings : TSettings read FSettings Write SetSettings;
+    property  WMIHost : TWMIHost read FWMIHost Write FWMIHost;
   end;
 
 function FindTextTreeView(const AText: string;
@@ -162,6 +164,7 @@ procedure TFrmWMITree.FormCreate(Sender: TObject);
   end;
 
 begin
+  FWMIHost:=nil;
   DataLoaded :=False;
   //AddImage(1, NamespaceImageIndex, 'Namespace');
   AddImage(1, ClassImageIndex, 'WMI Class');
@@ -285,9 +288,7 @@ begin
     end;
 
   finally
-    if @FSetMsg<>nil then
       SetMsg('');
-    //FrmMain.ProgressBarWmi.Visible := False;
   end;
 end;
 
@@ -304,19 +305,28 @@ begin
     LClasses.BeginUpdate;
     try
       try
-        if not ExistWmiClassesCache(FNamespace) then
-        begin
-          GetListWmiClasses(FNamespace, LClasses, [], ['abstract'], True);
-          SaveWMIClassesToCache(FNamespace , LClasses);
-        end
+        if FWMIHost<>nil then
+          if not ExistWmiClassesCache(FWMIHost.Host, FNamespace) then
+          begin
+            GetListWmiClasses(FNamespace, FWMIHost.Host, FWMIHost.User, FWMIHost.PassWord, LClasses, [], ['abstract'], True);
+            SaveWMIClassesToCache(FWMIHost.Host, FNamespace , LClasses);
+          end
+          else
+            LoadWMIClassesFromCache(FWMIHost.Host, FNamespace, LClasses)
         else
-          LoadWMIClassesFromCache(FNamespace, LClasses);
+          if not ExistWmiClassesCache(FNamespace) then
+          begin
+            GetListWmiClasses(FNamespace, LClasses, [], ['abstract'], True);
+            SaveWMIClassesToCache(FNamespace , LClasses);
+          end
+          else
+            LoadWMIClassesFromCache(FNamespace, LClasses);
       except
         on E: EOleSysError do
-          if E.ErrorCode = HRESULT(wbemErrAccessDenied) then
-            SetLog(Format('Access denied  %s %s  Code : %x', ['GetListWmiClasses', E.Message, E.ErrorCode]))
-          else
-            raise;
+            SetLog(Format('EOleSysError  %s %s  Code : %x', ['TFrmWMITree.LoadWMIClasses', E.Message, E.ErrorCode]));
+        on E: Exception do
+            SetLog(Format('EOleSysError  %s %s', ['TFrmWMITree.LoadWMIClasses', E.Message]));
+
       end;
 
     finally
@@ -430,7 +440,11 @@ begin
   if Assigned(Node) and (Node.Level = LevelClass)  then
   begin
     PanelClassInfo.Height := 220;
-    WMiClassMetaData:= CachedWMIClasses.GetWmiClass(FNamespace, Node.Text);
+    if FWMIHost<>nil then
+      WMiClassMetaData:= CachedWMIClasses.GetWmiClass(FWMIHost.Host, FWMIHost.User, FWMIHost.PassWord, FNamespace, Node.Text)
+    else
+      WMiClassMetaData:= CachedWMIClasses.GetWmiClass(FNamespace, Node.Text);
+
     LoadClassInfo(WMiClassMetaData);
   end
   else
