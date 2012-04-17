@@ -33,10 +33,10 @@ type
   TFrmCheckUpdate = class(TForm)
     LabelMsg: TLabel;
     ProgressBar1: TProgressBar;
-    ImageUpdate: TImage;
     BtnCheckUpdates: TButton;
     LabelVersion: TLabel;
     BtnInstall: TButton;
+    Image1: TImage;
     procedure FormCreate(Sender: TObject);
     procedure BtnCheckUpdatesClick(Sender: TObject);
     procedure BtnInstallClick(Sender: TObject);
@@ -159,8 +159,11 @@ begin
   if MessageDlg(Format('Do you want install the new version (the %s will be closed) ?',[FApplicationName]),
       mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
-    ShellExecute(Handle, 'Open', PChar(TempInstallerFileName), nil, nil, SW_SHOWNORMAL) ;
-    Application.Terminate;
+    ShellExecute(Handle, 'Open', PChar(TempInstallerFileName), nil, nil, SW_SHOWNORMAL);
+    if Application.MainForm<>nil then
+     Application.Terminate
+    else
+     Halt(0);
   end;
 end;
 

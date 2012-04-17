@@ -19,6 +19,9 @@
    C#
    c++
 
+  Add Remote hosts support - working
+  add splash or run update checks in secondary thread,
+  
 
   add option to select prefered compiler
   add option to select prefered IDE
@@ -30,7 +33,8 @@
 
   disable run as admin requirement
   Fix disabled icons
-  Remote machine support
+  
+
   Improve source code
   Add automated tests
   Store cache x machine

@@ -191,7 +191,6 @@ object FrmWMISQL: TFrmWMISQL
         Gutter.Font.Style = []
         Gutter.ShowLineNumbers = True
         Highlighter = SynSQLSyn1
-        ExplicitTop = 1
       end
       object PanelNav: TPanel
         Left = 1
@@ -201,7 +200,6 @@ object FrmWMISQL: TFrmWMISQL
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitTop = 20
         object Label2: TLabel
           Left = 8
           Top = 6
@@ -353,7 +351,7 @@ object FrmWMISQL: TFrmWMISQL
     Left = 128
     Top = 296
     Bitmap = {
-      494C010101000800300010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010101000800340010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000010D0434052D0DD9042F
       0FFD041909B70005012600000000000000000000000000000000000000000000

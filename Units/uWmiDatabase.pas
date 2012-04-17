@@ -83,7 +83,7 @@ type
     procedure DeleteWmiDatabase;
     procedure CreateWmiDatabaseStructure;
     procedure Status(const Msg: string);
-    procedure SetNameSpaces(const Value: TStrings);
+    //procedure SetNameSpaces(const Value: TStrings);
   public
     property SetLog   : TProcLog read FLog write FLog;
   end;
@@ -321,7 +321,7 @@ end;
 procedure TFrmWmiDatabase.DBGridWMIDblClick(Sender: TObject);
 begin
   if ClientDataSetWmi.Active then
-    ListValuesWmiProperties(ClientDataSetWmi.FieldByName('Namespace').AsString, ClientDataSetWmi.FieldByName('Class').AsString, nil);
+    ListValuesWmiProperties(ClientDataSetWmi.FieldByName('Namespace').AsString, ClientDataSetWmi.FieldByName('Class').AsString, nil, SetLog);
 end;
 
 procedure TFrmWmiDatabase.DeleteWmiDatabase;
@@ -440,12 +440,13 @@ begin
   end;
 end;
 
+{
 procedure TFrmWmiDatabase.SetNameSpaces(const Value: TStrings);
 begin
   FNameSpaces.Clear;
   FNameSpaces.AddStrings(Value);
 end;
-
+}
 procedure TFrmWmiDatabase.Status(const Msg: string);
 begin
   LabelMsg.Caption:=Msg;

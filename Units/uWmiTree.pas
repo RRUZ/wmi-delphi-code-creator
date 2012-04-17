@@ -325,7 +325,7 @@ begin
         on E: EOleSysError do
             SetLog(Format('EOleSysError  %s %s  Code : %x', ['TFrmWMITree.LoadWMIClasses', E.Message, E.ErrorCode]));
         on E: Exception do
-            SetLog(Format('EOleSysError  %s %s', ['TFrmWMITree.LoadWMIClasses', E.Message]));
+            SetLog(Format('Exception     %s %s', ['TFrmWMITree.LoadWMIClasses', E.Message]));
 
       end;
 

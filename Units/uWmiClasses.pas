@@ -295,7 +295,7 @@ begin
         if ListViewProperties.Items[i].Checked then
           Props.Add(ListViewProperties.Items[i].Caption);
 
-      ListValuesWmiProperties(Namespace, WmiClass, Props);
+      ListValuesWmiProperties(Namespace, WmiClass, Props, SetLog);
     finally
      Props.Free;
     end;
