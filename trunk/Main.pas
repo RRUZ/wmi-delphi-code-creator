@@ -45,7 +45,7 @@ type
     PopupActionBar1: TPopupActionBar;
     TreeViewTasks: TTreeView;
     Splitter1: TSplitter;
-    PageControl1: TPageControl;
+    PageControlTasks: TPageControl;
     TabSheet1: TTabSheet;
     PageControl3: TPageControl;
     TabSheetTask: TTabSheet;
@@ -76,6 +76,7 @@ type
     procedure ActionPingUpdate(Sender: TObject);
     procedure ActionPingExecute(Sender: TObject);
     procedure ActionDisconnectUpdate(Sender: TObject);
+    procedure ToolButton1Click(Sender: TObject);
   private
     FSettings: TSettings;
     Ctx : TRttiContext;
@@ -182,12 +183,12 @@ end;
 
 procedure TFrmMain.ActionConnectUpdate(Sender: TObject);
 begin
- TAction(Sender).Enabled:=(TreeViewTasks.Selected<>nil) and (TObject(TreeViewTasks.Selected.Data) is TWMIHost) and (TWMIHost(TreeViewTasks.Selected.Data).Form=nil);
+ TAction(Sender).Enabled:=(PageControlTasks.Visible) and (TreeViewTasks.Selected<>nil) and (TObject(TreeViewTasks.Selected.Data) is TWMIHost) and (TWMIHost(TreeViewTasks.Selected.Data).Form=nil);
 end;
 
 procedure TFrmMain.ActionDisconnectUpdate(Sender: TObject);
 begin
- TAction(Sender).Enabled:=(TreeViewTasks.Selected<>nil) and (TObject(TreeViewTasks.Selected.Data) is TWMIHost) and (TWMIHost(TreeViewTasks.Selected.Data).Form<>nil);
+ TAction(Sender).Enabled:=(PageControlTasks.Visible) and (TreeViewTasks.Selected<>nil) and (TObject(TreeViewTasks.Selected.Data) is TWMIHost) and (TWMIHost(TreeViewTasks.Selected.Data).Form<>nil);
 end;
 
 procedure TFrmMain.ActionPingExecute(Sender: TObject);
@@ -197,7 +198,7 @@ end;
 
 procedure TFrmMain.ActionPingUpdate(Sender: TObject);
 begin
- TAction(Sender).Enabled:=(TreeViewTasks.Selected<>nil) and (TObject(TreeViewTasks.Selected.Data) is TWMIHost);
+ TAction(Sender).Enabled:=(PageControlTasks.Visible) and (TreeViewTasks.Selected<>nil) and (TObject(TreeViewTasks.Selected.Data) is TWMIHost);
 end;
 
 procedure TFrmMain.ActionRegisterHostExecute(Sender: TObject);
@@ -222,7 +223,6 @@ procedure TFrmMain.FormCreate(Sender: TObject);
 Var
  LNameSpaces : TStrings;
  LIndex      : Integer;
- LHost       : string;
 begin
   {$WARN SYMBOL_PLATFORM OFF}
   //ReportMemoryLeaksOnShutdown:=DebugHook<>0;
@@ -342,6 +342,11 @@ procedure TFrmMain.SetMsg(const Msg: string);
 begin
   StatusBar1.Panels[0].Text := Msg;
   StatusBar1.Update;
+end;
+
+procedure TFrmMain.ToolButton1Click(Sender: TObject);
+begin
+ PageControlTasks.Visible:=not PageControlTasks.Visible;
 end;
 
 procedure TFrmMain.ToolButtonAboutClick(Sender: TObject);

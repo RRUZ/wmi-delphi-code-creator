@@ -121,7 +121,6 @@ type
     FMachine: string;
     FPassword: string;
     FSettings : TSettings;
-    FSetMsg: TProcLog;
     FSetLog: TProcLog;
     procedure SetNameSpaces(const Value: TStrings);
     function GetNameSpaces: TStrings;

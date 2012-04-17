@@ -70,6 +70,8 @@ object FrmMain: TFrmMain
         object TabSheet3: TTabSheet
           Caption = 'Console Output'
           ImageIndex = 17
+          ExplicitTop = 24
+          ExplicitHeight = 149
           object MemoConsole: TMemo
             Left = 0
             Top = 0
@@ -85,6 +87,7 @@ object FrmMain: TFrmMain
             ParentFont = False
             ScrollBars = ssBoth
             TabOrder = 0
+            ExplicitHeight = 149
           end
         end
         object TabSheet2: TTabSheet
@@ -113,7 +116,7 @@ object FrmMain: TFrmMain
         end
       end
     end
-    object PageControl1: TPageControl
+    object PageControlTasks: TPageControl
       Left = 5
       Top = 5
       Width = 260
@@ -123,6 +126,10 @@ object FrmMain: TFrmMain
       TabOrder = 1
       object TabSheet1: TTabSheet
         Caption = 'Tasks'
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object TreeViewTasks: TTreeView
           Left = 0
           Top = 0
@@ -151,6 +158,8 @@ object FrmMain: TFrmMain
       object TabSheetTask: TTabSheet
         Caption = 'TabSheetTask'
         ImageIndex = -1
+        ExplicitTop = 24
+        ExplicitHeight = 452
       end
     end
   end
@@ -198,7 +207,7 @@ object FrmMain: TFrmMain
       DropdownMenu = PopupActionBar1
       ImageIndex = 30
       Style = tbsDropDown
-      OnClick = ActionConnectExecute
+      OnClick = ToolButton1Click
     end
     object ToolButtonSettings: TToolButton
       Left = 79
@@ -231,7 +240,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C010156007800F00210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010156007800FC0210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000006001000001002000000000000060
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000C0C0C392826257B423F3CB75B554FEA514943F8100C0C360000

@@ -27,7 +27,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, SynEdit, ExtCtrls,
+  Dialogs, ComCtrls, SynEdit, ExtCtrls, uMisc,
   Generics.Collections, uWmi_Metadata,
   ImgList, Contnrs, ActiveX, StdCtrls, Vcl.Menus, {$IFDEF USE_ASYNCWMIQUERY} WbemScripting_TLB, {$ENDIF}
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, Vcl.ActnList, Vcl.ActnMan;
@@ -140,6 +140,7 @@ type
     FContainValues: boolean;
     FWMIProperties: TStrings;
     WmiMetaData : TWMiClassMetaData;
+    FSetLog: TProcLog;
     procedure Log(const msg: string);
     procedure SetWmiClass(const Value: string);
     procedure SetWmiNamespace(const Value: string);
@@ -169,15 +170,15 @@ type
     property WmiClass: string Read FWmiClass Write SetWmiClass;
     property WmiNamespace: string Read FWmiNamespace Write SetWmiNamespace;
     property WQL: TStrings Read FWQL;
+    property SetLog : TProcLog read FSetLog Write FSetLog;
     procedure LoadValues(Properties : TStringList); cdecl;
   end;
 
-  procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList);
+  procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList;SetLog : TProcLog);
 
 implementation
 
 uses
-  uMisc,
   uOnlineResources,
   ComObj,
   CommCtrl,
@@ -230,7 +231,7 @@ begin
  end;
 end;
 
-procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList);
+procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList;SetLog : TProcLog);
 var
   Frm: TFrmWmiVwProps;
 begin
@@ -240,6 +241,7 @@ begin
     Frm.WmiClass     := WmiClass;
     Frm.WmiNamespace := Namespace;
     Frm.Caption      := 'Properties Values for the class ' + WmiClass;
+    Frm.SetLog:=SetLog;
     Frm.LoadValues(Properties);
     Frm.Show();
   end;
@@ -471,8 +473,14 @@ begin
     FWMIService  :=nil;
   end;
 {$ELSE}
-  if (not FThreadFinished) and Assigned(FThread) and not FThread.Terminated then
-    FThread.Terminate;
+  try
+    if (not FThreadFinished) and Assigned(FThread) and not FThread.Terminated then
+      FThread.Terminate;
+  except
+    on E: Exception do
+        SetLog(Format('Exception  %s %s', ['TFrmWmiVwProps.Terminate', E.Message]));
+  end;
+
 {$ENDIF}
 
   FWMIProperties.Free;

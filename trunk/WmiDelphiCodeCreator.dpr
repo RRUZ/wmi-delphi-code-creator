@@ -72,24 +72,31 @@ uses
 procedure UpdateApp;
 var
   Frm: TFrmCheckUpdate;
+  Settings : TSettings;
 begin
-  Frm := GetUpdaterInstance;
+  Settings:=TSettings.Create;
   try
-    Frm.CheckExternal:=True;
-    if Frm.UpdateAvailable then
-      Frm.ExecuteUpdater;
+    ReadSettings(Settings);
+    if Settings.CheckForUpdates then
+    begin
+      Frm := GetUpdaterInstance;
+      try
+        Frm.CheckExternal:=True;
+        if Frm.UpdateAvailable then
+          Frm.ExecuteUpdater;
+      finally
+        Frm.Free;
+      end;
+    end;
   finally
-    Frm.Free;
+    Settings.Free;
   end;
 end;
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  UpdateApp;
   Application.CreateForm(TFrmMain, FrmMain);
-  Application.CreateForm(TFrmWmiMethodsContainer, FrmWmiMethodsContainer);
-  if FrmMain.Settings.CheckForUpdates then
-   UpdateApp;
-
   Application.Run;
 end.
