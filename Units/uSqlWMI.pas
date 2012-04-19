@@ -27,7 +27,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Datasnap.DBClient, Vcl.Grids, Generics.Collections,
   Vcl.DBGrids, Vcl.StdCtrls, SynEditHighlighter, SynHighlighterSQL, uMisc, ActiveX,
-  Vcl.ExtCtrls, SynEdit, uSynEditPopupEdit, uComboBox, Vcl.DBCtrls,
+  Vcl.ExtCtrls, SynEdit, uSynEditPopupEdit, uComboBox, Vcl.DBCtrls, uHostsAdmin,
   SynCompletionProposal, Vcl.ComCtrls, uWmi_Metadata, uSettings,
   Vcl.ImgList, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan,
   Vcl.Menus, Vcl.ActnPopup;
@@ -40,7 +40,9 @@ type
    end;
 
   TFrmWMISQL = class(TForm)
+    CbHosts: TComboBox;
     procedure FormShow(Sender: TObject);
+    procedure CbHostsChange(Sender: TObject);
    type
       TWMIPropData = class
       private
@@ -61,7 +63,6 @@ type
     DBGridWMI: TDBGrid;
     ClientDataSet1: TClientDataSet;
     DataSource1: TDataSource;
-    EditMachine: TEdit;
     Label2: TLabel;
     Label3: TLabel;
     EditUser: TEdit;
@@ -118,15 +119,16 @@ type
     DataLoaded : Boolean;
     FLog: TProcLog;
     FUser: string;
-    FMachine: string;
+    FHost: string;
     FPassword: string;
     FSettings : TSettings;
     FSetLog: TProcLog;
+    ListWINHosts : TObjectList<TWMIHost>;
     procedure SetNameSpaces(const Value: TStrings);
     function GetNameSpaces: TStrings;
     procedure CreateStructure;
     procedure RunWQL;
-    procedure SetMachine(const Value: string);
+    procedure SetHost(const Value: string);
     procedure SetPassWord(const Value: string);
     procedure SetUser(const Value: string);
     procedure LoadClassInfo;
@@ -138,11 +140,10 @@ type
 
   public
     property SetLog : TProcLog read FSetLog Write FSetLog;
-
     property NameSpaces : TStrings read GetNameSpaces Write SetNameSpaces;
     property User : string read FUser write SetUser;
     property Password : string read FPassword write SetPassWord;
-    property Machine  : string read FMachine write SetMachine;
+    property Host  : string read FHost write SetHost;
     procedure SetNameSpaceIndex(Index : integer);
   end;
 
@@ -193,6 +194,36 @@ end;
 procedure TFrmWMISQL.ActionRunWQLUpdate(Sender: TObject);
 begin
  TAction(Sender).Enabled:=(Length(SynEditWQL.Text)>0) and (FRunningWQL=False);
+end;
+
+procedure TFrmWMISQL.CbHostsChange(Sender: TObject);
+var
+ LWMIHost : TWMIHost;
+begin
+
+  if SameText(trim(CbHosts.Text), 'localhost') then
+  begin
+    EditUser.Text:='';
+    FUser:='';
+    EditPassword.Text:='';
+    FPassword:='';
+    FHost:='localhost';
+    LoadNamespaces;
+  end
+  else
+   for LWMIHost in  ListWINHosts do
+    if SameText(CbHosts.Text, LWMIHost.Host) then
+    begin
+      EditUser.Text:=LWMIHost.User;
+      FUser:=LWMIHost.User;
+      EditPassword.Text:=LWMIHost.PassWord;
+      FPassword:=LWMIHost.PassWord;
+      FHost:=LWMIHost.Host;
+      LoadNamespaces;
+      break;
+    end;
+
+
 end;
 
 procedure TFrmWMISQL.CbNameSpacesChange(Sender: TObject);
@@ -306,7 +337,7 @@ procedure TFrmWMISQL.DBGridWMIDrawColumnCell(Sender: TObject; const Rect: TRect;
 
 procedure TFrmWMISQL.EditMachineExit(Sender: TObject);
 begin
- FMachine:=EditMachine.Text;
+ FHost:=CbHosts.Text;
 end;
 
 procedure TFrmWMISQL.EditPasswordExit(Sender: TObject);
@@ -320,14 +351,22 @@ begin
 end;
 
 procedure TFrmWMISQL.FormCreate(Sender: TObject);
+var
+ LWMIHost : TWMIHost;
 begin
+  ListWINHosts:=GetListWMIRegisteredHosts;
   DataLoaded :=False;
   FSettings:=TSettings.Create;
   FRunningWQL:=False;
   FUser:='';
   FPassword:='';
-  FMachine:='localhost';
+  FHost:='localhost';
   FFields:=TObjectList<TWMIPropData>.Create(True);
+
+   CbHosts.Items.Add('localhost');
+   for LWMIHost in ListWINHosts do
+     CbHosts.Items.Add(LWMIHost.Host);
+  CbHosts.ItemIndex:=0;
 
   ReadSettings(FSettings);
   LoadCurrentTheme(Self, FSettings.CurrentTheme);
@@ -338,6 +377,8 @@ procedure TFrmWMISQL.FormDestroy(Sender: TObject);
 begin
   FSettings.Free;
   FFields.Free;
+  if ListWINHosts<>nil then
+   FreeAndNil(ListWINHosts);
 end;
 
 procedure TFrmWMISQL.FormShow(Sender: TObject);
@@ -456,8 +497,15 @@ end;
 
 procedure TFrmWMISQL.LoadNamespaces;
 begin
- NameSpaces:=CachedWMIClasses.NameSpaces;
- SetNameSpaceIndex(0);
+ SetLog(Format('Loading Namespaces for %s',[FHost]));
+ if SameText('localhost', FHost) then
+  NameSpaces:=CachedWMIClasses.NameSpaces
+ else
+  NameSpaces:=CachedWMIClasses.GetNameSpacesHost(CbHosts.Text, FUser, FPassword);
+
+ if NameSpaces.Count>0 then
+   SetNameSpaceIndex(0);
+
  DataLoaded:=True;
 end;
 
@@ -541,8 +589,8 @@ begin
   try
     FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
     try
-      SetMsg(Format('Connecting to %s server', [FMachine]));
-      FWMIService   := FSWbemLocator.ConnectServer(FMachine, CbNameSpaces.Text, FUser, FPassword);
+      SetMsg(Format('Connecting to %s server', [FHost]));
+      FWMIService   := FSWbemLocator.ConnectServer(FHost, CbNameSpaces.Text, FUser, FPassword);
       SetMsg('Done');
       SetMsg('Running WQL sentence');
       FWbemObjectSet:= FWMIService.ExecQuery(SynEditWQL.Lines.Text, 'WQL', wbemFlagForwardOnly);
@@ -614,10 +662,10 @@ begin
   end;
 end;
 
-procedure TFrmWMISQL.SetMachine(const Value: string);
+procedure TFrmWMISQL.SetHost(const Value: string);
 begin
-  FMachine := Value;
-  EditMachine.Text:=Value;
+  FHost := Value;
+  CbHosts.Text:=Value;
 end;
 
 procedure TFrmWMISQL.SetMsg(const Msg: string);

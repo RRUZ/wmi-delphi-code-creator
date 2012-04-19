@@ -183,7 +183,7 @@ object FrmWMISQL: TFrmWMISQL
         Font.Name = 'Courier New'
         Font.Style = []
         PopupMenu = PopupActionBar1
-        TabOrder = 0
+        TabOrder = 1
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
         Gutter.Font.Height = -11
@@ -199,7 +199,7 @@ object FrmWMISQL: TFrmWMISQL
         Height = 57
         Align = alTop
         BevelOuter = bvNone
-        TabOrder = 1
+        TabOrder = 0
         object Label2: TLabel
           Left = 8
           Top = 6
@@ -229,23 +229,14 @@ object FrmWMISQL: TFrmWMISQL
           Action = ActionRunWQL
           Caption = 'Execute'
           Images = ImageList1
-          TabOrder = 0
-        end
-        object EditMachine: TEdit
-          Left = 8
-          Top = 25
-          Width = 121
-          Height = 21
           TabOrder = 1
-          Text = 'localhost'
-          OnExit = EditMachineExit
         end
         object EditUser: TEdit
           Left = 135
           Top = 25
           Width = 121
           Height = 21
-          TabOrder = 2
+          TabOrder = 3
           OnExit = EditUserExit
         end
         object EditPassword: TEdit
@@ -254,7 +245,7 @@ object FrmWMISQL: TFrmWMISQL
           Width = 121
           Height = 21
           PasswordChar = '*'
-          TabOrder = 3
+          TabOrder = 4
           OnExit = EditPasswordExit
         end
         object CheckBoxAsync: TCheckBox
@@ -265,7 +256,16 @@ object FrmWMISQL: TFrmWMISQL
           Caption = 'Run in Async mode'
           Checked = True
           State = cbChecked
-          TabOrder = 4
+          TabOrder = 0
+        end
+        object CbHosts: TComboBox
+          Left = 8
+          Top = 25
+          Width = 121
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 2
+          OnChange = CbHostsChange
         end
       end
     end
@@ -351,7 +351,7 @@ object FrmWMISQL: TFrmWMISQL
     Left = 128
     Top = 296
     Bitmap = {
-      494C010101000800340010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010101000800380010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000010D0434052D0DD9042F
       0FFD041909B70005012600000000000000000000000000000000000000000000

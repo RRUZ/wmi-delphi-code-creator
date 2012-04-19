@@ -20,6 +20,8 @@
    c++
 
   Add Remote hosts support - working
+    SQL WMI done
+
   add splash or run update checks in secondary thread,
   
 
@@ -37,7 +39,7 @@
 
   Improve source code
   Add automated tests
-  Store cache x machine
+  Store cache x machine - done
   Create code based in plugins and interfaces
 
 
