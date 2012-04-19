@@ -161,6 +161,9 @@ begin
       LWMIHost.Form:=LForm;
       LWMIHost.Form.Show;
 
+      TreeViewTasks.Selected.ImageIndex:=6;
+      TreeViewTasks.Selected.SelectedIndex:=6;
+
       LNameSpaces:=TStringList.Create;
       SetMsg(Format('Getting WMI namespaces from [%s]',[LWMIHost.Host]));
       try
@@ -177,7 +180,11 @@ begin
       end;
     end
     else
-    MsgWarning('Was not possible establish a connection with the host');
+    begin
+      TreeViewTasks.Selected.ImageIndex:=12;
+      TreeViewTasks.Selected.SelectedIndex:=12;
+      MsgWarning('Was not possible establish a connection with the host');
+    end;
   end;
 end;
 
@@ -279,7 +286,7 @@ begin
   RegisterTask('','WQL', 56, Ctx.GetType(TFrmSqlWMIContainer));
   //RegisterTask('','Events Monitor', 28, nil);
   //RegisterTask('','Log', 32, Ctx.GetType(TFrmLog));
-  RegisterTask('','CIM Repository (localhost)', 31, Ctx.GetType(TFrmWMIInfo));
+  RegisterTask('','CIM Repository (localhost)', 6, Ctx.GetType(TFrmWMIInfo));
 
   LNameSpaces:=TStringList.Create;
   try
@@ -381,15 +388,15 @@ end;
 procedure TFrmMain.RegisterWMIHosts;
 Var
  Node : TTreeNode;
- LWMIRegisterdHosts : TWMIHost;
+ LWMIHost : TWMIHost;
 begin
    if ListWINHosts<>nil then
      FreeAndNil(ListWINHosts);
    ListWINHosts:=GetListWMIRegisteredHosts;
 
-   for LWMIRegisterdHosts in ListWINHosts do
+   for LWMIHost in ListWINHosts do
    begin
-     Node:=TreeViewTasks.Items.AddObject(nil, Format(HostCIMStr, [LWMIRegisterdHosts.Host]), LWMIRegisterdHosts);
+     Node:=TreeViewTasks.Items.AddObject(nil, Format(HostCIMStr, [LWMIHost.Host]), LWMIHost);
      Node.ImageIndex    :=31;//add BN ??
      Node.SelectedIndex :=31;
    end;

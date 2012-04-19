@@ -108,14 +108,15 @@ class function TCachedWMIClasses.GetNameSpacesHost(
 Var
   LNameSpaces : TStrings;
 begin
+
   if FHostNameSpaces.ContainsKey(Host) then
     LNameSpaces:=FHostNameSpaces.Items[Host]
   else
   begin
     LNameSpaces:=TStringList.Create;
+    TStringList(LNameSpaces).Sorted:=True;
     FHostNameSpaces.Add(Host, LNameSpaces);
   end;
-
 
   if not ExistWmiNameSpaceCache(Host) then
   begin
