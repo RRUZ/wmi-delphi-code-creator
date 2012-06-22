@@ -221,7 +221,7 @@ end;
 
 procedure TFrmWmiDatabase.ButtonBuildWmiDatabaseClick(Sender: TObject);
 var
-  AsyncCall: IAsyncCall;
+  LAsyncCall: IAsyncCall;
   d: TDateTime;
 
   procedure Dummy;
@@ -246,9 +246,15 @@ begin
   else
   begin
     PanelStatus.Height:=90;
-    AsyncCall := LocalAsyncCall(@Dummy);
-    while AsyncMultiSync([AsyncCall], True, 1) = WAIT_TIMEOUT do
+    {$IFNDEF CPUX64}
+    LAsyncCall := LocalAsyncCall(@Dummy);
+    {$ELSE}
+    LAsyncCall := AsyncCall(@Dummy, nil);
+    {$ENDIF ~CPUX64}
+    while AsyncMultiSync([LAsyncCall], True, 1) = WAIT_TIMEOUT do
       Application.ProcessMessages;
+
+
     MsgInformation(Format('The WMI database has been created - Elapsed time %s',
       [FormatDateTime('hh:nn:ss.zzz', Now - d)]));
 

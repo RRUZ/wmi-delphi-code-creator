@@ -27,7 +27,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
   SynEditHighlighter, SynHighlighterPas, uCheckUpdate, SynHighlighterCpp, Vcl.Styles.Ext,Vcl.Styles.ColorTabs,
-  SynHighlighterCS, Vcl.ExtDlgs, SynHighlighterSQL;
+  SynHighlighterCS, Vcl.ExtDlgs, SynHighlighterSQL, Vcl.Themes;
 
 type
   TSettings = class
@@ -227,9 +227,7 @@ type
     procedure BtnSetBackImageClick(Sender: TObject);
   private
     FPreview:TVclStylesPreview;
-    LStyle    : TCustomStyleExt;
     FSettings: TSettings;
-    //FCurrentTheme:  TIDETheme;
     FForm: TForm;
     procedure LoadFixedWidthFonts;
     procedure LoadThemes;
@@ -299,7 +297,6 @@ uses
   uWmiDelphiCode,
   uWmiGenCode,
   Vcl.Styles,
-  Vcl.Themes,
   uMisc;
 
 const
@@ -1107,16 +1104,13 @@ procedure TFrmSettings.DrawSeletedVCLStyle;
 var
   StyleName : string;
   SourceInfo: TSourceInfo;
+  LStyle    : TCustomStyleServices;
 begin
    StyleName:=ComboBoxVCLStyle.Text;
-   if (StyleName<>'') and (not SameText('Windows',StyleName)) then
+   if (StyleName<>'') and (not SameText(StyleName, 'Windows')) then
    begin
-     if LStyle<>nil then
-      FreeAndNil(LStyle);
-
      TStyleManager.StyleNames;//call DiscoverStyleResources
-     SourceInfo:=TStyleManager.StyleSourceInfo[StyleName];
-     LStyle:=TCustomStyleExt.Create(TStream(SourceInfo.Data));
+     LStyle:=TStyleManager.Style[StyleName];
      FPreview.Caption:=StyleName;
      FPreview.Style:=LStyle;
      TVclStylesPreviewClass(FPreview).Paint;
@@ -1125,20 +1119,17 @@ end;
 
 procedure TFrmSettings.FormCreate(Sender: TObject);
 var
-  i : TSourceLanguages;
+  LIndex : TSourceLanguages;
 begin
-  LStyle:=Nil;
-
   FPreview:=TVclStylesPreview.Create(Self);
   FPreview.Parent:=PanelPreview;
   FPreview.BoundsRect := PanelPreview.ClientRect;
 
-
-  for i := Low(TSourceLanguages) to High(TSourceLanguages) do
+  for LIndex := Low(TSourceLanguages) to High(TSourceLanguages) do
   begin
-    ComboBoxLanguageSel.Items.AddObject(ListSourceLanguages[i], TObject(i));
-    ComboBoxLanguageThemes.Items.AddObject(ListSourceLanguages[i], TObject(i));
-    ComboBoxLanguageTemplate.Items.AddObject(ListSourceLanguages[i], TObject(i));
+    ComboBoxLanguageSel.Items.AddObject(ListSourceLanguages[LIndex], TObject(LIndex));
+    ComboBoxLanguageThemes.Items.AddObject(ListSourceLanguages[LIndex], TObject(LIndex));
+    ComboBoxLanguageTemplate.Items.AddObject(ListSourceLanguages[LIndex], TObject(LIndex));
   end;
 
   FSettings:=TSettings.Create;
@@ -1156,9 +1147,6 @@ end;
 procedure TFrmSettings.FormDestroy(Sender: TObject);
 begin
   FPreview.Free;
-  if LStyle<>nil then
-    LStyle.Free;
-
   FSettings.Free;
 end;
 

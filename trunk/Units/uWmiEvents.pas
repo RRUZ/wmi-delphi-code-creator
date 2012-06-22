@@ -81,6 +81,7 @@ type
     procedure SetSettings(const Value: TSettings);
     procedure SetConsole(const Value: TMemo);
     procedure LoadNameSpaces;
+    procedure SaveCurrentSettings;
   public
     procedure LoadWmiEvents(const Namespace: string; FirstTime : Boolean=False);
     property Settings : TSettings read FSettings Write SetSettings;
@@ -130,16 +131,19 @@ end;
 procedure TFrmWmiEvents.ComboBoxEventsChange(Sender: TObject);
 begin
   LoadEventsInfo;
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiEvents.ComboBoxNamespacesEventsChange(Sender: TObject);
 begin
   LoadWmiEvents(ComboBoxNamespacesEvents.Text);
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiEvents.ComboBoxTargetInstanceChange(Sender: TObject);
 begin
   LoadTargetInstanceProps;
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiEvents.EditValueEventExit(Sender: TObject);
@@ -155,11 +159,7 @@ end;
 
 procedure TFrmWmiEvents.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  Settings.LastWmiNameSpaceEvents:=ComboBoxNamespacesEvents.Text;
-  Settings.LastWmiEvent:=ComboBoxEvents.Text;
-  Settings.LastWmiEventIntrinsic:=RadioButtonIntrinsic.Checked;
-  if RadioButtonIntrinsic.Checked then
-   Settings.LastWmiEventTargetInstance:=ComboBoxTargetInstance.Text;
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiEvents.FormCreate(Sender: TObject);
@@ -533,6 +533,15 @@ end;
 procedure TFrmWmiEvents.RadioButtonIntrinsicClick(Sender: TObject);
 begin
   LoadWmiEvents(ComboBoxNamespacesEvents.Text);
+end;
+
+procedure TFrmWmiEvents.SaveCurrentSettings;
+begin
+  Settings.LastWmiNameSpaceEvents:=ComboBoxNamespacesEvents.Text;
+  Settings.LastWmiEvent:=ComboBoxEvents.Text;
+  Settings.LastWmiEventIntrinsic:=RadioButtonIntrinsic.Checked;
+  if RadioButtonIntrinsic.Checked then
+   Settings.LastWmiEventTargetInstance:=ComboBoxTargetInstance.Text;
 end;
 
 procedure TFrmWmiEvents.SetConsole(const Value: TMemo);

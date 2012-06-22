@@ -46,19 +46,29 @@ end;
 
 procedure TFrmWmiClassTree.Fill;
 var
-  AsyncCall: IAsyncCall;
+  LAsyncCall: IAsyncCall;
 
  Procedure Foo;
  begin
   FillTree(CbNamespaces.Text);
  end;
 
+ Procedure Foo2(const NameSpace:string);
+ begin
+  FillTree(NameSpace);
+ end;
+
 begin
   if Working then exit;
   Working:=True;
 
-  AsyncCall := LocalAsyncCall(@Foo);
-  while AsyncMultiSync([AsyncCall], True, 1) = WAIT_TIMEOUT do
+  {$IFNDEF CPUX64}
+  LAsyncCall := LocalAsyncCall(@Foo);
+  {$ELSE}
+  LAsyncCall := AsyncCall(@Foo2, CbNamespaces.Text);
+  {$ENDIF ~CPUX64}
+
+  while AsyncMultiSync([LAsyncCall], True, 1) = WAIT_TIMEOUT do
     Application.ProcessMessages;
 
   Working:=False;

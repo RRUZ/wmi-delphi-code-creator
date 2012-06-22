@@ -181,9 +181,13 @@ begin
       RunWQL
     else
     begin
+      {$IFNDEF CPUX64}
         AsyncCall := LocalAsyncCall(@LRunWQL);
         while AsyncMultiSync([AsyncCall], True, 1) = WAIT_TIMEOUT do
           Application.ProcessMessages;
+       {$ELSE}
+         RunWQL
+       {$ENDIF ~CPUX64}
     end;
   finally
     FRunningWQL:=False;

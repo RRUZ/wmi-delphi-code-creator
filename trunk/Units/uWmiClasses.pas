@@ -62,6 +62,7 @@ type
     procedure SetSettings(const Value: TSettings);
     procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
     procedure LoadNameSpaces;
+    procedure SaveCurrentSettings;
   public
     property SetMsg : TProcLog read FSetMsg Write FSetMsg;
     property SetLog : TProcLog read FSetLog Write FSetLog;
@@ -116,6 +117,7 @@ end;
 procedure TFrmWmiClasses.ComboBoxClassesChange(Sender: TObject);
 begin
   LoadClassInfo;
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiClasses.ComboBoxNameSpacesChange(Sender: TObject);
@@ -123,12 +125,12 @@ begin
   LoadWmiClasses(TComboBox(Sender).Text);
   ComboBoxClasses.ItemIndex := 0;
   LoadClassInfo;
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiClasses.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  FSettings.LastWmiNameSpace:=ComboBoxNameSpaces.Text;
-  FSettings.LastWmiClass:=ComboBoxClasses.Text;
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiClasses.FormCreate(Sender: TObject);
@@ -458,6 +460,12 @@ begin
   ListViewProperties.Repaint;
 
   GenerateCode;
+end;
+
+procedure TFrmWmiClasses.SaveCurrentSettings;
+begin
+  FSettings.LastWmiNameSpace:=ComboBoxNameSpaces.Text;
+  FSettings.LastWmiClass:=ComboBoxClasses.Text;
 end;
 
 procedure TFrmWmiClasses.SetConsole(const Value: TMemo);

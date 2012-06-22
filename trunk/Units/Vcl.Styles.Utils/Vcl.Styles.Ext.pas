@@ -23,7 +23,7 @@ unit Vcl.Styles.Ext;
 
 interface
 
-{$DEFINE USE_VCL_STYLESAPI}
+{.$DEFINE USE_VCL_STYLESAPI}
 
 
 Uses
@@ -43,7 +43,7 @@ type
 type
   TVclStylesPreview = class(TCustomControl)
   private
-    FStyle: TCustomStyle;
+    FStyle: TCustomStyleServices;
     FIcon: HICON;
     FCaption: TCaption;
     FRegion : HRGN;
@@ -52,7 +52,7 @@ type
     procedure Paint; override;
   public
     property Icon:HICON read FIcon Write FIcon;
-    property Style:TCustomStyle read FStyle Write FStyle;
+    property Style:TCustomStyleServices read FStyle Write FStyle;
     property Caption : TCaption read FCaption write FCaption;
     property BitMap : TBitmap read FBitmap write FBitmap;
     constructor Create(AControl: TComponent); override;
@@ -216,8 +216,8 @@ uses
  Vcl.Consts,
  Vcl.GraphUtil,
  Vcl.Imaging.pngimage,
- Winapi.Messages,
 {$ENDIF}
+ Winapi.Messages,
  Rtti,
  Vcl.Dialogs,
  System.Sysutils;
@@ -896,6 +896,8 @@ var
   ARect           : TRect;
   //BlendFunction   : TBlendFunction;
   LRegion         : HRgn;
+  TitleInfo       : TTitleBarInfoEx;
+  NativeTheme     : Boolean;
 
     function GetBorderSize: TRect;
     var
@@ -933,6 +935,14 @@ var
 begin
   if FStyle=nil then Exit;
 
+  ZeroMemory(@TitleInfo, SizeOf(TitleInfo));
+  TitleInfo.cbSize:=SizeOf(TitleInfo);
+
+  NativeTheme:=SameText(FStyle.Name, 'Windows');
+  if NativeTheme then
+   SendMessage(Application.MainFormHandle, WM_GETTITLEBARINFOEX, 0, NativeInt(@TitleInfo));
+   //GetTitleBarInfo(Application.MainFormHandle, TitleInfo);
+
   BorderRect := GetBorderSize;
   ARect:=ClientRect;
   CaptionBitmap := TBitmap.Create;
@@ -944,7 +954,7 @@ begin
   //Draw background
   LDetails.Element := teWindow;
   LDetails.Part := 0;
-  Style.DrawElement(FBitmap.Canvas.Handle, LDetails, ARect);
+  FStyle.DrawElement(FBitmap.Canvas.Handle, LDetails, ARect);
 
   //Draw caption border
   CaptionRect := Rect(0, 0, CaptionBitmap.Width, CaptionBitmap.Height);
@@ -960,13 +970,13 @@ begin
   end;
 
 
-  Style.DrawElement(CaptionBitmap.Canvas.Handle, LDetails, CaptionRect);
+  FStyle.DrawElement(CaptionBitmap.Canvas.Handle, LDetails, CaptionRect);
   TextRect := CaptionRect;
   CaptionDetails := LDetails;
 
   //Draw icon
-  IconDetails := Style.GetElementDetails(twSysButtonNormal);
-  if not Style.GetElementContentRect(0, IconDetails, CaptionRect, ButtonRect) then
+  IconDetails := FStyle.GetElementDetails(twSysButtonNormal);
+  if not FStyle.GetElementContentRect(0, IconDetails, CaptionRect, ButtonRect) then
     ButtonRect := Rect(0, 0, 0, 0);
   IconRect := Rect(0, 0, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON));
   RectVCenter(IconRect, ButtonRect);
@@ -980,31 +990,31 @@ begin
   //Draw buttons
 
   //Close button
-  LDetails := Style.GetElementDetails(twCloseButtonNormal);
-  if Style.GetElementContentRect(0, LDetails, CaptionRect, ButtonRect) then
-   Style.DrawElement(CaptionBitmap.Canvas.Handle, LDetails, ButtonRect);
+  LDetails := FStyle.GetElementDetails(twCloseButtonNormal);
+  if FStyle.GetElementContentRect(0, LDetails, CaptionRect, ButtonRect) then
+   FStyle.DrawElement(CaptionBitmap.Canvas.Handle, LDetails, ButtonRect);
 
   //Maximize button
   LDetails := Style.GetElementDetails(twMaxButtonNormal);
-  if Style.GetElementContentRect(0, LDetails, CaptionRect, ButtonRect) then
-    Style.DrawElement(CaptionBitmap.Canvas.Handle, LDetails, ButtonRect);
+  if FStyle.GetElementContentRect(0, LDetails, CaptionRect, ButtonRect) then
+    FStyle.DrawElement(CaptionBitmap.Canvas.Handle, LDetails, ButtonRect);
 
   //Minimize button
   LDetails := Style.GetElementDetails(twMinButtonNormal);
 
-  if Style.GetElementContentRect(0, LDetails, CaptionRect, ButtonRect) then
-    Style.DrawElement(CaptionBitmap.Canvas.Handle, LDetails, ButtonRect);
+  if FStyle.GetElementContentRect(0, LDetails, CaptionRect, ButtonRect) then
+    FStyle.DrawElement(CaptionBitmap.Canvas.Handle, LDetails, ButtonRect);
 
   //Help button
-  LDetails := Style.GetElementDetails(twHelpButtonNormal);
-  if Style.GetElementContentRect(0, LDetails, CaptionRect, ButtonRect) then
-    Style.DrawElement(CaptionBitmap.Canvas.Handle, LDetails, ButtonRect);
+  LDetails := FStyle.GetElementDetails(twHelpButtonNormal);
+  if FStyle.GetElementContentRect(0, LDetails, CaptionRect, ButtonRect) then
+    FStyle.DrawElement(CaptionBitmap.Canvas.Handle, LDetails, ButtonRect);
 
   if ButtonRect.Left > 0 then
     TextRect.Right := ButtonRect.Left;
 
   //Draw text
-  Style.DrawText(CaptionBitmap.Canvas.Handle, CaptionDetails, FCaption, TextRect, [tfLeft, tfSingleLine, tfVerticalCenter]);
+  FStyle.DrawText(CaptionBitmap.Canvas.Handle, CaptionDetails, FCaption, TextRect, [tfLeft, tfSingleLine, tfVerticalCenter]);
 
   //Draw caption
   FBitmap.Canvas.Draw(0, 0, CaptionBitmap);

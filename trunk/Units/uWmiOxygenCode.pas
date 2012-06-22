@@ -72,6 +72,7 @@ var
   DynCode: TStrings;
   i: integer;
   TemplateCode : string;
+  CimType:Integer;
 begin
   Descr := GetWmiClassDescription;
 
@@ -94,14 +95,19 @@ begin
 
     if Props.Count > 0 then
       for i := 0 to Props.Count - 1 do
-        if UseHelperFunctions then
-          DynCode.Add(Format(
-            '     Console.WriteLine(''{0,-35} {1,-40}'',%s,WmiObject[%s]);// %s',
-            [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]))
-        else
-          DynCode.Add(Format(
-            '     Console.WriteLine(''{0,-35} {1,-40}'',%s,WmiObject[%s]);// %s',
-            [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+      begin
+          CimType:=Integer(Props.Objects[i]);
+          case CimType of
+            wbemCimtypeDatetime :
+              DynCode.Add(Format(
+                '     Console.WriteLine(''{0,-35} {1,-40}'',%s,ManagementDateTimeConverter.ToDateTime(string(WmiObject[%s])));// %s',
+                [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]))
+            else
+              DynCode.Add(Format(
+                '     Console.WriteLine(''{0,-35} {1,-40}'',%s,WmiObject[%s]);// %s',
+                [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+          end;
+      end;
 
     StrCode := StringReplace(StrCode, sTagOxygenCode, DynCode.Text, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassDescr, Descr, [rfReplaceAll]);
@@ -123,6 +129,7 @@ var
   Wql:     string;
   i, Len:  integer;
   Props:   TStrings;
+  CimType:Integer;
 begin
   StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiEvents));
 
@@ -154,11 +161,27 @@ begin
   Props := TStringList.Create;
   try
     for i := 0 to PropsOut.Count - 1 do
-     if StartsText(wbemTargetInstance,PropsOut[i]) then
-      Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + ManagementBaseObject(e.NewEvent[%s])[%s]);',
-      [QuotedStr(PropsOut[i]+' : '),QuotedStr(wbemTargetInstance), QuotedStr(StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]))]))
-     else
-      Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + e.NewEvent.Properties[%s].Value.ToString());', [QuotedStr(PropsOut[i]+' : '), QuotedStr(PropsOut[i])]));
+    begin
+          CimType:=Integer(PropsOut.Objects[i]);
+          case CimType of
+            wbemCimtypeDatetime :
+            begin
+               if StartsText(wbemTargetInstance,PropsOut[i]) then
+                Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + ManagementDateTimeConverter.ToDateTime(string(ManagementBaseObject(e.NewEvent[%s])[%s])));',
+                [QuotedStr(PropsOut[i]+' : '),QuotedStr(wbemTargetInstance), QuotedStr(StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]))]))
+               else
+                Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + ManagementDateTimeConverter.ToDateTime(e.NewEvent.Properties[%s].Value.ToString()));', [QuotedStr(PropsOut[i]+' : '), QuotedStr(PropsOut[i])]));
+            end
+            else
+            begin
+               if StartsText(wbemTargetInstance,PropsOut[i]) then
+                Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + ManagementBaseObject(e.NewEvent[%s])[%s]);',
+                [QuotedStr(PropsOut[i]+' : '),QuotedStr(wbemTargetInstance), QuotedStr(StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]))]))
+               else
+                Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + e.NewEvent.Properties[%s].Value.ToString());', [QuotedStr(PropsOut[i]+' : '), QuotedStr(PropsOut[i])]));
+            end;
+          end;
+    end;
 
     StrCode := StringReplace(StrCode, sTagOxygenEventsOut, Props.Text, [rfReplaceAll]);
   finally
