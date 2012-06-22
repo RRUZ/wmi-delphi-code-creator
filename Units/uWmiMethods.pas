@@ -76,6 +76,7 @@ type
     procedure GenerateCode;
     procedure LoadNameSpaces;
     procedure LoadWmiMethods(const Namespace: string; FirstTime : Boolean=False);
+    procedure SaveCurrentSettings;
   public
     property SetMsg : TProcLog read FSetMsg Write FSetMsg;
     property SetLog : TProcLog read FSetLog Write FSetLog;
@@ -120,17 +121,20 @@ end;
 procedure TFrmWmiMethods.ComboBoxClassesMethodsChange(Sender: TObject);
 begin
   LoadMethodInfo;
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiMethods.ComboBoxMethodsChange(Sender: TObject);
 begin
   LoadParametersMethodInfo(CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text));
   GenerateCode;
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiMethods.ComboBoxNamespaceMethodsChange(Sender: TObject);
 begin
   LoadWmiMethods(ComboBoxNamespaceMethods.Text);
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiMethods.ComboBoxPathsChange(Sender: TObject);
@@ -154,9 +158,7 @@ end;
 
 procedure TFrmWmiMethods.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  Settings.LastWmiNameSpaceMethods:=ComboBoxNamespaceMethods.Text;
-  Settings.LastWmiClassesMethods  :=ComboBoxClassesMethods.Text;
-  Settings.LastWmiMethod          :=ComboBoxMethods.Text;
+  SaveCurrentSettings;
 end;
 
 procedure TFrmWmiMethods.FormCreate(Sender: TObject);
@@ -498,6 +500,13 @@ begin
   finally
     SetMsg('');
   end;
+end;
+
+procedure TFrmWmiMethods.SaveCurrentSettings;
+begin
+  Settings.LastWmiNameSpaceMethods:=ComboBoxNamespaceMethods.Text;
+  Settings.LastWmiClassesMethods  :=ComboBoxClassesMethods.Text;
+  Settings.LastWmiMethod          :=ComboBoxMethods.Text;
 end;
 
 procedure TFrmWmiMethods.SetConsole(const Value: TMemo);

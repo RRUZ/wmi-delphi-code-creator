@@ -87,6 +87,8 @@ var
   i: integer;
   TemplateCode : string;
   Padding    : string;
+  CimType:Integer;
+
 begin
   Descr := GetWmiClassDescription;
 
@@ -103,9 +105,19 @@ begin
     Padding:=StringOfChar(' ',20);
     if Props.Count > 0 then
       for i := 0 to Props.Count - 1 do
-          DynCode.Add(Format(
-            Padding+'Console.WriteLine("{0,-35} {1,-40}","%s",WmiObject["%s"]);// %s',
-            [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]));
+      begin
+          CimType:=Integer(Props.Objects[i]);
+          case CimType of
+            wbemCimtypeDatetime :
+              DynCode.Add(Format(
+                Padding+'Console.WriteLine("{0,-35} {1,-40}","%s",ManagementDateTimeConverter.ToDateTime((string)WmiObject["%s"]));// %s',
+                [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]))
+          else
+              DynCode.Add(Format(
+                Padding+'Console.WriteLine("{0,-35} {1,-40}","%s",WmiObject["%s"]);// %s',
+                [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]));
+          end;
+      end;
 
     StrCode := StringReplace(StrCode, sTagCSharpCode, DynCode.Text, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassDescr, Descr, [rfReplaceAll]);
@@ -128,6 +140,7 @@ var
   i, Len:  integer;
   Props:   TStrings;
   Padding : string;
+  CimType:Integer;
 begin
   Padding := StringOfChar(' ',10);
   StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiEvents));
@@ -159,11 +172,26 @@ begin
   Props := TStringList.Create;
   try
     for i := 0 to PropsOut.Count - 1 do
-     if StartsText(wbemTargetInstance,PropsOut[i]) then
-      Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + ((ManagementBaseObject)e.NewEvent.Properties["%s"].Value)["%s"]);',
-      [PropsOut[i]+' : ',wbemTargetInstance, StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll])]))
-     else
-      Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + e.NewEvent.Properties["%s"].Value.ToString());', [PropsOut[i]+' : ', PropsOut[i]]));
+    begin
+          CimType:=Integer(PropsOut.Objects[i]);
+          case CimType of
+            wbemCimtypeDatetime :
+               if StartsText(wbemTargetInstance,PropsOut[i]) then
+                Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + ManagementDateTimeConverter.ToDateTime((string)((ManagementBaseObject)e.NewEvent.Properties["%s"].Value)["%s"]));',
+                [PropsOut[i]+' : ',wbemTargetInstance, StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll])]))
+               else
+                Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + ManagementDateTimeConverter.ToDateTime(e.NewEvent.Properties["%s"].Value.ToString()));', [PropsOut[i]+' : ', PropsOut[i]]));
+          else
+            begin
+               if StartsText(wbemTargetInstance,PropsOut[i]) then
+                Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + ((ManagementBaseObject)e.NewEvent.Properties["%s"].Value)["%s"]);',
+                [PropsOut[i]+' : ',wbemTargetInstance, StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll])]))
+               else
+                Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + e.NewEvent.Properties["%s"].Value.ToString());', [PropsOut[i]+' : ', PropsOut[i]]));
+            end;
+
+          end;
+    end;
 
     StrCode := StringReplace(StrCode, sTagCSharpEventsOut, Props.Text, [rfReplaceAll]);
   finally

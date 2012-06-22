@@ -25,8 +25,6 @@ object FrmSettings: TFrmSettings
     Align = alClient
     BorderWidth = 5
     TabOrder = 0
-    ExplicitWidth = 587
-    ExplicitHeight = 428
     object PageControl1: TPageControl
       Left = 6
       Top = 6
@@ -35,8 +33,6 @@ object FrmSettings: TFrmSettings
       ActivePage = TabSheet4
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 575
-      ExplicitHeight = 416
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
