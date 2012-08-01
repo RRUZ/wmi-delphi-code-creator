@@ -2,7 +2,7 @@
 		<PropertyGroup>
 			<ProjectGuid>{32301805-B238-47C6-A643-4C62BFBDFD0E}</ProjectGuid>
 			<ProjectVersion>13.4</ProjectVersion>
-			<MainSource>WmiDelphiCodeCreator.dpr</MainSource>
+			<MainSource>WDCC.dpr</MainSource>
 			<Base>True</Base>
 			<Config Condition="'$(Config)'==''">Release</Config>
 			<AppType>Application</AppType>
@@ -301,7 +301,7 @@
 						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
 					</Excluded_Packages>
 					<Source>
-						<Source Name="MainSource">WmiDelphiCodeCreator.dpr</Source>
+						<Source Name="MainSource">WDCC.dpr</Source>
 					</Source>
 				</Delphi.Personality>
 				<Platforms>
