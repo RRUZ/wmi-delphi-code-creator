@@ -1,4 +1,4 @@
-program WmiDelphiCodeCreator;
+program WDCC;
 
 uses
   Forms,
