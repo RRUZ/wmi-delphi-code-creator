@@ -1,7 +1,7 @@
 {**************************************************************************************************}
 {                                                                                                  }
 { Unit uBorlandCppVersions                                                                         }
-{ unit retrieves the Borland/Embaradero cpp ide installed versions for the WMI Delphi Code Creator }
+{ unit retrieves the Borland/Embarcadero cpp ide installed versions for the WMI Delphi Code Creator}
 {                                                                                                  }
 { The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
 { you may not use this file except in compliance with the License. You may obtain a copy of the    }
@@ -41,7 +41,8 @@ type
     BorlandCpp2009,
     BorlandCpp2010,
     BorlandCppXE,
-    BorlandCppXE2
+    BorlandCppXE2,
+    BorlandCppXE3
     );
 
 const
@@ -54,7 +55,8 @@ const
     'RAD Studio 2009',
     'RAD Studio 2010',
     'RAD Studio XE',
-    'RAD Studio XE2'
+    'RAD Studio XE2',
+    'RAD Studio XE3'
     );
 
   BorlandCppRegPaths: array[TBorlandCppVersions] of string = (
@@ -66,7 +68,8 @@ const
     '\Software\CodeGear\BDS\6.0',
     '\Software\CodeGear\BDS\7.0',
     '\Software\Embarcadero\BDS\8.0',
-    '\Software\Embarcadero\BDS\9.0'
+    '\Software\Embarcadero\BDS\9.0',
+    '\Software\Embarcadero\BDS\10.0'
     );
 
 
@@ -76,11 +79,11 @@ procedure FillListViewBorlandCppVersions(ListView: TListView);
 implementation
 
 uses
+  uRegistry,
   Vcl.ImgList,
   Winapi.CommCtrl,
   Winapi.ShellAPI,
   Winapi.Windows,
-  uRegistry,
   System.Win.Registry;
 
 procedure ExtractIconFileToImageList(ImageList: TCustomImageList; const Filename: string);
