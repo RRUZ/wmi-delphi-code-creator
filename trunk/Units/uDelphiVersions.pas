@@ -1,7 +1,7 @@
 {**************************************************************************************************}
 {                                                                                                  }
 { Unit uDelphiVersions                                                                             }
-{ unit retrieves the delphi ide installed versions  for the Delphi IDE Theme Editor                }
+{ unit retrieves the delphi ide installed versions                                                 }
 {                                                                                                  }
 { The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
 { you may not use this file except in compliance with the License. You may obtain a copy of the    }
@@ -46,7 +46,8 @@ type
     Delphi2009,
     Delphi2010,
     DelphiXE,
-    DelphiXE2
+    DelphiXE2,
+    DelphiXE3
     );
 
 
@@ -81,7 +82,8 @@ const
     'RAD Studio 2009',
     'RAD Studio 2010',
     'RAD Studio XE',
-    'RAD Studio XE2'
+    'RAD Studio XE2',
+    'RAD Studio XE3'
     );
 
   DelphiVersionNumbers: array[TDelphiVersions] of double =
@@ -98,7 +100,8 @@ const
     20,      // 'RAD Studio 2009',
     21,      // 'RAD Studio 2010',
     22,      // 'RAD Studio XE'
-    23       // 'RAD Studio XE2'
+    23,      // 'RAD Studio XE2'
+    24       // 'RAD Studio XE3'
     );
 
 
@@ -116,7 +119,8 @@ const
     '\Software\CodeGear\BDS\6.0',
     '\Software\CodeGear\BDS\7.0',
     '\Software\Embarcadero\BDS\8.0',
-    '\Software\Embarcadero\BDS\9.0'
+    '\Software\Embarcadero\BDS\9.0',
+    '\Software\Embarcadero\BDS\10.0'
     );
 
 
