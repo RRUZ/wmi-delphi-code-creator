@@ -51,6 +51,7 @@ var
 implementation
 
 uses
+ IdURI,
  uListView_Helper,
  ShellApi,
  ComObj,
@@ -75,6 +76,54 @@ begin
 end;
 
 procedure TFrmOnlineResources.GetResults;
+const
+ ApplicationID= 'TnirCFpM4B8F8mCECpFxNtF0i0qts/xVKkVJT/iWRig=';
+ URI='https://api.datamarket.azure.com/Bing/Search/Web?Query=%s&$format=ATOM&$top=%d&$skip=%d';
+ COMPLETED=4;
+ OK       =200;
+var
+  XMLHTTPRequest  : IXMLHTTPRequest;
+  XMLDOMDocument  : IXMLDOMDocument;
+  XMLDOMNode      : IXMLDOMNode;
+  cXMLDOMNode     : IXMLDOMNode;
+  XMLDOMNodeList  : IXMLDOMNodeList;
+  LIndex          : Integer;
+  Item            : TListItem;
+
+begin
+    ListViewURL.Items.Clear;
+    XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As IXMLHTTPRequest;
+  try
+    XMLHTTPRequest.open('GET',Format(URI,[TIdURI.PathEncode(QuotedStr(SearchKey)), 10, 0]), False, ApplicationID, ApplicationID);
+    XMLHTTPRequest.send('');
+    if (XMLHTTPRequest.readyState = COMPLETED) and (XMLHTTPRequest.status = OK) then
+    begin
+      XMLDOMDocument:=CoDOMDocument.Create;
+      try
+        XMLDOMDocument.loadXML(XMLHTTPRequest.responseText);
+        XMLDOMNode := XMLDOMDocument.selectSingleNode('/feed');
+        XMLDOMNodeList := XMLDOMNode.selectNodes('//entry');
+        for LIndex:=0 to  XMLDOMNodeList.length-1 do
+        begin
+          Item:=ListViewURL.Items.Add;
+          XMLDOMNode:=XMLDOMNodeList.item[LIndex];
+           cXMLDOMNode:=XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Title',[LIndex]));
+           Item.Caption:=String(cXMLDOMNode.Text);
+           cXMLDOMNode:=XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Url',[LIndex]));
+           Item.SubItems.Add(String(cXMLDOMNode.Text));
+           cXMLDOMNode:=XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Description',[LIndex]));
+           Item.SubItems.Add(String(cXMLDOMNode.Text));
+        end;
+      finally
+        XMLDOMDocument:=nil;
+      end;
+    end;
+  finally
+    XMLHTTPRequest := nil;
+  end;
+  AutoResizeListView(ListViewURL);
+end;
+{
 const
  ApplicationID= '73C8F474CA4D1202AD60747126813B731199ECEA';
  URI='http://api.bing.net/xml.aspx?AppId=%s&Version=2.2&Market=en-US&Query=%s&Sources=web&web.count=%d&xmltype=AttributeBased';
@@ -113,7 +162,7 @@ begin
   end;
   AutoResizeListView(ListViewURL);
 end;
-
+}
 
 
 procedure TFrmOnlineResources.ListViewURLDblClick(Sender: TObject);
