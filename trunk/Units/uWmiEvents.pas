@@ -479,13 +479,13 @@ begin
 
     if RadioButtonIntrinsic.Checked then
     begin
-      GetListIntrinsicWmiEvents(Namespace, ComboBoxEvents.Items);
+      GetListIntrinsicWmiEvents(Namespace, 'localhost', '', '', ComboBoxEvents.Items);
       ComboBoxTargetInstance.Visible := True;
       LabelTargetInstance.Visible    := True;
     end
     else
     begin
-      GetListExtrinsicWmiEvents(Namespace, ComboBoxEvents.Items);
+      GetListExtrinsicWmiEvents(Namespace, 'localhost', '', '', ComboBoxEvents.Items);
       ComboBoxTargetInstance.Visible := False;
       LabelTargetInstance.Visible    := False;
     end;
