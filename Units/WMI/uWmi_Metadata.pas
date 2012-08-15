@@ -385,9 +385,9 @@ type
   procedure GetListWmiClassMethods(const NameSpace,WmiClass:String;const List :TStrings);
   procedure GetListWmiClassImplementedMethods(const NameSpace,WmiClass:String;Const List :TStrings);
 
-  procedure GetListWmiEvents(const NameSpace:String;const List :TStrings);
-  procedure GetListIntrinsicWmiEvents(const NameSpace:String;const List :TStrings);
-  procedure GetListExtrinsicWmiEvents(const NameSpace:String;const List :TStrings);
+  procedure GetListWmiEvents(const NameSpace, Host , User, Password:String;const List :TStrings);
+  procedure GetListIntrinsicWmiEvents(const NameSpace, Host , User, Password:String;const List :TStrings);
+  procedure GetListExtrinsicWmiEvents(const NameSpace, Host , User, Password:String;const List :TStrings);
 
   procedure GetListWmiMethodInParameters(const NameSpace,WmiClass,WmiMethod:String;ParamsList,ParamsTypes,ParamsDescr :TStringList);
   procedure GetListWmiMethodOutParameters(const NameSpace,WmiClass,WmiMethod:String;ParamsList,ParamsTypes,ParamsDescr :TStringList);
@@ -872,45 +872,64 @@ var
   ClassName         : string;
   i                 : Integer;
   Ok                : Boolean;
+  ExtrinsicWmiEvents: TStrings;
+  IntrinsicWmiEvents: TStrings;
 begin
-  objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
-  objWMIService   := objSWbemLocator.ConnectServer(Host, NameSpace, User, Password);
-  colClasses      := objWMIService.SubclassesOf();
-  for objClass in GetOleVariantEnum(colClasses) do
-  begin
-     ClassName:= objClass.Path_.Class;
-     if ExcludeEvents and StartsText('_',ClassName) then //ugly hack to fast detection of events classes
-      Continue;
+   ExtrinsicWmiEvents:=TStringList.Create;
+   IntrinsicWmiEvents:=TStringList.Create;
+   try
+     if ExcludeEvents then
+     begin
+       GetListExtrinsicWmiEvents(NameSpace, Host, User, Password ,ExtrinsicWmiEvents);
+       GetListIntrinsicWmiEvents(NameSpace, Host, User, Password ,IntrinsicWmiEvents);
+     end;
 
-      Ok          := True;
-      for objClassQualifier in GetOleVariantEnum(objClass.Qualifiers_) do
-        if ok then
-        begin
-          //inc(QualifCount);
+    objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+    objWMIService   := objSWbemLocator.ConnectServer(Host, NameSpace, User, Password);
+    colClasses      := objWMIService.SubclassesOf();
+    for objClass in GetOleVariantEnum(colClasses) do
+    begin
+       ClassName:= objClass.Path_.Class;
 
-          for i := Low(ExcludeQualifiers) to High(ExcludeQualifiers) do
-          if SameText(objClassQualifier.Name,ExcludeQualifiers[i]) then
-           Ok:=False;
+       if ExcludeEvents and StartsText('_',ClassName) then //ugly hack to fast detection of events classes
+        Continue;
 
+       if ExcludeEvents and (ExtrinsicWmiEvents.IndexOf(ClassName)>-1) then  Continue;
+       if ExcludeEvents and (IntrinsicWmiEvents.IndexOf(ClassName)>-1) then  Continue;
 
-          for i := Low(IncludeQualifiers) to High(IncludeQualifiers) do
-          if SameText(objClassQualifier.Name,IncludeQualifiers[i]) then
+        Ok          := True;
+        for objClassQualifier in GetOleVariantEnum(objClass.Qualifiers_) do
+          if ok then
           begin
-            List.Add(ClassName);
-            Ok:=False;
-            Break;
+            //inc(QualifCount);
+
+            for i := Low(ExcludeQualifiers) to High(ExcludeQualifiers) do
+            if SameText(objClassQualifier.Name,ExcludeQualifiers[i]) then
+             Ok:=False;
+
+
+            for i := Low(IncludeQualifiers) to High(IncludeQualifiers) do
+            if SameText(objClassQualifier.Name,IncludeQualifiers[i]) then
+            begin
+              List.Add(ClassName);
+              Ok:=False;
+              Break;
+            end;
           end;
-        end;
 
-      if (Length(IncludeQualifiers)=0) then
-        List.Add(ClassName);
-  end;
+        if (Length(IncludeQualifiers)=0) then
+          List.Add(ClassName);
+    end;
 
-  objSWbemLocator   :=Unassigned;
-  objWMIService     :=Unassigned;
-  colClasses        :=Unassigned;
-  objClass          :=Unassigned;
-  objClassQualifier :=Unassigned;
+    objSWbemLocator   :=Unassigned;
+    objWMIService     :=Unassigned;
+    colClasses        :=Unassigned;
+    objClass          :=Unassigned;
+    objClassQualifier :=Unassigned;
+   finally
+      ExtrinsicWmiEvents.Free;
+      IntrinsicWmiEvents.Free;
+   end;
 end;
 
 procedure  GetListWmiClasses(const NameSpace:String;const List :TStrings;const IncludeQualifiers,ExcludeQualifiers: Array of string;ExcludeEvents:Boolean);overload;
@@ -1011,7 +1030,7 @@ begin
   objClassQualifier :=Unassigned;
 end;
 
-procedure  GetListWmiEvents(const NameSpace:String;const List :TStrings);
+procedure  GetListWmiEvents(const NameSpace, Host , User, Password:String;const List :TStrings);
 var
   objSWbemLocator: OleVariant;
   objWMIService  : OLEVariant;
@@ -1020,7 +1039,7 @@ var
 begin
   List.Clear;
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
-  objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
+  objWMIService   := objSWbemLocator.ConnectServer(Host, NameSpace, User, Password);
   colItems        := objWMIService.ExecQuery('select * from meta_class where __this isa ''__EVENT''');
   for colItem in GetOleVariantEnum(colItems) do
     List.Add(colItem.Path_.Class);
@@ -1034,7 +1053,7 @@ begin
   colItem        :=Unassigned;
 end;
 
-procedure  GetListExtrinsicWmiEvents(const NameSpace:String;const List :TStrings);
+procedure  GetListExtrinsicWmiEvents(const NameSpace, Host , User, Password:String;const List :TStrings);
 var
   objSWbemLocator: OleVariant;
   objWMIService  : OLEVariant;
@@ -1043,7 +1062,7 @@ var
 begin
   List.Clear;
   objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
-  objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
+  objWMIService   := objSWbemLocator.ConnectServer(Host, NameSpace, User, Password);
   colItems        := objWMIService.ExecQuery('select * from meta_class where __this isa ''__ExtrinsicEvent''');
   for colItem in GetOleVariantEnum(colItems) do
     List.Add(colItem.Path_.Class);
@@ -1054,7 +1073,7 @@ begin
   colItem        :=Unassigned;
 end;
 
-procedure  GetListIntrinsicWmiEvents(const NameSpace:String;const List :TStrings);
+procedure  GetListIntrinsicWmiEvents(const NameSpace, Host , User, Password:String;const List :TStrings);
 var
   objSWbemLocator: OleVariant;
   objWMIService  : OLEVariant;
@@ -1064,10 +1083,10 @@ var
 begin
   Extrinsic:=TStringList.Create;
   try
-    GetListExtrinsicWmiEvents(NameSpace,Extrinsic);
+    GetListExtrinsicWmiEvents(NameSpace, Host, User, Password, Extrinsic);
     List.Clear;
     objSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
-    objWMIService   := objSWbemLocator.ConnectServer(wbemLocalhost, NameSpace, '', '');
+    objWMIService   := objSWbemLocator.ConnectServer(Host, NameSpace, User, Password);
     colItems        := objWMIService.ExecQuery('select * from meta_class where __this isa ''__Event''');
     for colItem in GetOleVariantEnum(colItems) do
       if Extrinsic.IndexOf(colItem.Path_.Class)=-1 then
