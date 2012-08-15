@@ -45,7 +45,7 @@ object FrmWmiMethods: TFrmWmiMethods
     end
     object Label6: TLabel
       Left = 11
-      Top = 197
+      Top = 213
       Width = 84
       Height = 13
       Caption = 'Input Parameters'
@@ -103,9 +103,9 @@ object FrmWmiMethods: TFrmWmiMethods
     end
     object ListViewMethodsParams: TListView
       Left = 10
-      Top = 216
+      Top = 232
       Width = 368
-      Height = 276
+      Height = 260
       Anchors = [akLeft, akTop, akRight, akBottom]
       Checkboxes = True
       Columns = <
@@ -140,7 +140,7 @@ object FrmWmiMethods: TFrmWmiMethods
       Left = 11
       Top = 130
       Width = 367
-      Height = 68
+      Height = 54
       Anchors = [akLeft, akTop, akRight]
       ReadOnly = True
       ScrollBars = ssVertical
@@ -183,6 +183,15 @@ object FrmWmiMethods: TFrmWmiMethods
       Caption = 'Instances'
       TabOrder = 3
       OnClick = CheckBoxPathClick
+    end
+    object CheckBoxSelAllProps: TCheckBox
+      Left = 11
+      Top = 190
+      Width = 114
+      Height = 17
+      Caption = 'Select all Properties'
+      TabOrder = 9
+      OnClick = CheckBoxSelAllPropsClick
     end
   end
   object PanelMethodCode: TPanel

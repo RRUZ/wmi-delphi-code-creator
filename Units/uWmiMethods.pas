@@ -48,6 +48,7 @@ type
     CheckBoxPath: TCheckBox;
     Splitter5: TSplitter;
     PanelMethodCode: TPanel;
+    CheckBoxSelAllProps: TCheckBox;
     procedure ComboBoxNamespaceMethodsChange(Sender: TObject);
     procedure ComboBoxClassesMethodsChange(Sender: TObject);
     procedure ComboBoxMethodsChange(Sender: TObject);
@@ -59,6 +60,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure CheckBoxSelAllPropsClick(Sender: TObject);
   private
     FSetMsg: TProcLog;
     FSetLog: TProcLog;
@@ -116,6 +118,16 @@ end;
 procedure TFrmWmiMethods.CheckBoxPathClick(Sender: TObject);
 begin
   LoadParametersMethodInfo(CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text));
+end;
+
+procedure TFrmWmiMethods.CheckBoxSelAllPropsClick(Sender: TObject);
+var
+  LIndex: integer;
+begin
+  for LIndex := 0 to ListViewMethodsParams.Items.Count - 1 do
+    ListViewMethodsParams.Items[LIndex].Checked := CheckBoxSelAllProps.Checked;
+
+  GenerateCode;
 end;
 
 procedure TFrmWmiMethods.ComboBoxClassesMethodsChange(Sender: TObject);
@@ -444,6 +456,8 @@ begin
         Item := ListViewMethodsParams.Items.Add;
         Item.Caption := LWMiMethodMetaData.InParameters[i].Name;
         Item.Data    := Pointer(LWMiMethodMetaData.InParameters[i].CimType);
+
+        Item.Checked := CheckBoxSelAllProps.Checked;
 
         Item.SubItems.Add(LWMiMethodMetaData.InParameters[i].&Type);
         s:=GetDefaultValueWmiType(LWMiMethodMetaData.InParameters[i].&Type);

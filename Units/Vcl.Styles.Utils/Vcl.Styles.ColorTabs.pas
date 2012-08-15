@@ -50,6 +50,7 @@ implementation
 
 uses
  System.Classes,
+ System.Types,
  System.SysUtils,
  Generics.Collections,
  Vcl.Styles,

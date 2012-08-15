@@ -24,8 +24,8 @@ unit uListView_Helper;
 interface
 
 uses
-  CommCtrl,
-  ComCtrls;
+  Winapi.CommCtrl,
+  Vcl.ComCtrls;
 
 const
   LVSCW_AUTOSIZE_BESTFIT = -3;
@@ -38,7 +38,7 @@ procedure AutoResizeListView(const ListView: TListView;  const Mode: integer = L
 implementation
 
 uses
-  Windows;
+  Winapi.Windows;
 
 
 procedure AutoResizeColumn(const Column: TListColumn;

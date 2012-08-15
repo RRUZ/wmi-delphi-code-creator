@@ -23,7 +23,7 @@ unit uOleVariantEnum;
 interface
 
 Uses
-  ActiveX;
+  Winapi.ActiveX;
 
 type
   IOleVariantEnum  = interface
@@ -69,7 +69,7 @@ function GetOleVariantArrEnum(Collection:OleVariant):IGetOleVariantEnum;
 implementation
 
 Uses
-  Variants;
+  System.Variants;
 
 function GetOleVariantEnum(Collection:OleVariant):IGetOleVariantEnum;
 begin

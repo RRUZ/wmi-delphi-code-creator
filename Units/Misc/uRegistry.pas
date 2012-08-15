@@ -25,20 +25,21 @@ unit uRegistry;
 interface
 
 uses
-  Registry,
-  Windows;
+  Winapi.Windows;
 
-function RegReadStr(const RegPath, RegValue: string; var Str: string; const RootKey: HKEY): boolean;
+function RegReadStr(const RegPath, RegValue: string; var StrValue: string; const RootKey: HKEY): boolean;
 function RegReadInt(const RegPath, RegValue: string; var IntValue: integer; const RootKey: HKEY): boolean;
-function RegWriteStr(const RegPath, RegValue: string; const Str: string; const RootKey: HKEY): boolean;
+function RegWriteStr(const RegPath, RegValue: string; const StrValue: string; const RootKey: HKEY): boolean;
 function RegWriteInt(const RegPath, RegValue: string; IntValue: integer; const RootKey: HKEY): boolean;
 function RegKeyExists(const RegPath: string; const RootKey: HKEY): boolean;
 
 
 implementation
 
+uses
+  System.Win.Registry;
 
-function RegWriteStr(const RegPath, RegValue: string; const Str: string; const RootKey: HKEY): boolean;
+function RegWriteStr(const RegPath, RegValue: string; const StrValue: string; const RootKey: HKEY): boolean;
 var
   Reg: TRegistry;
 begin
@@ -48,7 +49,7 @@ begin
       Reg.RootKey := RootKey;
       Result      := Reg.OpenKey(RegPath, True);
       if Result then
-        Reg.WriteString(RegValue, Str);
+        Reg.WriteString(RegValue, StrValue);
     finally
       Reg.Free;
     end;
@@ -57,7 +58,7 @@ begin
   end;
 end;
 
-function RegReadStr(const RegPath, RegValue: string; var Str: string;
+function RegReadStr(const RegPath, RegValue: string; var StrValue: string;
   const RootKey: HKEY): boolean;
 var
   Reg: TRegistry;
@@ -68,7 +69,7 @@ begin
       Reg.RootKey := RootKey;
       Result      := Reg.OpenKey(RegPath, True);
       if Result then
-        Str := Reg.ReadString(RegValue);
+        StrValue := Reg.ReadString(RegValue);
     finally
       Reg.Free;
     end;

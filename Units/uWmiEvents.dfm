@@ -39,7 +39,7 @@ object FrmWmiEvents: TFrmWmiEvents
       472)
     object LabelEventsConds: TLabel
       Left = 5
-      Top = 157
+      Top = 173
       Width = 50
       Height = 13
       Caption = 'Conditions'
@@ -88,9 +88,9 @@ object FrmWmiEvents: TFrmWmiEvents
     end
     object ListViewEventsConds: TListView
       Left = 5
-      Top = 176
+      Top = 192
       Width = 405
-      Height = 257
+      Height = 241
       Anchors = [akLeft, akTop, akRight, akBottom]
       Checkboxes = True
       Columns = <
@@ -219,6 +219,15 @@ object FrmWmiEvents: TFrmWmiEvents
       Caption = 'Extrinsic'
       TabOrder = 2
       OnClick = RadioButtonIntrinsicClick
+    end
+    object CheckBoxSelAllProps: TCheckBox
+      Left = 5
+      Top = 153
+      Width = 114
+      Height = 17
+      Caption = 'Select all Properties'
+      TabOrder = 10
+      OnClick = CheckBoxSelAllPropsClick
     end
   end
   object PanelEventCode: TPanel

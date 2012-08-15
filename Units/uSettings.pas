@@ -1103,7 +1103,6 @@ end;
 procedure TFrmSettings.DrawSeletedVCLStyle;
 var
   StyleName : string;
-  SourceInfo: TSourceInfo;
   LStyle    : TCustomStyleServices;
 begin
    StyleName:=ComboBoxVCLStyle.Text;
