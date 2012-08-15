@@ -163,9 +163,6 @@ begin
 end;
 
 procedure TFrmHostAdmin.CreateStructure;
-var
-  colItems : OleVariant;
-  colItem  : OleVariant;
 begin
   if ClientDataSet1.Active then ClientDataSet1.Close;
   ClientDataSet1.FieldDefs.Clear;

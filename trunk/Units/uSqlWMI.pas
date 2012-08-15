@@ -117,7 +117,6 @@ type
     iValue        : LongWord;
     FRunningWQL   : Boolean;
     DataLoaded : Boolean;
-    FLog: TProcLog;
     FUser: string;
     FHost: string;
     FPassword: string;

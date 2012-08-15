@@ -53,6 +53,7 @@ type
     RadioButtonExtrinsic: TRadioButton;
     Splitter6: TSplitter;
     PanelEventCode: TPanel;
+    CheckBoxSelAllProps: TCheckBox;
     procedure ComboBoxNamespacesEventsChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure RadioButtonIntrinsicClick(Sender: TObject);
@@ -64,6 +65,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure EditValueEventExit(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure CheckBoxSelAllPropsClick(Sender: TObject);
   private
     FItem:      TListitem;
     FrmCodeEditorEvent  : TFrmCodeEditor;
@@ -114,6 +116,16 @@ const
 
 procedure TFrmWmiEvents.ButtonGenerateEventCodeClick(Sender: TObject);
 begin
+  GenerateCode;
+end;
+
+procedure TFrmWmiEvents.CheckBoxSelAllPropsClick(Sender: TObject);
+var
+  LIndex: integer;
+begin
+  for LIndex := 0 to ListViewEventsConds.Items.Count - 1 do
+    ListViewEventsConds.Items[LIndex].Checked := CheckBoxSelAllProps.Checked;
+
   GenerateCode;
 end;
 
@@ -379,7 +391,7 @@ begin
     for i := 0 to WmiMetaClassInfo.PropertiesCount - 1 do
     begin
       Item := ListVieweventsConds.Items.Add;
-      Item.Checked := False;
+      Item.Checked := CheckBoxSelAllProps.Checked;
       Item.Caption := WmiMetaClassInfo.Properties[i].Name;
       item.Data    := Pointer(WmiMetaClassInfo.Properties[i].CimType);
       Item.SubItems.Add(WmiMetaClassInfo.Properties[i].&Type);

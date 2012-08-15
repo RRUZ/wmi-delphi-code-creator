@@ -26,10 +26,10 @@ interface
 
 uses
  Vcl.DBGrids,
- ComObj,
- SysUtils,
- Forms,
- Classes;
+ System.Win.ComObj,
+ System.SysUtils,
+ Vcl.Forms,
+ System.Classes;
 
 type
   TProcLog    = procedure (const  Log : string) of object;
@@ -50,10 +50,10 @@ function  Ping(const Address:string;Retries,BufferSize:Word;Log : TStrings) : Bo
 implementation
 
 Uses
- ActiveX,
- Variants,
- ShlObj,
- ShellAPi,
+ Winapi.ActiveX,
+ System.Variants,
+ Winapi.ShlObj,
+ Winapi.ShellAPi,
  WinApi.Windows,
  Vcl.Controls,
  Vcl.Dialogs;

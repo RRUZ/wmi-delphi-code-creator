@@ -100,7 +100,6 @@ begin
   Action.ShortCut := 46;
   MenuItem.Action := Action;
   PopupActionBar.Items.Add(MenuItem);
-
 end;
 
 
@@ -114,7 +113,6 @@ begin
    else
     AssignStdActionsPopUpMenu(ParentComponent.Components[Lindex], PopupMenu);
 end;
-
 
 
 end.

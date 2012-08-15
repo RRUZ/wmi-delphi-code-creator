@@ -242,7 +242,7 @@ DisableProgramGroupPage=false
 AppID=WmiDelphiCodeCreator
 SetupIconFile=Images\Icon.ico
 DefaultGroupName=WmiDelphiCodeCreator
-MinVersion=,5.01.2600
+;MinVersion=
 [Run]
 Filename: {app}\WDCC.exe; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent
 [Languages]

@@ -106,10 +106,10 @@ end;
 
 procedure TFrmWmiClasses.CheckBoxSelAllPropsClick(Sender: TObject);
 var
-  i: integer;
+  LIndex: integer;
 begin
-  for i := 0 to ListViewProperties.Items.Count - 1 do
-    ListViewProperties.Items[i].Checked := CheckBoxSelAllProps.Checked;
+  for LIndex := 0 to ListViewProperties.Items.Count - 1 do
+    ListViewProperties.Items[LIndex].Checked := CheckBoxSelAllProps.Checked;
 
   GenerateCode;
 end;

@@ -36,6 +36,10 @@ object FrmSettings: TFrmSettings
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -146,8 +150,8 @@ object FrmSettings: TFrmSettings
         ImageIndex = 1
         ExplicitLeft = 0
         ExplicitTop = 0
-        ExplicitWidth = 567
-        ExplicitHeight = 388
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 99
@@ -249,8 +253,8 @@ object FrmSettings: TFrmSettings
         Caption = 'GUI Settings'
         ExplicitLeft = 0
         ExplicitTop = 0
-        ExplicitWidth = 567
-        ExplicitHeight = 388
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object PageControl2: TPageControl
           Left = 0
           Top = 0
@@ -259,16 +263,12 @@ object FrmSettings: TFrmSettings
           ActivePage = TabSheet6
           Align = alClient
           TabOrder = 0
-          ExplicitLeft = 5
-          ExplicitTop = 5
-          ExplicitWidth = 557
-          ExplicitHeight = 378
           object TabSheet6: TTabSheet
             Caption = 'Themes (Vcl Styles)'
             ExplicitLeft = 0
             ExplicitTop = 0
-            ExplicitWidth = 549
-            ExplicitHeight = 350
+            ExplicitWidth = 0
+            ExplicitHeight = 0
             object Label9: TLabel
               Left = 3
               Top = 22
@@ -441,8 +441,8 @@ object FrmSettings: TFrmSettings
             ImageIndex = 1
             ExplicitLeft = 0
             ExplicitTop = 0
-            ExplicitWidth = 543
-            ExplicitHeight = 344
+            ExplicitWidth = 0
+            ExplicitHeight = 0
             object Label3: TLabel
               Left = 491
               Top = 8
@@ -563,8 +563,8 @@ object FrmSettings: TFrmSettings
         ImageIndex = 2
         ExplicitLeft = 0
         ExplicitTop = 0
-        ExplicitWidth = 567
-        ExplicitHeight = 388
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -579,8 +579,8 @@ object FrmSettings: TFrmSettings
         ImageIndex = 5
         ExplicitLeft = 0
         ExplicitTop = 0
-        ExplicitWidth = 567
-        ExplicitHeight = 388
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label18: TLabel
           Left = 8
           Top = 16
@@ -615,10 +615,11 @@ object FrmSettings: TFrmSettings
       object TabSheet5: TTabSheet
         Caption = 'Templates'
         ImageIndex = 4
+        TabVisible = False
         ExplicitLeft = 0
         ExplicitTop = 0
-        ExplicitWidth = 567
-        ExplicitHeight = 388
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Label15: TLabel
           Left = 11
           Top = 10
