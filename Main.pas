@@ -62,6 +62,7 @@ type
     ToolButton1: TToolButton;
     ActionDisconnect: TAction;
     DisconnectHost1: TMenuItem;
+    ToolButtonExit: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure ToolButtonAboutClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -77,6 +78,7 @@ type
     procedure ActionPingExecute(Sender: TObject);
     procedure ActionDisconnectUpdate(Sender: TObject);
     procedure ToolButton1Click(Sender: TObject);
+    procedure ToolButtonExitClick(Sender: TObject);
   private
     FSettings: TSettings;
     Ctx : TRttiContext;
@@ -365,6 +367,11 @@ begin
 end;
 
 
+
+procedure TFrmMain.ToolButtonExitClick(Sender: TObject);
+begin
+ Close();
+end;
 
 procedure TFrmMain.RegisterTask(const ParentTask, Name: string; ImageIndex: Integer;
   LinkObject: TRttiType);

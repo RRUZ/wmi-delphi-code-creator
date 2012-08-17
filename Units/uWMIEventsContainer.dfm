@@ -34,7 +34,6 @@ object FrmWmiEventsContainer: TFrmWmiEventsContainer
     Font.Style = []
     ParentFont = False
     Spacing = 0
-    ExplicitWidth = 984
   end
   object PageControl1: TPageControl
     Left = 0
@@ -43,8 +42,6 @@ object FrmWmiEventsContainer: TFrmWmiEventsContainer
     Height = 611
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 984
-    ExplicitHeight = 571
   end
   object ActionManager1: TActionManager
     ActionBars = <
@@ -83,7 +80,7 @@ object FrmWmiEventsContainer: TFrmWmiEventsContainer
     Left = 208
     Top = 248
     Bitmap = {
-      494C010104000800340010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010104000800380010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

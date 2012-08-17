@@ -65,7 +65,8 @@ uses
   uWMIClassesContainer in 'Units\uWMIClassesContainer.pas' {FrmWMiClassesContainer},
   uWMIEventsContainer in 'Units\uWMIEventsContainer.pas' {FrmWmiEventsContainer},
   uWMIMethodsContainer in 'Units\uWMIMethodsContainer.pas' {FrmWmiMethodsContainer},
-  uHostsAdmin in 'Units\uHostsAdmin.pas' {FrmHostAdmin};
+  uHostsAdmin in 'Units\uHostsAdmin.pas' {FrmHostAdmin},
+  Vcl.Styles.TabsClose in 'Units\Vcl.Styles.Utils\Vcl.Styles.TabsClose.pas';
 
 {$R *.res}
 
