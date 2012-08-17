@@ -114,8 +114,8 @@
 			<DCC_DebugInformation>true</DCC_DebugInformation>
 			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
 			<VerInfo_MinorVer>7</VerInfo_MinorVer>
-			<VerInfo_Build>25</VerInfo_Build>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.7.4.25;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<VerInfo_Build>78</VerInfo_Build>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.7.4.78;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="$(MainSource)">
@@ -248,6 +248,7 @@
 				<Form>FrmHostAdmin</Form>
 				<FormType>dfm</FormType>
 			</DCCReference>
+			<DCCReference Include="Units\Vcl.Styles.Utils\Vcl.Styles.TabsClose.pas"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
@@ -273,7 +274,7 @@
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">1</VersionInfo>
 						<VersionInfo Name="Release">2</VersionInfo>
-						<VersionInfo Name="Build">214</VersionInfo>
+						<VersionInfo Name="Build">215</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -285,7 +286,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription"/>
-						<VersionInfoKeys Name="FileVersion">1.1.2.214</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.1.2.215</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright"/>
 						<VersionInfoKeys Name="LegalTrademarks"/>
@@ -309,12 +310,12 @@
 					<Platform value="Win32">True</Platform>
 				</Platforms>
 				<Deployment>
-					<DeployFile Class="ProjectOutput" Configuration="Release" LocalName="WmiDelphiCodeCreator.exe">
+					<DeployFile Class="ProjectOutput" Configuration="Release" LocalName="WDCC.exe">
 						<Platform Name="Win32"/>
 					</DeployFile>
-					<DeployFile Class="DebugSymbols" Configuration="Release" LocalName="WmiDelphiCodeCreator.rsm">
+					<DeployFile Class="DebugSymbols" Configuration="Release" LocalName="WDCC.rsm">
 						<Platform Name="Win32">
-							<RemoteName>WmiDelphiCodeCreator.rsm</RemoteName>
+							<RemoteName>WDCC.rsm</RemoteName>
 						</Platform>
 					</DeployFile>
 					<DeployClass Name="ProjectOutput" Required="true">

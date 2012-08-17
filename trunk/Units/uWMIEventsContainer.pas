@@ -29,6 +29,8 @@ uses
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ToolWin, Vcl.ActnCtrls;
 
 type
+  TPageControl = class(Vcl.ComCtrls.TPageControl);
+
   TFrmWmiEventsContainer = class(TForm)
     ActionToolBar1: TActionToolBar;
     ActionManager1: TActionManager;
@@ -59,7 +61,10 @@ type
 implementation
 
 uses
-  uWmiEvents;
+  uWmiEvents,
+  Vcl.Styles.TabsClose,
+  Vcl.Styles,
+  Vcl.Themes;
 
 {$R *.dfm}
 
@@ -69,7 +74,7 @@ procedure TFrmWmiEventsContainer.ActionDeleteExecute(Sender: TObject);
 Var
  LTabSheet : TTabSheet;
 begin
- if MsgQuestion(Format('Do you want delete the %s page',[PageControl1.ActivePage.Caption])) then
+ if MsgQuestion(Format('Do you want delete the %s page?',[Trim(PageControl1.ActivePage.Caption)])) then
  begin
   LTabSheet := TTabSheet(PageControl1.ActivePage);
   PageControl1.SelectNextPage(False);
@@ -124,5 +129,9 @@ begin
  if not DataLoaded then
   CreateNewInstance;
 end;
+
+initialization
+  TStyleManager.Engine.RegisterStyleHook(uWMIEventsContainer.TPageControl, TTabControlStyleHookBtnClose);
+
 
 end.
