@@ -68,6 +68,7 @@ type
     FImageBack: string;
     FUseColorNC: Boolean;
     FUseColorBack: Boolean;
+    FUseOnlineMSDNinTree: Boolean;
     function GetOutputFolder: string;
     function GetBackGroundColor: TColor;
     function GetForeGroundColor: TColor;
@@ -118,6 +119,7 @@ type
     property MicrosoftCppCmdLine : string read FMicrosoftCppCmdLine write FMicrosoftCppCmdLine;
     property CSharpCmdLine : string read FCSharpCmdLine write FCSharpCmdLine;
 
+    property UseOnlineMSDNinTree : Boolean read FUseOnlineMSDNinTree write FUseOnlineMSDNinTree;
   end;
 
 
@@ -206,6 +208,8 @@ type
     OpenPictureDialog1: TOpenPictureDialog;
     SynSQLSyn1: TSynSQLSyn;
     PanelPreview: TPanel;
+    GroupBox1: TGroupBox;
+    CheckBoxOnlineMSDN: TCheckBox;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -703,6 +707,8 @@ begin
     Settings.CheckForUpdates               := iniFile.ReadBool('Global', 'CheckForUpdates', True);
     Settings.DisableVClStylesNC            := iniFile.ReadBool('Global', 'DisableVClStylesNC', False);
 
+    Settings.UseOnlineMSDNinTree           := iniFile.ReadBool('Global', 'UseOnlineMSDNinTree', False);
+
     Settings.ActivateCustomForm            := iniFile.ReadBool('Global', 'ActivateCustomForm', False);
     Settings.CustomFormNC                  := iniFile.ReadBool('Global', 'CustomFormNC', False);
     Settings.CustomFormBack                := iniFile.ReadBool('Global', 'CustomFormBack', False);
@@ -752,6 +758,10 @@ begin
     iniFile.WriteString('Global', 'VCLStyle', Settings.VCLStyle);
     iniFile.WriteString('Global', 'Formatter', Settings.Formatter);
     iniFile.WriteBool('Global', 'CheckForUpdates', Settings.CheckForUpdates);
+
+    iniFile.WriteBool('Global', 'UseOnlineMSDNinTree', Settings.UseOnlineMSDNinTree);
+
+
     iniFile.WriteBool('Global', 'DisableVClStylesNC', Settings.DisableVClStylesNC);
 
     iniFile.WriteBool('Global', 'ActivateCustomForm', Settings.ActivateCustomForm);
@@ -902,6 +912,7 @@ begin
     FSettings.VCLStyle                      := ComboBoxVCLStyle.Text;
     FSettings.Formatter                     := CbFormatter.Text;
     FSettings.CheckForUpdates               := CheckBoxUpdates.Checked;
+    FSettings.UseOnlineMSDNinTree           := CheckBoxOnlineMSDN.Checked;
     FSettings.AStyleCmdLine                 := EditAStyle.Text;
     FSettings.MicrosoftCppCmdLine           := EditMicrosoftCppSwitch.Text;
     FSettings.CSharpCmdLine                 := EditCSharpSwitch.Text;
@@ -1203,6 +1214,8 @@ begin
 
   CheckBoxUpdates.Checked            := FSettings.CheckForUpdates;
   CheckBoxDisableVClStylesNC.Checked := FSettings.DisableVClStylesNC;
+
+  CheckBoxOnlineMSDN.Checked         := FSettings.UseOnlineMSDNinTree;
 
   EditAStyle.Text                    := FSettings.AStyleCmdLine;
   EditMicrosoftCppSwitch.Text        := FSettings.MicrosoftCppCmdLine;

@@ -26,7 +26,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, SynEditHighlighter, ImgList, uWmi_Metadata, uMisc, uSettings, uHostsAdmin,
-  XMLDoc,  XMLIntf, OleCtrls, SHDocVw, SynEdit, ComCtrls, StdCtrls, ExtCtrls, Vcl.Styles.WebBrowser;
+  XMLDoc,  XMLIntf, OleCtrls, SHDocVw, SynEdit, ComCtrls, StdCtrls, ExtCtrls, Vcl.Styles.WebBrowser,
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.Menus, Vcl.ActnPopup;
 
 const
   //NamespaceImageIndex = 0;
@@ -52,13 +53,14 @@ type
     TabSheetMOFClass: TTabSheet;
     MemoWmiMOF:     TMemo;
     TabSheetXMLClass: TTabSheet;
-    TabSheet3:      TTabSheet;
+    TabSheetOnlineMSDN: TTabSheet;
     WebBrowserWmi:  TWebBrowser;
     TabSheet4:      TTabSheet;
     MemoQualifiers: TMemo;
     FindDialog1:    TFindDialog;
     TreeView1:      TTreeView;
     ImageList1:     TImageList;
+    PopupActionBar2: TPopupActionBar;
     procedure FormCreate(Sender: TObject);
     procedure TreeViewWmiClassesChange(Sender: TObject; xNode: TTreeNode);
     procedure FindDialog1Find(Sender: TObject);
@@ -89,6 +91,8 @@ function FindTextTreeView(const AText: string;
 implementation
 
 uses
+  uStdActionsPopMenu,
+  uOnlineResources,
   uxtheme,
   uGlobals,
   ComObj,
@@ -175,6 +179,9 @@ begin
   AddImage(6, ParameterOutImageIndex, 'Out Parameter');
 
   PanelClassInfo.Height := 0;
+
+  FillPopupActionBar(PopupActionBar2);
+  AssignStdActionsPopUpMenu(Self, PopupActionBar2);
 end;
 
 procedure TFrmWMITree.FormShow(Sender: TObject);
@@ -190,6 +197,7 @@ var
   NodeC: TTreeNode;
   NodeQ: TTreeNode;
   Xml: string;
+  URL : string;
 begin
   //FrmMain.ProgressBarWmi.Visible := True;
   try
@@ -197,12 +205,20 @@ begin
     begin
       SetMsg(Format('Loading Info Class %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
-      WebBrowserWmi.HandleNeeded;
-      WebBrowserWmi.Navigate(Format(UrlWmiHelp, [WmiMetaClassInfo.WmiClass]));
+      if Settings.UseOnlineMSDNinTree then
+      begin
+        URL:=GetURLBySearchTerm('MSDN WMI '+WmiMetaClassInfo.WmiClass);
+        if (URL='') or not StartsText('http://msdn.microsoft.com', URL) then
+        URL :='about:blank';
+
+        WebBrowserWmi.HandleNeeded;
+        //WebBrowserWmi.Navigate(Format(UrlWmiHelp, [WmiMetaClassInfo.WmiClass]));
+        WebBrowserWmi.Navigate(URL);
       {
       while WebBrowserWmi.ReadyState <> READYSTATE_COMPLETE do
         Application.ProcessMessages;
       }
+      end;
       MemoWmiMOF.Lines.Text := WmiMetaClassInfo.WmiClassMOF;
       Xml := WmiMetaClassInfo.WmiClassXML;
       LoadXMLWMIClass(Xml);
@@ -298,6 +314,7 @@ var
   LIndex   : integer;
   LNode    : TTreeNode;
 begin
+  TabSheetOnlineMSDN.TabVisible:=Settings.UseOnlineMSDNinTree;
   PanelClassInfo.Height := 0;
   LClasses := TStringList.Create;
   try

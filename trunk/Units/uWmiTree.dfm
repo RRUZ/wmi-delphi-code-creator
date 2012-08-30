@@ -36,9 +36,6 @@ object FrmWMITree: TFrmWMITree
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 0
-    ExplicitLeft = 5
-    ExplicitTop = 416
-    ExplicitWidth = 1102
     object PageControl2: TPageControl
       Left = 5
       Top = 5
@@ -47,7 +44,6 @@ object FrmWMITree: TFrmWMITree
       ActivePage = TabSheetMOFClass
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 1092
       object TabSheetMOFClass: TTabSheet
         Caption = 'MOF Class Definition'
         object MemoWmiMOF: TMemo
@@ -63,6 +59,7 @@ object FrmWMITree: TFrmWMITree
           Font.Name = 'Consolas'
           Font.Style = []
           ParentFont = False
+          PopupMenu = PopupActionBar2
           ScrollBars = ssBoth
           TabOrder = 0
         end
@@ -70,10 +67,6 @@ object FrmWMITree: TFrmWMITree
       object TabSheetXMLClass: TTabSheet
         Caption = 'XML Class Definition'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object TreeView1: TTreeView
           Left = 0
           Top = 0
@@ -84,25 +77,21 @@ object FrmWMITree: TFrmWMITree
           TabOrder = 0
         end
       end
-      object TabSheet3: TTabSheet
+      object TabSheetOnlineMSDN: TTabSheet
         Caption = 'Online Help'
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 1084
-        ExplicitHeight = 0
         object WebBrowserWmi: TWebBrowser
           Left = 0
           Top = 0
-          Width = 1084
+          Width = 1094
           Height = 182
           Align = alClient
           TabOrder = 0
-          ExplicitWidth = 1068
+          ExplicitWidth = 1084
           ControlData = {
-            4C00000009700000CF1200000000000000000000000000000000000000000000
-            000000004C000000000000000000000000000000000000000000000000000000
-            000000000A000000000000004C0000000114020000000000C000000000000046
+            4C00000011710000CF1200000000000000000000000000000000000000000000
+            000000004C000000000000000000000001000000E0D057007335CF11AE690800
+            2B2E12620A000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
             00000000000000000100000000000000000000000000000000000000}
         end
@@ -110,10 +99,6 @@ object FrmWMITree: TFrmWMITree
       object TabSheet4: TTabSheet
         Caption = 'Class Qualifiers'
         ImageIndex = 3
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object MemoQualifiers: TMemo
           Left = 0
           Top = 0
@@ -127,6 +112,7 @@ object FrmWMITree: TFrmWMITree
           Font.Name = 'Consolas'
           Font.Style = []
           ParentFont = False
+          PopupMenu = PopupActionBar2
           TabOrder = 0
         end
       end
@@ -155,10 +141,6 @@ object FrmWMITree: TFrmWMITree
     ReadOnly = True
     TabOrder = 2
     OnChange = TreeViewWmiClassesChange
-    ExplicitLeft = 5
-    ExplicitTop = 5
-    ExplicitWidth = 1102
-    ExplicitHeight = 377
   end
   object FindDialog1: TFindDialog
     OnFind = FindDialog1Find
@@ -171,7 +153,7 @@ object FrmWMITree: TFrmWMITree
     Left = 176
     Top = 128
     Bitmap = {
-      494C010107000800800010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010107000800940010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -441,5 +423,9 @@ object FrmWMITree: TFrmWMITree
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
+  end
+  object PopupActionBar2: TPopupActionBar
+    Left = 312
+    Top = 312
   end
 end
