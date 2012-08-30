@@ -92,7 +92,6 @@ type
     Label1: TLabel;
     EditNameSpace: TEdit;
     Label2: TLabel;
-    EditURL: TEdit;
     BtnUrl: TButton;
     TabSheet2: TTabSheet;
     ListViewPropsLinks: TListView;
@@ -328,8 +327,15 @@ begin
 end;
 
 procedure TFrmWmiVwProps.BtnUrlClick(Sender: TObject);
+var
+  URL : string;
 begin
-  ShellExecute(Handle, 'open', PChar(EditURL.Text), nil, nil, SW_SHOW);
+  //ShellExecute(Handle, 'open', PChar(EditURL.Text), nil, nil, SW_SHOW);
+  URL:=GetURLBySearchTerm('MSDN WMI '+EditClass.Text);
+  if (URL<>'') and StartsText('http://msdn.microsoft.com', URL) then
+    ShellExecute(Handle, 'open', PChar(URL), nil, nil, SW_SHOW)
+  else
+    MsgWarning(Format('MSDN documentation for the %s class was not found',[EditClass.Text]));
 end;
 
 procedure TFrmWmiVwProps.CheckOnlineDoc;
@@ -658,7 +664,7 @@ procedure TFrmWmiVwProps.SetWmiClass(const Value: string);
 begin
   FWmiClass := Value;
   EditClass.Text:=Value;
-  EditURL.Text:=Format(UrlWmiHelp, [Value]);
+  //EditURL.Text:=Format(UrlWmiHelp, [Value]);
 end;
 
 procedure TFrmWmiVwProps.SetWmiNamespace(const Value: string);

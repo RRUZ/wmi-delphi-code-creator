@@ -45,6 +45,9 @@ type
     procedure GetResults;
   end;
 
+
+  function GetURLBySearchTerm(const SearchKey : string) : string;
+
 var
   FrmOnlineResources: TFrmOnlineResources;
 
@@ -58,6 +61,48 @@ uses
  MSXML;
 
 {$R *.dfm}
+
+function GetURLBySearchTerm(const SearchKey : string) : string;
+const
+ ApplicationID= 'TnirCFpM4B8F8mCECpFxNtF0i0qts/xVKkVJT/iWRig=';
+ URI='https://api.datamarket.azure.com/Bing/Search/Web?Query=%s&$format=ATOM&$top=%d&$skip=%d';
+ COMPLETED=4;
+ OK       =200;
+var
+  XMLHTTPRequest  : IXMLHTTPRequest;
+  XMLDOMDocument  : IXMLDOMDocument;
+  XMLDOMNode      : IXMLDOMNode;
+  cXMLDOMNode     : IXMLDOMNode;
+  XMLDOMNodeList  : IXMLDOMNodeList;
+  LIndex          : Integer;
+begin
+    Result:='';
+    XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As IXMLHTTPRequest;
+  try
+    XMLHTTPRequest.open('GET',Format(URI,[TIdURI.PathEncode(QuotedStr(SearchKey)), 10, 0]), False, ApplicationID, ApplicationID);
+    XMLHTTPRequest.send('');
+    if (XMLHTTPRequest.readyState = COMPLETED) and (XMLHTTPRequest.status = OK) then
+    begin
+      XMLDOMDocument:=CoDOMDocument.Create;
+      try
+        XMLDOMDocument.loadXML(XMLHTTPRequest.responseText);
+        XMLDOMNode := XMLDOMDocument.selectSingleNode('/feed');
+        XMLDOMNodeList := XMLDOMNode.selectNodes('//entry');
+        for LIndex:=0 to  XMLDOMNodeList.length-1 do
+        begin
+          XMLDOMNode:=XMLDOMNodeList.item[LIndex];
+           cXMLDOMNode:=XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Url',[LIndex]));
+           Result:= String(cXMLDOMNode.Text);
+           Break;
+        end;
+      finally
+        XMLDOMDocument:=nil;
+      end;
+    end;
+  finally
+    XMLHTTPRequest := nil;
+  end;
+end;
 
 procedure TFrmOnlineResources.btnSearchClick(Sender: TObject);
 begin

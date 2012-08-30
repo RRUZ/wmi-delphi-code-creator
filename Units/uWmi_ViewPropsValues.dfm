@@ -20,9 +20,9 @@ object FrmWmiVwProps: TFrmWmiVwProps
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 81
+    Top = 57
     Width = 713
-    Height = 375
+    Height = 399
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
@@ -31,7 +31,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
       Left = 5
       Top = 5
       Width = 703
-      Height = 365
+      Height = 389
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
@@ -42,7 +42,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           Left = 0
           Top = 0
           Width = 695
-          Height = 337
+          Height = 361
           Align = alClient
           Columns = <
             item
@@ -62,6 +62,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           SmallImages = listViewImages
           TabOrder = 0
           ViewStyle = vsReport
+          ExplicitHeight = 337
         end
       end
       object TabSheet1: TTabSheet
@@ -71,7 +72,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           Left = 0
           Top = 0
           Width = 695
-          Height = 337
+          Height = 361
           Align = alClient
           Columns = <>
           HideSelection = False
@@ -83,12 +84,13 @@ object FrmWmiVwProps: TFrmWmiVwProps
           ViewStyle = vsReport
           OnData = ListViewGridData
           OnDblClick = ActionViewPropDetailsExecute
+          ExplicitHeight = 337
         end
         object MemoInstances: TMemo
           Left = 0
           Top = 0
           Width = 695
-          Height = 337
+          Height = 361
           Align = alClient
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
@@ -109,7 +111,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           Left = 0
           Top = 0
           Width = 695
-          Height = 337
+          Height = 361
           Align = alClient
           Columns = <
             item
@@ -140,6 +142,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
           TabOrder = 0
           ViewStyle = vsReport
           OnDblClick = ActionViewDetailsPropsExecute
+          ExplicitHeight = 337
         end
       end
     end
@@ -156,7 +159,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 0
     Top = 0
     Width = 713
-    Height = 81
+    Height = 57
     Align = alTop
     TabOrder = 2
     object Label1: TLabel
@@ -189,21 +192,13 @@ object FrmWmiVwProps: TFrmWmiVwProps
       ReadOnly = True
       TabOrder = 1
     end
-    object EditURL: TEdit
-      Left = 9
-      Top = 54
-      Width = 488
-      Height = 21
-      ReadOnly = True
-      TabOrder = 2
-    end
     object BtnUrl: TButton
-      Left = 512
-      Top = 50
+      Left = 503
+      Top = 25
       Width = 161
       Height = 25
       Caption = 'Go to MSDN Documentation'
-      TabOrder = 3
+      TabOrder = 2
       OnClick = BtnUrlClick
     end
   end
@@ -212,7 +207,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C010106000800540010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106000800580010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

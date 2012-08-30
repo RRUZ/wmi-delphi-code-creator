@@ -36,10 +36,6 @@ object FrmSettings: TFrmSettings
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -144,14 +140,27 @@ object FrmSettings: TFrmSettings
           Height = 21
           TabOrder = 3
         end
+        object GroupBox1: TGroupBox
+          Left = 320
+          Top = 124
+          Width = 225
+          Height = 63
+          Caption = 'Additional Settings'
+          TabOrder = 7
+          object CheckBoxOnlineMSDN: TCheckBox
+            Left = 16
+            Top = 16
+            Width = 206
+            Height = 33
+            Caption = 'Enable retrieve online  MSDN documentation in WMI Classes Tree '
+            TabOrder = 0
+            WordWrap = True
+          end
+        end
       end
       object TabSheet2: TTabSheet
         Caption = 'Object Pascal Code generation'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 99
@@ -251,10 +260,6 @@ object FrmSettings: TFrmSettings
       object TabSheet1: TTabSheet
         BorderWidth = 8
         Caption = 'GUI Settings'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object PageControl2: TPageControl
           Left = 0
           Top = 0
@@ -265,10 +270,6 @@ object FrmSettings: TFrmSettings
           TabOrder = 0
           object TabSheet6: TTabSheet
             Caption = 'Themes (Vcl Styles)'
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
             object Label9: TLabel
               Left = 3
               Top = 22
@@ -439,10 +440,6 @@ object FrmSettings: TFrmSettings
           object TabSheet7: TTabSheet
             Caption = 'Syntax Highlighting'
             ImageIndex = 1
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
             object Label3: TLabel
               Left = 491
               Top = 8
@@ -561,10 +558,6 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -577,10 +570,6 @@ object FrmSettings: TFrmSettings
       object TabSheet8: TTabSheet
         Caption = 'Compiler Options'
         ImageIndex = 5
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label18: TLabel
           Left = 8
           Top = 16
@@ -616,10 +605,6 @@ object FrmSettings: TFrmSettings
         Caption = 'Templates'
         ImageIndex = 4
         TabVisible = False
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label15: TLabel
           Left = 11
           Top = 10
