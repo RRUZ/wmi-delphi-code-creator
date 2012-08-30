@@ -54,6 +54,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure GridInstancesClick(Sender: TObject);
     procedure TextInstancesClick(Sender: TObject);
+    procedure ButtonGetValuesClick(Sender: TObject);
   private
     DataLoaded : Boolean;
     FSetMsg: TProcLog;
@@ -107,6 +108,21 @@ uses
 procedure TFrmWmiClasses.GridInstancesClick(Sender: TObject);
 begin
   GetValuesWmiPropertiesGrid(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
+end;
+
+procedure TFrmWmiClasses.ButtonGetValuesClick(Sender: TObject);
+var
+  LPoint : TPoint;
+begin
+  if Win32MajorVersion < 6 then
+  begin
+    LPoint.X := ButtonGetValues.Left;
+    LPoint.Y := ButtonGetValues.Top+ButtonGetValues.Height;
+    LPoint := ClientToScreen(LPoint);
+    PopupActionBar1.Popup(LPoint.x,LPoint.y);
+  end
+  else
+  GridInstancesClick(Sender);
 end;
 
 procedure TFrmWmiClasses.CheckBoxSelAllPropsClick(Sender: TObject);
