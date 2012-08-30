@@ -38,6 +38,10 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheetProps: TTabSheet
         Caption = 'Properties'
         TabVisible = False
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object ListViewWmi: TListView
           Left = 0
           Top = 0
@@ -84,7 +88,6 @@ object FrmWmiVwProps: TFrmWmiVwProps
           ViewStyle = vsReport
           OnData = ListViewGridData
           OnDblClick = ActionViewPropDetailsExecute
-          ExplicitHeight = 337
         end
         object MemoInstances: TMemo
           Left = 0
@@ -107,6 +110,10 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheet2: TTabSheet
         Caption = 'Properties Links'
         ImageIndex = 2
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object ListViewPropsLinks: TListView
           Left = 0
           Top = 0
@@ -207,7 +214,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C010106000800580010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101060008005C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

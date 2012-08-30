@@ -720,11 +720,17 @@ procedure TWMIQueryToCustomView.AddTextRecord;
 begin
    FTextOutput.Lines.BeginUpdate;
    try
+     FTextOutput.Lines.Text:=FTextOutput.Lines.Text+FTextRecord;
+     {
      FTextOutput.Lines.Add(FTextRecord);
      FTextOutput.Lines.Add('');
+     }
    finally
      FTextOutput.Lines.EndUpdate;
    end;
+  FTextOutput.SelStart  := FTextOutput.GetTextLen;
+  FTextOutput.SelLength := 0;
+  SendMessage(FTextOutput.Handle, EM_SCROLLCARET, 0, 0);
 end;
 
 procedure TWMIQueryToCustomView.AdjustColumnsWidth;
@@ -850,7 +856,12 @@ begin
         Synchronize(AddTextRecord);
       end;
 
-      FMsg :=Format('%d records retrieved', [FValues.Count]);
+      if FMode=GridView then
+       FMsg :=Format('%d records retrieved', [FValues.Count])
+      else
+      if FMode=TextView then
+       FMsg :=Format('%d records retrieved', [FCount]);
+
       Synchronize(SendMsg);
 
       FWbemObject := Unassigned;
