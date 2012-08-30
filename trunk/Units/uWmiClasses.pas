@@ -25,7 +25,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, uMisc,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls, uWmi_Metadata, uCodeEditor, uSettings, uComboBox,
-  Vcl.ImgList;
+  Vcl.ImgList, Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup;
 
 type
   TFrmWmiClasses = class(TForm)
@@ -42,14 +42,18 @@ type
     PanelCode: TPanel;
     ImageList1: TImageList;
     Splitter1: TSplitter;
+    PopupActionBar1: TPopupActionBar;
+    GridInstances: TMenuItem;
+    TextInstances: TMenuItem;
     procedure ComboBoxNameSpacesChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxClassesChange(Sender: TObject);
-    procedure ButtonGetValuesClick(Sender: TObject);
     procedure ListViewPropertiesClick(Sender: TObject);
     procedure CheckBoxSelAllPropsClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure GridInstancesClick(Sender: TObject);
+    procedure TextInstancesClick(Sender: TObject);
   private
     DataLoaded : Boolean;
     FSetMsg: TProcLog;
@@ -71,7 +75,8 @@ type
     property  Settings : TSettings read FSettings Write  SetSettings;
     procedure LoadWmiClasses(const Namespace: string);
     procedure LoadClassInfo;
-    procedure GetValuesWmiProperties(const Namespace, WmiClass: string);
+    procedure GetValuesWmiPropertiesGrid(const Namespace, WmiClass: string);
+    procedure GetValuesWmiPropertiesText(const Namespace, WmiClass: string);
     procedure GenerateConsoleCode(WmiMetaClassInfo : TWMiClassMetaData);
   end;
 
@@ -99,9 +104,9 @@ uses
   uWmiCSharpCode,
   uListView_Helper;
 
-procedure TFrmWmiClasses.ButtonGetValuesClick(Sender: TObject);
+procedure TFrmWmiClasses.GridInstancesClick(Sender: TObject);
 begin
-  GetValuesWmiProperties(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
+  GetValuesWmiPropertiesGrid(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
 end;
 
 procedure TFrmWmiClasses.CheckBoxSelAllPropsClick(Sender: TObject);
@@ -283,7 +288,7 @@ begin
   end;
 end;
 
-procedure TFrmWmiClasses.GetValuesWmiProperties(const Namespace,
+procedure TFrmWmiClasses.GetValuesWmiPropertiesGrid(const Namespace,
   WmiClass: string);
 var
   Props: TStringList;
@@ -297,13 +302,34 @@ begin
         if ListViewProperties.Items[i].Checked then
           Props.Add(ListViewProperties.Items[i].Caption);
 
-      ListValuesWmiProperties(Namespace, WmiClass, Props, SetLog);
+      ListValuesWmiProperties(Namespace, WmiClass, Props, SetLog, GridView);
     finally
      Props.Free;
     end;
   end;
 end;
 
+
+procedure TFrmWmiClasses.GetValuesWmiPropertiesText(const Namespace,
+  WmiClass: string);
+var
+  Props: TStringList;
+  i    : Integer;
+begin
+  if (ListViewProperties.Items.Count > 0) and (WmiClass <> '') and (Namespace <> '') then
+  begin
+    Props:=TStringList.Create;
+    try
+      for i := 0 to ListViewProperties.Items.Count - 1 do
+        if ListViewProperties.Items[i].Checked then
+          Props.Add(ListViewProperties.Items[i].Caption);
+
+      ListValuesWmiProperties(Namespace, WmiClass, Props, SetLog, TextView);
+    finally
+     Props.Free;
+    end;
+  end;
+end;
 
 procedure TFrmWmiClasses.ListViewPropertiesClick(Sender: TObject);
 
@@ -487,5 +513,10 @@ begin
 end;
 
 
+
+procedure TFrmWmiClasses.TextInstancesClick(Sender: TObject);
+begin
+  GetValuesWmiPropertiesText(ComboBoxNameSpaces.Text, ComboBoxClasses.Text);
+end;
 
 end.

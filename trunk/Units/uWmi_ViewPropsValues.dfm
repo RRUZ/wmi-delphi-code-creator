@@ -38,10 +38,6 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheetProps: TTabSheet
         Caption = 'Properties'
         TabVisible = False
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object ListViewWmi: TListView
           Left = 0
           Top = 0
@@ -88,14 +84,27 @@ object FrmWmiVwProps: TFrmWmiVwProps
           OnData = ListViewGridData
           OnDblClick = ActionViewPropDetailsExecute
         end
+        object MemoInstances: TMemo
+          Left = 0
+          Top = 0
+          Width = 695
+          Height = 337
+          Align = alClient
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -12
+          Font.Name = 'Consolas'
+          Font.Style = []
+          ParentFont = False
+          PopupMenu = PopupActionBar3
+          ReadOnly = True
+          ScrollBars = ssBoth
+          TabOrder = 1
+        end
       end
       object TabSheet2: TTabSheet
         Caption = 'Properties Links'
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object ListViewPropsLinks: TListView
           Left = 0
           Top = 0
@@ -203,7 +212,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C0101060008004C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106000800540010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -534,5 +543,9 @@ object FrmWmiVwProps: TFrmWmiVwProps
       OnExecute = ActionSMBIOSExecute
       OnUpdate = ActionSMBIOSUpdate
     end
+  end
+  object PopupActionBar3: TPopupActionBar
+    Left = 384
+    Top = 136
   end
 end

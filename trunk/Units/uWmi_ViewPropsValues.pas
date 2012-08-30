@@ -39,9 +39,10 @@ const
 
 type
   TWMIQueryCallbackLog = procedure(const msg: string) of object;
+  TWmi_ViewPropsValuesMode = (GridView, TextView);
 
 {$IFNDEF USE_ASYNCWMIQUERY}
-  TWMIQueryToListView = class(TThread)
+  TWMIQueryToCustomView = class(TThread)
   private
     Success:   HResult;
     FEnum:     IEnumvariant;
@@ -55,19 +56,23 @@ type
     FPassword: string;
     FNameSpace: string;
     FListView: TListView;
+    FTextOutput : TMemo;
     FProperties: TStrings;
     FCallback: TWMIQueryCallbackLog;
     FMsg:      string;
     FValues:   TList<TStrings>;
     FParentHandle : THandle;
+    FMode : TWmi_ViewPropsValuesMode;
+    FTextRecord : string;
     procedure CreateColumns;
     procedure SetListViewSize;
     procedure AdjustColumnsWidth;
     procedure SendMsg;
+    procedure AddTextRecord;
   public
     constructor Create(const Server, User, PassWord, NameSpace, WQL: string;
       ListWMIProperties : TStrings;
-      ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>; ParentHandle : THandle); overload;
+      ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>; ParentHandle : THandle;TextOutput: TMemo; Mode : TWmi_ViewPropsValuesMode); overload;
     destructor Destroy; override;
     procedure Execute; override;
   end;
@@ -105,6 +110,8 @@ type
     N1: TMenuItem;
     ActionSMBIOS: TAction;
     OpenSMBIOSReferenceSpecification1: TMenuItem;
+    MemoInstances: TMemo;
+    PopupActionBar3: TPopupActionBar;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -129,7 +136,7 @@ type
     FSink         : TSWbemSink;
     {$ELSE}
     FThreadFinished : Boolean;
-    FThread: TWMIQueryToListView;
+    FThread: TWMIQueryToCustomView;
     {$ENDIF}
     FValues:   TObjectList<TStrings>;
     FWmiClass: string;
@@ -141,6 +148,7 @@ type
     FWMIProperties: TStrings;
     WmiMetaData : TWMiClassMetaData;
     FSetLog: TProcLog;
+    FMode: TWmi_ViewPropsValuesMode;
     procedure Log(const msg: string);
     procedure SetWmiClass(const Value: string);
     procedure SetWmiNamespace(const Value: string);
@@ -163,6 +171,7 @@ type
                                                      const objWbemAsyncContext: ISWbemNamedValueSet);
    {$ELSE}
    procedure OnWMIThreadFinished(var Msg: TMessage); message WM_WMI_THREAD_FINISHED;
+    procedure SetMode(const Value: TWmi_ViewPropsValuesMode);
    {$ENDIF}
   public
     property ContainValues: boolean Read FContainValues;
@@ -171,15 +180,17 @@ type
     property WmiNamespace: string Read FWmiNamespace Write SetWmiNamespace;
     property WQL: TStrings Read FWQL;
     property SetLog : TProcLog read FSetLog Write FSetLog;
+    property Mode : TWmi_ViewPropsValuesMode read FMode Write SetMode default GridView;
     procedure LoadValues(Properties : TStringList); cdecl;
   end;
 
-  procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList;SetLog : TProcLog);
+  procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList;SetLog : TProcLog;Mode : TWmi_ViewPropsValuesMode = GridView);
 
 implementation
 
 uses
   uOnlineResources,
+  uStdActionsPopMenu,
   ComObj,
   CommCtrl,
   StrUtils,
@@ -231,13 +242,14 @@ begin
  end;
 end;
 
-procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList;SetLog : TProcLog);
+procedure ListValuesWmiProperties(const Namespace, WmiClass: string; Properties : TStringList;SetLog : TProcLog;Mode : TWmi_ViewPropsValuesMode = GridView);
 var
   Frm: TFrmWmiVwProps;
 begin
   if (WmiClass <> '') and (Namespace <> '') then
   begin
     Frm := TFrmWmiVwProps.Create(nil);
+    Frm.Mode         := Mode;
     Frm.WmiClass     := WmiClass;
     Frm.WmiNamespace := Namespace;
     Frm.Caption      := 'Properties Values for the class ' + WmiClass;
@@ -410,6 +422,7 @@ begin
     end;
 
     FWMIProperties.AddObject('Object Path', TObject(wbemCimtypeString));
+    if FMode=gridview then
     CreateColumns;
   end;
 
@@ -449,7 +462,9 @@ begin
   FThreadFinished:=False;
   FThread := nil;
 {$ENDIF}
-
+  ListViewWmi.Visible:=False;
+  MemoInstances.Visible:=False;
+  Mode:=GridView;
   WmiMetaData:=nil;
   FDataLoaded := False;
   FWQLProperties := TStringList.Create;
@@ -459,6 +474,10 @@ begin
   FValues:=TObjectList<TStrings>.Create(True);
   FWMIProperties:=TStringList.Create;
   //NullStrictConvert:=False;
+
+  FillPopupActionBar(PopupActionBar3);
+  AssignStdActionsPopUpMenu(Self, PopupActionBar3);
+
 end;
 
 procedure TFrmWmiVwProps.FormDestroy(Sender: TObject);
@@ -595,7 +614,7 @@ begin
 {$IFDEF USE_ASYNCWMIQUERY}
   RunAsyncWQL;
 {$ELSE}
-  FThread := TWMIQueryToListView.Create('.', '', '', FWmiNamespace, FWQL.Text, FWMIProperties, ListViewGrid, Log, FValues, Handle)
+  FThread := TWMIQueryToCustomView.Create('.', '', '', FWmiNamespace, FWQL.Text, FWMIProperties, ListViewGrid, Log, FValues, Handle, MemoInstances, Mode)
 {$ENDIF}
 end;
 
@@ -624,6 +643,16 @@ begin
   FWMIService.ExecQueryAsync(FSink.DefaultInterface, FWQL.Text,'WQL', wbemFlagSendStatus , nil, nil);
 end;
 {$ENDIF}
+
+procedure TFrmWmiVwProps.SetMode(const Value: TWmi_ViewPropsValuesMode);
+begin
+  FMode := Value;
+  if FMode=GridView then
+   ListViewWmi.Visible:=True
+  else
+  if FMode=TextView then
+   MemoInstances.Visible:=True;
+end;
 
 procedure TFrmWmiVwProps.SetWmiClass(const Value: string);
 begin
@@ -681,20 +710,33 @@ end;
 {$IFNDEF USE_ASYNCWMIQUERY}
 
 { TWMIQueryToListView }
-procedure TWMIQueryToListView.AdjustColumnsWidth;
+procedure TWMIQueryToCustomView.AddTextRecord;
+begin
+   FTextOutput.Lines.BeginUpdate;
+   try
+     FTextOutput.Lines.Add(FTextRecord);
+     FTextOutput.Lines.Add('');
+   finally
+     FTextOutput.Lines.EndUpdate;
+   end;
+end;
+
+procedure TWMIQueryToCustomView.AdjustColumnsWidth;
 begin
   //AutoResizeListView(FListView);
   AutoResizeVirtualListView(FListView, FValues);
 end;
 
-constructor TWMIQueryToListView.Create(const Server, User, PassWord, NameSpace, WQL: string;
+constructor TWMIQueryToCustomView.Create(const Server, User, PassWord, NameSpace, WQL: string;
       ListWMIProperties : TStrings;
-      ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>; ParentHandle : THandle);
+      ListView: TListView; CallBack: TWMIQueryCallbackLog;Values: TList<TStrings>; ParentHandle : THandle;TextOutput: TMemo;Mode : TWmi_ViewPropsValuesMode );
 begin
   inherited Create(False);
   FreeOnTerminate := True;
   FParentHandle:=ParentHandle;
+  FTextOutput:=TextOutput;
   FListView := ListView;
+  FMode     := Mode;
   FWQL      := WQL;
   FServer   := Server;
   FUser     := User;
@@ -706,11 +748,12 @@ begin
 end;
 
 
-procedure TWMIQueryToListView.CreateColumns;
+procedure TWMIQueryToCustomView.CreateColumns;
 var
   i:      integer;
   Column: TListColumn;
 begin
+  if FMode<>GridView then exit;
   FListView.Items.BeginUpdate;
   try
     for i := 0 to FProperties.Count - 1 do
@@ -727,7 +770,7 @@ begin
 end;
 
 
-destructor TWMIQueryToListView.Destroy;
+destructor TWMIQueryToCustomView.Destroy;
 begin
   FSWbemLocator  := Unassigned;
   FWMIService    := Unassigned;
@@ -736,7 +779,7 @@ begin
   inherited;
 end;
 
-procedure TWMIQueryToListView.Execute;
+procedure TWMIQueryToCustomView.Execute;
 var
   Props:  olevariant;
   PropItem: olevariant;
@@ -767,7 +810,7 @@ begin
       Props     := FWbemObject.Properties_;
       oEnumProp := IUnknown(Props._NewEnum) as IEnumVariant;
 
-      if FProperties.Count = 0 then
+      if (FProperties.Count = 0) and (FMode=GridView) then
       begin
         while oEnumProp.Next(1, PropItem, iValue) = 0 do
         begin
@@ -781,23 +824,30 @@ begin
       end;
 
 
-      RowData:=TStringList.Create;
-      if Assigned(FValues) then
-        FValues.Add(RowData);
+      if FMode=GridView then
+      begin
+        RowData:=TStringList.Create;
+        if Assigned(FValues) then
+          FValues.Add(RowData);
 
-      for i := 0 to FProperties.Count - 1 -1 do
-        RowData.Add(FormatWbemValue(Props.Item(FProperties[i]).Value, Integer(FProperties.Objects[i])));
-        //RowData.Add(VarToStr(Props.Item(FProperties[i]).Value));
+        for i := 0 to FProperties.Count - 1 -1 do
+          RowData.Add(FormatWbemValue(Props.Item(FProperties[i]).Value, Integer(FProperties.Objects[i])));
+          //RowData.Add(VarToStr(Props.Item(FProperties[i]).Value));
 
-      RowData.Add(VarStrNull(FWbemObject.Path_.RelPath));
-
-      Synchronize(SetListViewSize);
+        RowData.Add(VarStrNull(FWbemObject.Path_.RelPath));
+        Synchronize(SetListViewSize);
+      end
+      else
+      if FMode=TextView then
+      begin
+        FTextRecord:=FWbemObject.GetObjectText_(0);
+        Synchronize(AddTextRecord);
+      end;
 
       FMsg :=Format('%d records retrieved', [FValues.Count]);
       Synchronize(SendMsg);
 
       FWbemObject := Unassigned;
-
       Props := Unassigned;
     end;
 
@@ -820,6 +870,7 @@ begin
         FMsg := Format('%d records found', [FCount]);
         Synchronize(SendMsg);
         //Synchronize(Fill_ListView);
+        if FMode=GridView then
         Synchronize(AdjustColumnsWidth);
       end;
     end;
@@ -834,13 +885,13 @@ begin
   SendMessage(FParentHandle, WM_WMI_THREAD_FINISHED,0,0);
 end;
 
-procedure TWMIQueryToListView.SendMsg;
+procedure TWMIQueryToCustomView.SendMsg;
 begin
   if not Terminated then
   FCallback(FMsg);
 end;
 
-procedure TWMIQueryToListView.SetListViewSize;
+procedure TWMIQueryToCustomView.SetListViewSize;
 begin
   FListView.Items.Count:=FValues.Count;
 end;

@@ -32,7 +32,6 @@ object FrmMain: TFrmMain
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
-    ExplicitTop = 24
     object Splitter1: TSplitter
       Left = 265
       Top = 5
@@ -84,6 +83,7 @@ object FrmMain: TFrmMain
             Font.Name = 'Consolas'
             Font.Style = []
             ParentFont = False
+            PopupMenu = PopupActionBar2
             ScrollBars = ssBoth
             TabOrder = 0
           end
@@ -104,6 +104,7 @@ object FrmMain: TFrmMain
             Font.Name = 'Consolas'
             Font.Style = []
             ParentFont = False
+            PopupMenu = PopupActionBar2
             ScrollBars = ssBoth
             TabOrder = 0
           end
@@ -148,8 +149,6 @@ object FrmMain: TFrmMain
       object TabSheetTask: TTabSheet
         Caption = 'TabSheetTask'
         ImageIndex = -1
-        ExplicitLeft = 6
-        ExplicitTop = 23
       end
     end
   end
@@ -238,7 +237,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C010157007800140310001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010157007800180310001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000006001000001002000000000000060
       0100000000000000000000000000000000000000000000000000000000000000
       000000000000383838397A7A7A7BAAAAAAB79A9693EA69635EF8353535360000
@@ -3194,5 +3193,9 @@ object FrmMain: TFrmMain
       ImageIndex = 74
       OnUpdate = ActionDisconnectUpdate
     end
+  end
+  object PopupActionBar2: TPopupActionBar
+    Left = 312
+    Top = 312
   end
 end

@@ -130,16 +130,18 @@ object FrmWmiClasses: TFrmWmiClasses
       OnClick = ListViewPropertiesClick
     end
     object ButtonGetValues: TButton
-      Left = 128
+      Left = 129
       Top = 161
-      Width = 171
+      Width = 170
       Height = 25
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Get Properties Values'
+      Caption = 'Get WMI Class Instances'
+      DropDownMenu = PopupActionBar1
       ImageIndex = 2
       Images = ImageList1
+      Style = bsSplitButton
       TabOrder = 3
-      OnClick = ButtonGetValuesClick
+      OnClick = GridInstancesClick
     end
   end
   object PanelCode: TPanel
@@ -158,7 +160,7 @@ object FrmWmiClasses: TFrmWmiClasses
     Left = 423
     Top = 198
     Bitmap = {
-      494C010103007800440210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010103007800640210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       00030B140B72414841F6606360FE676967FF686968FF365D38EF264727CE6263
@@ -296,5 +298,17 @@ object FrmWmiClasses: TFrmWmiClasses
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
+  end
+  object PopupActionBar1: TPopupActionBar
+    Left = 360
+    Top = 152
+    object GridInstances: TMenuItem
+      Caption = 'List grid WMI Class instances '
+      OnClick = GridInstancesClick
+    end
+    object TextInstances: TMenuItem
+      Caption = 'List text WMI Class instances '
+      OnClick = TextInstancesClick
+    end
   end
 end
