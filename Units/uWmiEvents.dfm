@@ -135,12 +135,11 @@ object FrmWmiEvents: TFrmWmiEvents
       Width = 145
       Height = 21
       Style = csDropDownList
-      ItemIndex = 0
       TabOrder = 7
-      Text = '='
       Visible = False
       OnExit = ComboBoxCondExit
       Items.Strings = (
+        ''
         '='
         '>'
         '<'

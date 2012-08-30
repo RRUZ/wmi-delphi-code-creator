@@ -63,6 +63,7 @@ type
     ActionDisconnect: TAction;
     DisconnectHost1: TMenuItem;
     ToolButtonExit: TToolButton;
+    PopupActionBar2: TPopupActionBar;
     procedure FormCreate(Sender: TObject);
     procedure ToolButtonAboutClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -98,7 +99,7 @@ var
 implementation
 
 uses
-
+  uStdActionsPopMenu,
   uMisc,
   uWmi_Metadata,
   uLog,
@@ -237,6 +238,10 @@ begin
   //ReportMemoryLeaksOnShutdown:=DebugHook<>0;
   {$WARN SYMBOL_PLATFORM ON}
   //FillPopupActionBar(PopupActionBar1);
+
+  FillPopupActionBar(PopupActionBar2);
+  AssignStdActionsPopUpMenu(Self, PopupActionBar2);
+
   ListWINHosts:=nil;
 
   Ctx:=TRttiContext.Create;
