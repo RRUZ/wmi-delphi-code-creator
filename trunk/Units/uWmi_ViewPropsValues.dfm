@@ -38,10 +38,6 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheetProps: TTabSheet
         Caption = 'Properties'
         TabVisible = False
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object ListViewWmi: TListView
           Left = 0
           Top = 0
@@ -66,7 +62,6 @@ object FrmWmiVwProps: TFrmWmiVwProps
           SmallImages = listViewImages
           TabOrder = 0
           ViewStyle = vsReport
-          ExplicitHeight = 337
         end
       end
       object TabSheet1: TTabSheet
@@ -110,10 +105,6 @@ object FrmWmiVwProps: TFrmWmiVwProps
       object TabSheet2: TTabSheet
         Caption = 'Properties Links'
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object ListViewPropsLinks: TListView
           Left = 0
           Top = 0
@@ -149,7 +140,6 @@ object FrmWmiVwProps: TFrmWmiVwProps
           TabOrder = 0
           ViewStyle = vsReport
           OnDblClick = ActionViewDetailsPropsExecute
-          ExplicitHeight = 337
         end
       end
     end
@@ -214,7 +204,7 @@ object FrmWmiVwProps: TFrmWmiVwProps
     Left = 144
     Top = 232
     Bitmap = {
-      494C0101060008005C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106000800600010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

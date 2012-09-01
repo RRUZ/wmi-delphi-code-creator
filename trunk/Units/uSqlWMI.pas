@@ -41,6 +41,12 @@ type
 
   TFrmWMISQL = class(TForm)
     CbHosts: TComboBox;
+    Panel2: TPanel;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    MemoWMI: TMemo;
+    PopupActionBar3: TPopupActionBar;
     procedure FormShow(Sender: TObject);
     procedure CbHostsChange(Sender: TObject);
    type
@@ -152,6 +158,7 @@ implementation
 uses
  Math,
  AsyncCalls,
+ uStdActionsPopMenu,
  uGlobals,
  uListView_Helper,
  MidasLib,
@@ -357,6 +364,9 @@ procedure TFrmWMISQL.FormCreate(Sender: TObject);
 var
  LWMIHost : TWMIHost;
 begin
+  FillPopupActionBar(PopupActionBar3);
+  AssignStdActionsPopUpMenu(Self, PopupActionBar3);
+
   ListWINHosts:=GetListWMIRegisteredHosts;
   DataLoaded :=False;
   FSettings:=TSettings.Create;
@@ -604,6 +614,8 @@ begin
       begin
         if FirstRecord then
         begin
+          MemoWMI.Lines.Clear;
+
           ClientDataSet1.EnableControls;
           try
             SetMsg('Creating dataset');
@@ -626,6 +638,18 @@ begin
            ClientDataSet1.FieldByName(F.Name).Value:=FWbemPropertySet.Item(F.Name, 0).Value;
 
         ClientDataSet1.Post;
+
+         MemoWMI.Lines.BeginUpdate;
+         try
+           MemoWMI.Lines.Text:=MemoWMI.Lines.Text+FWbemObject.GetObjectText_(0);
+         finally
+           MemoWMI.Lines.EndUpdate;
+         end;
+
+        MemoWMI.SelStart  := MemoWMI.GetTextLen;
+        MemoWMI.SelLength := 0;
+        SendMessage(MemoWMI.Handle, EM_SCROLLCARET, 0, 0);
+
         FWbemObject:=Unassigned;
       end;
 
