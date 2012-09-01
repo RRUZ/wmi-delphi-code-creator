@@ -114,8 +114,8 @@
 			<DCC_DebugInformation>true</DCC_DebugInformation>
 			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
 			<VerInfo_MinorVer>7</VerInfo_MinorVer>
-			<VerInfo_Build>27</VerInfo_Build>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.7.5.27;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<VerInfo_Build>85</VerInfo_Build>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.7.5.85;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="$(MainSource)">

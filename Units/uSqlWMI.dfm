@@ -254,8 +254,6 @@ object FrmWMISQL: TFrmWMISQL
           Width = 130
           Height = 17
           Caption = 'Run in Async mode'
-          Checked = True
-          State = cbChecked
           TabOrder = 0
         end
         object CbHosts: TComboBox
@@ -269,23 +267,6 @@ object FrmWMISQL: TFrmWMISQL
         end
       end
     end
-    object DBGridWMI: TDBGrid
-      Left = 5
-      Top = 195
-      Width = 642
-      Height = 257
-      Align = alClient
-      DataSource = DataSource1
-      ReadOnly = True
-      TabOrder = 1
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -11
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
-      OnDrawColumnCell = DBGridWMIDrawColumnCell
-      OnDblClick = DBGridWMIDblClick
-    end
     object Panel1: TPanel
       Left = 5
       Top = 457
@@ -293,7 +274,7 @@ object FrmWMISQL: TFrmWMISQL
       Height = 83
       Align = alBottom
       BevelOuter = bvNone
-      TabOrder = 2
+      TabOrder = 1
       object Memo1: TMemo
         Left = 0
         Top = 0
@@ -310,6 +291,64 @@ object FrmWMISQL: TFrmWMISQL
         TabOrder = 0
       end
     end
+    object Panel2: TPanel
+      Left = 5
+      Top = 195
+      Width = 642
+      Height = 257
+      Align = alClient
+      BorderWidth = 5
+      TabOrder = 2
+      object PageControl1: TPageControl
+        Left = 6
+        Top = 6
+        Width = 630
+        Height = 245
+        ActivePage = TabSheet1
+        Align = alClient
+        TabOrder = 0
+        object TabSheet1: TTabSheet
+          Caption = 'Grid'
+          object DBGridWMI: TDBGrid
+            Left = 0
+            Top = 0
+            Width = 622
+            Height = 217
+            Align = alClient
+            DataSource = DataSource1
+            ReadOnly = True
+            TabOrder = 0
+            TitleFont.Charset = DEFAULT_CHARSET
+            TitleFont.Color = clWindowText
+            TitleFont.Height = -11
+            TitleFont.Name = 'Tahoma'
+            TitleFont.Style = []
+            OnDrawColumnCell = DBGridWMIDrawColumnCell
+            OnDblClick = DBGridWMIDblClick
+          end
+        end
+        object TabSheet2: TTabSheet
+          Caption = 'Text'
+          ImageIndex = 1
+          object MemoWMI: TMemo
+            Left = 0
+            Top = 0
+            Width = 622
+            Height = 217
+            Align = alClient
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -12
+            Font.Name = 'Consolas'
+            Font.Style = []
+            ParentFont = False
+            PopupMenu = PopupActionBar3
+            ScrollBars = ssBoth
+            TabOrder = 0
+          end
+        end
+      end
+    end
   end
   object SynSQLSyn1: TSynSQLSyn
     Left = 384
@@ -318,7 +357,7 @@ object FrmWMISQL: TFrmWMISQL
   object ClientDataSet1: TClientDataSet
     Aggregates = <>
     Params = <>
-    Left = 320
+    Left = 224
     Top = 224
   end
   object DataSource1: TDataSource
@@ -351,7 +390,7 @@ object FrmWMISQL: TFrmWMISQL
     Left = 128
     Top = 296
     Bitmap = {
-      494C010101000800440010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101010008004C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000010D0434052D0DD9042F
       0FFD041909B70005012600000000000000000000000000000000000000000000
@@ -509,5 +548,9 @@ object FrmWMISQL: TFrmWMISQL
     object ExecuteWQL1: TMenuItem
       Action = ActionRunWQL
     end
+  end
+  object PopupActionBar3: TPopupActionBar
+    Left = 384
+    Top = 136
   end
 end
