@@ -51,6 +51,7 @@ implementation
 
 Uses
  Winapi.ActiveX,
+ System.UITypes,
  System.Variants,
  Winapi.ShlObj,
  Winapi.ShellAPi,

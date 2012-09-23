@@ -38,6 +38,7 @@ procedure AutoResizeListView(const ListView: TListView;  const Mode: integer = L
 implementation
 
 uses
+  System.Classes,
   Winapi.Windows;
 
 

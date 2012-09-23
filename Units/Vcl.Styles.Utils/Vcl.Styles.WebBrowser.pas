@@ -144,6 +144,7 @@ implementation
 uses
  MSHTML,
  System.Sysutils,
+ System.UITypes,
  System.Win.ComObj,
  Vcl.Dialogs,
  Vcl.Themes,

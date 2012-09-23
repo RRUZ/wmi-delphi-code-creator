@@ -84,6 +84,7 @@ implementation
 
 
 uses
+  System.UITypes,
   ShellAPI,
   uUpdatesChanges,
   uMisc,
