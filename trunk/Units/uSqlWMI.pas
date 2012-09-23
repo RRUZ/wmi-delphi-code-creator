@@ -54,9 +54,11 @@ type
       private
         FName: string;
         FCimType: Integer;
+        FIsArray: Boolean;
       public
         property Name : string read FName write FName;
         property CimType : Integer read FCimType write FCimType;
+        property IsArray : Boolean read FIsArray write FIsArray;
       end;
     var
     SynEditWQL: TSynEdit;
@@ -282,7 +284,11 @@ begin
     FFields.Add(TWMIPropData.Create);
     FFields.Items[FFields.Count-1].Name   :=colItem.Name;
     FFields.Items[FFields.Count-1].CimType:=colItem.cimtype;
+    FFields.Items[FFields.Count-1].IsArray:=colItem.IsArray;
 
+    if FFields.Items[FFields.Count-1].IsArray then
+      ClientDataSet1.FieldDefs.Add(colItem.Name, ftString, 255)
+    else
     with ClientDataSet1 do
      case FFields.Items[FFields.Count-1].CimType of
 
@@ -632,6 +638,9 @@ begin
         FWbemPropertySet:= FWbemObject.Properties_;
         ClientDataSet1.Append;
          for F in FFields do
+         if F.IsArray then
+           ClientDataSet1.FieldByName(F.Name).AsString:='[ARRAY]'
+         else
          if F.CimType=wbemCimtypeDatetime then
            ClientDataSet1.FieldByName(F.Name).Value:=WbemDateToDateTime(FWbemPropertySet.Item(F.Name, 0).Value)
          else

@@ -63,6 +63,7 @@ type
 implementation
 
 uses
+ System.Actions,
  SysUtils;
 
 const

@@ -287,20 +287,23 @@ implementation
 {$R *.dfm}
 
 uses
-  ShlObj,
-  ShellAPI,
-  GraphUtil,
+  Winapi.ShlObj,
+  System.Types,
+  System.UITypes,
+  Winapi.ShellAPI,
+  Vcl.GraphUtil,
   {$WARN UNIT_PLATFORM OFF}
   Vcl.FileCtrl,
   {$WARN UNIT_PLATFORM ON}
   uDelphiVersions,
   uSelectCompilerVersion,
-  StrUtils,
-  IOUtils,
-  IniFiles,
+  System.StrUtils,
+  System.IOUtils,
+  System.IniFiles,
   uWmiDelphiCode,
   uWmiGenCode,
   Vcl.Styles,
+
   uMisc;
 
 const
@@ -858,7 +861,7 @@ procedure TFrmSettings.BtnDeleteCacheClick(Sender: TObject);
 Var
  FileName  : string;
 begin
-  for FileName in IOUtils.TDirectory.GetFiles(GetWMICFolderCache,'*.wmic') do
+  for FileName in TDirectory.GetFiles(GetWMICFolderCache,'*.wmic') do
     DeleteFile(FileName);
 
   MsgInformation('The cache was deleted');

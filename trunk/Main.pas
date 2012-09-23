@@ -27,7 +27,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls,   Rtti, Generics.Collections, uHostsAdmin,
   SynEdit, ImgList, ToolWin,  uSettings, Menus, Buttons,  Vcl.Styles.ColorTabs,
-  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, Vcl.ActnList, Vcl.ActnMan;
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, Vcl.ActnList, Vcl.ActnMan,
+  System.Actions;
 
 type
   TFrmMain = class(TForm)

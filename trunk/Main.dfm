@@ -91,6 +91,10 @@ object FrmMain: TFrmMain
         object TabSheet2: TTabSheet
           Caption = 'Log'
           ImageIndex = 35
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object MemoLog: TMemo
             Left = 0
             Top = 0
@@ -237,7 +241,7 @@ object FrmMain: TFrmMain
     Left = 423
     Top = 198
     Bitmap = {
-      494C010157007800180310001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101570078001C0310001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000006001000001002000000000000060
       0100000000000000000000000000000000000000000000000000000000000000
       000000000000383838397A7A7A7BAAAAAAB79A9693EA69635EF8353535360000
