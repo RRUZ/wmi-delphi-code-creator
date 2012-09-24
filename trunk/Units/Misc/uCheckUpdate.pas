@@ -27,7 +27,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls, pngimage, ExtCtrls, Diagnostics;
+  Dialogs, ComCtrls, StdCtrls, pngimage, ExtCtrls, Diagnostics, uWinInet;
 
 type
   TFrmCheckUpdate = class(TForm)
@@ -37,11 +37,15 @@ type
     LabelVersion: TLabel;
     BtnInstall: TButton;
     Image1: TImage;
+    BtnCancel: TButton;
     procedure FormCreate(Sender: TObject);
     procedure BtnCheckUpdatesClick(Sender: TObject);
     procedure BtnInstallClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure BtnCancelClick(Sender: TObject);
   private
+    FileStream : TFileStream;
     FXmlVersionInfo: string;
     FLocalVersion: string;
     FRemoteVersion: string;
@@ -56,6 +60,8 @@ type
     FXPathVersionNumber: string;
     FXPathUrlInstaller: string;
     FXPathInstallerFileName: string;
+    FWinINetGetThread : TWinINetGetThread;
+    FCancelled : Boolean;
     procedure ReadRemoteInfo;
     procedure ReadLocalInfo;
     function GetUpdateAvailable: Boolean;
@@ -69,6 +75,10 @@ type
     procedure Download;
     procedure ExecuteInstaller;
     procedure DownloadCallBack(BytesRead:Integer);
+    procedure DownloadFinished;
+    procedure OnDownloadFinished(var Msg: TMessage); message WM_UWININET_THREAD_FINISHED;
+    procedure OnDownloadCancelled(var Msg: TMessage); message WM_UWININET_THREAD_CANCELLED;
+    procedure ThreadOnTerminate(Sender: TObject);
   public
     property  RemoteVersionFile : string read FRemoteVersionFile write FRemoteVersionFile;
     property  ApplicationName  : string read FApplicationName write FApplicationName;
@@ -88,18 +98,24 @@ uses
   ShellAPI,
   uUpdatesChanges,
   uMisc,
-  ComObj,
-  uWinInet;
+  ComObj;
 
-Type
-   TProcCallBack= procedure(BytesRead:Integer) of object;
 
 {$R *.dfm}
 
 { TFrmCheckUpdate }
+procedure TFrmCheckUpdate.BtnCancelClick(Sender: TObject);
+begin
+ if FWinINetGetThread<>nil then
+   FWinINetGetThread.Terminate;
+ BtnCancel.Enabled:=False;
+ FCancelled:=True;
+end;
+
+
 procedure TFrmCheckUpdate.BtnCheckUpdatesClick(Sender: TObject);
 begin
- ExecuteUpdater;
+  ExecuteUpdater;
 end;
 
 procedure TFrmCheckUpdate.BtnInstallClick(Sender: TObject);
@@ -108,8 +124,10 @@ begin
 end;
 
 procedure TFrmCheckUpdate.Download;
+{
 var
   FileStream : TFileStream;
+}
 begin
   try
    ProgressBar1.Style:=pbstNormal;
@@ -118,21 +136,57 @@ begin
    SetMsg(Format('%s bytes to download ',[FormatFloat('#,', ProgressBar1.Max)]));
    FTempInstallerFileName:=IncludeTrailingPathDelimiter(GetTempDirectory)+InstallerFileName;
    DeleteFile(TempInstallerFileName);
-   FileStream:=TFileStream.Create(TempInstallerFileName,fmCreate);
-   try
-     FStopwatch.Reset;
-     FStopwatch.Start;
-     WinInet_HttpGet(UrlInstaller,FileStream,DownloadCallBack);
-     SetMsg('Application downloaded');
-   finally
-     FileStream.Free;
-   end;
+
+     {
+     FileStream:=TFileStream.Create(TempInstallerFileName,fmCreate);
+     try
+       FStopwatch.Reset;
+       FStopwatch.Start;
+       WinInet_HttpGet(UrlInstaller,FileStream,DownloadCallBack);
+       SetMsg('Application downloaded');
+     finally
+       FileStream.Free;
+     end;
+
      BtnInstall.Visible:=FileExists(TempInstallerFileName);
      BtnCheckUpdates.Visible:=not BtnInstall.Visible;
      if BtnInstall.Visible and not CheckExternal then ExecuteInstaller;
+     }
+     FCancelled:=False;
+     BtnCancel.Visible:=True;
+     BtnCancel.Enabled:=False;
+     FStopwatch.Reset;
+     FStopwatch.Start;
+     FileStream:=TFileStream.Create(TempInstallerFileName,fmCreate);
+     FWinINetGetThread:=TWinINetGetThread.Create(UrlInstaller, FileStream, DownloadCallBack, Handle);
+     FWinINetGetThread.OnTerminate:=ThreadOnTerminate;
+     BtnCancel.Enabled:=True;
+     //Application.ProcessMessages;
   except on E : Exception do
     SetMsg(Format('Error checking updates %s',[E.Message]));
   end;
+end;
+
+procedure TFrmCheckUpdate.DownloadFinished;
+begin
+   if FileStream<>nil then
+   begin
+     FileStream.Free;
+     FileStream:=nil;
+   end;
+
+   BtnCancel.Visible:=False;
+   BtnInstall.Visible:=FileExists(TempInstallerFileName);
+   BtnCheckUpdates.Visible:=not BtnInstall.Visible;
+   if BtnInstall.Visible and not CheckExternal then ExecuteInstaller;
+
+   if CheckExternal then
+     ExecuteInstaller;
+
+   ProgressBar1.Style:=pbstNormal;
+   BtnCheckUpdates.Enabled:=True;
+
+   Close;
 end;
 
 procedure TFrmCheckUpdate.DownloadCallBack(BytesRead: Integer);
@@ -154,6 +208,8 @@ begin
      SetMsg(Format('Downloaded %s of %s bytes %n%% %sTransfer Rate %s',[FormatFloat('#,',Pos),FormatFloat('#,',Max),Pos*100/Max,#13#10,sRate]));
    end;
 end;
+
+
 
 procedure TFrmCheckUpdate.ExecuteInstaller;
 begin
@@ -181,24 +237,24 @@ begin
        Close;
       end
       else
-      {
-      if MessageDlg(Format('Exist a new version available (%s) of the %s , Do you want download the new version?',[RemoteVersion, FApplicationName]),
-      mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-      }
       if CheckChangesUpdates(Format('Exist a new version available (%s) of the %s %sDo you want download the new version?',[RemoteVersion, FApplicationName,#13#10])) then
       begin
        if not Visible then
          Show;
 
         Download;
+        {
         if CheckExternal then
          ExecuteInstaller;
+         }
       end;
 
 
     finally
+      {
       ProgressBar1.Style:=pbstNormal;
       BtnCheckUpdates.Enabled:=True;
+      }
     end;
   except on E : Exception do
     SetMsg(Format('Error checking updates %s',[E.Message]));
@@ -211,9 +267,19 @@ begin
    ExecuteUpdater;
 end;
 
+procedure TFrmCheckUpdate.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action:=caFree;
+  if (FWinINetGetThread<>nil)  then
+     Action:=caNone;
+end;
+
 procedure TFrmCheckUpdate.FormCreate(Sender: TObject);
 begin
-
+   BtnCancel.Visible:=False;
+   FCancelled:=False;
+   FileStream:=nil;
+   FWinINetGetThread:=nil;
    FRemoteVersion:='';
    FErrorUpdate  :=False;
    FCheckExternal:=False;
@@ -234,27 +300,6 @@ var
   XmlDoc : OleVariant;
   Node   : OleVariant;
 begin
-{
-  XmlDoc       := CreateOleObject('Msxml2.XMLHTTP.3.0');
-  try
-    SetMsg('Getting version info');
-    XmlDoc.open('GET', sRemoteVersionFile, false);
-    XmlDoc.send();
-    XmlVersionInfo:=XmlDoc.responseXML.xml;
-
-     Node:=XmlDoc.responseXML.selectSingleNode(sXPathVersionNumber);
-     if not VarIsClear(Node) then FRemoteVersion:=Node.Text;
-
-     Node:=XmlDoc.responseXML.selectSingleNode(sXPathUrlInstaller);
-     if not VarIsClear(Node) then FUrlInstaller:=Node.Text;
-
-     Node:=XmlDoc.responseXML.selectSingleNode(sXPathInstallerFileName);
-     if not VarIsClear(Node) then FInstallerFileName:=Node.Text;
-  finally
-   XmlDoc    :=Unassigned;
-  end;
-}
-
   XmlDoc       := CreateOleObject('Msxml2.DOMDocument.6.0');
   XmlDoc.Async := False;
   try
@@ -286,17 +331,36 @@ begin
 end;
 
 
+procedure TFrmCheckUpdate.ThreadOnTerminate(Sender: TObject);
+var
+  LException: TObject;
+begin
+  Assert(Sender is TThread);
+  LException := TThread(Sender).FatalException;
+  if Assigned(LException) then
+  begin
+    BtnCancel.Visible:=False;
+    FWinINetGetThread:=nil;
+
+    if LException is Exception then
+      SetMsg(Format('Error downloading update %s %s',[#13#10,Exception(LException).Message]))
+    else
+      SetMsg(LException.ClassName);
+  end;
+end;
+
+
 function TFrmCheckUpdate.GetUpdateAvailable: Boolean;
 begin
  Result:=False;
  try
    if FRemoteVersion='' then
      ReadRemoteInfo;
-     {
+
    if DebugHook<>0 then
      Result:=True
    else
-     }
+
      Result:=(FRemoteVersion>FLocalVersion);
  except on E : Exception do
    begin
@@ -306,5 +370,24 @@ begin
  end;
 end;
 
+
+procedure TFrmCheckUpdate.OnDownloadCancelled(var Msg: TMessage);
+begin
+  FWinINetGetThread:=nil;
+
+  if FileStream<>nil then
+  begin
+    FileStream.Free;
+    FileStream:=nil;
+  end;
+
+  Close;
+end;
+
+procedure TFrmCheckUpdate.OnDownloadFinished(var Msg: TMessage);
+begin
+  DownloadFinished;
+  FWinINetGetThread:=nil;
+end;
 
 end.
