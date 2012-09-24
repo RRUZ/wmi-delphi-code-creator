@@ -23,10 +23,31 @@ unit uWinInet;
 interface
 
 uses
-  Classes;
+  Winapi.Windows,
+  System.SysUtils,
+  Winapi.Messages,
+  System.Classes;
+
+const
+   WM_UWININET_THREAD_FINISHED = WM_USER + 669;
+   WM_UWININET_THREAD_CANCELLED= WM_USER + 670;
 
 type
-   TuWinInetProcCallBack= procedure(BytesRead:Integer) of object;
+  TuWinInetProcCallBack= procedure(BytesRead:Integer) of object;
+
+  TWinINetGetThread = class(TThread)
+  private
+    FBytesRead: DWORD;
+    FUrl : string;
+    FStream : TStream;
+    FCallBack : TuWinInetProcCallBack;
+    FhWnd: HWND;
+    procedure SyncCallBack;
+  public
+    constructor Create(const Url: string;Stream:TStream;CallBack:TuWinInetProcCallBack;hWnd: HWND); overload;
+    destructor Destroy; override;
+    procedure Execute; override;
+  end;
 
 function  GetRemoteFileSize(const Url : string): Integer;
 procedure WinInet_HttpGet(const Url: string;Stream:TStream;CallBack:TuWinInetProcCallBack);overload;
@@ -37,9 +58,8 @@ function  GetWinInetError(ErrorCode:Cardinal): string;
 implementation
 
 uses
- SysUtils,
- Windows,
- WinInet;
+ Vcl.Forms,
+ Winapi.WinInet;
 
 const
   sUserAgent = 'Mozilla/5.001 (windows; U; NT4.0; en-US; rv:1.0) Gecko/25250101';
@@ -166,6 +186,7 @@ begin
   finally
     InternetCloseHandle(hInet);
   end;
+
 end;
 
 
@@ -236,5 +257,82 @@ begin
     end;
 end;
 
+
+{ TWinINetGetThread }
+
+constructor TWinINetGetThread.Create(const Url: string; Stream: TStream; CallBack: TuWinInetProcCallBack;hWnd: HWND);
+begin
+  inherited Create(False);
+  FreeOnTerminate := True;
+  FUrl:=Url;
+  FStream:=Stream;
+  FCallBack:=CallBack;
+  FhWnd:=hWnd;
+end;
+
+destructor TWinINetGetThread.Destroy;
+begin
+  inherited;
+end;
+
+
+procedure TWinINetGetThread.Execute;
+const
+  BuffSize = 1024*64;
+var
+  hInter   : HINTERNET;
+  hFile    : HINTERNET;
+  Buffer   : Pointer;
+  ErrorCode: Cardinal;
+begin
+  hInter := InternetOpen('', INTERNET_OPEN_TYPE_PRECONFIG, nil, nil, 0);
+  if hInter=nil then
+  begin
+    ErrorCode:=GetLastError;
+    raise Exception.Create(Format('InternetOpen Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
+  end;
+
+  try
+    FStream.Seek(0,0);
+    GetMem(Buffer,BuffSize);
+    try
+        hFile := InternetOpenUrl(hInter, PChar(FUrl), nil, 0, INTERNET_FLAG_RELOAD, 0);
+        if hFile=nil then
+        begin
+          ErrorCode:=GetLastError;
+          raise Exception.Create(Format('InternetOpenUrl Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
+        end;
+
+          try
+            repeat
+              InternetReadFile(hFile, Buffer, BuffSize, FBytesRead);
+              if FBytesRead>0 then
+              begin
+                FStream.WriteBuffer(Buffer^, FBytesRead);
+                Synchronize(SyncCallBack);
+              end;
+            until (FBytesRead = 0) or Terminated;
+          finally
+           InternetCloseHandle(hFile);
+          end;
+    finally
+      FreeMem(Buffer);
+    end;
+  finally
+   InternetCloseHandle(hInter);
+  end;
+
+  if not Terminated then
+   SendMessage(FhWnd, WM_UWININET_THREAD_FINISHED,0,0)
+  else
+   SendMessage(FhWnd, WM_UWININET_THREAD_CANCELLED,0,0);
+end;
+
+
+procedure TWinINetGetThread.SyncCallBack;
+begin
+  if @FCallBack<>nil then
+   FCallBack(FBytesRead);
+end;
 
 end.

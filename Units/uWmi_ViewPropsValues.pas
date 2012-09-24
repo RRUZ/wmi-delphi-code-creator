@@ -30,7 +30,8 @@ uses
   Dialogs, ComCtrls, SynEdit, ExtCtrls, uMisc,
   Generics.Collections, uWmi_Metadata,
   ImgList, Contnrs, ActiveX, StdCtrls, Vcl.Menus, {$IFDEF USE_ASYNCWMIQUERY} WbemScripting_TLB, {$ENDIF}
-  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, Vcl.ActnList, Vcl.ActnMan;
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, Vcl.ActnList, Vcl.ActnMan,
+  System.Actions;
 
 {$IFNDEF USE_ASYNCWMIQUERY}
 const

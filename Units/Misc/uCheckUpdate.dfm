@@ -1,6 +1,7 @@
 object FrmCheckUpdate: TFrmCheckUpdate
   Left = 563
   Top = 413
+  BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Download Update'
   ClientHeight = 157
@@ -14,6 +15,7 @@ object FrmCheckUpdate: TFrmCheckUpdate
   OldCreateOrder = False
   Position = poScreenCenter
   OnActivate = FormActivate
+  OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -213,5 +215,14 @@ object FrmCheckUpdate: TFrmCheckUpdate
     TabOrder = 2
     Visible = False
     OnClick = BtnInstallClick
+  end
+  object BtnCancel: TButton
+    Left = 135
+    Top = 127
+    Width = 113
+    Height = 25
+    Caption = 'Cancel'
+    TabOrder = 3
+    OnClick = BtnCancelClick
   end
 end

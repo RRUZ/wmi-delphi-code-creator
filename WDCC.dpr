@@ -85,8 +85,10 @@ begin
         Frm.CheckExternal:=True;
         if Frm.UpdateAvailable then
           Frm.ExecuteUpdater;
+
+         // ccccccc
       finally
-        Frm.Free;
+        //Frm.Free;
       end;
     end;
   finally
@@ -97,7 +99,7 @@ end;
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  UpdateApp;
   Application.CreateForm(TFrmMain, FrmMain);
+  UpdateApp;
   Application.Run;
 end.
