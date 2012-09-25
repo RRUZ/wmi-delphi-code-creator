@@ -363,13 +363,13 @@ http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wik
 
 = Features =
         
-	<li>The Delphi code generated is compatible with  Delphi 7, 2005, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE, XE2.</li>
+	<li>The Delphi code generated is compatible with  Delphi 7, 2005, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE, XE2, XE3.</li>
 
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/DelphiCode_Compiler.PNG
 	<li>Code formatter</li>
 	<li>The Code generated support local and remote WMI connections</li>
-	<li>Open the generated Delphi code in any of these  <a href="http://www.embarcadero.com/products/delphi">Delphi</a> IDE's 7, 2005, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE, XE2</li>
-	<li>Compile and Run the generated Delphi code using any of these compilers  <a href="http://www.embarcadero.com/products/delphi">Delphi</a> 7, 2005, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE, XE2</li>
+	<li>Open the generated Delphi code in any of these  <a href="http://www.embarcadero.com/products/delphi">Delphi</a> IDE's 7, 2005, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE, XE2, XE3</li>
+	<li>Compile and Run the generated Delphi code using any of these compilers  <a href="http://www.embarcadero.com/products/delphi">Delphi</a> 7, 2005, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE, XE2, XE3</li>
 
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/DelphiCode_Generator.PNG
 
