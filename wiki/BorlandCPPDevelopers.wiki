@@ -7,8 +7,8 @@ The C++ Builder code generator included in the WDCC has the next features
 
     <li>Code formatter</li>
     <li>The Code generated support local and remote WMI connections</li>
-    <li>Can generate C++ code compatible with all these compilers <strong>Borland C++ Builder 5 to Embarcadero C++ Builder XE2 </strong></li>
-    <li>Open the generated Borland C++ code directly in any of these  <a href="http://www.embarcadero.com/products/cbuilder">C++ Builder</a> IDE's 5, 6, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE, XE2</li>
+    <li>Can generate C++ code compatible with all these compilers <strong>Borland C++ Builder 5 to Embarcadero C++ Builder XE3 </strong></li>
+    <li>Open the generated Borland C++ code directly in any of these  <a href="http://www.embarcadero.com/products/cbuilder">C++ Builder</a> IDE's 5, 6, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE, XE2, XE3</li>
 
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/BorlandCppCode_Compiler.PNG
 
