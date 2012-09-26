@@ -146,14 +146,16 @@ begin
     Dec(R.Right, 2);
 
   Result := R;
-  FButtonState := twSmallCloseButtonNormal;
+  FButtonState :=  twSmallCloseButtonNormal;
 
   Details := StyleServices.GetElementDetails(FButtonState);
   if not StyleServices.GetElementContentRect(0, Details, Result, ButtonR) then
     ButtonR := Rect(0, 0, 0, 0);
 
-  Result.Left :=Result.Right - (ButtonR.Width) - 5;
-  Result.Width:=ButtonR.Width;
+  Result.Left  :=Result.Right - (ButtonR.Width) - 5;
+  Result.Width :=ButtonR.Width;
+  Result.Top   :=(Result.Height-ButtonR.Height) div 2;
+  Result.Height:=ButtonR.Height;
 end;
 
 procedure TTabControlStyleHookBtnClose.MouseEnter;

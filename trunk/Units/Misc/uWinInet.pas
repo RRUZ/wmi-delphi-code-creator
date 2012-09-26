@@ -49,6 +49,8 @@ type
     procedure Execute; override;
   end;
 
+
+
 function  GetRemoteFileSize(const Url : string): Integer;
 procedure WinInet_HttpGet(const Url: string;Stream:TStream;CallBack:TuWinInetProcCallBack);overload;
 function  WinInet_HttpGet(const Url: string;CallBack:TuWinInetProcCallBack): string;overload;
@@ -58,7 +60,6 @@ function  GetWinInetError(ErrorCode:Cardinal): string;
 implementation
 
 uses
- Vcl.Forms,
  Winapi.WinInet;
 
 const
@@ -334,5 +335,6 @@ begin
   if @FCallBack<>nil then
    FCallBack(FBytesRead);
 end;
+
 
 end.
