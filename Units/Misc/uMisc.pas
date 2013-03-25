@@ -46,10 +46,16 @@ function  IsWow64: boolean;
 function  CopyDir(const fromDir, toDir: string): boolean;
 procedure SetGridColumnWidths(DbGrid: TDBGrid);
 function  Ping(const Address:string;Retries,BufferSize:Word;Log : TStrings) : Boolean;
+procedure SetOwnerDrawMethods(Form: TForm);
+
 
 implementation
 
 Uses
+ Vcl.ComCtrls,
+ Vcl.StdCtrls,
+ Vcl.Themes,
+ Vcl.Styles.OwnerDrawFix,
  Winapi.ActiveX,
  System.UITypes,
  System.Variants,
@@ -58,6 +64,42 @@ Uses
  WinApi.Windows,
  Vcl.Controls,
  Vcl.Dialogs;
+
+
+procedure SetOwnerDrawMethods(Form: TForm);
+var
+  i : integer;
+begin
+ for i :=0 to Form.ComponentCount-1 do
+  if Form.Components[i] is TComboBox then
+  begin
+    TComboBox(Form.Components[i]).Style:=csDropDownList;
+    TComboBox(Form.Components[i]).OnDrawItem:=nil;
+  end
+  else
+  if Form.Components[i] is TListView then
+  begin
+    TListView(Form.Components[i]).OwnerDraw:=false;
+    TListView(Form.Components[i]).OnDrawItem:=nil;
+    TListView(Form.Components[i]).OnMouseDown:=nil;
+  end;
+
+ if not TStyleManager.ActiveStyle.IsSystemStyle then
+ for i :=0 to Form.ComponentCount-1 do
+  if Form.Components[i] is TComboBox then
+  begin
+    TComboBox(Form.Components[i]).Style:=csOwnerDrawFixed;
+    TComboBox(Form.Components[i]).OnDrawItem:=VclStylesOwnerDrawFix.ComboBoxDrawItem;
+  end
+  else
+  if Form.Components[i] is TListView then
+  begin
+    TListView(Form.Components[i]).OwnerDraw:=true;
+    TListView(Form.Components[i]).OnDrawItem:=VclStylesOwnerDrawFix.ListViewDrawItem;
+    TListView(Form.Components[i]).OnMouseDown:=VclStylesOwnerDrawFix.ListViewMouseDown;
+  end;
+
+end;
 
 procedure SetGridColumnWidths(DbGrid: TDBGrid);
 const

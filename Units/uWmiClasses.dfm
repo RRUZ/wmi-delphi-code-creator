@@ -122,9 +122,12 @@ object FrmWmiClasses: TFrmWmiClasses
           WidthType = (
             -1)
         end>
+      DoubleBuffered = True
       HideSelection = False
+      Items.ItemData = {}
       ReadOnly = True
       RowSelect = True
+      ParentDoubleBuffered = False
       TabOrder = 5
       ViewStyle = vsReport
       OnClick = ListViewPropertiesClick
@@ -160,7 +163,7 @@ object FrmWmiClasses: TFrmWmiClasses
     Left = 423
     Top = 198
     Bitmap = {
-      494C010103007800680210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101030078006C0210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       00030B140B72414841F6606360FE676967FF686968FF365D38EF264727CE6263

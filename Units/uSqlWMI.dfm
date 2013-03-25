@@ -191,6 +191,7 @@ object FrmWMISQL: TFrmWMISQL
         Gutter.Font.Style = []
         Gutter.ShowLineNumbers = True
         Highlighter = SynSQLSyn1
+        FontSmoothing = fsmNone
       end
       object PanelNav: TPanel
         Left = 1
@@ -265,6 +266,14 @@ object FrmWMISQL: TFrmWMISQL
           TabOrder = 2
           OnChange = CbHostsChange
         end
+        object Button1: TButton
+          Left = 480
+          Top = 26
+          Width = 75
+          Height = 25
+          Caption = 'Button1'
+          TabOrder = 5
+        end
       end
     end
     object Panel1: TPanel
@@ -330,6 +339,10 @@ object FrmWMISQL: TFrmWMISQL
         object TabSheet2: TTabSheet
           Caption = 'Text'
           ImageIndex = 1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object MemoWMI: TMemo
             Left = 0
             Top = 0
@@ -351,6 +364,9 @@ object FrmWMISQL: TFrmWMISQL
     end
   end
   object SynSQLSyn1: TSynSQLSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
     Left = 384
     Top = 40
   end
@@ -390,7 +406,7 @@ object FrmWMISQL: TFrmWMISQL
     Left = 128
     Top = 296
     Bitmap = {
-      494C0101010008004C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010101000800580010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000010D0434052D0DD9042F
       0FFD041909B70005012600000000000000000000000000000000000000000000

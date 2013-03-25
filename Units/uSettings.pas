@@ -466,7 +466,7 @@ begin
   if StyleName<>'' then
    TStyleManager.SetStyle(StyleName)
   else
-   TStyleManager.SetStyle(TStyleManager.SystemStyle.Name);
+   TStyleManager.SetStyle(TStyleManager.SystemStyle);
 end;
 
 function GetCurrentTheme(const ThemeName:string):TIDETheme;

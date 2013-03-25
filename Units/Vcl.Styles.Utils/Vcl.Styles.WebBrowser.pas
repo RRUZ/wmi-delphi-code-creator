@@ -143,8 +143,8 @@ implementation
 
 uses
  MSHTML,
- System.Sysutils,
  System.UITypes,
+ System.Sysutils,
  System.Win.ComObj,
  Vcl.Dialogs,
  Vcl.Themes,
