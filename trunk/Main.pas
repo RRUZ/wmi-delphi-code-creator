@@ -14,7 +14,7 @@
 { The Original Code is Main.pas.                                                                   }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -263,23 +263,23 @@ begin
   else
   if FSettings.ActivateCustomForm then
   begin
-    TStyleManager.Engine.RegisterStyleHook(TCustomForm, TFormStyleHookBackround);
-    TStyleManager.Engine.RegisterStyleHook(TForm, TFormStyleHookBackround);
+    TStyleManager.Engine.RegisterStyleHook(TCustomForm, TFormStyleHookBackground);
+    TStyleManager.Engine.RegisterStyleHook(TForm, TFormStyleHookBackground);
 
    if FSettings.CustomFormNC then
    begin
-     TFormStyleHookBackround.NCSettings.Enabled  := True;
-     TFormStyleHookBackround.NCSettings.UseColor := FSettings.UseColorNC;
-     TFormStyleHookBackround.NCSettings.Color    := FSettings.ColorNC;
-     TFormStyleHookBackround.NCSettings.ImageLocation := FSettings.ImageNC;
+     TFormStyleHookBackground.NCSettings.Enabled  := True;
+     TFormStyleHookBackground.NCSettings.UseColor := FSettings.UseColorNC;
+     TFormStyleHookBackground.NCSettings.Color    := FSettings.ColorNC;
+     TFormStyleHookBackground.NCSettings.ImageLocation := FSettings.ImageNC;
    end;
 
    if FSettings.CustomFormBack then
    begin
-     TFormStyleHookBackround.BackGroundSettings.Enabled  := True;
-     TFormStyleHookBackround.BackGroundSettings.UseColor := FSettings.UseColorBack;
-     TFormStyleHookBackround.BackGroundSettings.Color    := FSettings.ColorBack;
-     TFormStyleHookBackround.BackGroundSettings.ImageLocation := FSettings.ImageBack;
+     TFormStyleHookBackground.BackGroundSettings.Enabled  := True;
+     TFormStyleHookBackground.BackGroundSettings.UseColor := FSettings.UseColorBack;
+     TFormStyleHookBackground.BackGroundSettings.Color    := FSettings.ColorBack;
+     TFormStyleHookBackground.BackGroundSettings.ImageLocation := FSettings.ImageBack;
    end;
 
   end;

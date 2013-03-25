@@ -26,7 +26,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uMisc, Vcl.StdCtrls, Vcl.ToolWin,
   Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ImgList, Vcl.ActnList, uSettings,
-  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ComCtrls;
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ComCtrls, System.Actions;
 
 type
   TPageControl = class(Vcl.ComCtrls.TPageControl);

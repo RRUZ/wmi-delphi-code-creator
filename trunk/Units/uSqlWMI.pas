@@ -30,7 +30,7 @@ uses
   Vcl.ExtCtrls, SynEdit, uSynEditPopupEdit, uComboBox, Vcl.DBCtrls, uHostsAdmin,
   SynCompletionProposal, Vcl.ComCtrls, uWmi_Metadata, uSettings,
   Vcl.ImgList, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan,
-  Vcl.Menus, Vcl.ActnPopup;
+  Vcl.Menus, Vcl.ActnPopup, System.Actions;
 
 type
 
@@ -47,6 +47,7 @@ type
     TabSheet2: TTabSheet;
     MemoWMI: TMemo;
     PopupActionBar3: TPopupActionBar;
+    Button1: TButton;
     procedure FormShow(Sender: TObject);
     procedure CbHostsChange(Sender: TObject);
    type
@@ -144,7 +145,8 @@ type
     procedure LoadProposal(WmiMetaClassInfo : TWMiClassMetaData);
     procedure SetMsg(const Msg : string);
     procedure LoadNamespaces;
-
+    procedure SetOwnerDrawMethods;
+    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
     property SetLog : TProcLog read FSetLog Write FSetLog;
     property NameSpaces : TStrings read GetNameSpaces Write SetNameSpaces;
@@ -208,6 +210,7 @@ begin
  TAction(Sender).Enabled:=(Length(SynEditWQL.Text)>0) and (FRunningWQL=False);
 end;
 
+
 procedure TFrmWMISQL.CbHostsChange(Sender: TObject);
 var
  LWMIHost : TWMIHost;
@@ -262,6 +265,11 @@ begin
     GenerateSqlCode;
 end;
 
+
+procedure TFrmWMISQL.CMStyleChanged(var Message: TMessage);
+begin
+ SetOwnerDrawMethods;
+end;
 
 procedure TFrmWMISQL.ComboBoxClassesChange(Sender: TObject);
 begin
@@ -370,6 +378,7 @@ procedure TFrmWMISQL.FormCreate(Sender: TObject);
 var
  LWMIHost : TWMIHost;
 begin
+  SetOwnerDrawMethods;
   FillPopupActionBar(PopupActionBar3);
   AssignStdActionsPopUpMenu(Self, PopupActionBar3);
 
@@ -722,6 +731,11 @@ begin
   CbNameSpaces.Items.AddStrings(Value);
 end;
 
+
+procedure TFrmWMISQL.SetOwnerDrawMethods;
+begin
+  uMisc.SetOwnerDrawMethods(Self);
+end;
 
 procedure TFrmWMISQL.SetPassWord(const Value: string);
 begin

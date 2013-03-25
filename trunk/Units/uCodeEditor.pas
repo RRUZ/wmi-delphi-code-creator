@@ -29,7 +29,7 @@ uses
   Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ActnCtrls, uWmiGenCode,
   uSettings,Vcl.StdCtrls,  Vcl.ToolWin, SynHighlighterPas, SynEditHighlighter,
   SynHighlighterCpp, Vcl.ActnMenus, Vcl.ExtCtrls, uSynEditPopupEdit,
-  SynHighlighterCS, Vcl.Menus, Vcl.ActnPopup;
+  SynHighlighterCS, Vcl.Menus, Vcl.ActnPopup, System.Actions;
 
 type
   TProcWMiCodeGen = procedure of object;
@@ -80,6 +80,9 @@ type
     procedure SetSourceCode(const Value: TStrings);
     procedure SetSourceLanguage(const Value: TSourceLanguages);
     procedure GenerateCode;
+    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
+    procedure SetOwnerDrawMethods;
+
   public
     property SourceLanguage : TSourceLanguages read FSourceLanguage write SetSourceLanguage;
     property Settings : TSettings read FSettings write FSettings;
@@ -94,6 +97,9 @@ implementation
 
 uses
  ShellApi,
+ Vcl.Styles,
+ Vcl.Themes,
+ uMisc,
  uSelectCompilerVersion,
  uDotNetFrameWork,
  uDelphiIDE,
@@ -102,8 +108,7 @@ uses
  uDelphiPrismIDE,
  uDelphiPrismHelper,
  uVisualStudio,
- StrUtils,
- uMisc;
+ StrUtils;
 
 {$R *.dfm}
 
@@ -153,6 +158,11 @@ begin
 
   if Assigned(Settings) then
     LoadCurrentTheme(Self,Settings.CurrentTheme);
+end;
+
+procedure TFrmCodeEditor.SetOwnerDrawMethods;
+begin
+  uMisc.SetOwnerDrawMethods(Self);
 end;
 
 procedure TFrmCodeEditor.SetSourceCode(const Value: TStrings);
@@ -563,6 +573,11 @@ begin
       SynEditCode.Lines.SaveToFile(SaveDialog1.FileName);
 end;
 
+procedure TFrmCodeEditor.CMStyleChanged(var Message: TMessage);
+begin
+  SetOwnerDrawMethods;
+end;
+
 procedure TFrmCodeEditor.ComboBoxLanguageSelChange(Sender: TObject);
 begin
    SourceLanguage:=TSourceLanguages(ComboBoxLanguageSel.Items.Objects[ComboBoxLanguageSel.ItemIndex]);
@@ -573,6 +588,7 @@ procedure TFrmCodeEditor.FormCreate(Sender: TObject);
 var
   i : TSourceLanguages;
 begin
+  SetOwnerDrawMethods;
   FCodeGenerator :=nil;
 
   for i := Low(TSourceLanguages) to High(TSourceLanguages) do

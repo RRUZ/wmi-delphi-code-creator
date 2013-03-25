@@ -68,6 +68,8 @@ type
     procedure LoadWmiProperties(WmiMetaClassInfo : TWMiClassMetaData);
     procedure LoadNameSpaces;
     procedure SaveCurrentSettings;
+    procedure SetOwnerDrawMethods;
+    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
     property SetMsg : TProcLog read FSetMsg Write FSetMsg;
     property SetLog : TProcLog read FSetLog Write FSetLog;
@@ -91,6 +93,7 @@ uses
   uGlobals,
   Vcl.Styles,
   Vcl.Themes,
+  Vcl.Styles.OwnerDrawFix,
   Winapi.CommCtrl,
   System.Win.ComObj,
   uWmi_ViewPropsValues,
@@ -135,6 +138,11 @@ begin
   GenerateCode;
 end;
 
+procedure TFrmWmiClasses.CMStyleChanged(var Message: TMessage);
+begin
+  SetOwnerDrawMethods;
+end;
+
 procedure TFrmWmiClasses.ComboBoxClassesChange(Sender: TObject);
 begin
   LoadClassInfo;
@@ -156,6 +164,7 @@ end;
 
 procedure TFrmWmiClasses.FormCreate(Sender: TObject);
 begin
+  SetOwnerDrawMethods;
   DataLoaded:=False;
   FrmCodeEditor  := TFrmCodeEditor.Create(Self);
   FrmCodeEditor.CodeGenerator:=GenerateCode;
@@ -517,6 +526,11 @@ begin
 end;
 
 
+
+procedure TFrmWmiClasses.SetOwnerDrawMethods;
+begin
+  uMisc.SetOwnerDrawMethods(Self);
+end;
 
 procedure TFrmWmiClasses.SetSettings(const Value: TSettings);
 begin

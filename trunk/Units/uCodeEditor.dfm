@@ -89,6 +89,7 @@ object FrmCodeEditor: TFrmCodeEditor
     Gutter.ShowLineNumbers = True
     Gutter.GradientStartColor = 4539717
     Gutter.GradientEndColor = 2565927
+    FontSmoothing = fsmNone
   end
   object ActionManager1: TActionManager
     ActionBars = <
@@ -220,7 +221,7 @@ object FrmCodeEditor: TFrmCodeEditor
     Left = 432
     Top = 152
     Bitmap = {
-      494C01010B0018006C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010B001800700010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       00000000000000000000000000000000000000000003000000100000001A0000
       001A0000001A0000001A00000017000000110000000B00000007000000070000
@@ -624,10 +625,16 @@ object FrmCodeEditor: TFrmCodeEditor
       000000000000}
   end
   object SynCppSyn1: TSynCppSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
     Left = 287
     Top = 195
   end
   object SynPasSyn1: TSynPasSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
     AsmAttri.Background = 4598550
     AsmAttri.Foreground = clGreen
     CommentAttri.Background = 4598550
@@ -663,6 +670,9 @@ object FrmCodeEditor: TFrmCodeEditor
     Top = 150
   end
   object SynCSSyn1: TSynCSSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
     Left = 360
     Top = 184
   end

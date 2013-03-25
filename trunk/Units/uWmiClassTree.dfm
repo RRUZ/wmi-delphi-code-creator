@@ -55,8 +55,6 @@ object FrmWmiClassTree: TFrmWmiClassTree
     ReadOnly = True
     RowSelect = True
     TabOrder = 1
-    ExplicitWidth = 500
-    ExplicitHeight = 356
   end
   object BtnFillTree: TButton
     Left = 327

@@ -232,9 +232,11 @@ type
     FIsOrdinal: Boolean;
     FIsArray : Boolean;
     FQualifiers: TList<TWMiQualifierMetaData>;
+    FIsReadOnly: Boolean;
   public
     constructor Create; overload;
     Destructor  Destroy; override;
+    property IsReadOnly : Boolean read FIsReadOnly;
     property IsArray : Boolean read FIsArray;
     property IsOrdinal : Boolean read FIsOrdinal;
     property Name : string read FName;
@@ -281,6 +283,8 @@ type
     property Qualifiers : TList<TWMiQualifierMetaData> read FQualifiers;
     property InParameters : TList<TWMiPropertyMetaData> read FInParameters;
     property OutParameters : TList<TWMiPropertyMetaData> read FOutParameters;
+    property ValidValues : TStrings read FValidValues;
+    property ValidMapValues : TStrings read FValidMapValues;
   end;
 
   TWMiClassMetaData=class
@@ -1938,7 +1942,12 @@ begin
   objSWbemObjectSet:= objWMIService.Get(FClass, wbemFlagUseAmendedQualifiers);
 
   //Get MOF definition
-  FWmiClassMOF     :=VarStrNull(objSWbemObjectSet.GetObjectText_);
+  try
+   //prevent incomplete class exception
+   FWmiClassMOF     :=VarStrNull(objSWbemObjectSet.GetObjectText_);
+  except
+   FWmiClassMOF:='';
+  end;
 
   //Get XML Wmi class definition
   colNamedValueSet:= CreateOleObject('Wbemscripting.SWbemNamedValueSet');
@@ -2054,6 +2063,10 @@ begin
         PropertyMetaData.Qualifiers[PropertyMetaData.Qualifiers.Count-1].FValue:=VarStrNull(Qualif.Value);
         PropertyMetaData.Qualifiers[PropertyMetaData.Qualifiers.Count-1].FName :=VarStrNull(Qualif.Name);
 
+
+        if CompareText(VarStrNull(Qualif.Name),'write')=0 then
+         PropertyMetaData.FIsReadOnly :=False
+        else
         if SameText(VarStrNull(Qualif.Name),'Singleton') then
          FIsSingleton := True
         else
@@ -2465,6 +2478,7 @@ begin
   FValidValues:=TStringList.Create;
   FValidMapValues:=TStringList.Create;
   FQualifiers:=TList<TWMiQualifierMetaData>.Create;
+  FIsReadOnly:=True;
 end;
 
 destructor TWMiPropertyMetaData.Destroy;
