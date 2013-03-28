@@ -27,7 +27,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
   SynEditHighlighter, SynHighlighterPas, uCheckUpdate, SynHighlighterCpp, Vcl.Styles.Ext,Vcl.Styles.ColorTabs,
-  SynHighlighterCS, Vcl.ExtDlgs, SynHighlighterSQL, Vcl.Themes;
+  SynHighlighterCS, Vcl.ExtDlgs, SynHighlighterSQL, Vcl.Themes, Vcl.Styles.Fixes;
 
 type
   TSettings = class
@@ -240,6 +240,8 @@ type
     procedure LoadFormatters;
     procedure DrawSeletedVCLStyle;
     procedure SetStateControls(Container: TWinControl; Value : boolean);
+    procedure SetOwnerDrawMethods;
+    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
     property Settings: TSettings Read FSettings Write FSettings;
     property Form: TForm Read FForm Write FForm;
@@ -1038,6 +1040,11 @@ begin
   MsgInformation('This feature will be applied when you restart the aplication');
 end;
 
+procedure TFrmSettings.CMStyleChanged(var Message: TMessage);
+begin
+  SetOwnerDrawMethods;
+end;
+
 procedure TFrmSettings.ColorBoxNCGetColors(Sender: TCustomColorBox;
   Items: TStrings);
 Var
@@ -1134,6 +1141,7 @@ procedure TFrmSettings.FormCreate(Sender: TObject);
 var
   LIndex : TSourceLanguages;
 begin
+  SetOwnerDrawMethods;
   FPreview:=TVclStylesPreview.Create(Self);
   FPreview.Parent:=PanelPreview;
   FPreview.BoundsRect := PanelPreview.ClientRect;
@@ -1288,6 +1296,11 @@ begin
   finally
     ComboBoxTheme.Items.EndUpdate;
   end;
+end;
+
+procedure TFrmSettings.SetOwnerDrawMethods;
+begin
+ uMisc.SetOwnerDrawMethods(Self);
 end;
 
 procedure TFrmSettings.SetStateControls(Container: TWinControl; Value: boolean);
