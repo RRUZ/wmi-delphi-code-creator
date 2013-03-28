@@ -114,8 +114,8 @@
         <DCC_DebugInformation>true</DCC_DebugInformation>
         <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
         <VerInfo_MinorVer>7</VerInfo_MinorVer>
-        <VerInfo_Build>12</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.7.6.12;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Build>14</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.7.6.14;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -249,6 +249,7 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Units\Vcl.Styles.Utils\Vcl.Styles.TabsClose.pas"/>
+        <DCCReference Include="Units\Vcl.Styles.Utils\Vcl.Styles.Fixes.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
