@@ -42,7 +42,8 @@ type
     BorlandCpp2010,
     BorlandCppXE,
     BorlandCppXE2,
-    BorlandCppXE3
+    BorlandCppXE3,
+    BorlandCppXE4
     );
 
 const
@@ -56,7 +57,8 @@ const
     'RAD Studio 2010',
     'RAD Studio XE',
     'RAD Studio XE2',
-    'RAD Studio XE3'
+    'RAD Studio XE3',
+    'RAD Studio XE4'
     );
 
   BorlandCppRegPaths: array[TBorlandCppVersions] of string = (
@@ -69,7 +71,8 @@ const
     '\Software\CodeGear\BDS\7.0',
     '\Software\Embarcadero\BDS\8.0',
     '\Software\Embarcadero\BDS\9.0',
-    '\Software\Embarcadero\BDS\10.0'
+    '\Software\Embarcadero\BDS\10.0',
+    '\Software\Embarcadero\BDS\11.0'
     );
 
 
