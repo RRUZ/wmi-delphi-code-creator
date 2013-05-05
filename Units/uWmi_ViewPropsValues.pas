@@ -14,7 +14,7 @@
 { The Original Code is uWmi_ViewPropsValues.pas.                                                   }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -171,8 +171,10 @@ type
                                                      const objWbemAsyncContext: ISWbemNamedValueSet);
    {$ELSE}
    procedure OnWMIThreadFinished(var Msg: TMessage); message WM_WMI_THREAD_FINISHED;
-    procedure SetMode(const Value: TWmi_ViewPropsValuesMode);
+   procedure SetMode(const Value: TWmi_ViewPropsValuesMode);
    {$ENDIF}
+   procedure SetOwnerDrawMethods;
+   procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
     property ContainValues: boolean Read FContainValues;
     property WQLProperties: TStrings Read FWQLProperties Write FWQLProperties;
@@ -363,6 +365,11 @@ begin
    Frm.Free;
 end;
 
+procedure TFrmWmiVwProps.CMStyleChanged(var Message: TMessage);
+begin
+  SetOwnerDrawMethods;
+end;
+
 {$IFDEF USE_ASYNCWMIQUERY}
 
 procedure TFrmWmiVwProps.CreateColumns;
@@ -461,6 +468,7 @@ end;
 
 procedure TFrmWmiVwProps.FormCreate(Sender: TObject);
 begin
+ SetOwnerDrawMethods;
 {$IFDEF USE_ASYNCWMIQUERY}
   FSWbemLocator :=nil;
   FWMIService   :=nil;
@@ -659,6 +667,11 @@ begin
   else
   if FMode=TextView then
    MemoInstances.Visible:=True;
+end;
+
+procedure TFrmWmiVwProps.SetOwnerDrawMethods;
+begin
+  uMisc.SetOwnerDrawMethods(Self);
 end;
 
 procedure TFrmWmiVwProps.SetWmiClass(const Value: string);

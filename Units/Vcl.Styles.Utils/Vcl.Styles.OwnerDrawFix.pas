@@ -141,7 +141,7 @@ begin
     Dx:=0;
     r.Right := r.Left + Sender.Column[ColIdx].Width;
 
-    if ColIdx > 0 then
+    if (ColIdx > 0) and (Item.SubItems.Count>=ColIdx) then
       s := Item.SubItems[ColIdx - 1]
     else
     begin
@@ -177,7 +177,7 @@ begin
     if TListView(Sender).RowSelect then
       Sender.Canvas.Brush.Color := LStyles.GetSystemColor(clHighlight);
 
-    if (TCustomListViewClass(Sender).SmallImages<>nil) and (TCustomListViewClass(Sender).SmallImages.Handle<>0) and (Item.ImageIndex>=0) then
+    if (ColIdx=0) and (TCustomListViewClass(Sender).SmallImages<>nil) and (TCustomListViewClass(Sender).SmallImages.Handle<>0) and (Item.ImageIndex>=0) then
     begin
       ImageList_Draw(TCustomListViewClass(Sender).SmallImages.Handle, Item.ImageIndex, Sender.Canvas.Handle, R.Left - 2, R.Top, ILD_NORMAL);
       ImageSize:=TCustomListViewClass(Sender).SmallImages.Width;

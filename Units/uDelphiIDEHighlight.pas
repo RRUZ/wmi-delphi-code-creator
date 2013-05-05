@@ -507,9 +507,6 @@ begin
   end;
 end;
 
-
-
-
 procedure FillListAvailableElements(DelphiVersion:TDelphiVersions;List: TStrings);
 var
  Element : TIDEHighlightElements;
