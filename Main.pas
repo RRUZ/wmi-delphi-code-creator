@@ -81,6 +81,8 @@ type
     procedure ActionDisconnectUpdate(Sender: TObject);
     procedure ToolButton1Click(Sender: TObject);
     procedure ToolButtonExitClick(Sender: TObject);
+    procedure TreeViewTasksCustomDrawItem(Sender: TCustomTreeView;
+      Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
   private
     FSettings: TSettings;
     Ctx : TRttiContext;
@@ -546,6 +548,17 @@ begin
 
 end;
 
+
+procedure TFrmMain.TreeViewTasksCustomDrawItem(Sender: TCustomTreeView;
+  Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
+begin
+  if not StyleServices.IsSystemStyle then
+  if cdsSelected in State then
+  begin
+    TTreeView(Sender).Canvas.Brush.Color := StyleServices.GetSystemColor(clHighlight);
+    TTreeView(Sender).Canvas.Font.Color := StyleServices.GetSystemColor(clHighlightText);
+  end;
+end;
 
 initialization
 

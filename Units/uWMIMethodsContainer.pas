@@ -14,7 +14,7 @@
 { The Original Code is uWMIMethodsContainer.pas.                                                   }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -28,7 +28,7 @@ uses
   Vcl.StdCtrls, uMisc, uSettings,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ImgList, Vcl.ActnList,
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ComCtrls, Vcl.ToolWin,
-  Vcl.ActnCtrls;
+  Vcl.ActnCtrls, System.Actions;
 
 type
   TPageControl = class(Vcl.ComCtrls.TPageControl);

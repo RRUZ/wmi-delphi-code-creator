@@ -4,7 +4,7 @@ object FrmSettings: TFrmSettings
   BorderStyle = bsDialog
   Caption = 'Settings'
   ClientHeight = 471
-  ClientWidth = 596
+  ClientWidth = 686
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,22 +20,25 @@ object FrmSettings: TFrmSettings
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 596
+    Width = 686
     Height = 436
     Align = alClient
     BorderWidth = 5
     TabOrder = 0
+    ExplicitWidth = 682
     object PageControl1: TPageControl
       Left = 6
       Top = 6
-      Width = 584
+      Width = 674
       Height = 424
       ActivePage = TabSheet4
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 670
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
+        ExplicitWidth = 662
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -161,10 +164,7 @@ object FrmSettings: TFrmSettings
       object TabSheet2: TTabSheet
         Caption = 'Object Pascal Code generation'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
+        ExplicitWidth = 662
         object Label4: TLabel
           Left = 3
           Top = 99
@@ -264,24 +264,19 @@ object FrmSettings: TFrmSettings
       object TabSheet1: TTabSheet
         BorderWidth = 8
         Caption = 'GUI Settings'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
+        ExplicitWidth = 662
         object PageControl2: TPageControl
           Left = 0
           Top = 0
-          Width = 560
+          Width = 650
           Height = 380
           ActivePage = TabSheet6
           Align = alClient
           TabOrder = 0
+          ExplicitWidth = 646
           object TabSheet6: TTabSheet
             Caption = 'Themes (Vcl Styles)'
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
+            ExplicitWidth = 638
             object Label9: TLabel
               Left = 3
               Top = 22
@@ -308,8 +303,8 @@ object FrmSettings: TFrmSettings
               OnChange = ComboBoxVCLStyleChange
             end
             object GroupBoxNonClient: TGroupBox
-              Left = 266
-              Top = 76
+              Left = 355
+              Top = 80
               Width = 280
               Height = 121
               Caption = 'Non client area'
@@ -370,8 +365,8 @@ object FrmSettings: TFrmSettings
               end
             end
             object GroupBoxBackgroud: TGroupBox
-              Left = 266
-              Top = 203
+              Left = 355
+              Top = 207
               Width = 280
               Height = 121
               Caption = 'Background'
@@ -432,8 +427,8 @@ object FrmSettings: TFrmSettings
               end
             end
             object CheckBoxFormCustom: TCheckBox
-              Left = 266
-              Top = 43
+              Left = 355
+              Top = 47
               Width = 280
               Height = 17
               Caption = 'Customize non client area and background'
@@ -443,7 +438,7 @@ object FrmSettings: TFrmSettings
             object PanelPreview: TPanel
               Left = 3
               Top = 80
-              Width = 257
+              Width = 346
               Height = 257
               BevelOuter = bvNone
               TabOrder = 5
@@ -452,10 +447,7 @@ object FrmSettings: TFrmSettings
           object TabSheet7: TTabSheet
             Caption = 'Syntax Highlighting'
             ImageIndex = 1
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
+            ExplicitWidth = 638
             object Label3: TLabel
               Left = 491
               Top = 8
@@ -575,10 +567,7 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
+        ExplicitWidth = 662
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -591,10 +580,7 @@ object FrmSettings: TFrmSettings
       object TabSheet8: TTabSheet
         Caption = 'Compiler Options'
         ImageIndex = 5
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
+        ExplicitWidth = 662
         object Label18: TLabel
           Left = 8
           Top = 16
@@ -630,10 +616,7 @@ object FrmSettings: TFrmSettings
         Caption = 'Templates'
         ImageIndex = 4
         TabVisible = False
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
+        ExplicitWidth = 662
         object Label15: TLabel
           Left = 11
           Top = 10
@@ -685,10 +668,11 @@ object FrmSettings: TFrmSettings
   object Panel2: TPanel
     Left = 0
     Top = 436
-    Width = 596
+    Width = 686
     Height = 35
     Align = alBottom
     TabOrder = 1
+    ExplicitWidth = 682
     object ButtonApply: TButton
       Left = 6
       Top = 6

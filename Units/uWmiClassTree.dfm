@@ -55,6 +55,7 @@ object FrmWmiClassTree: TFrmWmiClassTree
     ReadOnly = True
     RowSelect = True
     TabOrder = 1
+    OnCustomDrawItem = TreeViewClassesCustomDrawItem
   end
   object BtnFillTree: TButton
     Left = 327

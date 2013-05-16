@@ -14,7 +14,7 @@
 { The Original Code is uWmiTree.pas.                                                               }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -65,6 +65,8 @@ type
     procedure TreeViewWmiClassesChange(Sender: TObject; xNode: TTreeNode);
     procedure FindDialog1Find(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure TreeViewWmiClassesCustomDrawItem(Sender: TCustomTreeView;
+      Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
   private
     DataLoaded : Boolean;
     FSetMsg: TProcLog;
@@ -91,6 +93,8 @@ function FindTextTreeView(const AText: string;
 implementation
 
 uses
+  Vcl.Styles,
+  Vcl.Themes,
   uStdActionsPopMenu,
   uOnlineResources,
   uxtheme,
@@ -491,5 +495,16 @@ begin
     PanelClassInfo.Height := 220;
 end;
 
+
+procedure TFrmWMITree.TreeViewWmiClassesCustomDrawItem(Sender: TCustomTreeView;
+  Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
+begin
+  if not StyleServices.IsSystemStyle then
+  if cdsSelected in State then
+  begin
+    TTreeView(Sender).Canvas.Brush.Color := StyleServices.GetSystemColor(clHighlight);
+    TTreeView(Sender).Canvas.Font.Color := StyleServices.GetSystemColor(clHighlightText);
+  end;
+end;
 
 end.
