@@ -1,3 +1,23 @@
+{**************************************************************************************************}
+{                                                                                                  }
+{ Unit uWmiClassTree                                                                               }
+{ unit for the WMI Delphi Code Creator                                                             }
+{                                                                                                  }
+{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
+{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
+{ License at http://www.mozilla.org/MPL/                                                           }
+{                                                                                                  }
+{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
+{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
+{ and limitations under the License.                                                               }
+{                                                                                                  }
+{ The Original Code is uWmiClassTree.pas.                                                          }
+{                                                                                                  }
+{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
+{ All Rights Reserved.                                                                             }
+{                                                                                                  }
+{**************************************************************************************************}
 unit uWmiClassTree;
 
 interface
@@ -17,6 +37,8 @@ type
     procedure BtnFillTreeClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure TreeViewClassesCustomDrawItem(Sender: TCustomTreeView;
+      Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
   private
     Working : Boolean;
     DataLoaded : Boolean;
@@ -32,11 +54,14 @@ type
 implementation
 
 uses
+  Vcl.Styles,
+  Vcl.Themes,
   AsyncCalls,
   ComObj,
   ActiveX,
   uGLobals,
-  uWmi_Metadata, uMisc;
+  uWmi_Metadata,
+  uMisc;
 
 {$R *.dfm}
 
@@ -170,6 +195,18 @@ procedure TFrmWmiClassTree.SetStaus(const Msg: string);
 begin
   LabelStatus.Caption:=Msg;
   LabelStatus.Update;
+end;
+
+procedure TFrmWmiClassTree.TreeViewClassesCustomDrawItem(
+  Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
+  var DefaultDraw: Boolean);
+begin
+  if not StyleServices.IsSystemStyle then
+  if cdsSelected in State then
+  begin
+    TTreeView(Sender).Canvas.Brush.Color := StyleServices.GetSystemColor(clHighlight);
+    TTreeView(Sender).Canvas.Font.Color := StyleServices.GetSystemColor(clHighlightText);
+  end;
 end;
 
 end.

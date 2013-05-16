@@ -1,6 +1,6 @@
 {**************************************************************************************************}
 {                                                                                                  }
-{ Unit                                                                                      }
+{ Unit uSqlWMI                                                                                     }
 { unit for the WMI Delphi Code Creator                                                             }
 {                                                                                                  }
 { The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
@@ -14,7 +14,7 @@
 { The Original Code is uSqlWMI.pas.                                                                }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 {**************************************************************************************************}
@@ -47,7 +47,6 @@ type
     TabSheet2: TTabSheet;
     MemoWMI: TMemo;
     PopupActionBar3: TPopupActionBar;
-    Button1: TButton;
     procedure FormShow(Sender: TObject);
     procedure CbHostsChange(Sender: TObject);
    type
