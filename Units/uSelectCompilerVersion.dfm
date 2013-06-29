@@ -51,21 +51,15 @@ object FrmSelCompilerVer: TFrmSelCompilerVer
     Columns = <
       item
         Caption = 'Version'
-        Width = -1
-        WidthType = (
-          -1)
+        Width = 110
       end
       item
         Caption = 'Path'
-        Width = -1
-        WidthType = (
-          -1)
+        Width = 200
       end
       item
         Caption = 'Compiler'
-        Width = -1
-        WidthType = (
-          -1)
+        Width = 200
       end>
     HideSelection = False
     ReadOnly = True

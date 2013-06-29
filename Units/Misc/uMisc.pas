@@ -97,6 +97,13 @@ begin
     TListView(Form.Components[i]).OwnerDraw:=true;
     TListView(Form.Components[i]).OnDrawItem:=VclStylesOwnerDrawFix.ListViewDrawItem;
     TListView(Form.Components[i]).OnMouseDown:=VclStylesOwnerDrawFix.ListViewMouseDown;
+  end
+  else
+  if Form.Components[i] is TTreeView then
+  begin
+    //TTreeView(Form.Components[i]).OwnerDraw:=true;
+    //TTreeView(Form.Components[i]).OnAdvancedCustomDrawItem:=VclStylesOwnerDrawFix.TreeViewAdvancedCustomDrawItem;
+    //TListView(Form.Components[i]).OnMouseDown:=VclStylesOwnerDrawFix.ListViewMouseDown;
   end;
 
 end;

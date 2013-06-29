@@ -45,6 +45,8 @@ type
     FShowCompiler: boolean;
     FShow64BitsCompiler: boolean;
     { Private declarations }
+    procedure SetOwnerDrawMethods;
+    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
     { Public declarations }
     procedure LoadInstalledVersions;
@@ -89,6 +91,11 @@ begin
 end;
 
 { TFrmSelDelphiVer }
+procedure TFrmSelCompilerVer.CMStyleChanged(var Message: TMessage);
+begin
+  SetOwnerDrawMethods;
+end;
+
 procedure TFrmSelCompilerVer.FormActivate(Sender: TObject);
 begin
   LabelText.Caption := Format('%s compilers installed', [ListSourceLanguages[FLanguageSource]]);
@@ -96,6 +103,7 @@ end;
 
 procedure TFrmSelCompilerVer.FormCreate(Sender: TObject);
 begin
+  SetOwnerDrawMethods;
   FShowCompiler := False;
   FShow64BitsCompiler :=True;
 end;
@@ -378,6 +386,22 @@ begin
             item.Data := Pointer(Ord(Lng_Oxygen));
           end;
 
+
+          if IsVS11Installed and
+            IsDelphiPrismAttachedtoVS2012 then
+          begin
+            FileName := GetVS11IDEFileName;
+            item     := ListViewIDEs.Items.Add;
+            item.Caption := 'Visual Studio 2012';
+            item.SubItems.Add(FileName);
+            item.SubItems.Add(GetDelphiPrismCompilerFileName);
+            ExtractIconFileToImageList(ImageList1, Filename);
+            ImageIndex := ImageList1.Count - 1;
+            item.ImageIndex := ImageIndex;
+            item.Data := Pointer(Ord(Lng_Oxygen));
+          end;
+
+
         end;
 
       end;
@@ -387,6 +411,11 @@ begin
 
   if ListViewIDEs.Items.Count>0 then
    ListViewIDEs.Items.Item[0].Selected:=True;
+end;
+
+procedure TFrmSelCompilerVer.SetOwnerDrawMethods;
+begin
+   uMisc.SetOwnerDrawMethods(Self);
 end;
 
 end.

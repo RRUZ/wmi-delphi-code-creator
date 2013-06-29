@@ -321,6 +321,15 @@ begin
             begin
               FileName := ChangeFileExt(FileName, '.sln');
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
+            end
+            else
+            if (Pos('2012', item.Caption) > 0) and
+              CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
+              FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
+              'Oxygene\VS2010\GetWMI_Info.oxygene', FileName) then
+            begin
+              FileName := ChangeFileExt(FileName, '.sln');
+              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
             end;
 
           end;

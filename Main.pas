@@ -324,6 +324,8 @@ begin
   AssignStdActionsPopUpMenu(Self, PopupActionBar1);
   ApplyVclStylesOwnerDrawFix(Self, True);
  }
+
+  SetOwnerDrawMethods(Self);
 end;
 
 
