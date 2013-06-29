@@ -37,6 +37,7 @@ function GetMonoDevelopIDEFileName: string;
 
 function IsDelphiPrismAttachedtoVS2008: boolean;
 function IsDelphiPrismAttachedtoVS2010: boolean;
+function IsDelphiPrismAttachedtoVS2012: boolean;
 
 
 procedure CompileAndRunOxygenCode(Console:TStrings;const CompilerName, ProjectFile: string;
@@ -65,6 +66,12 @@ const
     '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\InstalledProducts\RemObjects Oxygene';
   DelphiPrismVS2010x86 =
     '\SOFTWARE\Microsoft\VisualStudio\10.0\InstalledProducts\RemObjects Oxygene';
+
+  DelphiPrismVS2012x64 =
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\InstalledProducts\RemObjects Oxygene';
+  DelphiPrismVS2012x86 =
+    '\SOFTWARE\Microsoft\VisualStudio\11.0\InstalledProducts\RemObjects Oxygene';
+
 
   //HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Novell\MonoDevelop
   MonoDevelopx64RegEntry = '\SOFTWARE\Novell\MonoDevelop';
@@ -176,6 +183,15 @@ begin
     Result := RegKeyExists(DelphiPrismVS2010x64, HKEY_LOCAL_MACHINE)
   else
     Result := RegKeyExists(DelphiPrismVS2010x86, HKEY_LOCAL_MACHINE);
+end;
+
+
+function IsDelphiPrismAttachedtoVS2012: boolean;
+begin
+  if IsWow64 then
+    Result := RegKeyExists(DelphiPrismVS2012x64, HKEY_LOCAL_MACHINE)
+  else
+    Result := RegKeyExists(DelphiPrismVS2012x86, HKEY_LOCAL_MACHINE);
 end;
 
 function GetDelphiPrismRegValue(const Value: string): string;

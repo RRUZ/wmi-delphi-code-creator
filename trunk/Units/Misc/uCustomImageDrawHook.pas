@@ -51,7 +51,7 @@ type
     Addr:   PPointer;
   end;
 
-  TCustomImageListHack = class(TCustomImageList);
+  TCustomImageListClass = class(TCustomImageList);
 
 var
   DoDrawBackup: TXRedirCode;
@@ -139,7 +139,7 @@ var
   MaskBitMap: TBitmap;
   GrayBitMap: TBitmap;
 begin
-  with TCustomImageListHack(Self) do
+  with TCustomImageListClass(Self) do
   begin
     if not HandleAllocated then
       Exit;
@@ -169,12 +169,12 @@ end;
 
 procedure HookDraw;
 begin
-  HookProc(@TCustomImageListHack.DoDraw, @New_Draw, DoDrawBackup);
+  HookProc(@TCustomImageListClass.DoDraw, @New_Draw, DoDrawBackup);
 end;
 
 procedure UnHookDraw;
 begin
-  UnhookProc(@TCustomImageListHack.DoDraw, DoDrawBackup);
+  UnhookProc(@TCustomImageListClass.DoDraw, DoDrawBackup);
 end;
 
 

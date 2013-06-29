@@ -70,12 +70,12 @@ begin
   inherited;
 
   if (FHotIndex>=0) and (Index=FHotIndex) then
-   FButtonState := twSmallCloseButtonHot
+   FButtonState := twMDICloseButtonHot//twSmallCloseButtonHot
   else
   if Index = TabIndex then
-   FButtonState := twSmallCloseButtonNormal
+   FButtonState := twMDICloseButtonNormal//twSmallCloseButtonNormal
   else
-   FButtonState := twSmallCloseButtonDisabled;
+   FButtonState := twMDICloseButtonDisabled;//twSmallCloseButtonDisabled;
 
   Details := StyleServices.GetElementDetails(FButtonState);
 
