@@ -243,8 +243,8 @@ type
     procedure SetOwnerDrawMethods;
     procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
-    property Settings: TSettings Read FSettings Write FSettings;
     property Form: TForm Read FForm Write FForm;
+    property Settings: TSettings Read FSettings Write FSettings;
     procedure LoadSettings;
   end;
   {

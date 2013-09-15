@@ -48,7 +48,8 @@ type
     DelphiXE,
     DelphiXE2,
     DelphiXE3,
-    DelphiXE4
+    DelphiXE4,
+    DelphiXE5
     );
 
 
@@ -85,7 +86,8 @@ const
     'RAD Studio XE',
     'RAD Studio XE2',
     'RAD Studio XE3',
-    'RAD Studio XE4'
+    'RAD Studio XE4',
+    'RAD Studio XE5'
     );
 
   DelphiVersionNumbers: array[TDelphiVersions] of double =
@@ -104,7 +106,8 @@ const
     22,      // 'RAD Studio XE'
     23,      // 'RAD Studio XE2'
     24,      // 'RAD Studio XE3'
-    25       // 'RAD Studio XE4'
+    25,      // 'RAD Studio XE4'
+    26       // 'RAD Studio XE5'
     );
 
 
@@ -124,7 +127,8 @@ const
     '\Software\Embarcadero\BDS\8.0',
     '\Software\Embarcadero\BDS\9.0',
     '\Software\Embarcadero\BDS\10.0',
-    '\Software\Embarcadero\BDS\11.0'
+    '\Software\Embarcadero\BDS\11.0',
+    '\Software\Embarcadero\BDS\12.0'
     );
 
 
