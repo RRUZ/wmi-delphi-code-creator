@@ -3,8 +3,6 @@
 #define MyAppName 'Wmi Delphi Code Creator'
 #define MyAppVersion GetFileVersion('WDCC.exe')
 [Files]
-Source: Extras\ISSkin.dll; DestDir: {app}; Flags: dontcopy
-Source: Extras\Office2007.cjstyles; DestDir: {tmp}; Flags: dontcopy
 Source: Themes\Aqua.theme.xml; DestDir: {app}\Themes\
 Source: Themes\artofnet-darkonblue.theme.xml; DestDir: {app}\Themes\
 Source: Themes\artofnet-lime-chocolate.theme.xml; DestDir: {app}\Themes\
@@ -216,6 +214,8 @@ Source: Textures\metal-texture.jpg; DestDir: {app}\Textures\
 Source: Textures\speaker-grille-texture.jpg; DestDir: {app}\Textures\
 Source: Textures\stainless-steel.jpg; DestDir: {app}\Textures\
 Source: Textures\titanium-texture.jpg; DestDir: {app}\Textures\
+Source: Installer\VclStylesInno.dll; DestDir: {app}; Flags: dontcopy
+Source: Installer\Amakrits.vsf; DestDir: {app}; Flags: dontcopy
 [Setup]
 UsePreviousLanguage=no
 AppName={#MyAppName}
@@ -269,9 +269,10 @@ Name: slovenian; MessagesFile: compiler:Languages\Slovenian.isl
 Name: spanish; MessagesFile: compiler:Languages\Spanish.isl
 
 [Code]
-procedure LoadSkin(lpszPath: String; lpszIniFileName: String); external 'LoadSkin@files:isskin.dll stdcall';
-procedure UnloadSkin(); external 'UnloadSkin@files:isskin.dll stdcall';
-function  ShowWindow(hWnd: Integer; uType: Integer): Integer; external 'ShowWindow@user32.dll stdcall';
+// Import the LoadVCLStyle function from VclStylesInno.DLL
+procedure LoadVCLStyle(VClStyleFile: String); external 'LoadVCLStyleW@files:VclStylesInno.dll stdcall';
+// Import the UnLoadVCLStyles function from VclStylesInno.DLL
+procedure UnLoadVCLStyles; external 'UnLoadVCLStyles@files:VclStylesInno.dll stdcall';
 
 function GetUninstallString(): String;
 var
@@ -311,15 +312,14 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-   ExtractTemporaryFile('Office2007.cjstyles');
-   LoadSkin(ExpandConstant('{tmp}\Office2007.cjstyles'), 'NormalBlack.ini');
-   Result:=True;
+	ExtractTemporaryFile('Amakrits.vsf');
+	LoadVCLStyle(ExpandConstant('{tmp}\Amakrits.vsf'));
+	Result := True;
 end;
 
 procedure DeinitializeSetup();
 begin
-	ShowWindow(StrToInt(ExpandConstant('{wizardhwnd}')), 0);
-	UnloadSkin();
+	UnLoadVCLStyles;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
