@@ -107,7 +107,7 @@ begin
   LabelVersion.Caption    := Format('Version %s', [FileVersionStr]);
   LabelWmiVersion.Caption := Format('WMI installed version %s', [GetWmiVersion]);
   MemoCopyRights.Lines.Add(
-    'Author Rodrigo Ruz rodrigo.ruz.v@gmail.com - © 2010-2012 all rights reserved.');
+    'Author Rodrigo Ruz rodrigo.ruz.v@gmail.com - © 2010-2014 all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Third Party libraries and tools used');
   MemoCopyRights.Lines.Add(

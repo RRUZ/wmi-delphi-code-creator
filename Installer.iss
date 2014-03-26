@@ -216,6 +216,8 @@ Source: Textures\stainless-steel.jpg; DestDir: {app}\Textures\
 Source: Textures\titanium-texture.jpg; DestDir: {app}\Textures\
 Source: Installer\VclStylesInno.dll; DestDir: {app}; Flags: dontcopy
 Source: Installer\Amakrits.vsf; DestDir: {app}; Flags: dontcopy
+Source: Installer\background.bmp; Flags: dontcopy
+
 [Setup]
 UsePreviousLanguage=no
 AppName={#MyAppName}
@@ -234,8 +236,8 @@ UsePreviousAppDir=false
 AppendDefaultDirName=true
 PrivilegesRequired=admin
 WindowVisible=false
-;WizardSmallImageFile=compiler:WizModernSmallImage-IS.bmp
-WizardSmallImageFile=Extras\SmallImage-IS.bmp
+WizardSmallImageFile=compiler:WizModernSmallImage-IS.bmp
+;WizardSmallImageFile=Extras\SmallImage-IS.bmp
 WizardImageFile=Extras\LeftBackground.bmp
 AppContact=theroadtodelphi@gmail.com
 DisableProgramGroupPage=false
@@ -247,7 +249,7 @@ DefaultGroupName=WmiDelphiCodeCreator
 Filename: {app}\WDCC.exe; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
-Name: basque; MessagesFile: compiler:Languages\Basque.isl
+;Name: basque; MessagesFile: compiler:Languages\Basque.isl
 Name: brazilianportuguese; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
 Name: catalan; MessagesFile: compiler:Languages\Catalan.isl
 Name: czech; MessagesFile: compiler:Languages\Czech.isl
@@ -264,7 +266,7 @@ Name: norwegian; MessagesFile: compiler:Languages\Norwegian.isl
 Name: polish; MessagesFile: compiler:Languages\Polish.isl
 Name: portuguese; MessagesFile: compiler:Languages\Portuguese.isl
 Name: russian; MessagesFile: compiler:Languages\Russian.isl
-Name: slovak; MessagesFile: compiler:Languages\Slovak.isl
+;Name: slovak; MessagesFile: compiler:Languages\Slovak.isl
 Name: slovenian; MessagesFile: compiler:Languages\Slovenian.isl
 Name: spanish; MessagesFile: compiler:Languages\Spanish.isl
 
@@ -309,6 +311,42 @@ begin
     Result := 1;
 end;
 
+procedure BitmapImageOnClick(Sender: TObject);
+var
+  ErrorCode : Integer;
+begin
+  ShellExec('open', 'https://code.google.com/p/wmi-delphi-code-creator/', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
+end;
+
+procedure CreateWizardPages;
+var
+  Page: TWizardPage;
+  BitmapImage: TBitmapImage;
+  BitmapFileName: String;
+begin
+  BitmapFileName := ExpandConstant('{tmp}\background.bmp');
+  ExtractTemporaryFile(ExtractFileName(BitmapFileName));
+
+  { TBitmapImage }
+  Page := CreateCustomPage(wpInstalling, 'Contributions',
+  'If you want show your appreciation for this project. Go to the code google page, login with you google account and star the project.');
+
+  BitmapImage := TBitmapImage.Create(Page);
+  BitmapImage.AutoSize := True;
+  BitmapImage.Left := 0;
+  BitmapImage.Top  := 0;
+  BitmapImage.Bitmap.LoadFromFile(BitmapFileName);
+  BitmapImage.Cursor := crHand;
+  BitmapImage.OnClick := @BitmapImageOnClick;
+  BitmapImage.Parent := Page.Surface;
+  BitmapImage.Align:=alCLient;
+  BitmapImage.Stretch:=True;
+end;
+
+procedure InitializeWizard();
+begin
+  CreateWizardPages;
+end;
 
 function InitializeSetup(): Boolean;
 begin

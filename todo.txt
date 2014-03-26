@@ -17,18 +17,16 @@
    fpc
    oxygen
    C#
-   c++
+   C++
 
   Add Remote hosts support - working
     SQL WMI done
 
   add splash or run update checks in secondary thread,
   
-
   add option to select prefered compiler
   add option to select prefered IDE
   create relation map between classes , properties and WinApi using 
-
  
   Add detection of additional compilers
   Add option to edit templates
@@ -36,12 +34,10 @@
   disable run as admin requirement
   Fix disabled icons
   
-
   Improve source code
   Add automated tests
   Store cache x machine - done
   Create code based in plugins and interfaces
 
-
-  plugin handle
+  plugin handler
 }
