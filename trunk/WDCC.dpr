@@ -67,7 +67,10 @@ uses
   uWMIMethodsContainer in 'Units\uWMIMethodsContainer.pas' {FrmWmiMethodsContainer},
   uHostsAdmin in 'Units\uHostsAdmin.pas' {FrmHostAdmin},
   Vcl.Styles.TabsClose in 'Units\Vcl.Styles.Utils\Vcl.Styles.TabsClose.pas',
-  Vcl.Styles.Fixes in 'Units\Vcl.Styles.Utils\Vcl.Styles.Fixes.pas';
+  Vcl.Styles.Fixes in 'Units\Vcl.Styles.Utils\Vcl.Styles.Fixes.pas',
+  Vcl.Styles.Utils.Menus in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.Menus.pas',
+  Vcl.Styles.Utils.SysControls in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.SysControls.pas',
+  Vcl.Styles.Utils.SysStyleHook in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.SysStyleHook.pas';
 
 {$R *.res}
 
