@@ -4,17 +4,17 @@ http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wik
 
 The C# code generator included in the WDCC has the next features
 
-    <li>Automatic detection of these IDE's VS2008, VS2010, VS11</li>
+    <li>Automatic detection of these IDE's VS2008, VS2010, VS11, VS2013</li>
     <li>Code formatter</li>
     <li>The Code generated support local and remote WMI connections</li>
     <li>Can generate C# code compatible with all these .Net Framework versions<strong> 2.0, 3.0, 3.5, 4.0</strong></li>
-    <li>Can open the generated C# code in any of these IDE's VS2008, VS2010, VS11</li>
+    <li>Can open the generated C# code in any of these IDE's VS2008, VS2010, VS11, VS2013</li>
     <li>The generated C# code can be compiled using the C# compiler of the Net framework or selecting one of the Visual Studio versions installed</li>
 
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/CSharpCode_Compiler.PNG
 
 
-Sample of code generated to access the Win32_Process WMI class
+Sample of code generated to access the !Win32_Process WMI class
 {{{
 using System;
 using System.Collections.Generic;
@@ -135,7 +135,7 @@ namespace GetWMI_Info
 }
 }}}
 
-Sample of C# code generated to listen the __InstanceCreationEvent and Win32_Process class.
+Sample of C# code generated to listen the __InstanceCreationEvent and !Win32_Process class.
 
 {{{
 using System;
