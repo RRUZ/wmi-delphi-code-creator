@@ -62,8 +62,6 @@ type
     Label2: TLabel;
     LabelMsg: TLabel;
     EditSearch: TEdit;
-    Button1: TButton;
-    Button2: TButton;
     procedure ButtonSearchWmiDatabaseClick(Sender: TObject);
     procedure ComboBoxSearch2Change(Sender: TObject);
     procedure ComboBoxSearch2Exit(Sender: TObject);
@@ -74,8 +72,6 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure DBGridWMIDblClick(Sender: TObject);
     procedure EditSearchChange(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
   private
     FDatabaseFile: string;
     FHistoryFile:  string;
@@ -275,16 +271,6 @@ ClientDataSet.IndexName := NewIndexName;
 end;
 
 
-
-procedure TFrmWmiDatabase.Button1Click(Sender: TObject);
-begin
-  SortClientDataSet(ClientDataSetWmi, 'value');
-end;
-
-procedure TFrmWmiDatabase.Button2Click(Sender: TObject);
-begin
-  ClientDataSetWmi.IndexName:='';
-end;
 
 procedure TFrmWmiDatabase.ButtonBuildWmiDatabaseClick(Sender: TObject);
 var

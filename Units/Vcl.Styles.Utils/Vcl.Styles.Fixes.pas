@@ -29,16 +29,16 @@ unit Vcl.Styles.Fixes;
 interface
 
 uses
+  Winapi.Windows,
+  Winapi.Messages,
   Vcl.Controls,
   Vcl.ComCtrls,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
-  Winapi.Windows,
-  Winapi.Messages,
   Vcl.Graphics;
 
-type
 {$IF CompilerVersion = 23.0}
+type
   /// <summary> The <c>TButtonStyleHookFix</c> vcl style hook fix these QC #103708, #107764 for Delphi XE2
   /// </summary>
   /// <remarks>
@@ -53,6 +53,8 @@ type
   end;
 {$IFEND}
 
+{$IF CompilerVersion <= 24.0}
+type
   /// <summary> The <c>TListViewStyleHookFix</c> vcl style hook fix these QC #108678, #108875 for Delphi XE2 and Delphi XE3
   /// </summary>
   /// <remarks>
@@ -91,6 +93,7 @@ type
     procedure ComboBoxWndProc(var Msg: TMessage); override;
     procedure DrawComboBox(DC: HDC); override;
   end;
+{$IFEND}
 
 implementation
 
@@ -115,6 +118,7 @@ type
   end;
 {$IFEND}
 
+{$IF CompilerVersion <= 24.0}
   TListViewStyleHookHelper = class helper for TListViewStyleHook
     function HeaderHandle: HWnd;
   end;
@@ -122,6 +126,7 @@ type
   TComboBoxExStyleHookHelper = class helper for TComboBoxExStyleHook
     function DroppedDown: Boolean;
   end;
+{$IFEND}
 
 {$IF CompilerVersion = 23.0}
 
@@ -343,16 +348,22 @@ begin
     begin
       // finally the text is aligned and drawn depending of the value of the ImageAlignment property
       case TCustomButton(Control).ImageAlignment of
-        TImageAlignment.iaLeft, TImageAlignment.iaRight,
-          TImageAlignment.iaCenter:
-          DrawControlText(Canvas, LDetails, BCaption, DrawRect,
-            DT_VCENTER or DT_CENTER);
-        TImageAlignment.iaBottom:
-          DrawControlText(Canvas, LDetails, BCaption, DrawRect,
-            DT_TOP or DT_CENTER);
-        TImageAlignment.iaTop:
-          DrawControlText(Canvas, LDetails, BCaption, DrawRect,
-            DT_BOTTOM or DT_CENTER);
+        TImageAlignment.iaLeft,
+        TImageAlignment.iaRight,
+        TImageAlignment.iaCenter:  if (Control is TCustomButton) and TCustomButtonClass(Control).WordWrap then
+                                    DrawControlText(Canvas, LDetails, BCaption, DrawRect, DT_VCENTER or DT_CENTER or DT_WORDBREAK or Control.DrawTextBiDiModeFlags(0))
+                                   else
+                                    DrawControlText(Canvas, LDetails, BCaption, DrawRect, DT_VCENTER or DT_CENTER or Control.DrawTextBiDiModeFlags(0));
+
+        TImageAlignment.iaBottom:  if (Control is TCustomButton) and TCustomButtonClass(Control).WordWrap then
+                                     DrawControlText(Canvas, LDetails, BCaption, DrawRect, DT_TOP or DT_CENTER or DT_WORDBREAK or Control.DrawTextBiDiModeFlags(0))
+                                   else
+                                     DrawControlText(Canvas, LDetails, BCaption, DrawRect, DT_TOP or DT_CENTER or Control.DrawTextBiDiModeFlags(0));
+
+        TImageAlignment.iaTop:     if (Control is TCustomButton) and TCustomButtonClass(Control).WordWrap then
+                                     DrawControlText(Canvas, LDetails, BCaption, DrawRect, DT_BOTTOM or DT_CENTER or DT_WORDBREAK or Control.DrawTextBiDiModeFlags(0))
+                                   else
+                                     DrawControlText(Canvas, LDetails, BCaption, DrawRect, DT_BOTTOM or DT_CENTER or Control.DrawTextBiDiModeFlags(0));
       end;
     end;
   end;
@@ -370,11 +381,19 @@ begin
   Result := Self.FPressed;
 end;
 {$IFEND}
-{ TListViewStyleHookHelper }
 
+
+{$IF CompilerVersion <= 24.0}
+{ TListViewStyleHookHelper }
 function TListViewStyleHookHelper.HeaderHandle: HWnd;
 begin
   Result := Self.FHeaderHandle;
+end;
+
+{ TComboBoxExStyleHookHelper }
+function TComboBoxExStyleHookHelper.DroppedDown: Boolean;
+begin
+  Exit(Self.FDroppedDown);
 end;
 
 { TListViewStyleHookFix }
@@ -437,24 +456,22 @@ begin
   Canvas.Font := Font;
   if TStyleManager.IsCustomStyleActive then
   begin
-{$IFDEF VER230}
+{$IF CompilerVersion<=23}  //XE2
     Canvas.Brush.Color := StyleServices.GetStyleColor(ColorStates[Enabled]);
     Canvas.Font.Color := StyleServices.GetStyleFontColor(FontStates[Enabled]);
-{$ENDIF}
-{$IFDEF VER240}
+{$ELSE}
     if seClient in StyleElements then
       Canvas.Brush.Color := StyleServices.GetStyleColor(ColorStates[Enabled])
     else
       Canvas.Brush := Brush;
     if seFont in StyleElements then
       Canvas.Font.Color := StyleServices.GetStyleFontColor(FontStates[Enabled]);
-{$ENDIF}
+{$IFEND}
   end
   else
     Canvas.Brush := Brush;
   if (Integer(Message.DrawItemStruct^.itemID) >= 0) and
-    (odSelected in LState){$IFDEF VER240} and (seClient in StyleElements)
-{$ENDIF} then
+    (odSelected in LState){$IF CompilerVersion>23}  and (seClient in StyleElements) {$IFEND} then
   begin
     if TStyleManager.IsCustomStyleActive then
     begin
@@ -723,12 +740,7 @@ begin
     LCanvas.Free;
   end;
 end;
+{$IFEND}
 
-{ TComboBoxExStyleHookHelper }
-
-function TComboBoxExStyleHookHelper.DroppedDown: Boolean;
-begin
-  Exit(Self.FDroppedDown);
-end;
 
 end.

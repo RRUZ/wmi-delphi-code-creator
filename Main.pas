@@ -325,7 +325,6 @@ begin
   ApplyVclStylesOwnerDrawFix(Self, True);
  }
 
-  SetOwnerDrawMethods(Self);
 end;
 
 

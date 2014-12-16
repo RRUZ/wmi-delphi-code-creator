@@ -130,7 +130,6 @@ object FrmWmiMethods: TFrmWmiMethods
           Width = 250
         end>
       HideSelection = False
-      Items.ItemData = {}
       ReadOnly = True
       RowSelect = True
       TabOrder = 6

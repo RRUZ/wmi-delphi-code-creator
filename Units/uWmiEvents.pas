@@ -84,8 +84,6 @@ type
     procedure SetConsole(const Value: TMemo);
     procedure LoadNameSpaces;
     procedure SaveCurrentSettings;
-    procedure SetOwnerDrawMethods;
-    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
     procedure LoadWmiEvents(const Namespace: string; FirstTime : Boolean=False);
     property Settings : TSettings read FSettings Write SetSettings;
@@ -129,11 +127,6 @@ begin
     ListViewEventsConds.Items[LIndex].Checked := CheckBoxSelAllProps.Checked;
 
   GenerateCode;
-end;
-
-procedure TFrmWmiEvents.CMStyleChanged(var Message: TMessage);
-begin
-  SetOwnerDrawMethods;
 end;
 
 procedure TFrmWmiEvents.ComboBoxCondExit(Sender: TObject);
@@ -183,7 +176,6 @@ end;
 
 procedure TFrmWmiEvents.FormCreate(Sender: TObject);
 begin
-  SetOwnerDrawMethods;
   DataLoaded:=False;
   FrmCodeEditorEvent  := TFrmCodeEditor.Create(Self);
   FrmCodeEditorEvent.CodeGenerator:=GenerateCode;
@@ -568,11 +560,6 @@ procedure TFrmWmiEvents.SetConsole(const Value: TMemo);
 begin
   FConsole := Value;
   FrmCodeEditorEvent.Console:=Value;
-end;
-
-procedure TFrmWmiEvents.SetOwnerDrawMethods;
-begin
-  uMisc.SetOwnerDrawMethods(Self);
 end;
 
 procedure TFrmWmiEvents.SetSettings(const Value: TSettings);

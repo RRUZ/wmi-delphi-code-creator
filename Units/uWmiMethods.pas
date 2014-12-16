@@ -79,8 +79,6 @@ type
     procedure LoadNameSpaces;
     procedure LoadWmiMethods(const Namespace: string; FirstTime : Boolean=False);
     procedure SaveCurrentSettings;
-    procedure SetOwnerDrawMethods;
-    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
     property SetMsg : TProcLog read FSetMsg Write FSetMsg;
     property SetLog : TProcLog read FSetLog Write FSetLog;
@@ -132,11 +130,6 @@ begin
   GenerateCode;
 end;
 
-procedure TFrmWmiMethods.CMStyleChanged(var Message: TMessage);
-begin
-  SetOwnerDrawMethods;
-end;
-
 procedure TFrmWmiMethods.ComboBoxClassesMethodsChange(Sender: TObject);
 begin
   LoadMethodInfo;
@@ -182,7 +175,6 @@ end;
 
 procedure TFrmWmiMethods.FormCreate(Sender: TObject);
 begin
-  SetOwnerDrawMethods;
   FrmCodeEditorMethod  := TFrmCodeEditor.Create(Self);
   FrmCodeEditorMethod.CodeGenerator:=GenerateCode;
   FrmCodeEditorMethod.Parent := PanelMethodCode;
@@ -535,11 +527,6 @@ procedure TFrmWmiMethods.SetConsole(const Value: TMemo);
 begin
   FConsole := Value;
   FrmCodeEditorMethod.Console:=Value;
-end;
-
-procedure TFrmWmiMethods.SetOwnerDrawMethods;
-begin
-  uMisc.SetOwnerDrawMethods(Self);
 end;
 
 procedure TFrmWmiMethods.SetSettings(const Value: TSettings);
