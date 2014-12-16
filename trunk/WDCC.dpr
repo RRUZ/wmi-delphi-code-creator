@@ -35,7 +35,6 @@ uses
   uWmiVsCppCode in 'Units\uWmiVsCppCode.pas',
   uVisualStudio in 'Units\uVisualStudio.pas',
   Vcl.Styles.Ext in 'Units\Vcl.Styles.Utils\Vcl.Styles.Ext.pas',
-  Vcl.Styles.OwnerDrawFix in 'Units\Vcl.Styles.Utils\Vcl.Styles.OwnerDrawFix.pas',
   AsyncCalls in 'Units\ThirdParty\AsyncCalls.pas',
   uXE2Patches in 'Units\Vcl.Styles.Utils\uXE2Patches.pas',
   uWmi_Metadata in 'Units\WMI\uWmi_Metadata.pas',
@@ -70,7 +69,15 @@ uses
   Vcl.Styles.Fixes in 'Units\Vcl.Styles.Utils\Vcl.Styles.Fixes.pas',
   Vcl.Styles.Utils.Menus in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.Menus.pas',
   Vcl.Styles.Utils.SysControls in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.SysControls.pas',
-  Vcl.Styles.Utils.SysStyleHook in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.SysStyleHook.pas';
+  Vcl.Styles.Utils.SysStyleHook in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.SysStyleHook.pas',
+  Vcl.Styles.Hooks in 'Units\Vcl.Styles.Utils\Vcl.Styles.Hooks.pas',
+  Vcl.Styles.NC in 'Units\Vcl.Styles.Utils\Vcl.Styles.NC.pas',
+  Vcl.Styles.Utils.SystemMenu in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.SystemMenu.pas',
+  Vcl.Styles.UxTheme in 'Units\Vcl.Styles.Utils\Vcl.Styles.UxTheme.pas',
+  DDetours in 'Units\Vcl.Styles.Utils\delphi-detours-library\DDetours.pas',
+  InstDecode in 'Units\Vcl.Styles.Utils\delphi-detours-library\InstDecode.pas',
+  CPUID in 'Units\Vcl.Styles.Utils\delphi-detours-library\CPUID.pas',
+  Vcl.Styles.Utils.Graphics in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.Graphics.pas';
 
 {$R *.res}
 

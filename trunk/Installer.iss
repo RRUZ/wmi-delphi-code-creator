@@ -215,7 +215,7 @@ Source: Textures\speaker-grille-texture.jpg; DestDir: {app}\Textures\
 Source: Textures\stainless-steel.jpg; DestDir: {app}\Textures\
 Source: Textures\titanium-texture.jpg; DestDir: {app}\Textures\
 Source: Installer\VclStylesInno.dll; DestDir: {app}; Flags: dontcopy
-Source: Installer\Amakrits.vsf; DestDir: {app}; Flags: dontcopy
+Source: Installer\Auric.vsf; DestDir: {app}; Flags: dontcopy
 Source: Installer\background.bmp; Flags: dontcopy
 
 [Setup]
@@ -350,8 +350,8 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-	ExtractTemporaryFile('Amakrits.vsf');
-	LoadVCLStyle(ExpandConstant('{tmp}\Amakrits.vsf'));
+	ExtractTemporaryFile('Auric.vsf');
+	LoadVCLStyle(ExpandConstant('{tmp}\Auric.vsf'));
 	Result := True;
 end;
 

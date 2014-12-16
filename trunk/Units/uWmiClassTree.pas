@@ -46,8 +46,6 @@ type
     procedure SetStaus(const Msg:string);
     procedure Fill;
     procedure LoadNamespaces;
-    procedure SetOwnerDrawMethods;
-    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
   end;
 
@@ -68,12 +66,6 @@ uses
 procedure TFrmWmiClassTree.BtnFillTreeClick(Sender: TObject);
 begin
  Fill;
-end;
-
-
-procedure TFrmWmiClassTree.CMStyleChanged(var Message: TMessage);
-begin
-  SetOwnerDrawMethods;
 end;
 
 procedure TFrmWmiClassTree.Fill;
@@ -167,7 +159,6 @@ end;
 
 procedure TFrmWmiClassTree.FormCreate(Sender: TObject);
 begin
-  SetOwnerDrawMethods;
   Working:=False;
   DataLoaded:=False;
 end;
@@ -185,11 +176,6 @@ begin
  DataLoaded:=True;
 end;
 
-
-procedure TFrmWmiClassTree.SetOwnerDrawMethods;
-begin
- uMisc.SetOwnerDrawMethods(Self);
-end;
 
 procedure TFrmWmiClassTree.SetStaus(const Msg: string);
 begin

@@ -44,11 +44,7 @@ type
     FLanguageSource: TSourceLanguages;
     FShowCompiler: boolean;
     FShow64BitsCompiler: boolean;
-    { Private declarations }
-    procedure SetOwnerDrawMethods;
-    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
-    { Public declarations }
     procedure LoadInstalledVersions;
     property LanguageSource: TSourceLanguages Read FLanguageSource Write FLanguageSource;
     property ShowCompiler: boolean Read FShowCompiler Write FShowCompiler;
@@ -91,10 +87,6 @@ begin
 end;
 
 { TFrmSelDelphiVer }
-procedure TFrmSelCompilerVer.CMStyleChanged(var Message: TMessage);
-begin
-  SetOwnerDrawMethods;
-end;
 
 procedure TFrmSelCompilerVer.FormActivate(Sender: TObject);
 begin
@@ -103,7 +95,6 @@ end;
 
 procedure TFrmSelCompilerVer.FormCreate(Sender: TObject);
 begin
-  SetOwnerDrawMethods;
   FShowCompiler := False;
   FShow64BitsCompiler :=True;
 end;
@@ -413,9 +404,5 @@ begin
    ListViewIDEs.Items.Item[0].Selected:=True;
 end;
 
-procedure TFrmSelCompilerVer.SetOwnerDrawMethods;
-begin
-   uMisc.SetOwnerDrawMethods(Self);
-end;
 
 end.

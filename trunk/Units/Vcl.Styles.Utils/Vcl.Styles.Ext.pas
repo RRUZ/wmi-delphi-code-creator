@@ -27,15 +27,15 @@ interface
 
 
 Uses
-  Winapi.Windows,
-  Vcl.Themes,
-  Vcl.Styles,
-  Vcl.Forms,
+  System.Classes,
   System.Generics.Collections,
+  Winapi.Windows,
+  Vcl.Styles,
+  Vcl.Themes,
+  Vcl.Forms,
   Vcl.Graphics,
   Vcl.Controls,
-  Vcl.ExtCtrls,
-  System.Classes;
+  Vcl.ExtCtrls;
 
 type
   TStyleHookList = TList<TStyleHookClass>;
@@ -237,6 +237,9 @@ implementation
 
 
 uses
+ System.Rtti,
+ System.Types,
+ System.Sysutils,
 {$IFDEF USE_VCL_STYLESAPI}
  System.ZLib,
  System.UITypes,
@@ -247,10 +250,7 @@ uses
  Vcl.Imaging.pngimage,
  Winapi.Messages,
 {$ENDIF}
- System.Rtti,
- System.Types,
- Vcl.Dialogs,
- System.Sysutils;
+ Vcl.Dialogs;
 
 
 {$IF (DEFINED (USE_VCL_STYLESAPI) and (CompilerVersion >=23))}
@@ -1249,10 +1249,20 @@ begin
 
   LDetails := Style.GetElementDetails(tmMenuBarItemNormal);
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
-  Style.DrawText(FBitmap.Canvas.Handle, LDetails, 'File', Rect(LRect.Left+10,LRect.Top+3, LRect.Right ,LRect.Bottom), 0, ThemeTextColor);
-  Style.DrawText(FBitmap.Canvas.Handle, LDetails, 'Edit', Rect(LRect.Left+40,LRect.Top+3, LRect.Right ,LRect.Bottom), 0, ThemeTextColor);
-  Style.DrawText(FBitmap.Canvas.Handle, LDetails, 'View', Rect(LRect.Left+70,LRect.Top+3, LRect.Right ,LRect.Bottom), 0, ThemeTextColor);
-  Style.DrawText(FBitmap.Canvas.Handle, LDetails, 'Help', Rect(LRect.Left+100,LRect.Top+3, LRect.Right ,LRect.Bottom), 0, ThemeTextColor);
+
+//    function DrawText(DC: HDC; Details: TThemedElementDetails;
+//      const S: string; var R: TRect; Flags: TTextFormat; Color: TColor = clNone): Boolean; overload;
+//    function DrawText(DC: HDC; Details: TThemedElementDetails;
+//      const S: string; var R: TRect; Flags: TTextFormat; Options: TStyleTextOptions): Boolean; overload;
+
+  CaptionRect := Rect(LRect.Left+10,LRect.Top+3, LRect.Right ,LRect.Bottom);
+  Style.DrawText(FBitmap.Canvas.Handle, LDetails, 'File', CaptionRect, [tfLeft], ThemeTextColor);
+  CaptionRect := Rect(LRect.Left+40,LRect.Top+3, LRect.Right ,LRect.Bottom);
+  Style.DrawText(FBitmap.Canvas.Handle, LDetails, 'Edit', CaptionRect,  [tfLeft], ThemeTextColor);
+  CaptionRect := Rect(LRect.Left+70,LRect.Top+3, LRect.Right ,LRect.Bottom);
+  Style.DrawText(FBitmap.Canvas.Handle, LDetails, 'View', CaptionRect,  [tfLeft], ThemeTextColor);
+  CaptionRect := Rect(LRect.Left+110,LRect.Top+3, LRect.Right ,LRect.Bottom);
+  Style.DrawText(FBitmap.Canvas.Handle, LDetails, 'Help', CaptionRect,  [tfLeft], ThemeTextColor);
 
 
   //Draw ToolButtons

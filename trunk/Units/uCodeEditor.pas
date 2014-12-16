@@ -80,9 +80,6 @@ type
     procedure SetSourceCode(const Value: TStrings);
     procedure SetSourceLanguage(const Value: TSourceLanguages);
     procedure GenerateCode;
-    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
-    procedure SetOwnerDrawMethods;
-
   public
     property SourceLanguage : TSourceLanguages read FSourceLanguage write SetSourceLanguage;
     property Settings : TSettings read FSettings write FSettings;
@@ -158,11 +155,6 @@ begin
 
   if Assigned(Settings) then
     LoadCurrentTheme(Self,Settings.CurrentTheme);
-end;
-
-procedure TFrmCodeEditor.SetOwnerDrawMethods;
-begin
-  uMisc.SetOwnerDrawMethods(Self);
 end;
 
 procedure TFrmCodeEditor.SetSourceCode(const Value: TStrings);
@@ -582,10 +574,6 @@ begin
       SynEditCode.Lines.SaveToFile(SaveDialog1.FileName);
 end;
 
-procedure TFrmCodeEditor.CMStyleChanged(var Message: TMessage);
-begin
-  SetOwnerDrawMethods;
-end;
 
 procedure TFrmCodeEditor.ComboBoxLanguageSelChange(Sender: TObject);
 begin
@@ -597,7 +585,6 @@ procedure TFrmCodeEditor.FormCreate(Sender: TObject);
 var
   i : TSourceLanguages;
 begin
-  SetOwnerDrawMethods;
   FCodeGenerator :=nil;
 
   for i := Low(TSourceLanguages) to High(TSourceLanguages) do

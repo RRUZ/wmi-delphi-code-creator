@@ -173,8 +173,6 @@ type
    procedure OnWMIThreadFinished(var Msg: TMessage); message WM_WMI_THREAD_FINISHED;
    procedure SetMode(const Value: TWmi_ViewPropsValuesMode);
    {$ENDIF}
-   procedure SetOwnerDrawMethods;
-   procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
     property ContainValues: boolean Read FContainValues;
     property WQLProperties: TStrings Read FWQLProperties Write FWQLProperties;
@@ -365,11 +363,6 @@ begin
    Frm.Free;
 end;
 
-procedure TFrmWmiVwProps.CMStyleChanged(var Message: TMessage);
-begin
-  SetOwnerDrawMethods;
-end;
-
 {$IFDEF USE_ASYNCWMIQUERY}
 
 procedure TFrmWmiVwProps.CreateColumns;
@@ -468,7 +461,6 @@ end;
 
 procedure TFrmWmiVwProps.FormCreate(Sender: TObject);
 begin
- SetOwnerDrawMethods;
 {$IFDEF USE_ASYNCWMIQUERY}
   FSWbemLocator :=nil;
   FWMIService   :=nil;
@@ -669,10 +661,6 @@ begin
    MemoInstances.Visible:=True;
 end;
 
-procedure TFrmWmiVwProps.SetOwnerDrawMethods;
-begin
-  uMisc.SetOwnerDrawMethods(Self);
-end;
 
 procedure TFrmWmiVwProps.SetWmiClass(const Value: string);
 begin

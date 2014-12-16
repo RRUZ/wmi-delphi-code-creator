@@ -310,6 +310,10 @@ object FrmWMISQL: TFrmWMISQL
         TabOrder = 0
         object TabSheet1: TTabSheet
           Caption = 'Grid'
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object DBGridWMI: TDBGrid
             Left = 0
             Top = 0
@@ -331,6 +335,10 @@ object FrmWMISQL: TFrmWMISQL
         object TabSheet2: TTabSheet
           Caption = 'Text'
           ImageIndex = 1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object MemoWMI: TMemo
             Left = 0
             Top = 0
@@ -394,7 +402,7 @@ object FrmWMISQL: TFrmWMISQL
     Left = 128
     Top = 296
     Bitmap = {
-      494C0101010008005C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010101000500040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000010D0434052D0DD9042F
       0FFD041909B70005012600000000000000000000000000000000000000000000

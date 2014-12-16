@@ -144,8 +144,6 @@ type
     procedure LoadProposal(WmiMetaClassInfo : TWMiClassMetaData);
     procedure SetMsg(const Msg : string);
     procedure LoadNamespaces;
-    procedure SetOwnerDrawMethods;
-    procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
   public
     property SetLog : TProcLog read FSetLog Write FSetLog;
     property NameSpaces : TStrings read GetNameSpaces Write SetNameSpaces;
@@ -264,12 +262,6 @@ begin
     GenerateSqlCode;
 end;
 
-
-procedure TFrmWMISQL.CMStyleChanged(var Message: TMessage);
-begin
- SetOwnerDrawMethods;
-end;
-
 procedure TFrmWMISQL.ComboBoxClassesChange(Sender: TObject);
 begin
   LoadClassInfo;
@@ -377,7 +369,6 @@ procedure TFrmWMISQL.FormCreate(Sender: TObject);
 var
  LWMIHost : TWMIHost;
 begin
-  SetOwnerDrawMethods;
   FillPopupActionBar(PopupActionBar3);
   AssignStdActionsPopUpMenu(Self, PopupActionBar3);
 
@@ -730,11 +721,6 @@ begin
   CbNameSpaces.Items.AddStrings(Value);
 end;
 
-
-procedure TFrmWMISQL.SetOwnerDrawMethods;
-begin
-  uMisc.SetOwnerDrawMethods(Self);
-end;
 
 procedure TFrmWMISQL.SetPassWord(const Value: string);
 begin
