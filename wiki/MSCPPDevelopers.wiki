@@ -6,12 +6,12 @@ The Microsoft C++ code generator included in the WDCC has the next features
 
     <li>Code formatter</li>
     <li>The Code generated support local and remote WMI connections</li>
-    <li>Can generate Microsoft C++ code compatible with all these compilers <strong>Visual Studio 2008, Visual Studio 2010, Visual Studio 11</strong></li>
-    <li>Open the generated Microsoft C++ code in any of these IDE's VS2008, VS2010, VS11</li>
+    <li>Can generate Microsoft C++ code compatible with all these compilers <strong>Visual Studio 2008-2013</strong></li>
+    <li>Open the generated Microsoft C++ code in any of these IDE's VS2008, VS2010, VS11, VS2013</li>
     <li> Compile the generated C++ code using any of the C++ compilers detected by the tool or using VS (devenv.com)
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/MSCppCode_Compiler.PNG
 
-Sample of C++ code generated to accesss the Win32_Session WMI class
+Sample of C++ code generated to accesss the !Win32_Session WMI class
 {{{
 #include "stdafx.h"
 #define _WIN32_DCOM
@@ -357,7 +357,7 @@ int main(int argc, char* argv[])
 }
 }}}
 
-Sample of C++ code generated to listen the __InstanceCreationEvent and the Win32_Process class.
+Sample of C++ code generated to listen the __InstanceCreationEvent and the !Win32_Process class.
 
 {{{
 #include "stdafx.h"
