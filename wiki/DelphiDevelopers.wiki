@@ -66,7 +66,7 @@ end.
 }}}
 
 
-Early binding (using the WbemScripting_TLB unit) 
+Early binding (using the !WbemScripting_TLB unit) 
 {{{
 {$APPTYPE CONSOLE}
 
@@ -363,7 +363,7 @@ http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wik
 
 = Features =
         
-	<li>The Delphi code generated is compatible with  Delphi 7, 2005, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE, XE2, XE3, XE4, XE5, XE6.</li>
+	<li>The Delphi code generated is compatible with Delphi 7, 2005, BDS/Turbo 2006 and RAD Studio 2007, 2009, 2010, XE-XE7.</li>
 
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/DelphiCode_Compiler.PNG
 	<li>Code formatter</li>
