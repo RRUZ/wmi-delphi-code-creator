@@ -2,7 +2,7 @@
 
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/OxygeneCode_Generator.PNG
 
-Sample of code generated to access the Win32_DiskDrive WMI class
+Sample of code generated to access the !Win32_DiskDrive WMI class
 {{{
 namespace GetWMI_Info;
 
@@ -72,7 +72,7 @@ end.
 
 }}}
 
-Sample of generated code to listen the __InstanceCreationEvent a nd Win32_Process WMI class.
+Sample of generated code to listen the __InstanceCreationEvent and !Win32_Process WMI class.
 
 {{{
 namespace GetWMI_Info;
@@ -144,7 +144,7 @@ end;
 end.
 }}}
 
-Sample of code generated to execute the Create method of the Win32_Process WMI class.
+Sample of code generated to execute the Create method of the !Win32_Process WMI class.
 
 {{{
 namespace GetWMI_Info;
@@ -233,8 +233,8 @@ end.
 
 The Oxygene/Delphi prism code generator included in the WDCC has the next features
 
-	<li>The Code generated support local and remote WMI connections</li>
-<li>The Delphi Prism/Oxygene generated code is compatible with all the versions up to 4.0.23.741 (in newer versions must work too)</li>
-<li>Open the generated Delphi Prism code directly in Visual Studio 2008, <a href="http://www.microsoft.com/visualstudio/en-us">Visual Studio</a> 2010 or <a href="http://monodevelop.com/">MonoDevelop</a>.</li>
+ <li>The Code generated support local and remote WMI connections</li>
+ <li>The Delphi Prism/Oxygene generated code is compatible with all the versions up to 4.0.23.741 (in newer versions must work too)</li>
+ <li>Open the generated Delphi Prism code directly in Visual Studio 2008, <a href="http://www.microsoft.com/visualstudio/en-us">Visual Studio</a> 2010-2013 or <a href="http://monodevelop.com/">MonoDevelop</a>.</li>
 
 http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/OxygeneCode_Compiler.PNG
