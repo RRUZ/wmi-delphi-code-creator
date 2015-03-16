@@ -1,15 +1,15 @@
-![](https://dl.dropboxusercontent.com/u/12733424/github/wmi-delphi-code-creator/logo.png)The <strong>WMI Delphi Code Creator </strong> (WDCC), allows you to generate <strong>Object Pascal</strong>,  <strong>Oxygene (Delphi Prism)</strong>, <strong>C++</strong> and <strong>C#</strong> code to access the WMI (Windows Management Instrumentation) classes, events and methods. Also includes a set of tools to explore and Query the content of the WMI.
+![](https://dl.dropboxusercontent.com/u/12733424/github/wmi-delphi-code-creator/logo.png)The <strong>WMI Delphi Code Creator </strong> (WDCC), allows you to generate <strong>Object Pascal</strong>,  <strong>[Oxygene](http://www.elementscompiler.com/elements/oxygene/default.aspx)</strong>, <strong>C++</strong> and <strong>C#</strong> code to access the WMI (Windows Management Instrumentation) classes, events and methods. Also includes a set of tools to exploreR and Query the content of the WMI.
 
-[![](https://dl.dropboxusercontent.com/u/12733424/Images/followrruz.png)](https://twitter.com/RRUZ)
+[![](https://dl.dropboxusercontent.com/u/12733424/Images/followrruz.png)](https://twitter.com/RUZ)
 
 ## Code Generation Features ##
 <ul>
- <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/DelphiDevelopers'>Delphi Developers </a> wiki page for an detailed list of features about Delphi and the WDCC</li>
- <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/OxygenDevelopers'>Oxygene  Developers </a> wiki page for an detailed list of features about Oxygene and the WDCC</li>
- <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/FPCDevelopers'>FPC Developers </a>wiki page for an detailed list of features about Free Pascal (FPC) and the WDCC</li>
- <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/CSharpDevelopers'>CSharp Developers</a>  wiki page for an detailed list of features about C#/.Net and the WDCC</li>
- <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/BorlandCPPDevelopers'>Borland/Embarcadero C++ Developers </a> wiki page for an detailed list of features about Borland/Embarcadero C++ and the WDCC</li>
- <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/MSCPPDevelopers'>Microsoft C++ Developers </a>wiki page for an detailed list of features about Microsoft C++ and the WDCC</li>
+ <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/DelphiDevelopers'>Delphi Developers </a> wiki page - detailed list of features about Delphi and the WDCC</li>
+ <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/OxygenDevelopers'>Oxygene  Developers </a> wiki page - detailed list of features about Oxygene and the WDCC</li>
+ <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/FPCDevelopers'>FPC Developers </a>wiki page - detailed list of features about Free Pascal (FPC) and the WDCC</li>
+ <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/CSharpDevelopers'>CSharp Developers</a>  wiki page - detailed list of features about C#/.Net and the WDCC</li>
+ <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/BorlandCPPDevelopers'>Borland/Embarcadero C++ Developers </a> wiki page - detailed list of features about Borland/Embarcadero C++ and the WDCC</li>
+ <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/MSCPPDevelopers'>Microsoft C++ Developers </a>wiki page - detailed list of features about Microsoft C++ and the WDCC</li>
 </ul>
 
 ![http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/All.png](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/All.png)
