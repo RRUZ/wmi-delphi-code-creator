@@ -1,4 +1,4 @@
-The <strong>WMI Delphi Code Creator </strong> (WDCC), allows you to generate <strong>Object Pascal</strong>,  <strong>Oxygene (Delphi Prism)</strong>, <strong>C++</strong> and <strong>C#</strong> code to access the WMI (Windows Management Instrumentation) classes, events and methods. Also includes a set of tools to explore and Query the content of the WMI.
+![](https://dl.dropboxusercontent.com/u/12733424/github/wmi-delphi-code-creator/logo.png)The <strong>WMI Delphi Code Creator </strong> (WDCC), allows you to generate <strong>Object Pascal</strong>,  <strong>Oxygene (Delphi Prism)</strong>, <strong>C++</strong> and <strong>C#</strong> code to access the WMI (Windows Management Instrumentation) classes, events and methods. Also includes a set of tools to explore and Query the content of the WMI.
 
 [![](https://dl.dropboxusercontent.com/u/12733424/Images/followrruz.png)](https://twitter.com/RRUZ)
 
