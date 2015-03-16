@@ -5,7 +5,7 @@
 ## Code Generation Features ##
 <ul>
  <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/DelphiDevelopers'>Delphi Developers </a> wiki page - detailed list of features about Delphi and the WDCC</li>
- <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/OxygenDevelopers'>Oxygene  Developers </a> wiki page - detailed list of features about Oxygene and the WDCC</li>
+ <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/Oxygene-Developers'>Oxygene  Developers </a> wiki page - detailed list of features about Oxygene and the WDCC</li>
  <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/FPCDevelopers'>FPC Developers </a>wiki page - detailed list of features about Free Pascal (FPC) and the WDCC</li>
  <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/CSharpDevelopers'>CSharp Developers</a>  wiki page - detailed list of features about C#/.Net and the WDCC</li>
  <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/BorlandCPPDevelopers'>Borland/Embarcadero C++ Developers </a> wiki page - detailed list of features about Borland/Embarcadero C++ and the WDCC</li>
