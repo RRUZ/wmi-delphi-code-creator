@@ -1,23 +1,24 @@
-{**************************************************************************************************}
-{                                                                                                  }
-{ Unit uSqlWMI                                                                                     }
-{ unit for the WMI Delphi Code Creator                                                             }
-{                                                                                                  }
-{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
-{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
-{ License at http://www.mozilla.org/MPL/                                                           }
-{                                                                                                  }
-{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
-{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
-{ and limitations under the License.                                                               }
-{                                                                                                  }
-{ The Original Code is uSqlWMI.pas.                                                                }
-{                                                                                                  }
-{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
-{ All Rights Reserved.                                                                             }
-{                                                                                                  }
-{**************************************************************************************************}
+//**************************************************************************************************
+//
+// Unit uSqlWMI
+// unit for the WMI Delphi Code Creator
+// https://github.com/RRUZ/wmi-delphi-code-creator
+//
+// The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
+// you may not use this file except in compliance with the License. You may obtain a copy of the
+// License at http://www.mozilla.org/MPL/
+//
+// Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
+// ANY KIND, either express or implied. See the License for the specific language governing rights
+// and limitations under the License.
+//
+// The Original Code is uSqlWMI.pas.
+//
+// The Initial Developer of the Original Code is Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// All Rights Reserved.
+//
+//**************************************************************************************************
 
 unit uSqlWMI;
 
@@ -115,22 +116,22 @@ type
     procedure ActionRunWQLExecute(Sender: TObject);
     procedure ActionRunWQLUpdate(Sender: TObject);
   private
-    ColumnWidthHelper : TColumnWidthHelper;
+    FColumnWidthHelper : TColumnWidthHelper;
     FSWbemLocator : OLEVariant;
     FWMIService   : OLEVariant;
     FWbemObjectSet: OLEVariant;
     FWbemObject   : OLEVariant;
     FFields       : TObjectList<TWMIPropData>;
-    oEnum         : IEnumvariant;
-    iValue        : LongWord;
+    FEnum         : IEnumvariant;
+    FiValue       : LongWord;
     FRunningWQL   : Boolean;
-    DataLoaded : Boolean;
+    FDataLoaded : Boolean;
     FUser: string;
     FHost: string;
     FPassword: string;
     FSettings : TSettings;
     FSetLog: TProcLog;
-    ListWINHosts : TObjectList<TWMIHost>;
+    FListWINHosts : TObjectList<TWMIHost>;
     procedure SetNameSpaces(const Value: TStrings);
     function GetNameSpaces: TStrings;
     procedure CreateStructure;
@@ -223,7 +224,7 @@ begin
     LoadNamespaces;
   end
   else
-   for LWMIHost in  ListWINHosts do
+   for LWMIHost in  FListWINHosts do
     if SameText(CbHosts.Text, LWMIHost.Host) then
     begin
       EditUser.Text:=LWMIHost.User;
@@ -332,22 +333,22 @@ begin
   if LGridCoord.Y <> 0 then Exit;
 
   if dgIndicator in DBGridWMI.Options then
-    ColumnWidthHelper.Index := -1 + LGridCoord.x
+    FColumnWidthHelper.Index := -1 + LGridCoord.x
   else
-   ColumnWidthHelper.Index := LGridCoord.x;
+   FColumnWidthHelper.Index := LGridCoord.x;
 
-  if ColumnWidthHelper.Index < 0 then Exit;
-    ColumnWidthHelper.MaxWidth := -1;
+  if FColumnWidthHelper.Index < 0 then Exit;
+    FColumnWidthHelper.MaxWidth := -1;
 
   DBGridWMI.Repaint;
-  DBGridWMI.Columns[ColumnWidthHelper.Index].Width := 4 + ColumnWidthHelper.MaxWidth;
+  DBGridWMI.Columns[FColumnWidthHelper.Index].Width := 4 + FColumnWidthHelper.MaxWidth;
 end;
 
 procedure TFrmWMISQL.DBGridWMIDrawColumnCell(Sender: TObject; const Rect: TRect;
   DataCol: Integer; Column: TColumn; State: TGridDrawState);
  begin
-   if (DataCol = ColumnWidthHelper.Index) and Assigned(Column.Field) then
-     ColumnWidthHelper.MaxWidth := Max(ColumnWidthHelper.MaxWidth, DBGridWMI.Canvas.TextWidth(Column.Field.DisplayText)) ;
+   if (DataCol = FColumnWidthHelper.Index) and Assigned(Column.Field) then
+     FColumnWidthHelper.MaxWidth := Max(FColumnWidthHelper.MaxWidth, DBGridWMI.Canvas.TextWidth(Column.Field.DisplayText)) ;
  end;
 
 procedure TFrmWMISQL.EditMachineExit(Sender: TObject);
@@ -372,8 +373,8 @@ begin
   FillPopupActionBar(PopupActionBar3);
   AssignStdActionsPopUpMenu(Self, PopupActionBar3);
 
-  ListWINHosts:=GetListWMIRegisteredHosts;
-  DataLoaded :=False;
+  FListWINHosts:=GetListWMIRegisteredHosts;
+  FDataLoaded :=False;
   FSettings:=TSettings.Create;
   FRunningWQL:=False;
   FUser:='';
@@ -382,7 +383,7 @@ begin
   FFields:=TObjectList<TWMIPropData>.Create(True);
 
    CbHosts.Items.Add('localhost');
-   for LWMIHost in ListWINHosts do
+   for LWMIHost in FListWINHosts do
      CbHosts.Items.Add(LWMIHost.Host);
   CbHosts.ItemIndex:=0;
 
@@ -395,13 +396,13 @@ procedure TFrmWMISQL.FormDestroy(Sender: TObject);
 begin
   FSettings.Free;
   FFields.Free;
-  if ListWINHosts<>nil then
-   FreeAndNil(ListWINHosts);
+  if FListWINHosts<>nil then
+   FreeAndNil(FListWINHosts);
 end;
 
 procedure TFrmWMISQL.FormShow(Sender: TObject);
 begin
- if not DataLoaded then
+ if not FDataLoaded then
   LoadNamespaces;
 end;
 
@@ -524,7 +525,7 @@ begin
  if NameSpaces.Count>0 then
    SetNameSpaceIndex(0);
 
- DataLoaded:=True;
+ FDataLoaded:=True;
 end;
 
 
@@ -614,8 +615,8 @@ begin
       FWbemObjectSet:= FWMIService.ExecQuery(SynEditWQL.Lines.Text, 'WQL', wbemFlagForwardOnly);
       SetMsg('Done');
 
-      oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
-      while oEnum.Next(1, FWbemObject, iValue) = 0 do
+      FEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
+      while FEnum.Next(1, FWbemObject, FiValue) = 0 do
       begin
         if FirstRecord then
         begin

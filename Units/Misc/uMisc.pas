@@ -1,23 +1,24 @@
-{**************************************************************************************************}
-{                                                                                                  }
-{ Unit uMisc                                                                                       }
-{ Unit for the WMI Delphi Code Creator                                                             }
-{                                                                                                  }
-{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
-{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
-{ License at http://www.mozilla.org/MPL/                                                           }
-{                                                                                                  }
-{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
-{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
-{ and limitations under the License.                                                               }
-{                                                                                                  }
-{ The Original Code is uMisc.pas.                                                                  }
-{                                                                                                  }
-{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
-{ All Rights Reserved.                                                                             }
-{                                                                                                  }
-{**************************************************************************************************}
+//**************************************************************************************************
+//
+// Unit uMisc
+// unit for the WMI Delphi Code Creator
+// https://github.com/RRUZ/wmi-delphi-code-creator
+//
+// The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
+// you may not use this file except in compliance with the License. You may obtain a copy of the
+// License at http://www.mozilla.org/MPL/
+//
+// Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
+// ANY KIND, either express or implied. See the License for the specific language governing rights
+// and limitations under the License.
+//
+// The Original Code is uMisc.pas.
+//
+// The Initial Developer of the Original Code is Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// All Rights Reserved.
+//
+//**************************************************************************************************
 
 
 unit uMisc;
@@ -28,25 +29,31 @@ uses
  Vcl.DBGrids,
  System.Win.ComObj,
  System.SysUtils,
+ WinApi.Windows,
  Vcl.Forms,
+ Vcl.Graphics,
  System.Classes;
 
 type
   TProcLog    = procedure (const  Log : string) of object;
 
-procedure CaptureConsoleOutput(const lpCommandLine: string; OutPutList: TStrings);
-procedure MsgWarning(const Msg: string);
-procedure MsgInformation(const Msg: string);
-function  MsgQuestion(const Msg: string):Boolean;
-function  GetFileVersion(const FileName: string): string;
-function  GetTempDirectory: string;
-function  GetWindowsDirectory : string;
-function  GetSpecialFolder(const CSIDL: integer) : string;
-function  IsWow64: boolean;
-function  CopyDir(const fromDir, toDir: string): boolean;
-procedure SetGridColumnWidths(DbGrid: TDBGrid);
-function  Ping(const Address:string;Retries,BufferSize:Word;Log : TStrings) : Boolean;
+  procedure CaptureConsoleOutput(const lpCommandLine: string; OutPutList: TStrings);
+  procedure MsgWarning(const Msg: string);
+  procedure MsgInformation(const Msg: string);
+  function  MsgQuestion(const Msg: string):Boolean;
+  function  GetFileVersion(const FileName: string): string;
+  function  GetTempDirectory: string;
+  function  GetWindowsDirectory : string;
+  function  GetSpecialFolder(const CSIDL: integer) : string;
+  function  IsWow64: boolean;
+  function  CopyDir(const fromDir, toDir: string): boolean;
+  procedure SetGridColumnWidths(DbGrid: TDBGrid);
+  function  Ping(const Address:string;Retries,BufferSize:Word;Log : TStrings) : Boolean;
 
+  procedure ScaleImage32(const SourceBitmap, ResizedBitmap: TBitmap; const ScaleAmount: Double);
+  procedure ExtractIconFile(Icon: TIcon; const Filename: string;IconType : Cardinal);
+  procedure ExtractBitmapFile(Bmp: TBitmap; const Filename: string;IconType : Cardinal);
+  procedure ExtractBitmapFile32(Bmp: TBitmap; const Filename: string;IconType : Cardinal);
 
 implementation
 
@@ -59,9 +66,234 @@ Uses
  System.Variants,
  Winapi.ShlObj,
  Winapi.ShellAPi,
- WinApi.Windows,
  Vcl.Controls,
  Vcl.Dialogs;
+
+
+procedure ExtractIconFile(Icon: TIcon; const Filename: string;IconType : Cardinal);
+var
+  FileInfo: TShFileInfo;
+begin
+  if FileExists(Filename) then
+  begin
+    FillChar(FileInfo, SizeOf(FileInfo), 0);
+    SHGetFileInfo(PChar(Filename), 0, FileInfo, SizeOf(FileInfo),
+      SHGFI_ICON or IconType);
+    if FileInfo.hIcon <> 0 then
+      Icon.Handle:=FileInfo.hIcon;
+  end;
+end;
+
+procedure ExtractBitmapFile(Bmp: TBitmap; const Filename: string;IconType : Cardinal);
+var
+ Icon: TIcon;
+begin
+  Icon:=TIcon.Create;
+  try
+    ExtractIconFile(Icon, Filename, SHGFI_SMALLICON);
+    Bmp.PixelFormat:=pf24bit;
+    Bmp.Width := Icon.Width;
+    Bmp.Height := Icon.Height;
+    Bmp.Canvas.Draw(0, 0, Icon);
+  finally
+    Icon.Free;
+  end;
+
+end;
+
+
+procedure ExtractBitmapFile32(Bmp: TBitmap; const Filename: string;IconType : Cardinal);
+var
+ Icon: TIcon;
+begin
+  Icon:=TIcon.Create;
+  try
+    ExtractIconFile(Icon, Filename, SHGFI_SMALLICON);
+    Bmp.PixelFormat:=pf32bit;  {
+    Bmp.Width := Icon.Width;
+    Bmp.Height := Icon.Height;
+    Bmp.Canvas.Draw(0, 0, Icon);
+    }
+    Bmp.Assign(Icon);
+  finally
+    Icon.Free;
+  end;
+
+end;
+
+procedure ShrinkImage32(const SourceBitmap, StretchedBitmap: TBitmap;
+  Scale: Double);
+var
+  ScanLines: array of PByteArray;
+  DestLine: PByteArray;
+  CurrentLine: PByteArray;
+  DestX, DestY: Integer;
+  DestA, DestR, DestB, DestG: Integer;
+  SourceYStart, SourceXStart: Integer;
+  SourceYEnd, SourceXEnd: Integer;
+  AvgX, AvgY: Integer;
+  ActualX: Integer;
+  PixelsUsed: Integer;
+  DestWidth, DestHeight: Integer;
+begin
+  DestWidth := StretchedBitmap.Width;
+  DestHeight := StretchedBitmap.Height;
+  SetLength(ScanLines, SourceBitmap.Height);
+  for DestY := 0 to DestHeight - 1 do
+  begin
+    SourceYStart := Round(DestY / Scale);
+    SourceYEnd := Round((DestY + 1) / Scale) - 1;
+
+    if SourceYEnd >= SourceBitmap.Height then
+      SourceYEnd := SourceBitmap.Height - 1;
+
+    { Grab the destination pixels }
+    DestLine := StretchedBitmap.ScanLine[DestY];
+    for DestX := 0 to DestWidth - 1 do
+    begin
+      { Calculate the RGB value at this destination pixel }
+      SourceXStart := Round(DestX / Scale);
+      SourceXEnd := Round((DestX + 1) / Scale) - 1;
+
+      DestR := 0;
+      DestB := 0;
+      DestG := 0;
+      DestA := 0;
+
+      PixelsUsed := 0;
+      if SourceXEnd >= SourceBitmap.Width then
+        SourceXEnd := SourceBitmap.Width - 1;
+      for AvgY := SourceYStart to SourceYEnd do
+      begin
+        if ScanLines[AvgY] = nil then
+          ScanLines[AvgY] := SourceBitmap.ScanLine[AvgY];
+        CurrentLine := ScanLines[AvgY];
+        for AvgX := SourceXStart to SourceXEnd do
+        begin
+          ActualX := AvgX*4; { 4 bytes per pixel }
+          DestR := DestR + CurrentLine[ActualX];
+          DestB := DestB + CurrentLine[ActualX+1];
+          DestG := DestG + CurrentLine[ActualX+2];
+          DestA := DestA + CurrentLine[ActualX+3];
+          Inc(PixelsUsed);
+        end;
+      end;
+
+      { pf32bit = 4 bytes per pixel }
+      ActualX := DestX*4;
+      DestLine[ActualX]   := Round(DestR / PixelsUsed);
+      DestLine[ActualX+1] := Round(DestB / PixelsUsed);
+      DestLine[ActualX+2] := Round(DestG / PixelsUsed);
+      DestLine[ActualX+3] := Round(DestA / PixelsUsed);
+    end;
+  end;
+end;
+
+
+procedure EnlargeImage32(const SourceBitmap, StretchedBitmap: TBitmap;
+  Scale: Double);
+var
+  ScanLines: array of PByteArray;
+  DestLine: PByteArray;
+  CurrentLine: PByteArray;
+  DestX, DestY: Integer;
+  DestA, DestR, DestB, DestG: Double;
+  SourceYStart, SourceXStart: Integer;
+  SourceYPos: Integer;
+  AvgX, AvgY: Integer;
+  ActualX: Integer;
+  { Use a 4 pixels for enlarging }
+  XWeights, YWeights: array[0..1] of Double;
+  PixelWeight: Double;
+  DistFromStart: Double;
+  DestWidth, DestHeight: Integer;
+begin
+  DestWidth := StretchedBitmap.Width;
+  DestHeight := StretchedBitmap.Height;
+  Scale := StretchedBitmap.Width / SourceBitmap.Width;
+  SetLength(ScanLines, SourceBitmap.Height);
+  for DestY := 0 to DestHeight - 1 do
+  begin
+    DistFromStart := DestY / Scale;
+    SourceYStart := Round(DistFromSTart);
+    YWeights[1] := DistFromStart - SourceYStart;
+    if YWeights[1] < 0 then
+      YWeights[1] := 0;
+    YWeights[0] := 1 - YWeights[1];
+
+    DestLine := StretchedBitmap.ScanLine[DestY];
+    for DestX := 0 to DestWidth - 1 do
+    begin
+      { Calculate the RGB value at this destination pixel }
+      DistFromStart := DestX / Scale;
+      if DistFromStart > (SourceBitmap.Width - 1) then
+        DistFromStart := SourceBitmap.Width - 1;
+      SourceXStart := Round(DistFromStart);
+      XWeights[1] := DistFromStart - SourceXStart;
+      if XWeights[1] < 0 then
+        XWeights[1] := 0;
+      XWeights[0] := 1 - XWeights[1];
+
+      { Average the four nearest pixels from the source mapped point }
+      DestR := 0;
+      DestB := 0;
+      DestG := 0;
+      DestA := 0;
+      for AvgY := 0 to 1 do
+      begin
+        SourceYPos := SourceYStart + AvgY;
+        if SourceYPos >= SourceBitmap.Height then
+          SourceYPos := SourceBitmap.Height - 1;
+        if ScanLines[SourceYPos] = nil then
+          ScanLines[SourceYPos] := SourceBitmap.ScanLine[SourceYPos];
+            CurrentLine := ScanLines[SourceYPos];
+
+        for AvgX := 0 to 1 do
+        begin
+          if SourceXStart + AvgX >= SourceBitmap.Width then
+            SourceXStart := SourceBitmap.Width - 1;
+
+          ActualX := (SourceXStart + AvgX) * 4; { 4 bytes per pixel }
+
+          { Calculate how heavy this pixel is based on how far away
+            it is from the mapped pixel }
+          PixelWeight := XWeights[AvgX] * YWeights[AvgY];
+          DestR := DestR + CurrentLine[ActualX] * PixelWeight;
+          DestB := DestB + CurrentLine[ActualX+1] * PixelWeight;
+          DestG := DestG + CurrentLine[ActualX+2] * PixelWeight;
+          DestA := DestA + CurrentLine[ActualX+3] * PixelWeight;
+        end;
+      end;
+
+      ActualX := DestX * 4; { 4 bytes per pixel }
+      DestLine[ActualX] := Round(DestR);
+      DestLine[ActualX+1] := Round(DestB);
+      DestLine[ActualX+2] := Round(DestG);
+      DestLine[ActualX+3] := Round(DestA);
+    end;
+  end;
+end;
+
+procedure ScaleImage32(const SourceBitmap, ResizedBitmap: TBitmap;
+  const ScaleAmount: Double);
+var
+  DestWidth, DestHeight: Integer;
+begin
+  DestWidth := Round(SourceBitmap.Width * ScaleAmount);
+  DestHeight := Round(SourceBitmap.Height * ScaleAmount);
+  SourceBitmap.PixelFormat := pf32bit;
+
+  ResizedBitmap.Width := DestWidth;
+  ResizedBitmap.Height := DestHeight;
+  //ResizedBitmap.Canvas.Brush.Color := Vcl.Graphics.clNone;
+  //ResizedBitmap.Canvas.FillRect(Rect(0, 0, DestWidth, DestHeight));
+  ResizedBitmap.PixelFormat := pf32bit;
+
+  if ResizedBitmap.Width < SourceBitmap.Width then
+    ShrinkImage32(SourceBitmap, ResizedBitmap, ScaleAmount)
+  else
+    EnlargeImage32(SourceBitmap, ResizedBitmap, ScaleAmount);
+end;
 
 procedure SetGridColumnWidths(DbGrid: TDBGrid);
 const

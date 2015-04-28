@@ -1,23 +1,26 @@
-{**************************************************************************************************}
-{                                                                                                  }
-{ Unit uWmiEvents                                                                                  }
-{ unit for the WMI Delphi Code Creator                                                             }
-{                                                                                                  }
-{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
-{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
-{ License at http://www.mozilla.org/MPL/                                                           }
-{                                                                                                  }
-{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
-{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
-{ and limitations under the License.                                                               }
-{                                                                                                  }
-{ The Original Code is uWmiEvents.pas.                                                             }
-{                                                                                                  }
-{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
-{ All Rights Reserved.                                                                             }
-{                                                                                                  }
-{**************************************************************************************************}
+//**************************************************************************************************
+//
+// Unit uWmiEvents
+// unit for the WMI Delphi Code Creator
+// https://github.com/RRUZ/wmi-delphi-code-creator
+//
+// The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
+// you may not use this file except in compliance with the License. You may obtain a copy of the
+// License at http://www.mozilla.org/MPL/
+//
+// Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
+// ANY KIND, either express or implied. See the License for the specific language governing rights
+// and limitations under the License.
+//
+// The Original Code is uWmiEvents.pas.
+//
+// The Initial Developer of the Original Code is Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// All Rights Reserved.
+//
+//**************************************************************************************************
+
+
 
 unit uWmiEvents;
 
@@ -72,7 +75,7 @@ type
     FSettings : TSettings;
     FSetLog: TProcLog;
     FConsole: TMemo;
-    DataLoaded : Boolean;
+    FDataLoaded : Boolean;
     FSetMsg: TProcLog;
     procedure UMEditEventValue(var msg: TMessage); message UM_EDITEVENTVALUE;
     procedure UMEditEventCond(var msg: TMessage); message UM_EDITEVENTCOND;
@@ -176,7 +179,7 @@ end;
 
 procedure TFrmWmiEvents.FormCreate(Sender: TObject);
 begin
-  DataLoaded:=False;
+  FDataLoaded:=False;
   FrmCodeEditorEvent  := TFrmCodeEditor.Create(Self);
   FrmCodeEditorEvent.CodeGenerator:=GenerateCode;
   FrmCodeEditorEvent.Parent := PanelEventCode;
@@ -187,7 +190,7 @@ end;
 
 procedure TFrmWmiEvents.FormShow(Sender: TObject);
 begin
- if not DataLoaded then
+ if not FDataLoaded then
   LoadNameSpaces;
 end;
 
@@ -428,7 +431,7 @@ begin
     ComboBoxNamespacesEvents.ItemIndex := 0;
 
   LoadWmiEvents(ComboBoxNamespacesEvents.Text, True);
-  DataLoaded:=True;
+  FDataLoaded:=True;
 end;
 
 procedure TFrmWmiEvents.LoadTargetInstanceProps;

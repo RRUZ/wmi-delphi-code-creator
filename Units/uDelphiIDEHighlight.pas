@@ -1,23 +1,25 @@
-{**************************************************************************************************}
-{                                                                                                  }
-{ Unit uDelphiIDEHighlight                                                                         }
-{ unit uDelphiIDEHighlight  for the Delphi IDE Theme Editor                                        }
-{                                                                                                  }
-{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
-{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
-{ License at http://www.mozilla.org/MPL/                                                           }
-{                                                                                                  }
-{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
-{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
-{ and limitations under the License.                                                               }
-{                                                                                                  }
-{ The Original Code is uDelphiIDEHighlight.pas.                                                    }
-{                                                                                                  }
-{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V                     }
-{ All Rights Reserved.                                                                             }
-{                                                                                                  }
-{**************************************************************************************************}
+//**************************************************************************************************
+//
+// Unit uDelphiIDEHighlight
+// unit for the WMI Delphi Code Creator
+// https://github.com/RRUZ/wmi-delphi-code-creator
+//
+// The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
+// you may not use this file except in compliance with the License. You may obtain a copy of the
+// License at http://www.mozilla.org/MPL/
+//
+// Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
+// ANY KIND, either express or implied. See the License for the specific language governing rights
+// and limitations under the License.
+//
+// The Original Code is uDelphiIDEHighlight.pas.
+//
+// The Initial Developer of the Original Code is Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// All Rights Reserved.
+//
+//**************************************************************************************************
+
 
 
 unit uDelphiIDEHighlight;
@@ -250,7 +252,6 @@ function  SaveIDEThemeToXmlFile(DelphiVersion:TDelphiVersions;const ATheme : TID
 
 function  LoadThemeFromXMLFile(var ATheme : TIDETheme;const FileName:TFileName):Boolean;
 function  SetIDEDefaultTheme(DelphiVersion:TDelphiVersions): Boolean;
-function  ApplyIDETheme(DelphiVersion:TDelphiVersions;const  ATheme : TIDETheme) : Boolean;
 function  GetIDEDefaultTheme(DelphiVersion:TDelphiVersions): TIDETheme;
 
 
@@ -323,17 +324,6 @@ begin
   end;
 end;
 
-function  ApplyIDETheme(DelphiVersion:TDelphiVersions;const  ATheme : TIDETheme) : Boolean;
- var
-  FileName: TFileName;
-begin
-  FileName:=SaveIDEThemeToRegFile(DelphiVersion,ATheme,ExtractFilePath(ParamStr(0)),'Dummy');
-  try
-    Result:= FileExists(FileName) and RunAndWait(0,'regedit.exe','/S "'+FileName+'"');
-  finally
-    //TFile.Delete(FileName);
-  end;
-end;
 
 function  SetIDEDefaultTheme(DelphiVersion:TDelphiVersions): Boolean;
  var

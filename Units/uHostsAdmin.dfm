@@ -184,7 +184,6 @@ object FrmHostAdmin: TFrmHostAdmin
     Width = 240
     Height = 25
     DataSource = DataSource1
-    Kind = dbnHorizontal
     ParentShowHint = False
     ShowHint = True
     TabOrder = 4

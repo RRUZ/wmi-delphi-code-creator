@@ -1,23 +1,24 @@
-{**************************************************************************************************}
-{                                                                                                  }
-{ Unit uWmi_ViewPropsValues                                                                        }
-{ Unit for the WMI Delphi Code Creator                                                             }
-{                                                                                                  }
-{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
-{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
-{ License at http://www.mozilla.org/MPL/                                                           }
-{                                                                                                  }
-{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
-{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
-{ and limitations under the License.                                                               }
-{                                                                                                  }
-{ The Original Code is uWmi_ViewPropsValues.pas.                                                   }
-{                                                                                                  }
-{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
-{ All Rights Reserved.                                                                             }
-{                                                                                                  }
-{**************************************************************************************************}
+//**************************************************************************************************
+//
+// Unit uWmi_ViewPropsValues
+// unit for the WMI Delphi Code Creator
+// https://github.com/RRUZ/wmi-delphi-code-creator
+//
+// The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
+// you may not use this file except in compliance with the License. You may obtain a copy of the
+// License at http://www.mozilla.org/MPL/
+//
+// Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
+// ANY KIND, either express or implied. See the License for the specific language governing rights
+// and limitations under the License.
+//
+// The Original Code is uWmi_ViewPropsValues.pas.
+//
+// The Initial Developer of the Original Code is Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// All Rights Reserved.
+//
+//**************************************************************************************************
 
 unit uWmi_ViewPropsValues;
 
@@ -45,7 +46,7 @@ type
 {$IFNDEF USE_ASYNCWMIQUERY}
   TWMIQueryToCustomView = class(TThread)
   private
-    Success:   HResult;
+    FSuccess:   HResult;
     FEnum:     IEnumvariant;
     FSWbemLocator: OleVariant;
     FWMIService: OleVariant;
@@ -146,7 +147,7 @@ type
     FDataLoaded: boolean;
     FContainValues: boolean;
     FWMIProperties: TStrings;
-    WmiMetaData : TWMiClassMetaData;
+    FWmiMetaData : TWMiClassMetaData;
     FSetLog: TProcLog;
     FMode: TWmi_ViewPropsValuesMode;
     procedure Log(const msg: string);
@@ -472,7 +473,7 @@ begin
   ListViewWmi.Visible:=False;
   MemoInstances.Visible:=False;
   Mode:=GridView;
-  WmiMetaData:=nil;
+  FWmiMetaData:=nil;
   FDataLoaded := False;
   FWQLProperties := TStringList.Create;
   FWQL    := TStringList.Create;
@@ -513,8 +514,8 @@ begin
   FWQLProperties.Free;
   FWQL.Free;
 
-  if WmiMetaData<>nil then
-    WmiMetaData.Free;
+  if FWmiMetaData<>nil then
+    FWmiMetaData.Free;
 
   FValues.Free;
 end;
@@ -547,12 +548,12 @@ begin
   ListViewPropsLinks.Items.BeginUpdate;
   try
     ListViewPropsLinks.Items.Clear;
-    for i:=0 to WmiMetaData.PropertiesCount-1 do
-    for WMiQualifierMetaData in WmiMetaData.Properties[i].Qualifiers do
+    for i:=0 to FWmiMetaData.PropertiesCount-1 do
+    for WMiQualifierMetaData in FWmiMetaData.Properties[i].Qualifiers do
       if SameText('MappingStrings',WMiQualifierMetaData.Name) then
       begin
         Item:=ListViewPropsLinks.Items.Add;
-        Item.Caption:=WmiMetaData.Properties[i].Name;
+        Item.Caption:=FWmiMetaData.Properties[i].Name;
         //[MIF.DMTF|Operational State|003.5|MIB.IETF|HOST-RESOURCES-MIB.hrDeviceStatus]
         MappingStrings:=WMiQualifierMetaData.Value;
         if (MappingStrings<>'') and (MappingStrings[1]='[') then
@@ -592,13 +593,13 @@ var
   i: integer;
 begin
   FDataLoaded := True;
-  WmiMetaData:=TWMiClassMetaData.Create(WmiNamespace, WmiClass);
+  FWmiMetaData:=TWMiClassMetaData.Create(WmiNamespace, WmiClass);
 
   FWQLProperties.Clear;
   if (Properties=nil) or (Properties.Count=0) then
   begin
-    for i:=0 to WmiMetaData.PropertiesCount-1 do
-      FWQLProperties.Add(WmiMetaData.Properties[i].Name)
+    for i:=0 to FWmiMetaData.PropertiesCount-1 do
+      FWQLProperties.Add(FWmiMetaData.Properties[i].Name)
   end
   else
     for i:=0 to Properties.Count-1 do
@@ -804,7 +805,7 @@ var
   RowData : TStringList;
   CimType : integer;
 begin
-  Success := CoInitializeEx(nil, COINIT_MULTITHREADED);//CoInitialize(nil); //CoInitializeEx(nil, COINIT_MULTITHREADED);
+  FSuccess := CoInitializeEx(nil, COINIT_MULTITHREADED);//CoInitialize(nil); //CoInitializeEx(nil, COINIT_MULTITHREADED);
   try
     FCount := 0;
     FMsg   := 'Executing WMI Query';
@@ -896,7 +897,7 @@ begin
   finally
     PropItem := Unassigned;
     Props    := Unassigned;
-    case Success of
+    case FSuccess of
       S_OK, S_FALSE: CoUninitialize;
     end;
   end;

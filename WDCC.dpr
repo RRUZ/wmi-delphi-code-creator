@@ -77,7 +77,8 @@ uses
   DDetours in 'Units\Vcl.Styles.Utils\delphi-detours-library\DDetours.pas',
   InstDecode in 'Units\Vcl.Styles.Utils\delphi-detours-library\InstDecode.pas',
   CPUID in 'Units\Vcl.Styles.Utils\delphi-detours-library\CPUID.pas',
-  Vcl.Styles.Utils.Graphics in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.Graphics.pas';
+  Vcl.Styles.Utils.Graphics in 'Units\Vcl.Styles.Utils\Vcl.Styles.Utils.Graphics.pas',
+  uSupportedIDEs in 'Units\uSupportedIDEs.pas';
 
 {$R *.res}
 

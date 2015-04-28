@@ -1,23 +1,25 @@
-{**************************************************************************************************}
-{                                                                                                  }
-{ Unit Main                                                                                        }
-{ Main Form for the WMI Delphi Code Creator                                                        }
-{                                                                                                  }
-{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
-{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
-{ License at http://www.mozilla.org/MPL/                                                           }
-{                                                                                                  }
-{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
-{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
-{ and limitations under the License.                                                               }
-{                                                                                                  }
-{ The Original Code is Main.pas.                                                                   }
-{                                                                                                  }
-{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
-{ All Rights Reserved.                                                                             }
-{                                                                                                  }
-{**************************************************************************************************}
+//**************************************************************************************************
+//
+// Unit Main
+// unit for the WMI Delphi Code Creator
+// https://github.com/RRUZ/wmi-delphi-code-creator
+//
+// The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
+// you may not use this file except in compliance with the License. You may obtain a copy of the
+// License at http://www.mozilla.org/MPL/
+//
+// Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
+// ANY KIND, either express or implied. See the License for the specific language governing rights
+// and limitations under the License.
+//
+// The Original Code is Main.pas.
+//
+// The Initial Developer of the Original Code is Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// All Rights Reserved.
+//
+//**************************************************************************************************
+
 unit Main;
 
 interface
@@ -85,9 +87,9 @@ type
       Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
   private
     FSettings: TSettings;
-    Ctx : TRttiContext;
-    RegisteredInstances : TDictionary<string,TForm>;
-    ListWINHosts : TObjectList<TWMIHost>;
+    FCtx : TRttiContext;
+    FRegisteredInstances : TDictionary<string,TForm>;
+    FListWINHosts : TObjectList<TWMIHost>;
     procedure RegisterTask(const ParentTask, Name : string;ImageIndex:Integer; LinkObject : TRttiType);
     procedure RegisterWMIHosts;
     procedure SetLog(const Log :string);
@@ -175,7 +177,7 @@ begin
       try
         LNameSpaces.AddStrings(CachedWMIClasses.GetNameSpacesHost(LWMIHost.Host, LWMIHost.User, LWMIHost.Password));
         for LIndex := 0 to LNameSpaces.Count-1 do
-          RegisterTask(Format(HostCIMStr, [LWMIHost.Host]), LNameSpaces[LIndex], 58, Ctx.GetType(TFrmWMITree));
+          RegisterTask(Format(HostCIMStr, [LWMIHost.Host]), LNameSpaces[LIndex], 58, FCtx.GetType(TFrmWMITree));
 
         LNode:=GetNodeByText(TreeViewTasks, Format(HostCIMStr, [LWMIHost.Host]));
         if LNode<>nil then
@@ -245,10 +247,10 @@ begin
   FillPopupActionBar(PopupActionBar2);
   AssignStdActionsPopUpMenu(Self, PopupActionBar2);
 
-  ListWINHosts:=nil;
+  FListWINHosts:=nil;
 
-  Ctx:=TRttiContext.Create;
-  RegisteredInstances:=TDictionary<string, TForm>.Create;
+  FCtx:=TRttiContext.Create;
+  FRegisteredInstances:=TDictionary<string, TForm>.Create;
 
   FSettings :=TSettings.Create;
   SetLog('Reading settings');
@@ -287,22 +289,22 @@ begin
   end;
 
   //RegisterTask('','Code Generation', 30, nil);
-  RegisterTask('','WMI Class Code Generation', 40, Ctx.GetType(TFrmWMiClassesContainer));
-  RegisterTask('','WMI Methods Code Generation', 41,  Ctx.GetType(TFrmWmiMethodsContainer));
-  RegisterTask('','WMI Events Code Generation', 45, Ctx.GetType(TFrmWmiEventsContainer));
+  RegisterTask('','WMI Class Code Generation', 40, FCtx.GetType(TFrmWMiClassesContainer));
+  RegisterTask('','WMI Methods Code Generation', 41,  FCtx.GetType(TFrmWmiMethodsContainer));
+  RegisterTask('','WMI Events Code Generation', 45, FCtx.GetType(TFrmWmiEventsContainer));
   //RegisterTask('','WMI Explorer', 29, Ctx.GetType(TFrmWMITree));
-  RegisterTask('','WMI Classes Tree', 47, Ctx.GetType(TFrmWmiClassTree));
-  RegisterTask('','WMI Finder', 57, Ctx.GetType(TFrmWmiDatabase));
-  RegisterTask('','WQL', 56, Ctx.GetType(TFrmSqlWMIContainer));
+  RegisterTask('','WMI Classes Tree', 47, FCtx.GetType(TFrmWmiClassTree));
+  RegisterTask('','WMI Finder', 57, FCtx.GetType(TFrmWmiDatabase));
+  RegisterTask('','WQL', 56, FCtx.GetType(TFrmSqlWMIContainer));
   //RegisterTask('','Events Monitor', 28, nil);
   //RegisterTask('','Log', 32, Ctx.GetType(TFrmLog));
-  RegisterTask('','CIM Repository (localhost)', 6, Ctx.GetType(TFrmWMIInfo));
+  RegisterTask('','CIM Repository (localhost)', 6, FCtx.GetType(TFrmWMIInfo));
 
   LNameSpaces:=TStringList.Create;
   try
     LNameSpaces.AddStrings(CachedWMIClasses.NameSpaces);
     for LIndex := 0 to LNameSpaces.Count-1 do
-      RegisterTask('CIM Repository (localhost)', LNameSpaces[LIndex], 58, Ctx.GetType(TFrmWMITree));
+      RegisterTask('CIM Repository (localhost)', LNameSpaces[LIndex], 58, FCtx.GetType(TFrmWMITree));
   finally
     LNameSpaces.Free;
   end;
@@ -332,16 +334,16 @@ procedure TFrmMain.FormDestroy(Sender: TObject);
 Var
  Pair : TPair<string,TForm>;
 begin
- if ListWINHosts<>nil then
-  FreeAndNil(ListWINHosts);
+ if FListWINHosts<>nil then
+  FreeAndNil(FListWINHosts);
 
-  for Pair in  RegisteredInstances do
+  for Pair in  FRegisteredInstances do
   begin
    Pair.Value.Close;
    Pair.Value.Free;
   end;
 
-  RegisteredInstances.Free;
+  FRegisteredInstances.Free;
   Settings.Free;
 end;
 
@@ -406,11 +408,11 @@ Var
  Node : TTreeNode;
  LWMIHost : TWMIHost;
 begin
-   if ListWINHosts<>nil then
-     FreeAndNil(ListWINHosts);
-   ListWINHosts:=GetListWMIRegisteredHosts;
+   if FListWINHosts<>nil then
+     FreeAndNil(FListWINHosts);
+   FListWINHosts:=GetListWMIRegisteredHosts;
 
-   for LWMIHost in ListWINHosts do
+   for LWMIHost in FListWINHosts do
    begin
      Node:=TreeViewTasks.Items.AddObject(nil, Format(HostCIMStr, [LWMIHost.Host]), LWMIHost);
      Node.ImageIndex    :=31;//add BN ??
@@ -456,8 +458,8 @@ begin
 
      if (Node.Data<>nil) and (Node.Parent<>nil) and (TObject(Node.Parent.Data) is TWMIHost) then
      begin
-       if RegisteredInstances.ContainsKey(Node.Parent.Text+Node.Text) then
-          RegisteredInstances.Items[Node.Parent.Text+Node.Text].Show
+       if FRegisteredInstances.ContainsKey(Node.Parent.Text+Node.Text) then
+          FRegisteredInstances.Items[Node.Parent.Text+Node.Text].Show
        else
        if Node.Data<>nil then
        begin
@@ -495,7 +497,7 @@ begin
            LRttiProperty.SetValue(LForm, TWMIHost(Node.Parent.Data));
 
           LForm.Show;
-          RegisteredInstances.Add(Node.Parent.Text+Node.Text, LForm);
+          FRegisteredInstances.Add(Node.Parent.Text+Node.Text, LForm);
        end;
      end
      else
@@ -506,8 +508,8 @@ begin
      end
      else
      begin
-       if RegisteredInstances.ContainsKey(Node.Text) then
-          RegisteredInstances.Items[Node.Text].Show
+       if FRegisteredInstances.ContainsKey(Node.Text) then
+          FRegisteredInstances.Items[Node.Text].Show
        else
        if Node.Data<>nil then
        begin
@@ -541,7 +543,7 @@ begin
            LRttiProperty.SetValue(LForm, Node.Text);
 
           LForm.Show;
-          RegisteredInstances.Add(Node.Text, LForm);
+          FRegisteredInstances.Add(Node.Text, LForm);
        end;
      end;
 

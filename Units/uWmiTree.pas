@@ -1,23 +1,25 @@
-{**************************************************************************************************}
-{                                                                                                  }
-{ Unit uWmiTree                                                                                    }
-{ Unit for the WMI Delphi Code Creator                                                             }
-{                                                                                                  }
-{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
-{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
-{ License at http://www.mozilla.org/MPL/                                                           }
-{                                                                                                  }
-{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
-{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
-{ and limitations under the License.                                                               }
-{                                                                                                  }
-{ The Original Code is uWmiTree.pas.                                                               }
-{                                                                                                  }
-{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2013 Rodrigo Ruz V.                    }
-{ All Rights Reserved.                                                                             }
-{                                                                                                  }
-{**************************************************************************************************}
+//**************************************************************************************************
+//
+// Unit uWmiTree
+// unit for the WMI Delphi Code Creator
+// https://github.com/RRUZ/wmi-delphi-code-creator
+//
+// The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
+// you may not use this file except in compliance with the License. You may obtain a copy of the
+// License at http://www.mozilla.org/MPL/
+//
+// Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
+// ANY KIND, either express or implied. See the License for the specific language governing rights
+// and limitations under the License.
+//
+// The Original Code is uWmiTree.pas.
+//
+// The Initial Developer of the Original Code is Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// All Rights Reserved.
+//
+//**************************************************************************************************
+
 
 unit uWmiTree;
 
@@ -68,7 +70,7 @@ type
     procedure TreeViewWmiClassesCustomDrawItem(Sender: TCustomTreeView;
       Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
   private
-    DataLoaded : Boolean;
+    FDataLoaded : Boolean;
     FSetMsg: TProcLog;
     FSetLog: TProcLog;
     FNamespace: string;
@@ -173,7 +175,7 @@ procedure TFrmWMITree.FormCreate(Sender: TObject);
 
 begin
   FWMIHost:=nil;
-  DataLoaded :=False;
+  FDataLoaded :=False;
   //AddImage(1, NamespaceImageIndex, 'Namespace');
   AddImage(1, ClassImageIndex, 'WMI Class');
   AddImage(2, MethodImageIndex, 'WMI Method');
@@ -190,7 +192,7 @@ end;
 
 procedure TFrmWMITree.FormShow(Sender: TObject);
 begin
- if not DataLoaded then
+ if not FDataLoaded then
   LoadWMIClasses;
 end;
 
@@ -376,7 +378,7 @@ begin
   finally
     LClasses.Free;
   end;
-    DataLoaded:=True;
+    FDataLoaded:=True;
 end;
 
 
