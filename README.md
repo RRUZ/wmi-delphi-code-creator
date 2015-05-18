@@ -18,7 +18,8 @@
 
 WMI Explorer : Allow you to navigate over all the WMI namespaces and classes, and display WMI metadata like MOF, Qualifiers and Properties.
 
-![http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_WMiExplorer.png](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_WMiExplorer.png)
+
+<img src="https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/Explorer1.png" alt="" align="center" />
 
 WMI Class Tree : shows the hierarchy and dependencies of the WMI classes in a namespace
 
