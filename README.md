@@ -16,33 +16,33 @@
 
 ## General Features ##
 
-*WMI Explorer* : Allow you to navigate over all the WMI namespaces and classes, and display WMI metadata like MOF, Qualifiers and Properties.
+**WMI Explorer** : Allow you to navigate over all the WMI namespaces and classes, and display WMI metadata like MOF, Qualifiers and Properties.
 
 ![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/Explorer1.png)
 
-*WMI Class Tree* : shows the hierarchy and dependencies of the WMI classes in a namespace
+**WMI Class Tree** : shows the hierarchy and dependencies of the WMI classes in a namespace
 
 ![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/Tree.png)
 
-*WMI Finder*: Display all the WMI classes and properties related to a search term.
+**WMI Finder**: Display all the WMI classes and properties related to a search term.
 
 ![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WMIFinder.png)
 
-WMI SQL : Allow you to execute WQL sentences in a local or remote machine, also include a option to auto generate of WQL code
+**WMI SQL** : Allow you to execute WQL sentences in a local or remote machine, also include a option to auto generate of WQL code
 
 ![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WQL.png)
 
-*WMI Properties Links* : Display the location and sources from where each wmi property get the information.
+**WMI Properties Links** : Display the location and sources from where each wmi property get the information.
 
 ![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WMILinks.png)
 
 ![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WMIOnline.png)
 
-*Support for VCL Styles (Skins)*
+**Support for VCL Styles (Skins)**
 
 ![](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_SettingsGUI.png)
 
-*Customizable Syntax Highlight Colors*
+**Customizable Syntax Highlight Colors**
 
 ![](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_SettingsSyntaxHigh.png)
 
