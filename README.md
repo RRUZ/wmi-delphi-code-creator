@@ -12,8 +12,7 @@
  <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/MSCPPDevelopers'>Microsoft C++ Developers </a>wiki page - detailed list of features about Microsoft C++ and the WDCC</li>
 </ul>
 
-![http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/All.png](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/All.png)
-
+![https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/AllSmall.png](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/AllSmall.png)
 
 ## General Features ##
 
