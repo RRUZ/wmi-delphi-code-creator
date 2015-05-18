@@ -32,20 +32,19 @@ WMI SQL : Allow you to execute WQL sentences in a local or remote machine, also 
 
 ![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WQL.png)
 
-WMI Properties Links : Display the location and sources from where each wmi property get the information.
+*WMI Properties Links* : Display the location and sources from where each wmi property get the information.
 
 ![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WMILinks.png)
 
-![http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_WMIPropsLinksOnline.png](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_WMIPropsLinksOnline.png)
+![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WMIOnline.png)
 
-Support for Skins
+*Support for VCL Styles (Skins)*
 
-![http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_SettingsGUI.png](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_SettingsGUI.png)
+![](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_SettingsGUI.png)
 
-Customizable Syntax Highlight Colors
+*Customizable Syntax Highlight Colors*
 
-![http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_SettingsSyntaxHigh.png](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_SettingsSyntaxHigh.png)
-
+![](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_SettingsSyntaxHigh.png)
 
 
 ## Download Links ##
