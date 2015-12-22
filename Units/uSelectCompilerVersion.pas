@@ -164,6 +164,20 @@ var
       item.ImageIndex := ImageIndex;
       item.Data := Pointer(Ord(FLanguageSource));
     end;
+
+    if IsVS14Installed then
+    begin
+      FileName := GetVS14IDEFileName;
+      item     := ListViewIDEs.Items.Add;
+      item.Caption := 'Visual Studio 2015';
+      item.SubItems.Add(FileName);
+      item.SubItems.Add(GetVS14CompilerFileName);
+      ExtractIconFileToImageList(ImageList1, Filename);
+      ImageIndex := ImageList1.Count - 1;
+      item.ImageIndex := ImageIndex;
+      item.Data := Pointer(Ord(FLanguageSource));
+    end;
+
   end;
 
 begin
@@ -311,6 +325,20 @@ begin
                       item.ImageIndex := ImageIndex;
                       item.Data := Pointer(Ord(Lng_VSCpp));
                     end;
+
+                    FileName :=GetMicrosoftCppCompiler14;
+                    if FileExists(FileName) then
+                    begin
+                      item     := ListViewIDEs.Items.Add;
+                      item.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
+                      item.SubItems.Add(FileName);
+                      item.SubItems.Add(FileName);
+                      ExtractIconFileToImageList(ImageList1, Filename);
+                      ImageIndex := ImageList1.Count - 1;
+                      item.ImageIndex := ImageIndex;
+                      item.Data := Pointer(Ord(Lng_VSCpp));
+                    end;
+
                   end;
 
                 end;

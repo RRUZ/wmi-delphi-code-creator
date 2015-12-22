@@ -142,6 +142,14 @@ Source: Microsoft_C++\VS11\GetWMI_Info.vcxproj; DestDir: {app}\Microsoft_C++\VS1
 Source: Microsoft_C++\VS11\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS11
 Source: Microsoft_C++\VS11\stdafx.h; DestDir: {app}\Microsoft_C++\VS11
 Source: Microsoft_C++\VS11\targetver.h; DestDir: {app}\Microsoft_C++\VS11
+
+Source: Microsoft_C++\VS14\GetWMI_Info.sln; DestDir: {app}\Microsoft_C++\VS14
+Source: Microsoft_C++\VS14\GetWMI_Info.vcxproj; DestDir: {app}\Microsoft_C++\VS14
+Source: Microsoft_C++\VS14\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS14
+Source: Microsoft_C++\VS14\stdafx.h; DestDir: {app}\Microsoft_C++\VS14
+Source: Microsoft_C++\VS14\targetver.h; DestDir: {app}\Microsoft_C++\VS14
+
+
 Source: CSharp\VS11\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS11\Properties
 Source: CSharp\VS11\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS11
 Source: CSharp\VS11\GetWMI_Info.sln; DestDir: {app}\CSharp\VS11
@@ -389,6 +397,7 @@ Name: {app}\Microsoft_C++\VS2008
 Name: {app}\Microsoft_C++\VS2010
 Name: {app}\Styles
 Name: {app}\Microsoft_C++\VS11
+Name: {app}\Microsoft_C++\VS14
 Name: {app}\CSharp
 Name: {app}\CSharp\VS11
 Name: {app}\CSharp\VS2008

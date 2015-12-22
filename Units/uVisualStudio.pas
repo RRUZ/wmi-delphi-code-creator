@@ -41,6 +41,11 @@ function IsVS11Installed: boolean;
 function GetVS11IDEFileName: string;
 function GetVS11CompilerFileName: string;
 
+
+function IsVS14Installed: boolean;
+function GetVS14IDEFileName: string;
+function GetVS14CompilerFileName: string;
+
 function CreateVsProject(const FileName, Path, ProjectTemplate: string;
   var NewFileName: string): boolean;
 
@@ -50,6 +55,7 @@ procedure CompileAndRunMicrosoftCppCode(Console:TStrings;const CompilerName, Pro
 function GetMicrosoftCppCompiler2008 : string;
 function GetMicrosoftCppCompiler2010 : string;
 function GetMicrosoftCppCompiler11   : string;
+function GetMicrosoftCppCompiler14   : string;
 
 implementation
 
@@ -65,6 +71,8 @@ uses
 
 
 const
+  VS14x64RegEntry        = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\Setup\VS';
+  VS14x86RegEntry        = '\SOFTWARE\Microsoft\VisualStudio\14.0\Setup\VS';
   VS11x64RegEntry        = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\Setup\VS';
   VS11x86RegEntry        = '\SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS';
   VS2010x64RegEntry      = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VS';
@@ -167,6 +175,12 @@ function GetMicrosoftCppCompiler11   : string;
 begin
  Result:=ExpandFileName(ExtractFilePath(GetVS11IDEFileName)+'\..\..')+'\VC\bin\cl.exe';
 end;
+
+function GetMicrosoftCppCompiler14   : string;
+begin
+ Result:=ExpandFileName(ExtractFilePath(GetVS14IDEFileName)+'\..\..')+'\VC\bin\cl.exe';
+end;
+
 
 function IsVS2008Installed: boolean;
 var
@@ -298,5 +312,50 @@ function GetVS11CompilerFileName: string;
 begin
  Result:=ChangeFileExt(GetVS11IDEFileName,'.com');
 end;
+
+function IsVS14Installed: boolean;
+var
+  Value: string;
+begin
+  Result := False;
+  if IsWow64 then
+  begin
+    if RegKeyExists(VS14x64RegEntry, HKEY_LOCAL_MACHINE) then
+    begin
+      RegReadStr(VS14x64RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
+      Result := FileExists(Value);
+    end;
+  end
+  else
+  begin
+    if RegKeyExists(VS14x86RegEntry, HKEY_LOCAL_MACHINE) then
+    begin
+      RegReadStr(VS14x86RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
+      Result := FileExists(Value);
+    end;
+  end;
+end;
+
+
+function GetVS14IDEFileName: string;
+begin
+  Result := '';
+  if IsWow64 then
+  begin
+    if RegKeyExists(VS14x64RegEntry, HKEY_LOCAL_MACHINE) then
+      RegReadStr(VS14x64RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
+  end
+  else
+  begin
+    if RegKeyExists(VS14x86RegEntry, HKEY_LOCAL_MACHINE) then
+      RegReadStr(VS14x86RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
+  end;
+end;
+
+function GetVS14CompilerFileName: string;
+begin
+ Result:=ChangeFileExt(GetVS14IDEFileName, '.com');
+end;
+
 
 end.
