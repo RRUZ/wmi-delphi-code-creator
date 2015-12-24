@@ -108,6 +108,7 @@ Source: Styles\AmethystKamri.vsf; DestDir: {app}\Styles\
 Source: Styles\AquaGraphite.vsf; DestDir: {app}\Styles\
 Source: Styles\AquaLightSlate.vsf; DestDir: {app}\Styles\
 Source: Styles\Auric.vsf; DestDir: {app}\Styles\
+Source: Styles\Glow.vsf; DestDir: {app}\Styles\
 Source: Styles\BlueGraphite.vsf; DestDir: {app}\Styles\
 Source: Styles\Carbon.vsf; DestDir: {app}\Styles\
 Source: Styles\CharcoalDarkSlate.vsf; DestDir: {app}\Styles\
@@ -153,6 +154,12 @@ Source: Microsoft_C++\VS14\targetver.h; DestDir: {app}\Microsoft_C++\VS14
 Source: CSharp\VS11\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS11\Properties
 Source: CSharp\VS11\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS11
 Source: CSharp\VS11\GetWMI_Info.sln; DestDir: {app}\CSharp\VS11
+
+Source: CSharp\VS14\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS14\Properties
+Source: CSharp\VS14\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS14
+Source: CSharp\VS14\GetWMI_Info.sln; DestDir: {app}\CSharp\VS14
+
+
 Source: CSharp\VS2008\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS2008\Properties
 Source: CSharp\VS2008\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS2008
 Source: CSharp\VS2008\GetWMI_Info.sln; DestDir: {app}\CSharp\VS2008
@@ -358,8 +365,8 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-	ExtractTemporaryFile('Auric.vsf');
-	LoadVCLStyle(ExpandConstant('{tmp}\Auric.vsf'));
+	ExtractTemporaryFile('glow.vsf');
+	LoadVCLStyle(ExpandConstant('{tmp}\glow.vsf'));
 	Result := True;
 end;
 
@@ -399,7 +406,10 @@ Name: {app}\Styles
 Name: {app}\Microsoft_C++\VS11
 Name: {app}\Microsoft_C++\VS14
 Name: {app}\CSharp
+Name: {app}\CSharp\VS14
+Name: {app}\CSharp\VS14\Properties
 Name: {app}\CSharp\VS11
+Name: {app}\CSharp\VS11\Properties
 Name: {app}\CSharp\VS2008
 Name: {app}\CSharp\VS2010
 Name: {app}\AStyle

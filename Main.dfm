@@ -2,8 +2,8 @@ object FrmMain: TFrmMain
   Left = 413
   Top = 137
   Caption = 'Wmi Delphi Code Creator'
-  ClientHeight = 731
-  ClientWidth = 1008
+  ClientHeight = 574
+  ClientWidth = 796
   Color = clBtnFace
   Constraints.MinHeight = 600
   Constraints.MinWidth = 800
@@ -26,54 +26,61 @@ object FrmMain: TFrmMain
   object PanelMain: TPanel
     Left = 0
     Top = 30
-    Width = 1008
-    Height = 682
+    Width = 796
+    Height = 525
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
+    ExplicitWidth = 1008
+    ExplicitHeight = 682
     object Splitter1: TSplitter
       Left = 265
       Top = 5
       Width = 5
-      Height = 480
+      Height = 323
       ExplicitLeft = 258
       ExplicitHeight = 493
     end
     object Splitter2: TSplitter
       Left = 5
-      Top = 485
-      Width = 998
+      Top = 328
+      Width = 786
       Height = 5
       Cursor = crVSplit
       Align = alBottom
       ExplicitTop = 495
+      ExplicitWidth = 998
     end
     object PanelConsole: TPanel
       Left = 5
-      Top = 490
-      Width = 998
+      Top = 333
+      Width = 786
       Height = 187
       Align = alBottom
       BevelOuter = bvNone
       BorderWidth = 5
       TabOrder = 0
+      ExplicitTop = 490
+      ExplicitWidth = 998
       object PageControl2: TPageControl
         Left = 5
         Top = 5
-        Width = 988
+        Width = 776
         Height = 177
         ActivePage = TabSheet3
         Align = alClient
         Images = ImageList1
         TabOrder = 0
+        ExplicitWidth = 988
         object TabSheet3: TTabSheet
           Caption = 'Console Output'
           ImageIndex = 17
+          ExplicitWidth = 980
           object MemoConsole: TMemo
             Left = 0
             Top = 0
-            Width = 980
+            Width = 768
             Height = 148
             Align = alClient
             Color = clGray
@@ -86,6 +93,7 @@ object FrmMain: TFrmMain
             PopupMenu = PopupActionBar2
             ScrollBars = ssBoth
             TabOrder = 0
+            ExplicitWidth = 980
           end
         end
         object TabSheet2: TTabSheet
@@ -119,17 +127,19 @@ object FrmMain: TFrmMain
       Left = 5
       Top = 5
       Width = 260
-      Height = 480
+      Height = 323
       ActivePage = TabSheet1
       Align = alLeft
       TabOrder = 1
+      ExplicitHeight = 480
       object TabSheet1: TTabSheet
         Caption = 'Tasks'
+        ExplicitHeight = 452
         object TreeViewTasks: TTreeView
           Left = 0
           Top = 0
           Width = 252
-          Height = 452
+          Height = 295
           Align = alClient
           HideSelection = False
           Images = ImageList1
@@ -139,28 +149,33 @@ object FrmMain: TFrmMain
           TabOrder = 0
           OnChange = TreeViewTasksChange
           OnCustomDrawItem = TreeViewTasksCustomDrawItem
+          ExplicitHeight = 452
         end
       end
     end
     object PageControl3: TPageControl
       Left = 270
       Top = 5
-      Width = 733
-      Height = 480
+      Width = 521
+      Height = 323
       ActivePage = TabSheetTask
       Align = alClient
       Images = ImageList1
       TabOrder = 2
+      ExplicitWidth = 733
+      ExplicitHeight = 480
       object TabSheetTask: TTabSheet
         Caption = 'TabSheetTask'
         ImageIndex = -1
+        ExplicitWidth = 725
+        ExplicitHeight = 451
       end
     end
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 712
-    Width = 1008
+    Top = 555
+    Width = 796
     Height = 19
     Panels = <
       item
@@ -174,11 +189,13 @@ object FrmMain: TFrmMain
         Alignment = taRightJustify
         Width = 250
       end>
+    ExplicitTop = 712
+    ExplicitWidth = 1008
   end
   object ToolBar1: TToolBar
     Left = 0
     Top = 0
-    Width = 1008
+    Width = 796
     Height = 30
     AutoSize = True
     ButtonHeight = 30

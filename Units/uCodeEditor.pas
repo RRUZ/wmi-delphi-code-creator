@@ -366,7 +366,10 @@ begin
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2010\GetWMI_Info.sln'
             else
             if Pos('11', item.Caption)>0 then
-             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS11\GetWMI_Info.sln';
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS11\GetWMI_Info.sln'
+            else
+            if Pos('2015', item.Caption)>0 then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS14\GetWMI_Info.sln';
 
 
              CreateVsProject(ExtractFileName(FileName), ExtractFilePath(FileName), TargetFile, FileName);
@@ -507,7 +510,10 @@ begin
                TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2010\GetWMI_Info.sln'
               else
               if Pos('11', item.Caption)>0 then
-               TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS11\GetWMI_Info.sln';
+               TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS11\GetWMI_Info.sln'
+              else
+              if Pos('2015', item.Caption)>0 then
+               TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS14\GetWMI_Info.sln';
 
               if CreateVsProject(ExtractFileName(FileName), ExtractFilePath(FileName), TargetFile, FileName) then
                  CompileAndRunVsCode(Console.Lines,CompilerName, FileName, TComponent(Sender).Tag = 1);
