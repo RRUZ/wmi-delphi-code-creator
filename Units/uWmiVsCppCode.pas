@@ -147,8 +147,8 @@ begin
               wbemCimtypeUint16    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.uiVal << endl;',[Props.Names[i]]));
               wbemCimtypeSint32    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.intVal << endl;',[Props.Names[i]]));
               wbemCimtypeUint32    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.uintVal << endl;',[Props.Names[i]]));
-              wbemCimtypeSint64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.intVal << endl;',[Props.Names[i]]));
-              wbemCimtypeUint64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.uintVal << endl;',[Props.Names[i]]));
+              wbemCimtypeSint64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));
+              wbemCimtypeUint64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.bstrVal << endl;',[Props.Names[i]]));
               wbemCimtypeReal32    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.fltVal << endl;',[Props.Names[i]]));
               wbemCimtypeReal64    : DynCode.Add(Padding + Format('    wcout << "%s : " << vtProp.dblVal << endl;',[Props.Names[i]]));
               wbemCimtypeBoolean   : DynCode.Add(Padding + Format('    wcout << "%s : " << (vtProp.boolVal ? "True" : "False") << endl;',[Props.Names[i]]));//ok
@@ -250,8 +250,8 @@ begin
           wbemCimtypeUint16    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.uiVal << endl;',[sValue]));
           wbemCimtypeSint32    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.intVal << endl;',[sValue]));
           wbemCimtypeUint32    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.uintVal << endl;',[sValue]));
-          wbemCimtypeSint64    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.intVal << endl;',[sValue]));
-          wbemCimtypeUint64    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.uintVal << endl;',[sValue]));
+          wbemCimtypeSint64    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.bstrVal << endl;',[sValue]));
+          wbemCimtypeUint64    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.bstrVal << endl;',[sValue]));
           wbemCimtypeReal32    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.fltVal << endl;',[sValue]));
           wbemCimtypeReal64    : Props.Add(Padding + Format('   wcout << "%s : " << vtProp.dblVal << endl;',[sValue]));
           wbemCimtypeBoolean   : Props.Add(Padding + Format('   wcout << "%s : " << (vtProp.boolVal ? "True" : "False") << endl;',[sValue]));//ok
@@ -357,8 +357,8 @@ begin
             wbemCimtypeUint16    : Props.Add(Padding + Format('         wcout << "%s : " << cn.uiVal << endl;',[sValue]));
             wbemCimtypeSint32    : Props.Add(Padding + Format('         wcout << "%s : " << cn.intVal << endl;',[sValue]));
             wbemCimtypeUint32    : Props.Add(Padding + Format('         wcout << "%s : " << cn.uintVal << endl;',[sValue]));
-            wbemCimtypeSint64    : Props.Add(Padding + Format('         wcout << "%s : " << cn.intVal << endl;',[sValue]));
-            wbemCimtypeUint64    : Props.Add(Padding + Format('         wcout << "%s : " << cn.uintVal << endl;',[sValue]));
+            wbemCimtypeSint64    : Props.Add(Padding + Format('         wcout << "%s : " << cn.bstrVal << endl;',[sValue]));
+            wbemCimtypeUint64    : Props.Add(Padding + Format('         wcout << "%s : " << cn.bstrVal << endl;',[sValue]));
             wbemCimtypeReal32    : Props.Add(Padding + Format('         wcout << "%s : " << cn.fltVal << endl;',[sValue]));
             wbemCimtypeReal64    : Props.Add(Padding + Format('         wcout << "%s : " << cn.dblVal << endl;',[sValue]));
             wbemCimtypeBoolean   : Props.Add(Padding + Format('         wcout << "%s : " << (cn.boolVal ? "True" : "False") << endl;',[sValue]));//ok
@@ -692,8 +692,8 @@ begin
               wbemCimtypeUint16    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uiVal << endl;',[ParamName]));
               wbemCimtypeSint32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.intVal << endl;',[ParamName]));
               wbemCimtypeUint32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uintVal << endl;',[ParamName]));
-              wbemCimtypeSint64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.intVal << endl;',[ParamName]));
-              wbemCimtypeUint64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.uintVal << endl;',[ParamName]));
+              wbemCimtypeSint64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[ParamName]));
+              wbemCimtypeUint64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.bstrVal << endl;',[ParamName]));
               wbemCimtypeReal32    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.fltVal << endl;',[ParamName]));
               wbemCimtypeReal64    : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << varReturnValue.dblVal << endl;',[ParamName]));
               wbemCimtypeBoolean   : DynCodeOutParams.Add(Padding + Format('    wcout << "%s : " << (varReturnValue.boolVal ? "True" : "False") << endl;',[ParamName]));//ok
