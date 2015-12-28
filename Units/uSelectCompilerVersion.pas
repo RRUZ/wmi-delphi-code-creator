@@ -295,21 +295,21 @@ begin
         end
         else
         begin
-          if IsMonoDevelopInstalled and
-            IsDelphiPrismAttachedtoMonoDevelop then
-          begin
-            FileName := GetMonoDevelopIDEFileName;
-            item     := ListViewIDEs.Items.Add;
-            item.Caption := 'MonoDevelop';
-            item.SubItems.Add(FileName);
-            item.SubItems.Add(GetDelphiPrismCompilerFileName);
-            //ExtractIconFileToImageList(ImageList1,Filename);
-            ExtractIconFileToImageList(
-              ImageList1, ExtractFilePath(ParamStr(0)) + 'Extras\MonoDevelop.ico');
-            ImageIndex := ImageList1.Count - 1;
-            item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Lng_Oxygen));
-          end;
+//          if IsMonoDevelopInstalled and
+//            IsDelphiPrismAttachedtoMonoDevelop then
+//          begin
+//            FileName := GetMonoDevelopIDEFileName;
+//            item     := ListViewIDEs.Items.Add;
+//            item.Caption := 'MonoDevelop';
+//            item.SubItems.Add(FileName);
+//            item.SubItems.Add(GetDelphiPrismCompilerFileName);
+//            //ExtractIconFileToImageList(ImageList1,Filename);
+//            ExtractIconFileToImageList(
+//              ImageList1, ExtractFilePath(ParamStr(0)) + 'Extras\MonoDevelop.ico');
+//            ImageIndex := ImageList1.Count - 1;
+//            item.ImageIndex := ImageIndex;
+//            item.Data := Pointer(Ord(Lng_Oxygen));
+//          end;
 
 
           LVSIDEList := GetVSIDEList;

@@ -80,6 +80,7 @@ Source: "Oxygene\VS2008\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxyge
 Source: "Oxygene\VS2008\Properties\Settings.settings"; DestDir: "{app}\Oxygene\VS2008\Properties"
 Source: "Oxygene\VS2008\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\VS2008"
 Source: "Oxygene\VS2008\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\VS2008"
+
 Source: "Oxygene\VS2010\Properties\App.ico"; DestDir: "{app}\Oxygene\VS2010\Properties"
 Source: "Oxygene\VS2010\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\VS2010\Properties"
 Source: "Oxygene\VS2010\Properties\Resources.Designer.pas"; DestDir: "{app}\Oxygene\VS2010\Properties"
@@ -88,6 +89,33 @@ Source: "Oxygene\VS2010\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxyge
 Source: "Oxygene\VS2010\Properties\Settings.settings"; DestDir: "{app}\Oxygene\VS2010\Properties"
 Source: "Oxygene\VS2010\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\VS2010"
 Source: "Oxygene\VS2010\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\VS2010"
+
+Source: "Oxygene\VS2012\Properties\App.ico"; DestDir: "{app}\Oxygene\VS2012\Properties"
+Source: "Oxygene\VS2012\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\VS2012\Properties"
+Source: "Oxygene\VS2012\Properties\Resources.Designer.pas"; DestDir: "{app}\Oxygene\VS2012\Properties"
+Source: "Oxygene\VS2012\Properties\Resources.resx"; DestDir: "{app}\Oxygene\VS2012\Properties"
+Source: "Oxygene\VS2012\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxygene\VS2012\Properties"
+Source: "Oxygene\VS2012\Properties\Settings.settings"; DestDir: "{app}\Oxygene\VS2012\Properties"
+Source: "Oxygene\VS2012\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\VS2012"
+Source: "Oxygene\VS2012\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\VS2012"
+
+Source: "Oxygene\VS2013\Properties\App.ico"; DestDir: "{app}\Oxygene\VS2013\Properties"
+Source: "Oxygene\VS2013\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\VS2013\Properties"
+Source: "Oxygene\VS2013\Properties\Resources.Designer.pas"; DestDir: "{app}\Oxygene\VS2013\Properties"
+Source: "Oxygene\VS2013\Properties\Resources.resx"; DestDir: "{app}\Oxygene\VS2013\Properties"
+Source: "Oxygene\VS2013\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxygene\VS2013\Properties"
+Source: "Oxygene\VS2013\Properties\Settings.settings"; DestDir: "{app}\Oxygene\VS2013\Properties"
+Source: "Oxygene\VS2013\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\VS2013"
+Source: "Oxygene\VS2013\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\VS2013"
+
+Source: "Oxygene\VS2015\Properties\App.ico"; DestDir: "{app}\Oxygene\VS2015\Properties"
+Source: "Oxygene\VS2015\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\VS2015\Properties"
+Source: "Oxygene\VS2015\Properties\Resources.Designer.pas"; DestDir: "{app}\Oxygene\VS2015\Properties"
+Source: "Oxygene\VS2015\Properties\Resources.resx"; DestDir: "{app}\Oxygene\VS2015\Properties"
+Source: "Oxygene\VS2015\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxygene\VS2015\Properties"
+Source: "Oxygene\VS2015\Properties\Settings.settings"; DestDir: "{app}\Oxygene\VS2015\Properties"
+Source: "Oxygene\VS2015\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\VS2015"
+Source: "Oxygene\VS2015\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\VS2015"
 
 Source: Delphi\Jedi.inc; DestDir: {app}\Delphi\
 Source: Delphi\JediAPILib.inc; DestDir: {app}\Delphi\
@@ -171,11 +199,16 @@ Source: "Styles\Windows10.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
 Source: "Styles\Windows10Blue.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
 Source: "Styles\Windows10Dark.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
 Source: "Styles\YellowGraphite.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Microsoft_C++\VS14\stdafx.h"; DestDir: "{app}\Microsoft_C++\VS14"
-Source: "Microsoft_C++\VS14\targetver.h"; DestDir: "{app}\Microsoft_C++\VS14"
+
+
 Source: "CSharp\VS11\Properties\AssemblyInfo.cs"; DestDir: "{app}\CSharp\VS11\Properties"
 Source: "CSharp\VS11\GetWMI_Info.csproj"; DestDir: "{app}\CSharp\VS11"
 Source: "CSharp\VS11\GetWMI_Info.sln"; DestDir: "{app}\CSharp\VS11"
+
+Source: "CSharp\VS13\Properties\AssemblyInfo.cs"; DestDir: "{app}\CSharp\VS13\Properties"
+Source: "CSharp\VS13\GetWMI_Info.csproj"; DestDir: "{app}\CSharp\VS13"
+Source: "CSharp\VS13\GetWMI_Info.sln"; DestDir: "{app}\CSharp\VS13"
+
 Source: "CSharp\VS14\Properties\AssemblyInfo.cs"; DestDir: "{app}\CSharp\VS14\Properties"
 Source: "CSharp\VS14\GetWMI_Info.csproj"; DestDir: "{app}\CSharp\VS14"
 Source: "CSharp\VS14\GetWMI_Info.sln"; DestDir: "{app}\CSharp\VS14"
@@ -205,7 +238,9 @@ Source: "AStyle\doc\styles.css"; DestDir: "{app}\AStyle\doc"
 Source: "AStyle\doc\subversion.html"; DestDir: "{app}\AStyle\doc"
 Source: "AStyle\doc\vsinstall.html"; DestDir: "{app}\AStyle\doc"
 Source: "Templates\TemplateConsoleAppBorlandCPP.cpp"; DestDir: "{app}"; Flags: dontcopy
+
 Source: "Installer\background.bmp"; Flags: dontcopy
+Source: "Installer\VclStylesInno.dll"; DestDir: {app}; Flags: dontcopy
 
 [Setup]
 UsePreviousLanguage=no

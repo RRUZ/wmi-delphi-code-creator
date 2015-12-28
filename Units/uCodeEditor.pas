@@ -289,19 +289,22 @@ begin
 
           Lng_Oxygen:
           begin
+            LVisualStudioInfo :=  TVisualStudioInfo(LItem.Data);
             FileName := FileName + 'Program.pas';
             SynEditCode.Lines.SaveToFile(FileName);
 
-            if StartsText('Monodevelop', LItem.Caption) and
-              CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
-              FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
-              'Oxygene\Monodevelop\GetWMI_Info.oxygene', FileName) then
-            begin
-              FileName := ChangeFileExt(FileName, '.sln');
-              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
-            end
-            else
-            if (Pos('2008', LItem.Caption) > 0) and
+//            if StartsText('Monodevelop', LItem.Caption) and
+//              CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
+//              FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
+//              'Oxygene\Monodevelop\GetWMI_Info.oxygene', FileName) then
+//            begin
+//              FileName := ChangeFileExt(FileName, '.sln');
+//              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
+//            end
+//            else
+
+
+            if (LVisualStudioInfo.Version = vs2008) and
               CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
               FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
               'Oxygene\VS2008\GetWMI_Info.oxygene', FileName) then
@@ -310,7 +313,7 @@ begin
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
             end
             else
-            if (Pos('2010', LItem.Caption) > 0) and
+            if (LVisualStudioInfo.Version = vs2010) and
               CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
               FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
               'Oxygene\VS2010\GetWMI_Info.oxygene', FileName) then
@@ -319,10 +322,28 @@ begin
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
             end
             else
-            if (Pos('2012', LItem.Caption) > 0) and
+            if (LVisualStudioInfo.Version = vs2012) and
               CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
               FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
-              'Oxygene\VS2010\GetWMI_Info.oxygene', FileName) then
+              'Oxygene\VS2012\GetWMI_Info.oxygene', FileName) then
+            begin
+              FileName := ChangeFileExt(FileName, '.sln');
+              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
+            end
+            else
+            if (LVisualStudioInfo.Version = vs2013) and
+              CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
+              FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
+              'Oxygene\VS2013\GetWMI_Info.oxygene', FileName) then
+            begin
+              FileName := ChangeFileExt(FileName, '.sln');
+              ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
+            end
+            else
+            if (LVisualStudioInfo.Version = vs2015) and
+              CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
+              FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
+              'Oxygene\VS2015\GetWMI_Info.oxygene', FileName) then
             begin
               FileName := ChangeFileExt(FileName, '.sln');
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
