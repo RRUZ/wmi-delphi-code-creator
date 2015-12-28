@@ -360,8 +360,7 @@ var
   IsWow64Result:  WinApi.Windows.BOOL;
   IsWow64Process: TIsWow64Process;
 begin
-  IsWow64Process := WinApi.Windows.GetProcAddress(WinApi.Windows.GetModuleHandle('kernel32.dll'),
-    'IsWow64Process');
+  IsWow64Process := WinApi.Windows.GetProcAddress(WinApi.Windows.GetModuleHandle('kernel32.dll'), 'IsWow64Process');
   if Assigned(IsWow64Process) then
   begin
     if not IsWow64Process(WinApi.Windows.GetCurrentProcess, IsWow64Result) then

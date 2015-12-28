@@ -14,8 +14,6 @@ object FrmCodeEditor: TFrmCodeEditor
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
-  ExplicitWidth = 320
-  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
   object PanelLanguageSet: TPanel
@@ -181,8 +179,8 @@ object FrmCodeEditor: TFrmCodeEditor
         ActionBar = ActionToolBar1
       end>
     Images = ImageList1
-    Left = 352
-    Top = 120
+    Left = 376
+    Top = 112
     StyleName = 'Platform Default'
     object ActionRun: TAction
       Tag = 1

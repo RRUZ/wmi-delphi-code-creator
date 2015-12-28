@@ -37,11 +37,6 @@ function IsDelphiPrismAttachedtoMonoDevelop: boolean;
 
 function GetMonoDevelopIDEFileName: string;
 
-function IsDelphiPrismAttachedtoVS2008: boolean;
-function IsDelphiPrismAttachedtoVS2010: boolean;
-function IsDelphiPrismAttachedtoVS2012: boolean;
-
-
 procedure CompileAndRunOxygenCode(Console:TStrings;const CompilerName, ProjectFile: string;
   Run: boolean);
 
@@ -59,21 +54,6 @@ const
   //HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\RemObjects\Oxygene
   DelphiPrismx86RegEntry = '\Software\RemObjects\Oxygene';
   DelphiPrismx64RegEntry = '\Software\Wow6432Node\RemObjects\Oxygene';
-
-  DelphiPrismVS2008x64 =
-    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0\InstalledProducts\RemObjects Oxygene';
-  DelphiPrismVS2008x86 =
-    '\SOFTWARE\Microsoft\VisualStudio\9.0\InstalledProducts\RemObjects Oxygene';
-  DelphiPrismVS2010x64 =
-    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\InstalledProducts\RemObjects Oxygene';
-  DelphiPrismVS2010x86 =
-    '\SOFTWARE\Microsoft\VisualStudio\10.0\InstalledProducts\RemObjects Oxygene';
-
-  DelphiPrismVS2012x64 =
-    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\InstalledProducts\RemObjects Oxygene';
-  DelphiPrismVS2012x86 =
-    '\SOFTWARE\Microsoft\VisualStudio\11.0\InstalledProducts\RemObjects Oxygene';
-
 
   //HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Novell\MonoDevelop
   MonoDevelopx64RegEntry = '\SOFTWARE\Novell\MonoDevelop';
@@ -171,30 +151,6 @@ begin
   end;
 end;
 
-function IsDelphiPrismAttachedtoVS2008: boolean;
-begin
-  if IsWow64 then
-    Result := RegKeyExists(DelphiPrismVS2008x64, HKEY_LOCAL_MACHINE)
-  else
-    Result := RegKeyExists(DelphiPrismVS2008x86, HKEY_LOCAL_MACHINE);
-end;
-
-function IsDelphiPrismAttachedtoVS2010: boolean;
-begin
-  if IsWow64 then
-    Result := RegKeyExists(DelphiPrismVS2010x64, HKEY_LOCAL_MACHINE)
-  else
-    Result := RegKeyExists(DelphiPrismVS2010x86, HKEY_LOCAL_MACHINE);
-end;
-
-
-function IsDelphiPrismAttachedtoVS2012: boolean;
-begin
-  if IsWow64 then
-    Result := RegKeyExists(DelphiPrismVS2012x64, HKEY_LOCAL_MACHINE)
-  else
-    Result := RegKeyExists(DelphiPrismVS2012x86, HKEY_LOCAL_MACHINE);
-end;
 
 function GetDelphiPrismRegValue(const Value: string): string;
 begin
@@ -217,8 +173,7 @@ end;
 
 function GetDelphiPrismCompilerFileName: string;
 begin
-  Result := Format('%s%s', [IncludeTrailingPathDelimiter(GetDelphiPrismCompilerFolder),
-    'oxygene.exe']);
+  Result := Format('%s%s', [IncludeTrailingPathDelimiter(GetDelphiPrismCompilerFolder), 'oxygene.exe']);
 end;
 
 function IsDelphiPrismInstalled: boolean;

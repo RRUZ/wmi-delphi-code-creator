@@ -25,7 +25,7 @@ unit uDelphiIDE;
 interface
 
 Uses
-  Classes;
+  System.Classes;
 
 
 function  CreateDelphiProject(const DestPath, SourcePath: string): boolean;

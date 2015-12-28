@@ -98,6 +98,7 @@ uses
  ShellApi,
  Vcl.Styles,
  Vcl.Themes,
+ System.Generics.Collections,
  uMisc,
  uSelectCompilerVersion,
  uDotNetFrameWork,
@@ -237,11 +238,12 @@ end;
 procedure TFrmCodeEditor.ActionOpenIDEExecute(Sender: TObject);
 var
   Frm: TFrmSelCompilerVer;
-  item: TListItem;
+  LItem: TListItem;
   FileName: string;
   IdeName: string;
   TargetFile: string;
   UseVS : Boolean;
+  LVisualStudioInfo : TVisualStudioInfo;
 begin
   Frm := TFrmSelCompilerVer.Create(Self);
   try
@@ -253,10 +255,10 @@ begin
     else
     if Frm.ShowModal = mrOk then
     begin
-      item := Frm.ListViewIDEs.Selected;
-      if Assigned(item) then
+      LItem := Frm.ListViewIDEs.Selected;
+      if Assigned(LItem) then
       begin
-        IdeName := item.SubItems[0];
+        IdeName := LItem.SubItems[0];
         FileName := IncludeTrailingPathDelimiter(Settings.OutputFolder);
 
         case SourceLanguage of
@@ -290,7 +292,7 @@ begin
             FileName := FileName + 'Program.pas';
             SynEditCode.Lines.SaveToFile(FileName);
 
-            if StartsText('Monodevelop', item.Caption) and
+            if StartsText('Monodevelop', LItem.Caption) and
               CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
               FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
               'Oxygene\Monodevelop\GetWMI_Info.oxygene', FileName) then
@@ -299,7 +301,7 @@ begin
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
             end
             else
-            if (Pos('2008', item.Caption) > 0) and
+            if (Pos('2008', LItem.Caption) > 0) and
               CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
               FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
               'Oxygene\VS2008\GetWMI_Info.oxygene', FileName) then
@@ -308,7 +310,7 @@ begin
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
             end
             else
-            if (Pos('2010', item.Caption) > 0) and
+            if (Pos('2010', LItem.Caption) > 0) and
               CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
               FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
               'Oxygene\VS2010\GetWMI_Info.oxygene', FileName) then
@@ -317,7 +319,7 @@ begin
               ShellExecute(Handle, nil, PChar(Format('"%s"',[IdeName])), PChar(Format('"%s"',[FileName])), nil, SW_SHOWNORMAL);
             end
             else
-            if (Pos('2012', item.Caption) > 0) and
+            if (Pos('2012', LItem.Caption) > 0) and
               CreateOxygeneProject(ExtractFileName(FileName), ExtractFilePath(
               FileName), IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) +
               'Oxygene\VS2010\GetWMI_Info.oxygene', FileName) then
@@ -330,20 +332,27 @@ begin
 
           Lng_VSCpp:
           begin
+            LVisualStudioInfo :=  TVisualStudioInfo(LItem.Data);
             TargetFile := '';
             FileName := FileName + 'main.cpp';
             SynEditCode.Lines.SaveToFile(FileName);
-            UseVS        := Pos('Visual Studio', item.Caption)>0;
-            if UseVS and (Pos('2008', item.Caption)>0) then
+            UseVS        := Pos('Visual Studio', LItem.Caption)>0;
+            if UseVS and (LVisualStudioInfo.Version = vs2005) then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2005\GetWMI_Info.sln'
+            else
+            if UseVS and (LVisualStudioInfo.Version = vs2008) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2008\GetWMI_Info.sln'
             else
-            if UseVS and (Pos('2010', item.Caption)>0) then
+            if UseVS and (LVisualStudioInfo.Version = vs2010) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2010\GetWMI_Info.sln'
             else
-            if UseVS and (Pos('11', item.Caption)>0) then
+            if UseVS and (LVisualStudioInfo.Version = vs2012) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS11\GetWMI_Info.sln'
             else
-            if UseVS and (Pos('2015', item.Caption)>0) then
+            if UseVS and (LVisualStudioInfo.Version = vs2013) then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS13\GetWMI_Info.sln'
+            else
+            if UseVS and (LVisualStudioInfo.Version = vs2015) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS14\GetWMI_Info.sln';
 
             if UseVS  and (TargetFile<>'') then
@@ -356,19 +365,26 @@ begin
 
           Lng_CSharp:
           begin
+            LVisualStudioInfo :=  TVisualStudioInfo(LItem.Data);
             FileName := FileName + 'Program.cs';
             SynEditCode.Lines.SaveToFile(FileName);
 
-            if Pos('2008', item.Caption)>0 then
+            if (LVisualStudioInfo.Version = vs2005) then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2005\GetWMI_Info.sln'
+            else
+            if (LVisualStudioInfo.Version = vs2008) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2008\GetWMI_Info.sln'
             else
-            if Pos('2010', item.Caption)>0 then
+            if (LVisualStudioInfo.Version = vs2010) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2010\GetWMI_Info.sln'
             else
-            if Pos('11', item.Caption)>0 then
+            if (LVisualStudioInfo.Version = vs2012) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS11\GetWMI_Info.sln'
             else
-            if Pos('2015', item.Caption)>0 then
+            if (LVisualStudioInfo.Version = vs2013) then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS13\GetWMI_Info.sln'
+            else
+            if (LVisualStudioInfo.Version = vs2015) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS14\GetWMI_Info.sln';
 
 
@@ -387,30 +403,32 @@ end;
 
 procedure TFrmCodeEditor.ActionRunExecute(Sender: TObject);
 var
-  Frm: TFrmSelCompilerVer;
-  item: TListItem;
+  LFrmSelCompilerVer: TFrmSelCompilerVer;
+  LItem: TListItem;
   FileName: string;
   CompilerName: string;
   TargetFile: string;
   UseVS : Boolean;
+  LVisualStudioInfo : TVisualStudioInfo;
+
 begin
-  Frm := TFrmSelCompilerVer.Create(Self);
+  LFrmSelCompilerVer := TFrmSelCompilerVer.Create(Self);
   try
-    Frm.ShowCompiler := True;
-    Frm.LanguageSource := SourceLanguage;
-    Frm.LoadInstalledVersions;
-    if Frm.ListViewIDEs.Items.Count = 0 then
+    LFrmSelCompilerVer.ShowCompiler := True;
+    LFrmSelCompilerVer.LanguageSource := SourceLanguage;
+    LFrmSelCompilerVer.LoadInstalledVersions;
+    if LFrmSelCompilerVer.ListViewIDEs.Items.Count = 0 then
       MsgWarning(Format('Not exist a %s compiler installed in this system', [ListSourceLanguages[SourceLanguage]]))
     else
-    if Frm.ShowModal = mrOk then
+    if LFrmSelCompilerVer.ShowModal = mrOk then
     begin
-      item := Frm.ListViewIDEs.Selected;
-      if Assigned(item) then
+      LItem := LFrmSelCompilerVer.ListViewIDEs.Selected;
+      if Assigned(LItem) then
       begin
         case SourceLanguage of
           Lng_Delphi:
           begin
-            CompilerName := item.SubItems[1];
+            CompilerName := LItem.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
             FileName     := FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.dpr';
             SynEditCode.Lines.SaveToFile(FileName);
@@ -424,7 +442,7 @@ begin
 
           Lng_BorlandCpp:
           begin
-            CompilerName := item.SubItems[1];
+            CompilerName := LItem.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
             FileName     := FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.cpp';
 
@@ -436,7 +454,7 @@ begin
 
           Lng_FPC:
           begin
-            CompilerName := item.SubItems[1];
+            CompilerName := LItem.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
             FileName     :=
               FileName + 'WMITemp_' + FormatDateTime('yyyymmddhhnnsszzz', Now) + '.lpr';
@@ -453,25 +471,34 @@ begin
 
           Lng_VSCpp:
           begin
-            CompilerName := item.SubItems[1];
+            LVisualStudioInfo :=  TVisualStudioInfo(LItem.Data);
+            CompilerName := LItem.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
-            UseVS        := Pos('Visual Studio', item.Caption)>0;
+            UseVS        := Pos('Visual Studio', LItem.Caption)>0;
 
             if UseVS then
              FileName     := FileName + 'main.cpp'
             else
               FileName    := FileName + 'GetWMI_Info.cpp';
 
-            if UseVS and (Pos('2008', item.Caption)>0) then
+
+            if UseVS and (LVisualStudioInfo.Version = vs2005) then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2005\GetWMI_Info.sln'
+            else
+            if UseVS and (LVisualStudioInfo.Version = vs2008) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2008\GetWMI_Info.sln'
             else
-            if UseVS and (Pos('2010', item.Caption)>0) then
+            if UseVS and (LVisualStudioInfo.Version = vs2010) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2010\GetWMI_Info.sln'
             else
-            if UseVS and (Pos('11', item.Caption)>0) then
+            if UseVS and (LVisualStudioInfo.Version = vs2012) then
              TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS11\GetWMI_Info.sln'
             else
-            TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS2008\GetWMI_Info.sln';
+            if UseVS and (LVisualStudioInfo.Version = vs2013) then
+             TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS13\GetWMI_Info.sln'
+            else
+            if UseVS and (LVisualStudioInfo.Version = vs2015) then
+            TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Microsoft_C++\VS14\GetWMI_Info.sln';
 
             SynEditCode.Lines.SaveToFile(FileName);
 
@@ -489,8 +516,9 @@ begin
 
           Lng_CSharp:
           begin
-            UseVS        := Pos('Visual Studio', item.Caption)>0;
-            CompilerName := item.SubItems[1];
+            LVisualStudioInfo :=  TVisualStudioInfo(LItem.Data);
+            UseVS        := Pos('Visual Studio', LItem.Caption)>0;
+            CompilerName := LItem.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
 
             if UseVS then
@@ -500,19 +528,24 @@ begin
 
             SynEditCode.Lines.SaveToFile(FileName);
 
-
             if UseVS then
             begin
-              if Pos('2008', item.Caption)>0 then
+              if (LVisualStudioInfo.Version = vs2005) then
+               TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2005\GetWMI_Info.sln'
+              else
+              if (LVisualStudioInfo.Version = vs2008) then
                TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2008\GetWMI_Info.sln'
               else
-              if Pos('2010', item.Caption)>0 then
+              if (LVisualStudioInfo.Version = vs2010) then
                TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS2010\GetWMI_Info.sln'
               else
-              if Pos('11', item.Caption)>0 then
+              if (LVisualStudioInfo.Version = vs2012) then
                TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS11\GetWMI_Info.sln'
               else
-              if Pos('2015', item.Caption)>0 then
+              if (LVisualStudioInfo.Version = vs2013) then
+               TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS13\GetWMI_Info.sln'
+              else
+              if (LVisualStudioInfo.Version = vs2015) then
                TargetFile:=IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'CSharp\VS14\GetWMI_Info.sln';
 
               if CreateVsProject(ExtractFileName(FileName), ExtractFilePath(FileName), TargetFile, FileName) then
@@ -527,7 +560,7 @@ begin
 
           Lng_Oxygen:
           begin
-            CompilerName := item.SubItems[1];
+            CompilerName := LItem.SubItems[1];
             FileName     := IncludeTrailingPathDelimiter(Settings.OutputFolder);
             FileName     := FileName + 'Program.pas';
 
@@ -546,7 +579,7 @@ begin
       end;
     end;
   finally
-    Frm.Free;
+    LFrmSelCompilerVer.Free;
   end;
 end;
 procedure TFrmCodeEditor.ActionSaveExecute(Sender: TObject);

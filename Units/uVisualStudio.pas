@@ -27,35 +27,43 @@ interface
 
 
 uses
- Classes;
+ System.Generics.Collections,
+ System.Classes;
 
-function IsVS2008Installed: boolean;
-function GetVS2008IDEFileName: string;
-function GetVS2008CompilerFileName: string;
+  type
+  TVSVersion =
+    (
+    vs2005,  //8.0
+    vs2008,  //9.0
+    vs2010,  //10.0
+    vs2012,  //11.0
+    vs2013,  //12.0
+    vs2015   //14.0
+    );
 
-function IsVS2010Installed: boolean;
-function GetVS2010IDEFileName: string;
-function GetVS2010CompilerFileName: string;
 
-function IsVS11Installed: boolean;
-function GetVS11IDEFileName: string;
-function GetVS11CompilerFileName: string;
+    TVisualStudioInfo = class
+  private
+     FIDEFileName: string;
+     FCompilerFileName: string;
+     FCppCompiler: string;
+     FIDEDescription: string;
+     FVSVersion: TVSVersion;
+     FBaseRegistryKey: string;
+    public
+     property IDEFileName: string  read FIDEFileName write FIDEFileName;
+     property IDEDescription: string  read FIDEDescription write FIDEDescription;
+     property CompilerFileName : string  read FCompilerFileName write FCompilerFileName;
+     property CppCompiler : string   read FCppCompiler write FCppCompiler;
+     property Version : TVSVersion read FVSVersion  write FVSVersion;
+     property BaseRegistryKey : string  read FBaseRegistryKey write FBaseRegistryKey;
+    end;
 
+    function GetVSIDEList : TObjectList<TVisualStudioInfo>;
+    function CreateVsProject(const FileName, Path, ProjectTemplate: string; var NewFileName: string): boolean;
 
-function IsVS14Installed: boolean;
-function GetVS14IDEFileName: string;
-function GetVS14CompilerFileName: string;
-
-function CreateVsProject(const FileName, Path, ProjectTemplate: string;
-  var NewFileName: string): boolean;
-
-procedure CompileAndRunVsCode(Console:TStrings;const CompilerName, ProjectFile: string;  Run: boolean);
-procedure CompileAndRunMicrosoftCppCode(Console:TStrings;const CompilerName, ProjectFile, SwitchOpts: string;  Run: boolean);
-
-function GetMicrosoftCppCompiler2008 : string;
-function GetMicrosoftCppCompiler2010 : string;
-function GetMicrosoftCppCompiler11   : string;
-function GetMicrosoftCppCompiler14   : string;
+    procedure CompileAndRunVsCode(Console:TStrings;const CompilerName, ProjectFile: string;  Run: boolean);
+    procedure CompileAndRunMicrosoftCppCode(Console:TStrings;const CompilerName, ProjectFile, SwitchOpts: string;  Run: boolean);
 
 implementation
 
@@ -69,6 +77,55 @@ uses
   IOUtils,
   uMisc;
 
+const
+
+ VSVersionsNames: array[TVSVersion] of string = (
+    'Visual Studio 2005',
+    'Visual Studio 2008',
+    'Visual Studio 2010',
+    'Visual Studio 2012',
+    'Visual Studio 2013',
+    'Visual Studio 2015'
+    );
+
+  VSRegBasePathsx86: array[TVSVersion] of string = (
+    '\SOFTWARE\Microsoft\VisualStudio\8.0\',
+    '\SOFTWARE\Microsoft\VisualStudio\9.0\',
+    '\SOFTWARE\Microsoft\VisualStudio\10.0\',
+    '\SOFTWARE\Microsoft\VisualStudio\11.0\',
+    '\SOFTWARE\Microsoft\VisualStudio\12.0\',
+    '\SOFTWARE\Microsoft\VisualStudio\14.0\'
+    );
+
+  VSRegBasePathsx64: array[TVSVersion] of string = (
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\8.0\',
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0\',
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\',
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\',
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\',
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\'
+    );
+
+
+
+  VSRegPathsx86: array[TVSVersion] of string = (
+    '\SOFTWARE\Microsoft\VisualStudio\8.0\Setup\VS',
+    '\SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS',
+    '\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS',
+    '\SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS',
+    '\SOFTWARE\Microsoft\VisualStudio\12.0\Setup\VS',
+    '\SOFTWARE\Microsoft\VisualStudio\14.0\Setup\VS'
+    );
+
+  VSRegPathsx64: array[TVSVersion] of string = (
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\8.0\Setup\VS',
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0\Setup\VS',
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VS',
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\Setup\VS',
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\Setup\VS',
+    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\Setup\VS'
+    );
+
 
 const
   VS14x64RegEntry        = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\Setup\VS';
@@ -79,6 +136,14 @@ const
   VS2010x86RegEntry      = '\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS';
   VS2008x64RegEntry      = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0\Setup\VS';
   VS2008x86RegEntry      = '\SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS';
+
+var
+  VSIDEList : TObjectList<TVisualStudioInfo>;
+
+function GetVSIDEList : TObjectList<TVisualStudioInfo>;
+begin
+  Result := VSIDEList;
+end;
 
 function CreateVsProject(const FileName, Path, ProjectTemplate: string;
   var NewFileName: string): boolean;
@@ -160,202 +225,50 @@ begin
   end;
 end;
 
-
-function GetMicrosoftCppCompiler2008 : string;
+procedure LoadVSIDEList;
+Var
+  LVisualStudioInfo : TVisualStudioInfo;
+  LVSVersion  : TVSVersion;
+  FileName    : string;
+  LWow64, Found  : boolean;
 begin
- Result:=ExpandFileName(ExtractFilePath(GetVS2008IDEFileName)+'\..\..')+'\VC\bin\cl.exe';
-end;
-
-function GetMicrosoftCppCompiler2010 : string;
-begin
- Result:=ExpandFileName(ExtractFilePath(GetVS2010IDEFileName)+'\..\..')+'\VC\bin\cl.exe';
-end;
-
-function GetMicrosoftCppCompiler11   : string;
-begin
- Result:=ExpandFileName(ExtractFilePath(GetVS11IDEFileName)+'\..\..')+'\VC\bin\cl.exe';
-end;
-
-function GetMicrosoftCppCompiler14   : string;
-begin
- Result:=ExpandFileName(ExtractFilePath(GetVS14IDEFileName)+'\..\..')+'\VC\bin\cl.exe';
-end;
-
-
-function IsVS2008Installed: boolean;
-var
-  Value: string;
-begin
-  Result := False;
-  if IsWow64 then
+  VSIDEList.Clear;
+  LWow64 := IsWow64;
+  for LVSVersion := Low(TVSVersion) to High(TVSVersion) do
   begin
-    if RegKeyExists(VS2008x64RegEntry, HKEY_LOCAL_MACHINE) then
+   FileName := '';
+   if LWow64 then
+    Found := RegKeyExists(VSRegPathsx64[LVSVersion], HKEY_LOCAL_MACHINE)
+   else
+    Found := RegKeyExists(VSRegPathsx86[LVSVersion], HKEY_LOCAL_MACHINE);
+
+    if Found and LWow64 then
+      Found := RegReadStr(VSRegPathsx64[LVSVersion], 'EnvironmentPath', FileName, HKEY_LOCAL_MACHINE) and FileExists(FileName)
+    else
+      Found := RegReadStr(VSRegPathsx86[LVSVersion], 'EnvironmentPath', FileName, HKEY_LOCAL_MACHINE) and FileExists(FileName);
+
+    if Found then
     begin
-      RegReadStr(VS2008x64RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end
-  else
-  begin
-    if RegKeyExists(VS2008x86RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS2008x86RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
+      LVisualStudioInfo:=TVisualStudioInfo.Create;
+      LVisualStudioInfo.IDEFileName:=Filename;
+      LVisualStudioInfo.Version := LVSVersion;
+      LVisualStudioInfo.IDEDescription:=VSVersionsNames[LVSVersion];
+      if LWow64 then
+       LVisualStudioInfo.BaseRegistryKey:= VSRegBasePathsx64[LVSVersion]
+      else
+       LVisualStudioInfo.BaseRegistryKey:= VSRegBasePathsx86[LVSVersion];
+
+      LVisualStudioInfo.CompilerFileName:=ChangeFileExt(LVisualStudioInfo.IDEFileName, '.com');
+      LVisualStudioInfo.CppCompiler:=ExpandFileName(ExtractFilePath(LVisualStudioInfo.IDEFileName)+'\..\..')+'\VC\bin\cl.exe';
+      VSIDEList.Add(LVisualStudioInfo);
     end;
   end;
+
 end;
 
-function IsVS2010Installed: boolean;
-var
-  Value: string;
-begin
-  Result := False;
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS2010x64RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS2010x64RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end
-  else
-  begin
-    if RegKeyExists(VS2010x86RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS2010x86RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end;
-end;
-
-function GetVS2008IDEFileName: string;
-begin
-  Result := '';
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS2008x64RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS2008x64RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end
-  else
-  begin
-    if RegKeyExists(VS2008x86RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS2008x86RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end;
-end;
-
-function GetVS2008CompilerFileName: string;
-begin
- Result:=ChangeFileExt(GetVS2008IDEFileName,'.com');
-end;
-
-function GetVS2010IDEFileName: string;
-begin
-  Result := '';
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS2010x64RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS2010x64RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end
-  else
-  begin
-    if RegKeyExists(VS2010x86RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS2010x86RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end;
-end;
-
-function GetVS2010CompilerFileName: string;
-begin
- Result:=ChangeFileExt(GetVS2010IDEFileName,'.com');
-end;
-
-function IsVS11Installed: boolean;
-var
-  Value: string;
-begin
-  Result := False;
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS11x64RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS11x64RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end
-  else
-  begin
-    if RegKeyExists(VS11x86RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS11x86RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end;
-end;
-
-
-function GetVS11IDEFileName: string;
-begin
-  Result := '';
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS11x64RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS11x64RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end
-  else
-  begin
-    if RegKeyExists(VS11x86RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS11x86RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end;
-end;
-
-
-function GetVS11CompilerFileName: string;
-begin
- Result:=ChangeFileExt(GetVS11IDEFileName,'.com');
-end;
-
-function IsVS14Installed: boolean;
-var
-  Value: string;
-begin
-  Result := False;
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS14x64RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS14x64RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end
-  else
-  begin
-    if RegKeyExists(VS14x86RegEntry, HKEY_LOCAL_MACHINE) then
-    begin
-      RegReadStr(VS14x86RegEntry, 'EnvironmentPath', Value, HKEY_LOCAL_MACHINE);
-      Result := FileExists(Value);
-    end;
-  end;
-end;
-
-
-function GetVS14IDEFileName: string;
-begin
-  Result := '';
-  if IsWow64 then
-  begin
-    if RegKeyExists(VS14x64RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS14x64RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end
-  else
-  begin
-    if RegKeyExists(VS14x86RegEntry, HKEY_LOCAL_MACHINE) then
-      RegReadStr(VS14x86RegEntry, 'EnvironmentPath', Result, HKEY_LOCAL_MACHINE);
-  end;
-end;
-
-function GetVS14CompilerFileName: string;
-begin
- Result:=ChangeFileExt(GetVS14IDEFileName, '.com');
-end;
-
-
+initialization
+    VSIDEList := TObjectList<TVisualStudioInfo>.Create(True);
+    LoadVSIDEList;
+finalization
+    VSIDEList.Free;
 end.

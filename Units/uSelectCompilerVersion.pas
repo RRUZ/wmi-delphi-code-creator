@@ -59,6 +59,7 @@ implementation
 {$R *.dfm}
 
 uses
+  System.Generics.Collections,
   uMisc,
   uVisualStudio,
   uRegistry,
@@ -123,61 +124,28 @@ var
   ImageIndex: integer;
   RootKey: HKEY;
 
+  LVisualStudioInfo : TVisualStudioInfo;
+  LVSVersion  : TVSVersion;
+  LVSIDEList  : TObjectList<TVisualStudioInfo>;
+  i : Integer;
 
   procedure  RegisterVSIDE;
+  var
+   i : Integer;
   begin
-    if IsVS2008Installed then
+    LVSIDEList := GetVSIDEList;
+    for i:=0 to LVSIDEList.Count-1 do
     begin
-      FileName := GetVS2008IDEFileName;
       item     := ListViewIDEs.Items.Add;
-      item.Caption := 'Visual Studio 2008';
+      Filename := LVSIDEList[i].IDEFileName;
+      item.Caption := LVSIDEList[i].IDEDescription;
       item.SubItems.Add(FileName);
-      item.SubItems.Add(GetVS2008CompilerFileName);
+      item.SubItems.Add(LVSIDEList[i].CompilerFileName);
       ExtractIconFileToImageList(ImageList1, Filename);
       ImageIndex := ImageList1.Count - 1;
       item.ImageIndex := ImageIndex;
-      item.Data := Pointer(Ord(FLanguageSource));
+      item.Data := Pointer(LVSIDEList[i]);
     end;
-
-    if IsVS2010Installed then
-    begin
-      FileName := GetVS2010IDEFileName;
-      item     := ListViewIDEs.Items.Add;
-      item.Caption := 'Visual Studio 2010';
-      item.SubItems.Add(FileName);
-      item.SubItems.Add(GetVS2010CompilerFileName);
-      ExtractIconFileToImageList(ImageList1, Filename);
-      ImageIndex := ImageList1.Count - 1;
-      item.ImageIndex := ImageIndex;
-      item.Data := Pointer(Ord(FLanguageSource));
-    end;
-
-    if IsVS11Installed then
-    begin
-      FileName := GetVS11IDEFileName;
-      item     := ListViewIDEs.Items.Add;
-      item.Caption := 'Visual Studio 11';
-      item.SubItems.Add(FileName);
-      item.SubItems.Add(GetVS11CompilerFileName);
-      ExtractIconFileToImageList(ImageList1, Filename);
-      ImageIndex := ImageList1.Count - 1;
-      item.ImageIndex := ImageIndex;
-      item.Data := Pointer(Ord(FLanguageSource));
-    end;
-
-    if IsVS14Installed then
-    begin
-      FileName := GetVS14IDEFileName;
-      item     := ListViewIDEs.Items.Add;
-      item.Caption := 'Visual Studio 2015';
-      item.SubItems.Add(FileName);
-      item.SubItems.Add(GetVS14CompilerFileName);
-      ExtractIconFileToImageList(ImageList1, Filename);
-      ImageIndex := ImageList1.Count - 1;
-      item.ImageIndex := ImageIndex;
-      item.Data := Pointer(Ord(FLanguageSource));
-    end;
-
   end;
 
 begin
@@ -282,66 +250,30 @@ begin
     end;
 
     Lng_VSCpp  :
-                begin
-                  RegisterVSIDE;
+    begin
+      RegisterVSIDE;
 
-                  if ShowCompiler then
-                  begin
-                    FileName :=GetMicrosoftCppCompiler2008;
-                    if FileExists(FileName) then
-                    begin
-                      item     := ListViewIDEs.Items.Add;
-                      item.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
-                      item.SubItems.Add(FileName);
-                      item.SubItems.Add(FileName);
-                      ExtractIconFileToImageList(ImageList1, Filename);
-                      ImageIndex := ImageList1.Count - 1;
-                      item.ImageIndex := ImageIndex;
-                      item.Data := Pointer(Ord(Lng_VSCpp));
-                    end;
+      if ShowCompiler then
+      begin
+        LVSIDEList := GetVSIDEList;
+        for i:=0 to LVSIDEList.Count-1 do
+        begin
+          FileName :=LVSIDEList[i].CppCompiler;
+          if FileExists(FileName) then
+          begin
+            item     := ListViewIDEs.Items.Add;
+            item.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
+            item.SubItems.Add(FileName);
+            item.SubItems.Add(FileName);
+            ExtractIconFileToImageList(ImageList1, Filename);
+            ImageIndex := ImageList1.Count - 1;
+            item.ImageIndex := ImageIndex;
+            item.Data := Pointer(LVSIDEList[i]);
+          end;
+        end;
+      end;
 
-                    FileName :=GetMicrosoftCppCompiler2010;
-                    if FileExists(FileName) then
-                    begin
-                      item     := ListViewIDEs.Items.Add;
-                      item.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
-                      item.SubItems.Add(FileName);
-                      item.SubItems.Add(FileName);
-                      ExtractIconFileToImageList(ImageList1, Filename);
-                      ImageIndex := ImageList1.Count - 1;
-                      item.ImageIndex := ImageIndex;
-                      item.Data := Pointer(Ord(Lng_VSCpp));
-                    end;
-
-                    FileName :=GetMicrosoftCppCompiler11;
-                    if FileExists(FileName) then
-                    begin
-                      item     := ListViewIDEs.Items.Add;
-                      item.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
-                      item.SubItems.Add(FileName);
-                      item.SubItems.Add(FileName);
-                      ExtractIconFileToImageList(ImageList1, Filename);
-                      ImageIndex := ImageList1.Count - 1;
-                      item.ImageIndex := ImageIndex;
-                      item.Data := Pointer(Ord(Lng_VSCpp));
-                    end;
-
-                    FileName :=GetMicrosoftCppCompiler14;
-                    if FileExists(FileName) then
-                    begin
-                      item     := ListViewIDEs.Items.Add;
-                      item.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
-                      item.SubItems.Add(FileName);
-                      item.SubItems.Add(FileName);
-                      ExtractIconFileToImageList(ImageList1, Filename);
-                      ImageIndex := ImageList1.Count - 1;
-                      item.ImageIndex := ImageIndex;
-                      item.Data := Pointer(Ord(Lng_VSCpp));
-                    end;
-
-                  end;
-
-                end;
+    end;
 
     Lng_Oxygen:
     begin
@@ -379,50 +311,21 @@ begin
             item.Data := Pointer(Ord(Lng_Oxygen));
           end;
 
-          if IsVS2008Installed and
-            IsDelphiPrismAttachedtoVS2008 then
+
+          LVSIDEList := GetVSIDEList;
+          for i:=0 to LVSIDEList.Count-1 do
+          if RegKeyExists(LVSIDEList[i].BaseRegistryKey + 'InstalledProducts\RemObjects Oxygene', HKEY_LOCAL_MACHINE) then
           begin
-            FileName := GetVS2008IDEFileName;
+            FileName := LVSIDEList[i].IDEFileName;
             item     := ListViewIDEs.Items.Add;
-            item.Caption := 'Visual Studio 2008';
+            item.Caption := LVSIDEList[i].IDEDescription;
             item.SubItems.Add(FileName);
             item.SubItems.Add(GetDelphiPrismCompilerFileName);
             ExtractIconFileToImageList(ImageList1, Filename);
             ImageIndex := ImageList1.Count - 1;
             item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Lng_Oxygen));
+            item.Data := Pointer(LVSIDEList[i]);
           end;
-
-          if IsVS2010Installed and
-            IsDelphiPrismAttachedtoVS2010 then
-          begin
-            FileName := GetVS2010IDEFileName;
-            item     := ListViewIDEs.Items.Add;
-            item.Caption := 'Visual Studio 2010';
-            item.SubItems.Add(FileName);
-            item.SubItems.Add(GetDelphiPrismCompilerFileName);
-            ExtractIconFileToImageList(ImageList1, Filename);
-            ImageIndex := ImageList1.Count - 1;
-            item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Lng_Oxygen));
-          end;
-
-
-          if IsVS11Installed and
-            IsDelphiPrismAttachedtoVS2012 then
-          begin
-            FileName := GetVS11IDEFileName;
-            item     := ListViewIDEs.Items.Add;
-            item.Caption := 'Visual Studio 2012';
-            item.SubItems.Add(FileName);
-            item.SubItems.Add(GetDelphiPrismCompilerFileName);
-            ExtractIconFileToImageList(ImageList1, Filename);
-            ImageIndex := ImageList1.Count - 1;
-            item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Lng_Oxygen));
-          end;
-
-
         end;
 
       end;

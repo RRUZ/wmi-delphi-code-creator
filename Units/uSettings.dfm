@@ -161,10 +161,6 @@ object FrmSettings: TFrmSettings
       object TabSheet2: TTabSheet
         Caption = 'Object Pascal Code generation'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 662
-        ExplicitHeight = 0
         object Label4: TLabel
           Left = 3
           Top = 99
@@ -264,10 +260,6 @@ object FrmSettings: TFrmSettings
       object TabSheet1: TTabSheet
         BorderWidth = 8
         Caption = 'GUI Settings'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 662
-        ExplicitHeight = 0
         object PageControl2: TPageControl
           Left = 0
           Top = 0
@@ -276,13 +268,8 @@ object FrmSettings: TFrmSettings
           ActivePage = TabSheet6
           Align = alClient
           TabOrder = 0
-          ExplicitWidth = 646
           object TabSheet6: TTabSheet
             Caption = 'Themes (Vcl Styles)'
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 638
-            ExplicitHeight = 0
             object Label9: TLabel
               Left = 3
               Top = 22
@@ -305,6 +292,7 @@ object FrmSettings: TFrmSettings
               Width = 190
               Height = 21
               Style = csDropDownList
+              Sorted = True
               TabOrder = 1
               OnChange = ComboBoxVCLStyleChange
             end
@@ -453,10 +441,6 @@ object FrmSettings: TFrmSettings
           object TabSheet7: TTabSheet
             Caption = 'Syntax Highlighting'
             ImageIndex = 1
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 638
-            ExplicitHeight = 0
             object Label3: TLabel
               Left = 491
               Top = 8
@@ -576,10 +560,6 @@ object FrmSettings: TFrmSettings
       object TabSheet3: TTabSheet
         Caption = 'Wmi Methods settings '
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 662
-        ExplicitHeight = 0
         object CheckBoxShowImplMethods: TCheckBox
           Left = 3
           Top = 7
@@ -592,10 +572,6 @@ object FrmSettings: TFrmSettings
       object TabSheet8: TTabSheet
         Caption = 'Compiler Options'
         ImageIndex = 5
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 662
-        ExplicitHeight = 0
         object Label18: TLabel
           Left = 8
           Top = 16
@@ -631,10 +607,6 @@ object FrmSettings: TFrmSettings
         Caption = 'Templates'
         ImageIndex = 4
         TabVisible = False
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 662
-        ExplicitHeight = 0
         object Label15: TLabel
           Left = 11
           Top = 10
