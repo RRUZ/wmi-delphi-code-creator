@@ -58,9 +58,9 @@ Source: Themes\Vibrant Ink.theme.xml; DestDir: {app}\Themes\
 Source: Themes\wekeroad-ink.theme.xml; DestDir: {app}\Themes\
 Source: Themes\zenburn-2010.theme.xml; DestDir: {app}\Themes\
 Source: Themes\Zenburn.theme.xml; DestDir: {app}\Themes\
-Source: WDCC.exe; DestDir: {app}
-Source: Extras\MonoDevelop.ico; DestDir: {app}\Extras\
-Source: Lazarus\TemplateConsole.lpi; DestDir: {app}\Lazarus\
+Source: "WDCC.exe"; DestDir: {app}
+Source: "Extras\MonoDevelop.ico"; DestDir: {app}\Extras\
+Source: "Lazarus\TemplateConsole.lpi"; DestDir: {app}\Lazarus\
 
 
 Source: "Oxygene\MonoDevelop\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\MonoDevelop\Properties"
@@ -232,6 +232,47 @@ Source: "AStyle\doc\install.html"; DestDir: "{app}\AStyle\doc"
 Source: "AStyle\doc\license.html"; DestDir: "{app}\AStyle\doc"
 Source: "AStyle\doc\links.html"; DestDir: "{app}\AStyle\doc"
 Source: "AStyle\doc\news.html"; DestDir: "{app}\AStyle\doc"
+Source: "Templates\Template_Oxygen.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\Template_MicrosoftCpp.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\Template_FPC.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\Template_Delphi.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\Template_Csharp.cs"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\Template_BorlandCpp.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateStaticMethodInvokerOxygen.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateStaticMethodInvokerMicrosoftCPP.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateStaticMethodInvokerFPC.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateStaticMethodInvokerDelphi_TLB.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateStaticMethodInvokerDelphi_COM.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateStaticMethodInvokerDelphi.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateStaticMethodInvokerCSharp.cs"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateStaticMethodInvokerBorlandCPP.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\Templates.xml"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateNonStaticMethodInvokerOxygen.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateNonStaticMethodInvokerFPC.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateNonStaticMethodInvokerDelphi_TLB.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateNonStaticMethodInvokerDelphi_COM.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateNonStaticMethodInvokerDelphi.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateNonStaticMethodInvokerCSharp.cs"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateNonStaticMethodInvokerBorlandCPP.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateEventsOxygen.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateEventsMicrosoft.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateEventsFPC.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateEventsDelphi_COM.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateEventsDelphiLate.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateEventsDelphi.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateEventsCSharp.cs"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateEventsBorlandCpp.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppOxygen.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppMicrosoftCPP.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppFPCSingleton.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppFPC.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppDelphi_TLB.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppDelphi_COM.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppDelphiSingleton_TLB.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppDelphiSingleton.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppDelphi.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppCSharp.cs"; DestDir: "{app}\Templates\"; Flags: ignoreversion
+Source: "Templates\TemplateConsoleAppBorlandCPP.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
 Source: "AStyle\doc\notes.html"; DestDir: "{app}\AStyle\doc"
 Source: "AStyle\doc\scripts.html"; DestDir: "{app}\AStyle\doc"
 Source: "AStyle\doc\styles.css"; DestDir: "{app}\AStyle\doc"
@@ -240,7 +281,7 @@ Source: "AStyle\doc\vsinstall.html"; DestDir: "{app}\AStyle\doc"
 Source: "Templates\TemplateConsoleAppBorlandCPP.cpp"; DestDir: "{app}"; Flags: dontcopy
 
 Source: "Installer\background.bmp"; Flags: dontcopy
-Source: "Installer\VclStylesInno.dll"; DestDir: {app}; Flags: dontcopy
+Source: "Installer\VclStylesInno.dll"; DestDir: "{app}"; Flags: dontcopy
 
 [Setup]
 UsePreviousLanguage=no
@@ -426,6 +467,7 @@ Name: "{app}\AStyle\bin"
 Name: "{app}\AStyle\doc"
 Name: "{app}\Templates"
 Name: "{app}\Textures"
+Name: "{app}\Templates\"
 
 [Icons]
 Name: {group}\Wmi Delphi Code Creator; Filename: {app}\WDCC.exe; WorkingDir: {app}
