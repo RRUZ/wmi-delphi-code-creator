@@ -2,7 +2,7 @@
 //
 // Unit Vcl.Styles.Utils.Menus
 // unit for the VCL Styles Utils
-// http://code.google.com/p/vcl-styles-utils/
+// https://github.com/RRUZ/vcl-styles-utils/
 //
 // The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
 // you may not use this file except in compliance with the License. You may obtain a copy of the
@@ -14,7 +14,7 @@
 //
 //
 // Portions created by Mahdi Safsafi [SMP3]   e-mail SMP@LIVE.FR
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2014 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2015 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
@@ -23,9 +23,9 @@ unit Vcl.Styles.Utils.Menus;
 interface
 
 {$DEFINE UseVCLStyleUtilsMenu}
-//{$IF CompilerVersion >= 27}    // uncomment these lines if you want to use the VCL Styles Menus Hooks
-//{$UNDEF UseVCLStyleUtilsMenu}  // included on XE6 and XE7  (Embarcadero Version)
-//{$IFEND}                       //
+// {$IF CompilerVersion >= 27}    // uncomment these lines if you want to use the VCL Styles Menus Hooks
+// {$UNDEF UseVCLStyleUtilsMenu}  // included on XE6-XE8  (Embarcadero Version)
+// {$IFEND}                       //
 
 uses
   System.Classes,
@@ -37,7 +37,6 @@ uses
   Winapi.UxTheme,
   Vcl.Themes,
   Vcl.Graphics,
-  Vcl.Forms,
   Vcl.ImgList,
   Vcl.GraphUtil,
   Vcl.Controls,
@@ -120,6 +119,7 @@ type
 {$ENDREGION}
 
   var
+    FOffset : Integer;
     FItemsPainted: Boolean;
     FParentSubItemPainted: Boolean;
     FPreviousHotItemIndex: integer;
@@ -129,6 +129,11 @@ type
     FCount: integer;
     FMenu: HMENU;
     FVCLMenuItems: TMenuItem;
+    FNCRect : TRect;
+    FEnterWithKeyboard : Boolean;
+    FPersistentHotKeys : Boolean;
+
+    FMenuBarHook : TObject;
     function GetMenuFromHandle(AHandle: HWND): HMENU;
     function GetItemsCount: integer;
     procedure MNSELECTITEM(var Message: TMessage); message MN_SELECTITEM;
@@ -138,7 +143,8 @@ type
   protected
     procedure EraseItem(Canvas: TCanvas; const Index: integer; const ItemRect: TRect); virtual;
     procedure DoDrawItem(Canvas: TCanvas; const Index: integer);
-    procedure DrawItem(Canvas: TCanvas; const Index: integer; const ItemRect: TRect; const ItemText: String; const State: TSysPopupItemState; const Style: TSysPopupItemStyle); Virtual;
+    procedure DrawItem(Canvas: TCanvas; const Index: integer; const ItemRect: TRect; const ItemText: String; const State: TSysPopupItemState;
+      const Style: TSysPopupItemStyle); Virtual;
     procedure PaintBackground(Canvas: TCanvas); override;
     procedure WndProc(var Message: TMessage); override;
     procedure UpdateColors; override;
@@ -153,7 +159,16 @@ type
 
 implementation
 
-uses Vcl.Styles.Utils.SysControls;
+{
+  RANGE CHECKS OFF .
+  IMPLICIT_STRING_CAST_LOSS OFF .
+}
+{$R-,WARN IMPLICIT_STRING_CAST_LOSS OFF}
+
+uses
+  Vcl.Forms,
+  Vcl.Styles.Utils.SysControls,
+  Vcl.Styles.Utils.Graphics;
 
 type
   TControlClass = Class(TControl);
@@ -182,71 +197,29 @@ var
   piconinfo: TIconInfo;
   Icon: HICON;
 begin
-  Icon:=0;
+  Icon := 0;
   FillChar(Bmp, sizeof(Bitmap), Char(0));
-  if GetObject(hBmp, sizeof(Bitmap), @Bmp)>0 then
+  if GetObject(hBmp, sizeof(Bitmap), @Bmp) > 0 then
   begin
     DC := GetDC(0);
-    if DC<>0 then
-    try
-      hbmMask := CreateCompatibleBitmap(DC, Bmp.bmWidth, Bmp.bmHeight);
-      if hbmMask<>0 then
+    if DC <> 0 then
       try
-        ZeroMemory(@piconinfo, SizeOf(piconinfo));
-        piconinfo.fIcon := True;
-        piconinfo.hbmColor := hBmp;
-        piconinfo.hbmMask := hbmMask;
-        Icon := CreateIconIndirect(piconinfo);
+        hbmMask := CreateCompatibleBitmap(DC, Bmp.bmWidth, Bmp.bmHeight);
+        if hbmMask <> 0 then
+          try
+            ZeroMemory(@piconinfo, sizeof(piconinfo));
+            piconinfo.fIcon := True;
+            piconinfo.hbmColor := hBmp;
+            piconinfo.hbmMask := hbmMask;
+            Icon := CreateIconIndirect(piconinfo);
+          finally
+            DeleteObject(hbmMask);
+          end;
       finally
-         DeleteObject(hbmMask);
+        ReleaseDC(0, DC);
       end;
-    finally
-      ReleaseDC(0, DC);
-    end;
   end;
   Result := Icon;
-end;
-
-procedure RotateBitmap(Bmp: TBitmap; Rads: Single; AdjustSize: Boolean; BkColor: TColor = clNone);
-var
-  C: Single;
-  S: Single;
-  XForm: tagXFORM;
-  Tmp: TBitmap;
-begin
-  C := Cos(Rads);
-  S := Sin(Rads);
-  XForm.eM11 := C;
-  XForm.eM12 := S;
-  XForm.eM21 := -S;
-  XForm.eM22 := C;
-  Tmp := TBitmap.Create;
-  try
-    Tmp.TransparentColor := Bmp.TransparentColor;
-    Tmp.TransparentMode := Bmp.TransparentMode;
-    Tmp.Transparent := Bmp.Transparent;
-    Tmp.Canvas.Brush.Color := BkColor;
-    if AdjustSize then
-    begin
-      Tmp.Width := Round(Bmp.Width * Abs(C) + Bmp.Height * Abs(S));
-      Tmp.Height := Round(Bmp.Width * Abs(S) + Bmp.Height * Abs(C));
-      XForm.eDx := (Tmp.Width - Bmp.Width * C + Bmp.Height * S) / 2;
-      XForm.eDy := (Tmp.Height - Bmp.Width * S - Bmp.Height * C) / 2;
-    end
-    else
-    begin
-      Tmp.Width := Bmp.Width;
-      Tmp.Height := Bmp.Height;
-      XForm.eDx := (Bmp.Width - Bmp.Width * C + Bmp.Height * S) / 2;
-      XForm.eDy := (Bmp.Height - Bmp.Width * S - Bmp.Height * C) / 2;
-    end;
-    SetGraphicsMode(Tmp.Canvas.Handle, GM_ADVANCED);
-    SetWorldTransform(Tmp.Canvas.Handle, XForm);
-    BitBlt(Tmp.Canvas.Handle, 0, 0, Tmp.Width, Tmp.Height, Bmp.Canvas.Handle, 0, 0, SRCCOPY);
-    Bmp.Assign(Tmp);
-  finally
-    Tmp.Free;
-  end;
 end;
 
 function GetMenuItemPos(Menu: HMENU; ID: integer): integer;
@@ -268,6 +241,18 @@ begin
   end;
 end;
 
+function IsItemHILITE(Menu: HMENU; const ItemIndex: integer): Boolean;
+var
+  pMenuItemInfo: TMenuItemInfo;
+begin
+  Result := False;
+  FillChar(pMenuItemInfo, sizeof(pMenuItemInfo), Char(0));
+  pMenuItemInfo.cbSize := sizeof(TMenuItemInfo);
+  pMenuItemInfo.fMask := MIIM_STATE;
+  if GetMenuItemInfo(Menu, ItemIndex, True, pMenuItemInfo) then
+    Result := (pMenuItemInfo.fState and MFS_HILITE) = MFS_HILITE;
+end;
+
 { TSysPopupStyleHook }
 constructor TSysPopupStyleHook.Create(AHandle: THandle);
 begin
@@ -284,6 +269,10 @@ begin
   FItemsPainted := False;
   FSysPopupItem := nil;
   FVCLMenuItems := nil;
+  FOffset := 0;
+  FEnterWithKeyboard  := False;
+  FPersistentHotKeys  := False;
+  FMenuBarHook := nil;
   // Font := Screen.MenuFont;
 end;
 
@@ -296,21 +285,42 @@ end;
 
 procedure TSysPopupStyleHook.DoDrawItem(Canvas: TCanvas; const Index: integer);
 var
-  LItemRect: TRect;
+  LRect, LRect2, LItemRect: TRect;
   P: TPoint;
   State: TSysPopupItemState;
   Style: TSysPopupItemStyle;
   LText: String;
   SaveIndex: integer;
-  Item: TSysPopupItem;
+  LSysPopupItem: TSysPopupItem;
 begin
   if (Index < 0) or (Index > Count - 1) then
     Exit;
-  Item := Items[Index];
-  LItemRect := Item.ItemRect;
+
+  LSysPopupItem := Items[Index];
+  LItemRect := LSysPopupItem.ItemRect;
   P := Point(LItemRect.Left, LItemRect.Top);
   ScreenToClient(Handle, P);
+
+ GetMenuItemRect(0, FMenu, Index, LRect);
+ //OutputDebugString(PChar(Format('Index %d  Width %d Height %d Left %d Top %d', [Index, LRect.Width, LRect.Height, LRect.Left, LRect.Top])));
+
+ if SysControl.ClientRect.Height>LRect.Height then
+ begin
+   //GetWindowRect(SysControl.Handle, LRect2);
+   LRect2:= SysControl.ClientRect;
+   LRect2.Height:=  LRect2.Height - LRect.Height;
+ end
+ else
+   LRect2:= SysControl.ClientRect;
+
+  //prevent draw  not visible items on larger menus
+  if not PtInRect (LRect2, P) then
+   Exit;
+
+
   LItemRect := Rect(P.X, P.Y, P.X + LItemRect.Width, P.Y + LItemRect.Height);
+
+
   if LItemRect.Left < 2 then
     LItemRect.Left := 2;
   inc(LItemRect.Right, 4);
@@ -320,22 +330,22 @@ begin
   State := [];
   if index <> FPreviousHotItemIndex then
     Include(State, isHot);
-  if Item.Disabled then
+  if LSysPopupItem.Disabled then
     Include(State, isDisabled);
-  if Item.Checked then
+  if LSysPopupItem.Checked then
     Include(State, isChecked);
-  if Item.DefaultItem then
+  if LSysPopupItem.DefaultItem then
     Include(State, isDefault);
   { Item Style }
   Style := isNormal;
-  if Item.Separator then
+  if LSysPopupItem.Separator then
     Style := isSep;
-  if Item.HasSubMenu then
+  if LSysPopupItem.HasSubMenu then
     Style := isDropDown;
 
   LText := '';
   if Style <> isSep then
-    LText := Item.Text;
+    LText := LSysPopupItem.Text;
 
   SaveIndex := SaveDC(Canvas.Handle);
   try
@@ -352,39 +362,20 @@ begin
   end;
 end;
 
-procedure TSysPopupStyleHook.DrawItem(Canvas: TCanvas; const Index: integer; const ItemRect: TRect; const ItemText: String; const State: TSysPopupItemState; const Style: TSysPopupItemStyle);
+procedure TSysPopupStyleHook.DrawItem(Canvas: TCanvas; const Index: integer; const ItemRect: TRect; const ItemText: String; const State: TSysPopupItemState;
+  const Style: TSysPopupItemStyle);
 var
-  Detail: TThemedMenu;
-  LDetails: TThemedElementDetails;
-  LTextFormat: TTextFormat;
-  DC: HDC;
-  LSize: TSize;
-  LMenuItem: TMenuItem;
-  LOwnerDrawState : TOwnerDrawState;
-  p, ImageIndex: integer;
-  LImageRect, R: TRect;
-  LImageWidth: integer;
   LTextRect: TRect;
-  hBmp: HBITMAP;
-  BmpHeight, BmpWidth: integer;
-  Icon: HICON;
-  DisplayCheckedGlyph: Boolean;
-  Sign: Char;
-  SysItem: TSysPopupItem;
-  sShortCut: String;
-  Bmp: TBitmap;
-  LParentMenu : TMenu;
-
+  DC: HDC;
 
   procedure DrawSubMenu(const ItemRect: TRect);
   var
-    Bmp: TBitmap;
+    LBitmap: TBitmap;
     LSubMenuDetails: TThemedElementDetails;
     LSubMenuDetail: TThemedMenu;
     SubMenuSize: TSize;
     LSubMenuRect: TRect;
   begin
-
     LSubMenuRect := Rect(0, 0, 0, 0);
     LSubMenuDetail := tmPopupSubMenuNormal;
     if isDisabled in State then
@@ -395,23 +386,24 @@ var
       LSubMenuRect := Rect(ItemRect.Right - SubMenuSize.cx, ItemRect.Top, ItemRect.Right, ItemRect.Top + SubMenuSize.cy)
     else
       LSubMenuRect := Rect(ItemRect.Left + 4, ItemRect.Top, ItemRect.Left + 4 + SubMenuSize.Width, ItemRect.Bottom);
-    Bmp := TBitmap.Create;
+    LBitmap := TBitmap.Create;
     try
-      Bmp.SetSize(SubMenuSize.Width, SubMenuSize.Height);
-      Bmp.Canvas.Brush.Color := clFuchsia;
-      Bmp.Canvas.FillRect(Rect(0, 0, SubMenuSize.Width, SubMenuSize.Height));
-      StyleServices.DrawElement(Bmp.Canvas.Handle, LSubMenuDetails, Rect(0, 0, SubMenuSize.Width, SubMenuSize.Height));
+      LBitmap.SetSize(SubMenuSize.Width, SubMenuSize.Height);
+      LBitmap.Canvas.Brush.Color := clFuchsia;
+      LBitmap.Canvas.FillRect(Rect(0, 0, SubMenuSize.Width, SubMenuSize.Height));
+      StyleServices.DrawElement(LBitmap.Canvas.Handle, LSubMenuDetails, Rect(0, 0, SubMenuSize.Width, SubMenuSize.Height));
       if RightToLeft then
       begin
-        RotateBitmap(Bmp, DegToRad(180), False, clFuchsia);
-        inc(LSubMenuRect.Top, (Bmp.Height div 2) - 2);
+        RotateBitmap(LBitmap, DegToRad(180), False, clFuchsia);
+        inc(LSubMenuRect.Top, (LBitmap.Height div 2) - 2);
       End
       else
         Dec(LSubMenuRect.Left, 4);
 
-      TransparentBlt(DC, LSubMenuRect.Left, LSubMenuRect.Top, SubMenuSize.Width, SubMenuSize.Height, Bmp.Canvas.Handle, 0, 0, SubMenuSize.Width, SubMenuSize.Height, clFuchsia);
+      TransparentBlt(DC, LSubMenuRect.Left, LSubMenuRect.Top, SubMenuSize.Width, SubMenuSize.Height, LBitmap.Canvas.Handle, 0, 0, SubMenuSize.Width,
+        SubMenuSize.Height, clFuchsia);
     finally
-      Bmp.Free;
+      LBitmap.Free;
     end;
     Dec(LTextRect.Right, LSubMenuRect.Width);
   end;
@@ -443,117 +435,156 @@ var
     LogFont.lfFaceName := 'Marlett';
 
     if Disabled then
-      oldColor := StyleServices.GetStyleFontColor(sfPopupMenuItemTextDisabled)
+      oldColor := ColorToRGB(StyleServices.GetStyleFontColor(sfPopupMenuItemTextDisabled))
     else
     begin
-      oldColor := StyleServices.GetStyleFontColor(sfPopupMenuItemTextNormal);
+      oldColor := ColorToRGB(StyleServices.GetStyleFontColor(sfPopupMenuItemTextNormal));
       if isHot in State then
-        oldColor := StyleServices.GetStyleFontColor(sfPopupMenuItemTextHot);
+        oldColor := ColorToRGB(StyleServices.GetStyleFontColor(sfPopupMenuItemTextHot));
       if isDisabled in State then
-        oldColor := StyleServices.GetStyleFontColor(sfPopupMenuItemTextDisabled);
+        oldColor := ColorToRGB(StyleServices.GetStyleFontColor(sfPopupMenuItemTextDisabled));
     end;
 
     AFont := CreateFontIndirect(LogFont);
-    if AFont<>0 then
-    try
-      oldColor := SetTextColor(DC, oldColor);
-      pOldFont := SelectObject(DC, AFont);
+    if AFont <> 0 then
       try
-        OldMode := SetBkMode(DC, Transparent);
-        Winapi.Windows.DrawText(DC, Sign, 1, DestRect, DT_LEFT or DT_SINGLELINE);
-        SetBkMode(DC, OldMode);
-        SelectObject(DC, oldColor);
+        oldColor := SetTextColor(DC, oldColor);
+        pOldFont := SelectObject(DC, AFont);
+        try
+          OldMode := SetBkMode(DC, Transparent);
+          Winapi.Windows.DrawText(DC, Sign, 1, DestRect, DT_LEFT or DT_SINGLELINE);
+          SetBkMode(DC, OldMode);
+          SelectObject(DC, oldColor);
+        finally
+          if pOldFont <> 0 then
+            SelectObject(DC, pOldFont);
+        end;
       finally
-       if pOldFont<>0 then
-         SelectObject(DC, pOldFont);
+        DeleteObject(AFont);
       end;
-    finally
-      DeleteObject(AFont);
-    end;
   end;
+
+var
+  LThemedMenu: TThemedMenu;
+  LDetails: TThemedElementDetails;
+  LTextFormat: TTextFormat;
+  LSize: TSize;
+  LMenuItem: TMenuItem;
+  LOwnerDrawState: TOwnerDrawState;
+  P, LImageWidth, ImageIndex: integer;
+  LImageRect, R: TRect;
+  hBmp: HBITMAP;
+  BmpHeight, BmpWidth: integer;
+  Icon: HICON;
+  DisplayCheckedGlyph: Boolean;
+  Sign: Char;
+  LSysPopupItem: TSysPopupItem;
+  sShortCut: String;
+  LBitmap: TBitmap;
+  LParentMenu: TMenu;
+  s : String;
+
 
 begin
   DisplayCheckedGlyph := True;
   LTextRect := ItemRect;
   { Fast access . }
-  SysItem := Items[Index]; // Do not destroy !!
+  LSysPopupItem := Items[Index]; // Do not destroy !!
   DC := Canvas.Handle;
   R := ItemRect;
-  Detail := tmPopupItemNormal;
+  LThemedMenu := tmPopupItemNormal;
   if isHot in State then
-    Detail := tmPopupItemHot;
+    LThemedMenu := tmPopupItemHot;
   if isDisabled in State then
-    Detail := tmPopupItemDisabled;
+    LThemedMenu := tmPopupItemDisabled;
   if Style = isSep then
   begin
-    Detail := tmPopupSeparator;
+    LThemedMenu := tmPopupSeparator;
     inc(R.Left, 25);
   end;
 
-  LDetails := StyleServices.GetElementDetails(Detail);
+  LDetails := StyleServices.GetElementDetails(LThemedMenu);
 
-  if (Detail <> tmPopupItemNormal) and (Detail <> tmPopupItemDisabled) then
+  if (isHot in State) and (LThemedMenu = tmPopupItemDisabled) then
+  begin
+    LDetails := StyleServices.GetElementDetails(tmPopupItemHot);
+    LBitmap := TBitmap.Create;
+    LBitmap.SetSize(R.Width, R.Height);
+    LBitmap.PixelFormat := pf32bit;
+    try
+      Bitmap32_SetAlphaAndColor(LBitmap, 0, 0);
+      StyleServices.DrawElement(LBitmap.Canvas.Handle, LDetails, Rect(0, 0, R.Width, R.Height));
+      _Darkness32(LBitmap, 30);
+      BitBlt(DC, R.Left, R.Top, R.Width, R.Height, LBitmap.Canvas.Handle, 0, 0, SRCCOPY);
+    finally
+      LBitmap.Free;
+    end;
+  end
+  else
+  if (LThemedMenu <> tmPopupItemNormal) and (LThemedMenu <> tmPopupItemDisabled) then
     StyleServices.DrawElement(DC, LDetails, R);
 
   if Style = isDropDown then
     DrawSubMenu(ItemRect);
 
   LImageWidth := 0;
-  LMenuItem := SysItem.VCLMenuItems;
+  LMenuItem := LSysPopupItem.VCLMenuItems;
   if LMenuItem <> nil then
-    LMenuItem := SysItem.VCLItem;
+    LMenuItem := LSysPopupItem.VCLItem;
 
-  LParentMenu:=nil;
+  LParentMenu := nil;
   if (LMenuItem <> nil) then
-    LParentMenu:=LMenuItem.GetParentMenu;
-  if (LParentMenu<>nil) and (LParentMenu.OwnerDraw) and (@LMenuItem.OnDrawItem<>nil) then
+    LParentMenu := LMenuItem.GetParentMenu;
+  if (LParentMenu <> nil) and (LParentMenu.OwnerDraw) and (@LMenuItem.OnDrawItem <> nil) then
   begin
     LMenuItem.OnDrawItem(LMenuItem, Canvas, ItemRect, (isHot in State));
-    exit;
+    Exit;
   end;
 
-  if (LParentMenu<>nil) and (LParentMenu.OwnerDraw) and (LMenuItem <> nil) and (@LMenuItem.OnAdvancedDrawItem<>nil) then
+
+  if (LParentMenu <> nil) and (LParentMenu.OwnerDraw) and (LMenuItem <> nil) and (@LMenuItem.OnAdvancedDrawItem <> nil) then
   begin
     LOwnerDrawState := [];
 
     if isHot in State then
-      Include(LOwnerDrawState , odSelected);
+      Include(LOwnerDrawState, odSelected);
     if isDisabled in State then
-     Include(LOwnerDrawState , odDisabled);
+      Include(LOwnerDrawState, odDisabled);
     if isChecked in State then
-     Include(LOwnerDrawState , odChecked);
+      Include(LOwnerDrawState, odChecked);
     if isDefault in State then
-     Include(LOwnerDrawState , odDefault);
+      Include(LOwnerDrawState, odDefault);
 
     LMenuItem.OnAdvancedDrawItem(LMenuItem, Canvas, ItemRect, LOwnerDrawState);
-    exit;
+    Exit;
   end;
 
   if LMenuItem <> nil then
   begin
     { Draw Vcl PopupMenu Bitmap }
     ImageIndex := LMenuItem.ImageIndex;
-    with LMenuItem.GetParentMenu do
-    begin
+
       if (ImageIndex < 0) and (LMenuItem.Bitmap <> nil) then
       begin
-        Bmp := LMenuItem.Bitmap;
-        if (Bmp.Width = 16) and (Bmp.Height = 16) then
+        LBitmap := LMenuItem.Bitmap;
+        if (LBitmap.Width = 16) and (LBitmap.Height = 16) then
         begin
-          LImageWidth := Bmp.Width;
-          LImageRect := Rect(0, 0, Bmp.Width, Bmp.Height);
+          LImageWidth := LBitmap.Width;
+          LImageRect := Rect(0, 0, LBitmap.Width, LBitmap.Height);
           RectVCenter(LImageRect, ItemRect);
+
           if not RightToLeft then
             OffsetRect(LImageRect, 4, 0)
           else
           begin
-            LImageRect.Left := ItemRect.Right - Bmp.Width - 4;
+            LImageRect.Left := ItemRect.Right - LBitmap.Width - 4;
             LImageRect.Right := ItemRect.Right;
           end;
 
-          Canvas.Draw(LImageRect.Left, LImageRect.Top, Bmp)
+          Canvas.Draw(LImageRect.Left, LImageRect.Top, LBitmap)
         end
         else
+        if (LBitmap.Width > 0) and (LBitmap.Height > 0) then
         begin
           LImageWidth := 16;
           LImageRect := Rect(0, 0, 16, 16);
@@ -566,41 +597,94 @@ begin
             LImageRect.Right := ItemRect.Right;
           end;
 
-          Canvas.StretchDraw(LImageRect, Bmp);
+          if (LSysPopupItem.Checked) and (not LSysPopupItem.RadioCheck)  then
+          begin
+           R:=LImageRect;
+           InflateRect(R, 2, 2);
+           Canvas.Brush.Style:=bsClear;
+           Canvas.Pen.Color  :=StyleServices.GetSystemColor(clHotLight);
+           Canvas.Rectangle(R);
+          end;
+
+          Canvas.StretchDraw(LImageRect, LBitmap);
         end;
 
       end
-      else if (LMenuItem.GetParentMenu.Images <> nil) and (ImageIndex > -1) then
+      else
+      if (LParentMenu.Images <> nil) and (ImageIndex > -1) then
       begin
-        LImageWidth := Images.Width;
+        LImageWidth := LParentMenu.Images.Width;
         DisplayCheckedGlyph := False;
-        LImageRect := Rect(0, 0, Images.Width, Images.Height);
+        LImageRect := Rect(0, 0, LParentMenu.Images.Width, LParentMenu.Images.Height);
         RectVCenter(LImageRect, ItemRect);
+
         if not RightToLeft then
           OffsetRect(LImageRect, 4, 0)
         else
         begin
-          LImageRect.Left := ItemRect.Right - Images.Width - 4;
+          LImageRect.Left := ItemRect.Right - LParentMenu.Images.Width - 4;
           LImageRect.Right := ItemRect.Right;
         end;
-        Images.Draw(Canvas, LImageRect.Left, LImageRect.Top, ImageIndex);
+
+        if (LSysPopupItem.Checked) and (not LSysPopupItem.RadioCheck)  then
+        begin
+         R:=LImageRect;
+         InflateRect(R, 2, 2);
+         Canvas.Brush.Style:=bsClear;
+         Canvas.Pen.Color  :=StyleServices.GetSystemColor(clHotLight);
+         Canvas.Rectangle(R);
+        end;
+
+        LParentMenu.Images.Draw(Canvas, LImageRect.Left, LImageRect.Top, ImageIndex);
+      end
+      else
+      if (LMenuItem.Parent<>nil) and (LMenuItem.Parent.SubMenuImages <> nil) and (ImageIndex > -1) then
+      begin
+        LImageWidth := LMenuItem.Parent.SubMenuImages.Width;
+        DisplayCheckedGlyph := False;
+        LImageRect := Rect(0, 0, LMenuItem.Parent.SubMenuImages.Width, LMenuItem.Parent.SubMenuImages.Height);
+        RectVCenter(LImageRect, ItemRect);
+
+        if not RightToLeft then
+          OffsetRect(LImageRect, 4, 0)
+        else
+        begin
+          LImageRect.Left := ItemRect.Right - LMenuItem.Parent.SubMenuImages.Width - 4;
+          LImageRect.Right := ItemRect.Right;
+        end;
+
+        if (LSysPopupItem.Checked) and (not LSysPopupItem.RadioCheck)  then
+        begin
+         R:=LImageRect;
+         InflateRect(R, 2, 2);
+         Canvas.Brush.Style:=bsClear;
+         Canvas.Pen.Color  :=StyleServices.GetSystemColor(clHotLight);
+         Canvas.Rectangle(R);
+        end;
+
+        LMenuItem.Parent.SubMenuImages.Draw(Canvas, LImageRect.Left, LImageRect.Top, ImageIndex);
       end;
-    end;
+
   end
-  else if SysItem.Bitmap > 0 then
+  else if LSysPopupItem.Bitmap > 0 then
   begin
-    hBmp := SysItem.Bitmap;
+    hBmp := LSysPopupItem.Bitmap;
     if hBmp < HBMMENU_POPUP_MINIMIZE + 1 then
     begin
       { Draw System PopupMenu Bitmap }
       DisplayCheckedGlyph := False;
 
       case hBmp of
-        HBMMENU_POPUP_RESTORE: Sign := MARLETT_RESTORE_CHAR;
-        HBMMENU_POPUP_MINIMIZE, HBMMENU_MBAR_MINIMIZE_D: Sign := MARLETT_MINIMIZE_CHAR;
-        HBMMENU_POPUP_MAXIMIZE: Sign := MARLETT_MAXIMIZE_CHAR;
-        HBMMENU_POPUP_CLOSE, HBMMENU_MBAR_CLOSE_D: Sign := MARLETT_CLOSE_CHAR;
-      else Sign := Char(0);
+        HBMMENU_POPUP_RESTORE:
+          Sign := MARLETT_RESTORE_CHAR;
+        HBMMENU_POPUP_MINIMIZE, HBMMENU_MBAR_MINIMIZE_D:
+          Sign := MARLETT_MINIMIZE_CHAR;
+        HBMMENU_POPUP_MAXIMIZE:
+          Sign := MARLETT_MAXIMIZE_CHAR;
+        HBMMENU_POPUP_CLOSE, HBMMENU_MBAR_CLOSE_D:
+          Sign := MARLETT_CLOSE_CHAR;
+      else
+        Sign := Char(0);
       end;
       if Sign <> #0 then
       begin
@@ -634,9 +718,20 @@ begin
           LImageRect.Left := ItemRect.Right - BmpWidth - 4;
           LImageRect.Right := ItemRect.Right;
         end;
+
         Icon := BmpToIcon(hBmp);
-        if Icon<>0 then
+        if Icon <> 0 then
         begin
+
+          if (LSysPopupItem.Checked) and (not LSysPopupItem.RadioCheck)  then
+          begin
+           R:=LImageRect;
+           InflateRect(R, 2, 2);
+           Canvas.Brush.Style:=bsClear;
+           Canvas.Pen.Color  :=StyleServices.GetSystemColor(clHotLight);
+           Canvas.Rectangle(R);
+          end;
+
           DrawIconEX(DC, LImageRect.Left, LImageRect.Top, Icon, BmpWidth, BmpHeight, 0, 0, DI_NORMAL);
           DeleteObject(Icon);
         end;
@@ -644,33 +739,44 @@ begin
     end;
   end;
 
-  if (SysItem.Checked) and (DisplayCheckedGlyph) then
+  if (LSysPopupItem.Checked)  then
   begin
-    Detail := TThemedMenu(integer(tmPopupCheckNormal) + integer(SysItem.Disabled));
-    if SysItem.RadioCheck then
-      Detail := TThemedMenu(integer(tmPopupBulletNormal) + integer(SysItem.Disabled));
-    LDetails := StyleServices.GetElementDetails(Detail);
+    LThemedMenu := TThemedMenu(integer(tmPopupCheckNormal) + integer(LSysPopupItem.Disabled));
+    if LSysPopupItem.RadioCheck then
+      LThemedMenu := TThemedMenu(integer(tmPopupBulletNormal) + integer(LSysPopupItem.Disabled));
+    LDetails := StyleServices.GetElementDetails(LThemedMenu);
     StyleServices.GetElementSize(DC, LDetails, esActual, LSize);
     LImageRect := Rect(0, 0, LSize.Width, LSize.Height);
+
     RectVCenter(LImageRect, ItemRect);
-    if not RightToLeft then
-      OffsetRect(LImageRect, 4, 0)
-    else
+    if DisplayCheckedGlyph then
     begin
-      LImageRect.Left := ItemRect.Right - LSize.Width - 4;
-      LImageRect.Right := ItemRect.Right;
+      if not RightToLeft then
+        OffsetRect(LImageRect, 4, 0)
+      else
+      begin
+        LImageRect.Left := ItemRect.Right - LSize.Width - 4;
+        LImageRect.Right := ItemRect.Right;
+      end;
+      StyleServices.DrawElement(DC, LDetails, LImageRect);
     end;
-    StyleServices.DrawElement(DC, LDetails, LImageRect);
   end;
 
   { Draw Text }
   LTextFormat := [tfLeft, tfVerticalCenter, tfSingleLine, tfExpandTabs, tfHidePrefix];
+
+//  if (LMenuItem.Parent<>nil) then
+//   OutputDebugString(PChar(Format('LMenuItem.Parent %s IsItemHILITE %s', [LMenuItem.Parent.Caption, BoolToStr(IsItemHILITE(LMenuItem.Parent.Handle, LMenuItem.Parent.MenuIndex), True)])));
+
+//  if FEnterWithKeyboard then
+//    Exclude(LTextFormat, tfHidePrefix);
+
   if not RightToLeft then
-    inc(LTextRect.Left, 30)
+    inc(LTextRect.Left, 28)
   else
   begin
-    LTextRect.Left := ItemRect.Left;
-    LTextRect.Right := ItemRect.Right - 30;
+    LTextRect.Left  := ItemRect.Left;
+    LTextRect.Right := ItemRect.Right - 28;
     Exclude(LTextFormat, tfLeft);
     Include(LTextFormat, tfRtlReading);
     Include(LTextFormat, tfRight);
@@ -679,7 +785,7 @@ begin
   if LImageWidth > 0 then
   begin
     if not RightToLeft then
-      LTextRect.Left := ItemRect.Left + LImageWidth + 4 + 4
+      LTextRect.Left := ItemRect.Left + LImageWidth + 8 + 4
     else
     begin
       LTextRect.Left := ItemRect.Left;
@@ -693,20 +799,20 @@ begin
   if isDisabled in State then
     LDetails := StyleServices.GetElementDetails(tmPopupItemDisabled);
 
-  if SysItem.DefaultItem then
+  if LSysPopupItem.DefaultItem then
     Canvas.Font.Style := [fsBold];
 
   if LMenuItem <> nil then
     DrawText(Canvas.Handle, LDetails, ItemText, LTextRect, LTextFormat)
   else
   begin
-    sShortCut:='';
-    //http://msdn.microsoft.com/en-us/library/ms647553%28v=VS.85%29.aspx#_win32_Menu_Shortcut_Keys
-    p:=Pos(#9, ItemText);
-    if p>1 then
+    sShortCut := '';
+    // http://msdn.microsoft.com/en-us/library/ms647553%28v=VS.85%29.aspx#_win32_Menu_Shortcut_Keys
+    P := Pos(#9, ItemText);
+    if P > 1 then
     begin
-      sShortCut:=Copy(ItemText, p+1, length(ItemText)-p);
-      DrawText(Canvas.Handle, LDetails, Copy(ItemText, 1, p), LTextRect, LTextFormat)
+      sShortCut := Copy(ItemText, P + 1, length(ItemText) - P);
+      DrawText(Canvas.Handle, LDetails, Copy(ItemText, 1, P), LTextRect, LTextFormat)
     end
     else
       DrawText(Canvas.Handle, LDetails, ItemText, LTextRect, LTextFormat)
@@ -732,8 +838,7 @@ begin
       DrawText(Canvas.Handle, LDetails, sShortCut, LTextRect, LTextFormat);
     end;
   end
-  else
-  if sShortCut<>'' then
+  else if sShortCut <> '' then
   begin
     LTextRect := ItemRect;
     if RightToLeft then
@@ -752,15 +857,15 @@ end;
 
 procedure TSysPopupStyleHook.EraseItem(Canvas: TCanvas; const Index: integer; const ItemRect: TRect);
 var
-  Bmp: TBitmap;
+  LBitmap: TBitmap;
 begin
-  Bmp := TBitmap.Create;
+  LBitmap := TBitmap.Create;
   try
-    Bmp.SetSize(SysControl.Width, SysControl.Height);
-    PaintBackground(Bmp.Canvas);
-    BitBlt(Canvas.Handle, ItemRect.Left, ItemRect.Top, ItemRect.Width, ItemRect.Height, Bmp.Canvas.Handle, ItemRect.Left, ItemRect.Top, SRCCOPY);
+    LBitmap.SetSize(SysControl.Width, SysControl.Height);
+    PaintBackground(LBitmap.Canvas);
+    BitBlt(Canvas.Handle, ItemRect.Left, ItemRect.Top, ItemRect.Width, ItemRect.Height, LBitmap.Canvas.Handle, ItemRect.Left, ItemRect.Top, SRCCOPY);
   finally
-    Bmp.Free;
+    LBitmap.Free;
   end;
 end;
 
@@ -771,14 +876,14 @@ end;
 
 function TSysPopupStyleHook.GetMenuFromHandle(AHandle: HWND): HMENU;
 begin
-  Result := SendMessage(AHandle, MN_GETHMENU, 0, 0);
+  Result := HMENU(SendMessage(AHandle, MN_GETHMENU, 0, 0));
 end;
 
 function TSysPopupStyleHook.GetRightToLeft: Boolean;
 var
   pMenuItemInfo: TMenuItemInfo;
 begin
-  Result:=False;
+  Result := False;
   FillChar(pMenuItemInfo, sizeof(pMenuItemInfo), Char(0));
   pMenuItemInfo.cbSize := sizeof(TMenuItemInfo);
   pMenuItemInfo.fMask := MIIM_TYPE;
@@ -799,11 +904,8 @@ begin
 end;
 
 procedure TSysPopupStyleHook.PaintBackground(Canvas: TCanvas);
-var
-  LDetails: TThemedElementDetails;
 begin
-  LDetails := StyleServices.GetElementDetails(tmPopupBorders);
-  StyleServices.DrawElement(Canvas.Handle, LDetails, SysControl.ClientRect);
+  StyleServices.DrawElement(Canvas.Handle, StyleServices.GetElementDetails(tmPopupBorders), SysControl.ClientRect);
 end;
 
 procedure TSysPopupStyleHook.UpdateColors;
@@ -811,7 +913,6 @@ begin
   inherited;
   Font := Screen.MenuFont;
 end;
-{$WARN IMPLICIT_STRING_CAST_LOSS OFF}
 
 type
   TSubMenuItemInfo = record
@@ -821,7 +922,7 @@ type
   end;
 
 var
-  SubMenuItemInfoArray : array of TSubMenuItemInfo;
+  SubMenuItemInfoArray: array of TSubMenuItemInfo;
 
 procedure TSysPopupStyleHook.MNSELECTITEM(var Message: TMessage);
 var
@@ -837,13 +938,13 @@ begin
   { The undocumented MN_SELECTITEM Message:
     This is the most importants message ,
     Windows sends this message every time when the user
-    select an item (not clicking,only select) ...
+    select an item (not clicking, only select) ...
     wParam=Current Item Index .
     lparam= may be it's unused (not sure).
   }
-//
+  //
   Handled := False;
-  DC:=0;
+  DC := 0;
   Canvas := TCanvas.Create;
   try
     ParentPopup := 0;
@@ -851,6 +952,9 @@ begin
     DC := GetDC(Handle);
     Canvas.Handle := DC;
     Index := integer(Message.WParam);
+
+    //OutputDebugString(PChar(Format('MNSELECTITEM Index %d', [Index])));
+
     if Assigned(Font) then
       Canvas.Font := Font;
     { Out of index . }
@@ -879,7 +983,7 @@ begin
       Exit;
     end;
 
-    L := Length(SubMenuItemInfoArray);
+    L := length(SubMenuItemInfoArray);
     if L <> 0 then
     begin
       for i := 0 to L - 1 do
@@ -911,22 +1015,22 @@ begin
         FParentSubItemPainted := True;
       end;
       { Don't Redraw the parent of the Current PopupMenu }
-      //SetRedraw(ParentPopup, False);  //issue #81
+      // SetRedraw(ParentPopup, False);  //issue #81
     end;
 
     { if Item can drop a sub Popup Menu }
     if Items[Index].HasSubMenu then
     begin
-      L := Length(SubMenuItemInfoArray);
+      L := length(SubMenuItemInfoArray);
       if L = 0 then
       begin
         SetLength(SubMenuItemInfoArray, 1);
         SubMenuItemInfoArray[0].Menu := 0;
-        L:=1;
+        L := 1;
       end;
 
       LMenu := GetMenuFromHandle(Handle);
-      for i := 0 to L-1 do
+      for i := 0 to L - 1 do
         { Avoid duplication }
         if SubMenuItemInfoArray[i].Menu <> LMenu then
         begin
@@ -961,8 +1065,8 @@ begin
   finally
     Canvas.Handle := 0;
     Canvas.Free;
-    if DC<>0 then
-     ReleaseDC(Handle, DC);
+    if DC <> 0 then
+      ReleaseDC(Handle, DC);
   end;
   Handled := True;
 end;
@@ -973,7 +1077,6 @@ var
   i: integer;
   Canvas: TCanvas;
 begin
-
   FMenu := GetMenuFromHandle(Handle);
   FCount := GetItemsCount;
 
@@ -987,15 +1090,26 @@ begin
     Canvas.Handle := DC;
     PaintBackground(Canvas);
   finally
-    Canvas.Handle:=0;
+    Canvas.Handle := 0;
     Canvas.Free;
     if DC <> HDC(Message.WParam) then
       ReleaseDC(Handle, DC);
   end;
 
+  FEnterWithKeyboard := (GetKeyState(VK_MENU) < 0);
+
   if Count > -1 then
   begin
-    for i := 0 to Count - 1 do
+    //exit;
+    //FCount:=48;
+
+//    for i := 0 to Count - 1 do
+//    begin
+//     GetMenuItemRect(0, FMenu, i, LRect);
+//     OutputDebugString(PChar(Format('Index %d  Width %d Height %d Left %d Top %d', [i, LRect.Width, LRect.Height, LRect.Left, LRect.Top])));
+//    end;
+
+    for i := 0 + FOffset to Count - 1 do
       PostMessage(Handle, MN_SELECTITEM, i, 0);
   end;
   Handled := True;
@@ -1003,13 +1117,13 @@ end;
 
 function IsItemSeparator(Menu: HMENU; const ItemIndex: integer): Boolean;
 var
-  pMenuItemInfo : TMenuItemInfo;
+  pMenuItemInfo: TMenuItemInfo;
 begin
   {
     Use this function instead of Items[Index].Separator .
     ==> Fast access in WM_KEYDOWN .
   }
-  Result:=False;
+  Result := False;
   FillChar(pMenuItemInfo, sizeof(pMenuItemInfo), Char(0));
   pMenuItemInfo.cbSize := sizeof(TMenuItemInfo);
   pMenuItemInfo.fMask := MIIM_FTYPE;
@@ -1017,14 +1131,36 @@ begin
     Result := (pMenuItemInfo.fType and MFT_SEPARATOR) = MFT_SEPARATOR;
 end;
 
+
+
+
 procedure TSysPopupStyleHook.WndProc(var Message: TMessage);
 var
   i: integer;
   TopWin: HWND;
-  TopCntrl:TControl;
+  TopCntrl: TControl;
 begin
-  // AddToLog(Message);
+//  AddToLog(Message);
+//  Message.Result := CallDefaultProc(Message);
+//  Exit;
+{
+
   case Message.Msg of
+            WM_KEYFIRST..WM_KEYLAST:
+            begin
+              FEnterWithKeyboard := True;
+            end;
+  end;
+}
+  case Message.Msg of
+//
+//    MN_BUTTONDOWN:
+//      begin
+//        AddToLog(Message);
+//        Message.Result := CallDefaultProc(Message);
+//        Exit;
+//      end;
+
 
     MN_SELECTITEM, WM_PRINT:
       begin
@@ -1076,7 +1212,11 @@ begin
 
     MN_BUTTONDOWN:
       begin
+        Inc(FOffset);
+        //AddToLog(Message);
+        //AddToLog('Index '+IntToStr(UINT(Message.WParamLo)));
         SetRedraw(False);
+        //SendMessage(Handle, WM_PRINT, 0, 0);
         Message.Result := CallDefaultProc(Message);
         SetRedraw(True);
       end;
@@ -1088,9 +1228,13 @@ begin
           Message.Result := CallDefaultProc(Message);
           Exit;
         end;
+
+        FEnterWithKeyboard := True;
+
         FMenu := GetMenuFromHandle(Handle);
         if FPreviousHotItemIndex <> -1 then
           FKeyIndex := FPreviousHotItemIndex;
+
         case Message.WParam of
 
           VK_DOWN:
@@ -1136,7 +1280,7 @@ begin
         else
           { Calling the Default Message will cause
             the WM_PAINT Message to be Sent to the PopupMenu Window }
-            Message.Result := CallDefaultProc(Message);
+          Message.Result := CallDefaultProc(Message);
         end;
         Exit;
       end;
@@ -1166,6 +1310,17 @@ begin
 
     WM_NCCALCSIZE, WM_NCPAINT:
       begin
+        if Message.Msg= WM_NCCALCSIZE then
+        begin
+          if TWMNCCalcSize(Message).CalcValidRects then
+          begin
+            FNCRect := TWMNCCalcSize(Message).CalcSize_Params.rgrc[0];
+            //Message.Result := CallDefaultProc(Message);
+            //LRect := TWMNCCalcSize(Message).CalcSize_Params.rgrc0;
+            //OutputDebugString(PChar(Format('LRect.Height %d WParam %d', [FNCRect.Height, Message.WParam])));
+          end;
+        end;
+
         if (not OverridePaint) or (not OverridePaintNC) then
         begin
           Message.Result := CallDefaultProc(Message);
@@ -1210,10 +1365,10 @@ begin
         Handled := False;
       end;
 
-//
-//    WM_NCDESTROY :
-//    begin
-//    end;
+    //
+    // WM_NCDESTROY :
+    // begin
+    // end;
 
   end;
   inherited;
@@ -1223,6 +1378,7 @@ end;
 
 constructor TSysPopupStyleHook.TSysPopupItem.Create(SysPopupStyleHook: TSysPopupStyleHook; SysParent: TSysControl; const Index: integer; const Menu: HMENU);
 begin
+  inherited Create;
   FSysPopupStyleHook := SysPopupStyleHook;
   FMenu := Menu;
   FHandle := SysParent.Handle;
@@ -1239,7 +1395,7 @@ function TSysPopupStyleHook.TSysPopupItem.GetItemBitmap: HBITMAP;
 var
   pMenuItemInfo: TMenuItemInfo;
 begin
-  Result:=0;
+  Result := 0;
   FillChar(pMenuItemInfo, sizeof(pMenuItemInfo), Char(0));
   pMenuItemInfo.cbSize := sizeof(TMenuItemInfo);
   pMenuItemInfo.fMask := MIIM_CHECKMARKS or MIIM_BITMAP;
@@ -1267,9 +1423,9 @@ end;
 
 function TSysPopupStyleHook.TSysPopupItem.GetItemText: String;
 var
-  Buffer : PChar;
-  StrSize : integer;
-  pMenuItemInfo : MENUITEMINFO;
+  Buffer: PChar;
+  StrSize: integer;
+  pMenuItemInfo: MENUITEMINFO;
 begin
 
   if VCLItem <> nil then
@@ -1285,13 +1441,14 @@ begin
 
   Result := '';
 
-  FillChar(pMenuItemInfo, sizeof(MENUITEMINFO), Char(0));
-  pMenuItemInfo.cbSize := sizeof(MENUITEMINFO);
+  FillChar(pMenuItemInfo, SizeOf(MENUITEMINFO), Char(0));
+  pMenuItemInfo.cbSize := SizeOf(MENUITEMINFO);
   pMenuItemInfo.fMask := MIIM_STRING or MIIM_FTYPE;
   pMenuItemInfo.dwTypeData := nil;
   if GetMenuItemInfo(FMenu, FIndex, True, pMenuItemInfo) then
   begin
-    if not(pMenuItemInfo.fType and MFT_OWNERDRAW = MFT_OWNERDRAW) then
+     //Fix for shell menus on W10
+    if (VCLMenuItems=nil) or (not (pMenuItemInfo.fType and MFT_OWNERDRAW = MFT_OWNERDRAW)) then
     begin
       { The Size needed for the Buffer . }
       StrSize := pMenuItemInfo.cch * 2 + 2;
@@ -1303,7 +1460,7 @@ begin
         if GetMenuItemInfo(FMenu, FIndex, True, pMenuItemInfo) then
           Result := String(Buffer);
       finally
-        //OutputDebugString(PChar('StrSize '+IntToStr(StrSize)));
+        // OutputDebugString(PChar('StrSize '+IntToStr(StrSize)));
         FreeMem(Buffer, StrSize);
       end;
       Exit;
@@ -1396,11 +1553,11 @@ var
 
   function GetMenuItem(AMenu: TMenuItem): TMenuItem;
   var
-    LMenuItem  :TMenuItem;
-    i :integer;
+    LMenuItem: TMenuItem;
+    i: integer;
   begin
     if (AMenu.Handle = FMenu) then
-      Result := aMenu
+      Result := AMenu
     else
     begin
       Result := nil;
@@ -1409,7 +1566,7 @@ var
       begin
         LMenuItem := AMenu.Items[i];
         Result := GetMenuItem(LMenuItem);
-        Inc (i);
+        inc(i);
       end;
     end;
   end;
@@ -1434,8 +1591,7 @@ begin
         if Assigned(Result) then
           Exit;
       end
-      else
-      if LForm.Components[j] is TPopupMenu then
+      else if LForm.Components[j] is TPopupMenu then
       begin
         LPopupMenu := TPopupMenu(LForm.Components[j]);
         if LPopupMenu.Handle = FMenu then
@@ -1468,21 +1624,22 @@ end;
 
 function TSysPopupStyleHook.TSysPopupItem.IsItemDisabled: Boolean;
 var
-  pMenuItemInfo : TMenuItemInfo;
+  pMenuItemInfo: TMenuItemInfo;
 begin
-  Result:=False;
+  Result := False;
   FillChar(pMenuItemInfo, sizeof(pMenuItemInfo), Char(0));
   pMenuItemInfo.cbSize := sizeof(TMenuItemInfo);
   pMenuItemInfo.fMask := MIIM_STATE;
   if GetMenuItemInfo(FMenu, FIndex, True, pMenuItemInfo) then
-    Result := (pMenuItemInfo.fState and MFS_DISABLED = MFS_DISABLED) or (pMenuItemInfo.fState and MF_DISABLED = MF_DISABLED) or (pMenuItemInfo.fState and MF_GRAYED = MF_GRAYED);
+    Result := (pMenuItemInfo.fState and MFS_DISABLED = MFS_DISABLED) or (pMenuItemInfo.fState and MF_DISABLED = MF_DISABLED) or
+      (pMenuItemInfo.fState and MF_GRAYED = MF_GRAYED);
 end;
 
 function TSysPopupStyleHook.TSysPopupItem.IsItemOwnerDraw: Boolean;
 var
   pMenuItemInfo: TMenuItemInfo;
 begin
-  Result:=False;
+  Result := False;
   FillChar(pMenuItemInfo, sizeof(MENUITEMINFO), Char(0));
   pMenuItemInfo.cbSize := sizeof(MENUITEMINFO);
   pMenuItemInfo.fMask := MIIM_FTYPE;
@@ -1495,7 +1652,7 @@ function TSysPopupStyleHook.TSysPopupItem.IsItemRadioCheck: Boolean;
 var
   pMenuItemInfo: TMenuItemInfo;
 begin
-  Result:=False;
+  Result := False;
   FillChar(pMenuItemInfo, sizeof(pMenuItemInfo), Char(0));
   pMenuItemInfo.cbSize := sizeof(TMenuItemInfo);
   pMenuItemInfo.fMask := MIIM_FTYPE;
@@ -1507,7 +1664,7 @@ function TSysPopupStyleHook.TSysPopupItem.IsItemChecked: Boolean;
 var
   pMenuItemInfo: TMenuItemInfo;
 begin
-  Result:=False;
+  Result := False;
   FillChar(pMenuItemInfo, sizeof(pMenuItemInfo), Char(0));
   pMenuItemInfo.cbSize := sizeof(TMenuItemInfo);
   pMenuItemInfo.fMask := MIIM_STATE;
@@ -1524,7 +1681,7 @@ function TSysPopupStyleHook.TSysPopupItem.IsItemDefault: Boolean;
 var
   pMenuItemInfo: TMenuItemInfo;
 begin
-  Result:=False;
+  Result := False;
   FillChar(pMenuItemInfo, sizeof(pMenuItemInfo), Char(0));
   pMenuItemInfo.cbSize := sizeof(TMenuItemInfo);
   pMenuItemInfo.fMask := MIIM_STATE;
@@ -1547,6 +1704,8 @@ begin
   end;
 end;
 
+
+
 initialization
 
 SubMenuItemInfoArray := nil;
@@ -1554,15 +1713,15 @@ SubMenuItemInfoArray := nil;
 {$IFDEF UseVCLStyleUtilsMenu}
 {$IF CompilerVersion >= 27} // Disable XE6-XE7 menu syshooks
 TStyleManager.SystemHooks := TStyleManager.SystemHooks - [shMenus];
-{$IFEND}
+{$IFEND CompilerVersion}
 if StyleServices.Available then
   TSysStyleManager.RegisterSysStyleHook('#32768', TSysPopupStyleHook);
-{$ENDIF}
+{$ENDIF UseVCLStyleUtilsMenu}
 
 finalization
 
 {$IFDEF UseVCLStyleUtilsMenu}
   TSysStyleManager.UnRegisterSysStyleHook('#32768', TSysPopupStyleHook);
-{$ENDIF}
+{$ENDIF UseVCLStyleUtilsMenu}
 
 end.

@@ -54,6 +54,7 @@ type
   procedure ExtractIconFile(Icon: TIcon; const Filename: string;IconType : Cardinal);
   procedure ExtractBitmapFile(Bmp: TBitmap; const Filename: string;IconType : Cardinal);
   procedure ExtractBitmapFile32(Bmp: TBitmap; const Filename: string;IconType : Cardinal);
+  procedure CheckForUpdates(Silent : Boolean);
 
 implementation
 
@@ -68,6 +69,18 @@ Uses
  Winapi.ShellAPi,
  Vcl.Controls,
  Vcl.Dialogs;
+
+procedure CheckForUpdates(Silent : Boolean);
+var
+  LBinaryPath, LUpdaterPath : string;
+begin
+  LBinaryPath  := ParamStr(0);
+  LUpdaterPath := ExtractFilePath(LBinaryPath)+'Updater\Updater.exe';
+  if Silent then
+   ShellExecute(0, 'open', PChar(LUpdaterPath), PChar(Format('"%s" -Silent', [ParamStr(0)])), '', SW_SHOWNORMAL)
+  else
+   ShellExecute(0, 'open', PChar(LUpdaterPath), PChar(Format('"%s"', [ParamStr(0)])), '', SW_SHOWNORMAL);
+end;
 
 
 procedure ExtractIconFile(Icon: TIcon; const Filename: string;IconType : Cardinal);

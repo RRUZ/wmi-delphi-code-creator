@@ -32,8 +32,6 @@ object FrmMain: TFrmMain
     BevelOuter = bvNone
     BorderWidth = 5
     TabOrder = 1
-    ExplicitWidth = 1008
-    ExplicitHeight = 682
     object Splitter1: TSplitter
       Left = 265
       Top = 5
@@ -61,8 +59,6 @@ object FrmMain: TFrmMain
       BevelOuter = bvNone
       BorderWidth = 5
       TabOrder = 0
-      ExplicitTop = 490
-      ExplicitWidth = 998
       object PageControl2: TPageControl
         Left = 5
         Top = 5
@@ -72,11 +68,9 @@ object FrmMain: TFrmMain
         Align = alClient
         Images = ImageList1
         TabOrder = 0
-        ExplicitWidth = 988
         object TabSheet3: TTabSheet
           Caption = 'Console Output'
           ImageIndex = 17
-          ExplicitWidth = 980
           object MemoConsole: TMemo
             Left = 0
             Top = 0
@@ -93,20 +87,15 @@ object FrmMain: TFrmMain
             PopupMenu = PopupActionBar2
             ScrollBars = ssBoth
             TabOrder = 0
-            ExplicitWidth = 980
           end
         end
         object TabSheet2: TTabSheet
           Caption = 'Log'
           ImageIndex = 35
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object MemoLog: TMemo
             Left = 0
             Top = 0
-            Width = 980
+            Width = 768
             Height = 148
             Align = alClient
             Color = clBlack
@@ -131,10 +120,8 @@ object FrmMain: TFrmMain
       ActivePage = TabSheet1
       Align = alLeft
       TabOrder = 1
-      ExplicitHeight = 480
       object TabSheet1: TTabSheet
         Caption = 'Tasks'
-        ExplicitHeight = 452
         object TreeViewTasks: TTreeView
           Left = 0
           Top = 0
@@ -149,7 +136,6 @@ object FrmMain: TFrmMain
           TabOrder = 0
           OnChange = TreeViewTasksChange
           OnCustomDrawItem = TreeViewTasksCustomDrawItem
-          ExplicitHeight = 452
         end
       end
     end
@@ -162,13 +148,9 @@ object FrmMain: TFrmMain
       Align = alClient
       Images = ImageList1
       TabOrder = 2
-      ExplicitWidth = 733
-      ExplicitHeight = 480
       object TabSheetTask: TTabSheet
         Caption = 'TabSheetTask'
         ImageIndex = -1
-        ExplicitWidth = 725
-        ExplicitHeight = 451
       end
     end
   end
@@ -189,8 +171,6 @@ object FrmMain: TFrmMain
         Alignment = taRightJustify
         Width = 250
       end>
-    ExplicitTop = 712
-    ExplicitWidth = 1008
   end
   object ToolBar1: TToolBar
     Left = 0

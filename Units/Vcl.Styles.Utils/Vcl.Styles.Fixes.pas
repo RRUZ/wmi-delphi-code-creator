@@ -2,7 +2,7 @@
 //
 // Unit Vcl.Styles.Fixes
 // unit for the VCL Styles Utils
-// http://code.google.com/p/vcl-styles-utils/
+// https://github.com/RRUZ/vcl-styles-utils/
 //
 // The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
 // you may not use this file except in compliance with the License. You may obtain a copy of the
@@ -15,7 +15,7 @@
 // The Original Code is Vcl.Styles.Fixes
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2012-2013 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2012-2015 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // Contributors
@@ -37,9 +37,10 @@ uses
   Vcl.ExtCtrls,
   Vcl.Graphics;
 
-{$IF CompilerVersion = 23.0}
+{$IF CompilerVersion >= 23.0}
 type
   /// <summary> The <c>TButtonStyleHookFix</c> vcl style hook fix these QC #103708, #107764 for Delphi XE2
+  /// and the https://quality.embarcadero.com/browse/RSP-11619 issue present in X2-XE8
   /// </summary>
   /// <remarks>
   /// Use this hook in this way
@@ -53,9 +54,9 @@ type
   end;
 {$IFEND}
 
-{$IF CompilerVersion <= 24.0}
+{$IF CompilerVersion <= 27.0}
 type
-  /// <summary> The <c>TListViewStyleHookFix</c> vcl style hook fix these QC #108678, #108875 for Delphi XE2 and Delphi XE3
+  /// <summary> The <c>TListViewStyleHookFix</c> vcl style hook fix these QC #108678, #108875 for Delphi XE2-XE6
   /// </summary>
   /// <remarks>
   /// Use this hook in this way
@@ -67,7 +68,10 @@ type
     procedure DrawHeaderSection(Canvas: TCanvas; R: TRect; Index: Integer;
       const Text: string; IsPressed, IsBackground: Boolean); override;
   end;
+{$IFEND}
 
+{$IF CompilerVersion <= 24.0}
+type
   /// <summary> This interposer class fix the QC #114032  for Delphi XE2 and Delphi XE3
   /// </summary>
   /// <remarks>
@@ -100,6 +104,7 @@ implementation
 uses
   Winapi.CommCtrl,
   Vcl.Themes,
+  Vcl.Forms,
   System.Classes,
   System.UITypes,
   System.Types;
@@ -108,7 +113,7 @@ type
   TCustomButtonClass = class(TCustomButton);
   TWinControlClass = class(TWinControl);
 
-{$IF CompilerVersion = 23.0}
+{$IF CompilerVersion >= 23.0}
 
   // we need this helper to access some strict private fields
   TButtonStyleHookHelper = class Helper for TButtonStyleHook
@@ -118,17 +123,19 @@ type
   end;
 {$IFEND}
 
-{$IF CompilerVersion <= 24.0}
+{$IF CompilerVersion <= 27.0}
   TListViewStyleHookHelper = class helper for TListViewStyleHook
     function HeaderHandle: HWnd;
   end;
+{$IFEND}
 
+{$IF CompilerVersion <= 24.0}
   TComboBoxExStyleHookHelper = class helper for TComboBoxExStyleHook
     function DroppedDown: Boolean;
   end;
 {$IFEND}
 
-{$IF CompilerVersion = 23.0}
+{$IF CompilerVersion >= 23.0}
 
 procedure TButtonStyleHookFix.Paint(Canvas: TCanvas);
 const
@@ -149,55 +156,42 @@ var
   BufferLength: Integer;
   SaveIndex: Integer;
   X, Y, I: Integer;
+  IsDefault: Boolean;
   BCaption: String;
   LImageIndex: Integer;
 begin
-  // LImageIndex:=PBS_NORMAL;
+  LImageIndex:=PBS_NORMAL;
+  IsDefault := (Control is TCustomButton) and (TCustomButton(Control).Default);
 
   if StyleServices.Available then
   begin
     BCaption := Text;
+
+    if not Control.Enabled then
+    begin
+      LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
+      LImageIndex := PBS_DISABLED;
+    end
+    else
     if Pressed then
     begin
       LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
       LImageIndex := PBS_PRESSED;
     end
-    else if MouseInControl then
+    else
+    if MouseInControl then
     begin
       LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
       LImageIndex := PBS_HOT;
     end
-    else if Focused then
+    else
+    if Focused or (IsDefault and (Screen.ActiveControl<>nil) and not (Screen.ActiveControl is TCustomButton) ) then
     begin
-      if not Control.Enabled then
-      begin
-        LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
-        LImageIndex := PBS_DISABLED;
-      end
-      else
-      begin
-        // if MouseInControl then
-        begin
-          LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
-          LImageIndex := PBS_DEFAULTED;
-        end;
-        (* else
-          begin
-          LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
-          LImageIndex := PBS_NORMAL;
-          end; *)
-      end;
+      LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
+      LImageIndex := PBS_DEFAULTED;
     end
     else if Control.Enabled then
-    begin
       LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
-      LImageIndex := PBS_NORMAL;
-    end
-    else
-    begin
-      LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
-      LImageIndex := PBS_DISABLED;
-    end;
 
     DrawRect := Control.ClientRect;
     StyleServices.DrawElement(Canvas.Handle, LDetails, DrawRect);
@@ -383,18 +377,23 @@ end;
 {$IFEND}
 
 
-{$IF CompilerVersion <= 24.0}
+{$IF CompilerVersion <= 27.0}
 { TListViewStyleHookHelper }
 function TListViewStyleHookHelper.HeaderHandle: HWnd;
 begin
   Result := Self.FHeaderHandle;
 end;
+{$IFEND}
 
+{$IF CompilerVersion <= 24.0}
 { TComboBoxExStyleHookHelper }
 function TComboBoxExStyleHookHelper.DroppedDown: Boolean;
 begin
   Exit(Self.FDroppedDown);
 end;
+{$IFEND}
+
+{$IF CompilerVersion <= 27.0}
 
 { TListViewStyleHookFix }
 
@@ -409,7 +408,7 @@ var
 begin
   FillChar(Item, SizeOf(Item), 0);
   Item.Mask := HDI_FORMAT;
-  Header_GetItem(Handle, Index, Item);
+  Header_GetItem(HeaderHandle, Index, Item);
   if IsBackground then
     DrawState := thHeaderItemNormal
   else if IsPressed then
@@ -423,6 +422,7 @@ begin
   ImageList := SendMessage(HeaderHandle, HDM_GETIMAGELIST, 0, 0);
   Item.Mask := HDI_FORMAT or HDI_IMAGE;
   InflateRect(R, -2, -2);
+  IconWidth := 0;
   if (ImageList <> 0) and Header_GetItem(HeaderHandle, Index, Item) then
   begin
     if Item.fmt and HDF_IMAGE = HDF_IMAGE then
@@ -432,10 +432,13 @@ begin
     Inc(R.Left, IconWidth + 5);
   end;
 
+  if IconWidth = 0 then Inc(R.Left, 2);
   DrawControlText(Canvas, Details, Text, R, DT_VCENTER or DT_LEFT or
     DT_SINGLELINE or DT_END_ELLIPSIS);
 end;
+{$IFEND}
 
+{$IF CompilerVersion <= 24.0}
 { TColorBox }
 
 procedure TColorBox.CNDrawItem(var Message: TWMDrawItem);

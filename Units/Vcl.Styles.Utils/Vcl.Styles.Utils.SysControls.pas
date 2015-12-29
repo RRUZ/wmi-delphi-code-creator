@@ -2,7 +2,7 @@
 //
 // Unit Vcl.Styles.Utils.SysControls
 // unit for the VCL Styles Utils
-// http://code.google.com/p/vcl-styles-utils/
+// https://github.com/RRUZ/vcl-styles-utils/
 //
 // The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License")
 // you may not use this file except in compliance with the License. You may obtain a copy of the
@@ -14,12 +14,12 @@
 //
 //
 // Portions created by Mahdi Safsafi [SMP3]   e-mail SMP@LIVE.FR
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2014 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2015 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
 unit Vcl.Styles.Utils.SysControls;
-{.$DEFINE EventLog}
+{$DEFINE EventLog}
 
 interface
 
@@ -66,7 +66,7 @@ type
   private
   class var
     FEnabled: Boolean;
-    FHook: HHook;
+    FHook_WH_CBT: HHook;
     FBeforeHookingControlProc: TBeforeHookingControl;
     FSysHookNotificationProc: TSysHookNotification;
     FRegSysStylesList: TObjectDictionary<String, TSysStyleHookClass>;
@@ -74,19 +74,20 @@ type
     FChildRegSysStylesList: TObjectDictionary<HWND, TChildControlInfo>;
     FHookVclControls: Boolean;
     FUseStyleColorsChildControls: Boolean;
+    class var FHookDialogIcons: Boolean;
   protected
     /// <summary>
     /// Install the Hook
     /// </summary>
-    class procedure InstallHook;
+    class procedure InstallHook_WH_CBT;
     /// <summary>
     /// Remove the Hook
     /// </summary>
-    class procedure RemoveHook;
+    class procedure RemoveHook_WH_CBT;
     /// <summary>
     /// Hook Callback
     /// </summary>
-    class function HookCBProc(nCode: Integer; wParam: wParam; lParam: lParam): LRESULT; stdcall; static;
+    class function HookActionCallBackCBT(nCode: Integer; wParam: wParam; lParam: lParam): LRESULT; stdcall; static;
   public
     /// <summary>
     /// Register a Sys Style Hook for an specified class.
@@ -122,6 +123,10 @@ type
     /// </summary>
     class property HookVclControls: Boolean read FHookVclControls write FHookVclControls;
     /// <summary>
+    /// Allow disable or enable the hook of the icons dialogs
+    /// </summary>
+    class property HookDialogIcons: Boolean read FHookDialogIcons write FHookDialogIcons;
+    /// <summary>
     /// Collection of Styled (Hooked) Controls
     /// </summary>
     class property SysStyleHookList: TObjectDictionary<HWND, TSysStyleHook> read FSysStyleHookList;
@@ -145,7 +150,11 @@ function WM_To_String(const WM_Message: Integer): string;
 implementation
 
 uses
-  CommCtrl;
+  {$IF CompilerVersion >= 30}
+  DDetours,
+  Vcl.SysStyles,
+  {$IFEND}
+  WinApi.CommCtrl;
 
 {$IFDEF EventLog}
 
@@ -153,7 +162,7 @@ uses
 procedure AddToLog(const Msg: TMessage);
 begin
   with Msg do
-    OutputDebugString(PChar('Msg = ' + WM_To_String(Msg) + ' wParam = ' + IntToStr(wParam) + ' LParam = ' + IntToStr(lParam)));
+    OutputDebugString(PChar(FormatDateTime('hh:nn:ss.zzz', Now)+' Msg = ' + WM_To_String(Msg) + ' wParam = ' + IntToStr(wParam) + ' LParam = ' + IntToStr(lParam)));
 end;
 
 procedure AddToLog(const S: string; const Value: Integer);
@@ -317,6 +326,33 @@ begin
     $00F6: Result := 'BM_GETIMAGE';
     $00F7: Result := 'BM_SETIMAGE';
     $00F8: Result := 'BM_SETDONTCLICK';
+
+    $0090: result := 'WM_UAHDESTROYWINDOW';
+    $0091: result := 'WM_UAHDRAWMENU';
+    $0092: result := 'WM_UAHDRAWMENUITEM';
+    $0093: result := 'WM_UAHINITMENU';
+    $0094: result := 'WM_UAHMEASUREMENUITEM';
+    $0095: result := 'WM_UAHNCPAINTMENUPOPUP';
+
+    $01E0: Result := 'MN_SETHMENU';
+    $01E1: Result := 'MN_GETHMENU';
+    $01E2: Result := 'MN_SIZEWINDOW';
+    $01E3: Result := 'MN_OPENHIERARCHY';
+    $01E4: Result := 'MN_CLOSEHIERARCHY';
+    $01E5: Result := 'MN_SELECTITEM';
+    $01E6: Result := 'MN_CANCELMENUS';
+    $01E7: Result := 'MN_SELECTFIRSTVALIDITEM';
+
+    $01EA: Result := 'MN_GETPPOPUPMENU';
+    $01EB: Result := 'MN_FINDMENUWINDOWFROMPOINT';
+    $01EC: Result := 'MN_SHOWPOPUPWINDOW';
+    $01ED: Result := 'MN_BUTTONDOWN';
+    $01F0: Result := 'MN_SETTIMERTOOPENHIERARCHY';
+    $01F1: Result := 'MN_DBLCLK';
+    $01F2: Result := 'MN_ENDMENU';
+    $01F3: Result := 'MN_DODRAGDROP';
+
+
     // button control messages end
     $0100: Result := 'WM_KEYFIRST or WM_KEYDOWN';
     $0101: Result := 'WM_KEYUP';
@@ -585,11 +621,27 @@ begin
     Exit;
   end;
 
-  if SameText(LInfo.ClassName, 'ToolBarWindow32') then
+  if SameText(LInfo.ClassName,  WC_LISTVIEW) then
   begin
+    if SameText(LInfo.ParentClassName, 'listviewpopup') then
+     Result:=False;
+  end
+  else
+  if SameText(LInfo.ClassName, TRACKBAR_CLASS) then
+  begin
+    if SameText(LInfo.ParentClassName, 'ViewControlClass') then
+     Result:=False;
+  end
+  else
+  //Prevent hook Toolbars on DirectUIHWND
+  if SameText(LInfo.ClassName, TOOLBARCLASSNAME) then
+  begin
+    if SameText(LInfo.ParentClassName, 'ViewControlClass') then
+     Result:=False
+    else
     if Root > 0 then
     begin
-      C := FindWinFromRoot(Root, 'ReBarWindow32');
+      C := FindWinFromRoot(Root, REBARCLASSNAME);
       Result := not(C > 0);
     end;
   end;
@@ -602,21 +654,23 @@ end;
 
 class constructor TSysStyleManager.Create;
 begin
+  FHook_WH_CBT:=0;
   FBeforeHookingControlProc := @BeforeHookingControl;
   FSysHookNotificationProc := @HookNotification;
   FUseStyleColorsChildControls := True;
   FEnabled := True;
+  FHookDialogIcons := False;
   FHookVclControls := False;
   FSysStyleHookList := TObjectDictionary<HWND, TSysStyleHook>.Create([doOwnsValues]);
   FRegSysStylesList := TObjectDictionary<String, TSysStyleHookClass>.Create;
   FChildRegSysStylesList := TObjectDictionary<HWND, TChildControlInfo>.Create;
   //FSysStyleHookList := TObjectDictionary<HWND, TSysStyleHook>.Create([]);
-  InstallHook;
+  InstallHook_WH_CBT;
 end;
 
 class destructor TSysStyleManager.Destroy;
 begin
-  RemoveHook;
+  RemoveHook_WH_CBT;
   FRegSysStylesList.Free;
   FSysStyleHookList.Free; // remove the childs too because doOwnsValues
   FChildRegSysStylesList.Free;
@@ -683,17 +737,17 @@ end;
 
 destructor TSysStyleManager.Destroy;
 begin
-
+  inherited;
 end;
 
 type
  TSysStyleClass = class(TSysStyleHook);
 
-class function TSysStyleManager.HookCBProc(nCode: Integer; wParam: wParam; lParam: lParam): LRESULT;
+class function TSysStyleManager.HookActionCallBackCBT(nCode: Integer; wParam: wParam; lParam: lParam): LRESULT;
 var
   CBTSturct: TCBTCreateWnd;
   sClassName, Tmp: string;
-  Parent: HWND;
+  {LHWND,} Parent: HWND;
   Style, ParentStyle, ExStyle, ParentExStyle: NativeInt;
   Info: TControlInfo;
 
@@ -738,9 +792,25 @@ var
   end;
 
 begin
-  Result := CallNextHookEx(FHook, nCode, wParam, lParam);
+  Result := CallNextHookEx(FHook_WH_CBT, nCode, wParam, lParam);
   if not FEnabled then
     Exit;
+
+//  if (nCode = HCBT_ACTIVATE) and not(StyleServices.IsSystemStyle) then
+//     begin
+//       LHWND := HWND(wParam);
+//       if(LHWND>0) then
+//       begin
+//          sClassName:= GetWindowClassName(LHWND);
+//          if (sClassName<>'') and  (not TSysStyleManager.SysStyleHookList.ContainsKey(LHWND)) and (SameText(sClassName,'#32770'))  then
+//          begin
+//            TSysStyleManager.AddControlDirectly(LHWND, sClassName);
+//            InvalidateRect(LHWND, nil, False);
+//          end;
+//       end;
+//     end;
+
+
   if (nCode = HCBT_CREATEWND) and not(StyleServices.IsSystemStyle) then
   begin
 
@@ -748,8 +818,8 @@ begin
     sClassName := GetWindowClassName(wParam);
     sClassName := LowerCase(sClassName);
 
-  //  if SameText(sClassName, 'button') then
-  //    OutputDebugString(PChar('Class '+sclassName+' '+IntToHex(wParam, 8)));
+//    if SameText(sClassName, '#32770') then
+//      OutputDebugString(PChar('Class '+sclassName+' '+IntToHex(wParam, 8)));
 
     Parent := CBTSturct.lpcs.hwndParent;
     Style := CBTSturct.lpcs.Style;
@@ -836,9 +906,9 @@ begin
   end;
 end;
 
-class procedure TSysStyleManager.InstallHook;
+class procedure TSysStyleManager.InstallHook_WH_CBT;
 begin
-  FHook := SetWindowsHookEx(WH_CBT, @HookCBProc, 0, GetCurrentThreadId);
+  FHook_WH_CBT := SetWindowsHookEx(WH_CBT, @HookActionCallBackCBT, 0, GetCurrentThreadId);
 end;
 
 class procedure TSysStyleManager.RegisterSysStyleHook(const SysControlClass: String; SysStyleHookClass: TSysStyleHookClass);
@@ -848,10 +918,10 @@ begin
   FRegSysStylesList.Add(LowerCase(SysControlClass), SysStyleHookClass);
 end;
 
-class procedure TSysStyleManager.RemoveHook;
+class procedure TSysStyleManager.RemoveHook_WH_CBT;
 begin
-  if FHook <> 0 then
-    UnhookWindowsHookEx(FHook);
+  if FHook_WH_CBT <> 0 then
+    UnhookWindowsHookEx(FHook_WH_CBT);
 end;
 
 class procedure TSysStyleManager.UnRegisterSysStyleHook(const SysControlClass: String; SysStyleHookClass: TSysStyleHookClass);
@@ -859,5 +929,66 @@ begin
   if FRegSysStylesList.ContainsKey(LowerCase(SysControlClass)) then
     FRegSysStylesList.Remove(LowerCase(SysControlClass));
 end;
+
+
+{$IF CompilerVersion >= 30}
+Type
+  TCustomStyleEngineClass = class(TCustomStyleEngine);
+
+  TCustomStyleEngineHelper = class helper for TCustomStyleEngine
+   function  CreateSysHookPtr : Pointer;
+   procedure SetPointer;
+  end;
+
+
+  TRegisterSysStyleHook = procedure(SysControlClass: String; SysStyleHookClass: Vcl.Themes.TSysStyleHookClass) of object;
+var
+  LRegisterSysStyleHookPtr: TRegisterSysStyleHook;
+  LCreateSysHookPtr: procedure of object;
+  Trampoline_RegisterSysStyleHook  : procedure(Self: TObject; SysControlClass: String; SysStyleHookClass: Vcl.Themes.TSysStyleHookClass);
+  Trampoline_CreateSysHook : procedure of Object;
+
+procedure  Detour_RegisterSysStyleHook(Self: TObject; SysControlClass: String; SysStyleHookClass: Vcl.Themes.TSysStyleHookClass);
+begin
+
+end;
+
+procedure  Detour_CreateSysHook(Self: TObject);
+begin
+ //OutputDebugString('Detour_CreateSysHook');
+end;
+
+function TCustomStyleEngineHelper.CreateSysHookPtr : Pointer;
+var
+  MethodAddr: procedure of object;
+begin
+  MethodAddr := CreateSysHook;
+  Result     := TMethod(MethodAddr).Code;
+end;
+
+procedure TCustomStyleEngineHelper.SetPointer;
+begin
+  LCreateSysHookPtr := TCustomStyleEngineClass.CreateSysHook;
+end;
+
+initialization
+  //Disable  TCustomStyleEngine.RegisterSysStyleHoo method
+  LRegisterSysStyleHookPtr := TCustomStyleEngine.RegisterSysStyleHook;
+  TCustomStyleEngineClass(nil).SetPointer;
+  //LCreateSysHookPtr := TCustomStyleEngineClass.CreateSysHook;
+
+  @Trampoline_RegisterSysStyleHook := InterceptCreate(@LRegisterSysStyleHookPtr, @Detour_RegisterSysStyleHook);
+  @Trampoline_CreateSysHook := InterceptCreate(@LCreateSysHookPtr, @Detour_CreateSysHook);
+  //remove hooks;
+  //TCustomStyleEngineClass(nil).FChildRegSysStylesList.Clear;
+  //TCustomStyleEngineClass(nil).FRegSysStylesList.Clear;
+  //TCustomStyleEngineClass(nil).FSysStyleHookList.Clear;
+  //TStyleManager.Engine.UnHook;
+
+finalization
+  InterceptRemove(@Trampoline_RegisterSysStyleHook);
+  InterceptRemove(@Trampoline_CreateSysHook);
+
+{$IFEND}
 
 end.

@@ -2,7 +2,7 @@
 //
 // Unit Vcl.Styles.Utils
 // unit for the VCL Styles Utils
-// http://code.google.com/p/vcl-styles-utils/
+// https://github.com/RRUZ/vcl-styles-utils/
 //
 // The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
 // you may not use this file except in compliance with the License. You may obtain a copy of the
@@ -15,7 +15,7 @@
 // The Original Code is Vcl.Styles.Utils.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2012-2014 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2012-2015 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 //**************************************************************************************************
@@ -120,7 +120,7 @@ end;
 
 class procedure TVclStylesUtils.SaveSettings(const FileName:String;Elements :TVCLStylesElements; FilterType : TVCLStylesFilter;Filters : TObjectList<TBitmapFilter>);
 var
-  Doc       : TXMLDocument;
+  Doc       : IXMLDocument;
   RootNode, ChildNode, oNode : IXMLNode;
   LFilter   : TBitmapFilter;
 begin

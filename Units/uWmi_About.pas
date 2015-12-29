@@ -59,10 +59,10 @@ type
 implementation
 
 uses
-  uCheckUpdate,
   uSettings,
   uWmiGenCode,
   uWmi_Metadata,
+  uMisc,
   ShellApi;
 
 {$R *.dfm}
@@ -70,15 +70,8 @@ uses
 
 
 procedure TFrmAbout.btnCheckUpdatesClick(Sender: TObject);
-var
-  Frm: TFrmCheckUpdate;
 begin
-  Frm := GetUpdaterInstance;
-  try
-    Frm.ShowModal();
-  finally
-    Frm.Free;
-  end;
+  CheckForUpdates(False);
 end;
 
 procedure TFrmAbout.Button1Click(Sender: TObject);

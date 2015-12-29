@@ -59,7 +59,8 @@ type
     Appmethod113,
     DelphiXE6,
     DelphiXE7,
-    DelphiXE8
+    DelphiXE8,
+    DelphiSeattle
 );
 
   SetDelphiVersions= TArray<TDelphiVersions>;
@@ -202,7 +203,8 @@ const
     'Appmethod 1.13',
     'RAD Studio XE6',
     'RAD Studio XE7',
-    'RAD Studio XE8'
+    'RAD Studio XE8',
+    'RAD Studio 10 Seattle'
     );
 
   DelphiRegPaths: array[TDelphiVersions] of string = (
@@ -225,7 +227,8 @@ const
     '\Software\Embarcadero\BDS\13.0',
     '\Software\Embarcadero\BDS\14.0',
     '\Software\Embarcadero\BDS\15.0',
-    '\Software\Embarcadero\BDS\16.0'
+    '\Software\Embarcadero\BDS\16.0',
+    '\Software\Embarcadero\BDS\17.0'
     );
 
  PAClientProfilesPaths: array[TDelphiVersions] of string = (
@@ -248,7 +251,8 @@ const
     '\Embarcadero\BDS\13.0',
     '\Embarcadero\BDS\14.0',
     '\Embarcadero\BDS\15.0',
-    '\Embarcadero\BDS\16.0'
+    '\Embarcadero\BDS\16.0',
+    '\Embarcadero\BDS\17.0'
     );
 
   DelphiVersionNumbers: array[TDelphiVersions] of double =
@@ -272,7 +276,8 @@ const
     27,      // 'RAD Studio XE6'
     27,      // ' Appmethod
     28,      // 'RAD Studio XE7'
-    29       // 'RAD Studio XE8'
+    29,      // 'RAD Studio XE8'
+    30       // 'RAD Studio 10 Seattle
     );
 
   function  GetListInstalledDelphiVersions : TInstalledDelphiVerions;

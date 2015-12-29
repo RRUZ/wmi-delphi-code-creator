@@ -1,8 +1,8 @@
-// **************************************************************************************************
+//**************************************************************************************************
 //
 // Unit Vcl.Styles.Utils.ComCtrls
 // unit for the VCL Styles Utils
-// http://code.google.com/p/vcl-styles-utils/
+// https://github.com/RRUZ/vcl-styles-utils/
 //
 // The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
 // you may not use this file except in compliance with the License. You may obtain a copy of the
@@ -14,11 +14,13 @@
 //
 //
 // Portions created by Mahdi Safsafi [SMP3]   e-mail SMP@LIVE.FR
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2014 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2015 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-// ************************************************************************************************
+//************************************************************************************************
 unit Vcl.Styles.Utils.ComCtrls;
+
+{$I VCL.Styles.Utils.inc}
 
 interface
 
@@ -33,6 +35,9 @@ uses
   Vcl.Styles,
   Vcl.Themes,
   Vcl.Graphics,
+  {$IFDEF USE_Vcl.Styles.Hooks}
+  Vcl.Styles.Hooks,
+  {$ENDIF}
   Vcl.Styles.Utils.SysStyleHook,
   Vcl.Styles.Utils.StdCtrls,
   Vcl.Forms,
@@ -119,6 +124,7 @@ type
 
   TSysTreeViewStyleHook = class(TSysScrollingStyleHook)
   protected
+    procedure Scroll(const Kind: TScrollBarKind; const ScrollType: TSysScrollingType; Pos, Delta: Integer); override;
     procedure UpdateColors; override;
     procedure WndProc(var Message: TMessage); override;
   public
@@ -317,45 +323,6 @@ type
     destructor Destroy; override;
   end;
 
-
-  TDirectUIHWNDStyleHook = class(TMouseTrackSysControlStyleHook)
-  protected
-    procedure Paint(Canvas: TCanvas); override;
-    procedure PaintNC(Canvas: TCanvas); override;
-    procedure PaintBackground(Canvas: TCanvas); override;
-    procedure UpdateColors; override;
-    procedure WndProc(var Message: TMessage); override;
-  public
-    constructor Create(AHandle: THandle); override;
-    Destructor Destroy; override;
-  end;
-
-
-  TCtrlNotifySinkStyleHook = class(TMouseTrackSysControlStyleHook)
-  protected
-    procedure Paint(Canvas: TCanvas); override;
-    procedure PaintNC(Canvas: TCanvas); override;
-    procedure PaintBackground(Canvas: TCanvas); override;
-    procedure UpdateColors; override;
-    procedure WndProc(var Message: TMessage); override;
-  public
-    constructor Create(AHandle: THandle); override;
-    Destructor Destroy; override;
-  end;
-
-  TTravelBandStyleHook = class(TMouseTrackSysControlStyleHook)
-  protected
-    procedure Paint(Canvas: TCanvas); override;
-    procedure PaintNC(Canvas: TCanvas); override;
-    procedure PaintBackground(Canvas: TCanvas); override;
-    procedure UpdateColors; override;
-    procedure WndProc(var Message: TMessage); override;
-  public
-    constructor Create(AHandle: THandle); override;
-    Destructor Destroy; override;
-  end;
-
-
   TSysLinkStyleHook = class(TSysStaticStyleHook)
   private
     procedure WMNCCalcSize(var Message: TWMNCCalcSize); message WM_NCCALCSIZE;
@@ -447,14 +414,14 @@ begin
   if OverrideEraseBkgnd then
     Color := StyleServices.GetStyleColor(scListView)
   else
-    Color := clWhite;
+    Color := clWindow;
   if OverrideFont then
     FontColor := StyleServices.GetSystemColor(clWindowText)
   else
     FontColor := clWindowText;
 
-  ListView_SetBkColor(Handle, Color);
-  ListView_SetTextBkColor(Handle, Color);
+  ListView_SetBkColor(Handle, ColorToRGB(Color));
+  ListView_SetTextBkColor(Handle, ColorToRGB(Color));
   ListView_SetTextColor(Handle, ColorToRGB(FontColor));
 
 end;
@@ -707,6 +674,7 @@ end;
 
 constructor TSysListViewStyleHook.TSysHeaderStyleHook.TSysSection.Create(SysParent: TSysControl; Index: Integer);
 begin
+  inherited Create;
   FTextFormat := [];
   FIndex := Index;
   FText := '';
@@ -776,14 +744,15 @@ end;
 
 { TSysTreeViewStyleHook }
 
+
 constructor TSysTreeViewStyleHook.Create(AHandle: THandle);
 begin
   inherited;
 {$IF CompilerVersion > 23}
-  StyleElements := [seFont, seBorder];
+  StyleElements := [seFont{, seBorder}];  //Allow to the Vcl.Styles.Hook handle the NC and scroll paint
 {$ELSE}
   OverrideFont := True;
-  OverridePaintNC := True;
+  OverridePaintNC := False; //Allow to the Vcl.Styles.Hook handle the NC and scroll paint
 {$IFEND}
   OverrideEraseBkgnd := True;
 end;
@@ -794,6 +763,48 @@ begin
   inherited;
 end;
 
+procedure TSysTreeViewStyleHook.Scroll(const Kind: TScrollBarKind;
+  const ScrollType: TSysScrollingType; Pos, Delta: Integer);
+begin
+  if Kind = sbVertical then
+  begin
+    case ScrollType of
+      skTracking:
+        begin
+          LstPos := Pos;
+          //OutputDebugString(PChar(Format('sbVertical Pos %d Delta %d AllowScrolling %s', [Pos, Delta, BooltoStr(AllowScrolling, True)])));
+          AllowScrolling := True;
+          SendMessage(Handle, WM_VSCROLL, MakeWParam(SB_THUMBTRACK, Pos), 0);
+          AllowScrolling := False;
+          //OutputDebugString(PChar(Format('sbVertical Pos %d Delta %d', [Pos, Delta])));
+        end;
+      skLineUp: SendMessage(Handle, WM_VSCROLL, SB_LINEUP, 0);
+      skLineDown: SendMessage(Handle, WM_VSCROLL, SB_LINEDOWN, 0);
+      skPageUp: SendMessage(Handle, WM_VSCROLL, SB_PAGEUP, 0);
+      skPageDown: SendMessage(Handle, WM_VSCROLL, SB_PAGEDOWN, 0);
+    end;
+  end
+  else
+  if Kind = sbHorizontal then
+  begin
+    case ScrollType of
+      skTracking:
+        begin
+          LstPos := Pos;
+          //OutputDebugString(PChar(Format('sbHorizontal Pos %d Delta %d AllowScrolling %s', [Pos, Delta, BooltoStr(AllowScrolling, True)])));
+          AllowScrolling := True;
+          SendMessage(Handle, WM_HSCROLL, MakeWParam(SB_THUMBTRACK, Pos), 0);
+          AllowScrolling := False;
+          //OutputDebugString(PChar(Format('sbHorizontal Pos %d Delta %d', [Pos, Delta])));
+        end;
+      skLineLeft: SendMessage(Handle, WM_HSCROLL, SB_LINELEFT, 0);
+      skLineRight: SendMessage(Handle, WM_HSCROLL, SB_LINERIGHT, 0);
+      skPageLeft: SendMessage(Handle, WM_HSCROLL, SB_PAGELEFT, 0);
+      skPageRight: SendMessage(Handle, WM_HSCROLL, SB_PAGERIGHT, 0);
+    end;
+  end;
+end;
+
 procedure TSysTreeViewStyleHook.UpdateColors;
 begin
   inherited;
@@ -801,6 +812,7 @@ begin
     Color := StyleServices.GetStyleColor(scTreeView)
   else
     Color := clWhite;
+
   if OverrideFont then
     FontColor := StyleServices.GetSystemColor(clWindowText)
   else
@@ -813,12 +825,13 @@ begin
     WM_ERASEBKGND:
       begin
         UpdateColors;
-        if (TreeView_GetBkColor(Handle) <> COLORREF(Color)) then
-        begin
-          // SetWindowTheme(Handle, '', '');
-          TreeView_SetBkColor(Handle, Color);
-          TreeView_SetTextColor(Handle, FontColor);
-        end;
+
+        if (Longint(TreeView_GetBkColor(Handle))<>ColorToRGB(Color)) then
+          TreeView_SetBkColor(Handle, ColorToRGB(Color));
+
+        if (Longint(TreeView_GetTextColor(Handle))<>ColorToRGB(FontColor)) then
+         TreeView_SetTextColor(Handle, ColorToRGB(FontColor));
+
         Message.Result := CallDefaultProc(Message);
         Exit;
       end;
@@ -865,11 +878,10 @@ end;
 
 function TSysTabControlStyleHook.GetDisplayRect: TRect;
 begin
-  Result := Rect(0, 0, 0, 0);
+  //Result := Rect(0, 0, 0, 0);
   Result := SysControl.ClientRect;
   SendMessage(Handle, TCM_ADJUSTRECT, 0, IntPtr(@Result));
   inc(Result.Top, 2);
-
 end;
 
 function TSysTabControlStyleHook.GetImages: TCustomImageList;
@@ -2620,101 +2632,7 @@ begin
   inherited;
 end;
 
-{ TDirectUIHWNDStyleHook }
-{
-Debug Output: TDirectUIHWNDStyleHook WM_NCPAINT Process ThemedSysControls.exe (3940)
-Debug Output: TDirectUIHWNDStyleHook WM_ERASEBKGND Process ThemedSysControls.exe (3940)
-Debug Output: TDirectUIHWNDStyleHook WM_PAINT Process ThemedSysControls.exe (3940)
-}
-constructor TDirectUIHWNDStyleHook.Create(AHandle: THandle);
-begin
-  inherited;
 
-{$IF CompilerVersion > 23}
-  StyleElements := [ seBorder, seClient];
-{$ELSE}
-  OverridePaint := True;
-  OverrideEraseBkgnd := True;
-  OverridePaintNC := True;
-{$IFEND}
-  UpdateColors;
-end;
-
-destructor TDirectUIHWNDStyleHook.Destroy;
-begin
-  inherited;
-end;
-
-procedure TDirectUIHWNDStyleHook.Paint(Canvas: TCanvas);
-begin
-end;
-
-procedure TDirectUIHWNDStyleHook.PaintBackground(Canvas: TCanvas);
-begin
- inherited;
-end;
-
-procedure TDirectUIHWNDStyleHook.PaintNC(Canvas: TCanvas);
-begin
-  inherited;
-end;
-
-procedure TDirectUIHWNDStyleHook.UpdateColors;
-begin
- inherited;
-end;
-
-procedure TDirectUIHWNDStyleHook.WndProc(var Message: TMessage);
-begin
-  //OutputDebugString(PChar('TDirectUIHWNDStyleHook '+WM_To_String(Message.Msg)));
-  inherited;
-end;
-
-{ TCtrlNotifySinkStyleHook }
-
-constructor TCtrlNotifySinkStyleHook.Create(AHandle: THandle);
-begin
-  inherited;
-
-{$IF CompilerVersion > 23}
-  StyleElements := [ seBorder, seClient];
-{$ELSE}
-  OverridePaint := True;
-  //OverrideEraseBkgnd := True;
-  //OverridePaintNC := True;
-{$IFEND}
-  UpdateColors;
-end;
-
-destructor TCtrlNotifySinkStyleHook.Destroy;
-begin
-  inherited;
-end;
-
-procedure TCtrlNotifySinkStyleHook.Paint(Canvas: TCanvas);
-begin
-end;
-
-procedure TCtrlNotifySinkStyleHook.PaintBackground(Canvas: TCanvas);
-begin
-end;
-
-
-procedure TCtrlNotifySinkStyleHook.PaintNC(Canvas: TCanvas);
-begin
-  //inherited;
-end;
-
-procedure TCtrlNotifySinkStyleHook.UpdateColors;
-begin
-  //inherited;
-end;
-
-procedure TCtrlNotifySinkStyleHook.WndProc(var Message: TMessage);
-begin
-  //OutputDebugString(PChar('TCtrlNotifySinkStyleHook '+WM_To_String(Message.Msg)));
-  inherited;
-end;
 
 { TSysLinkStyleHook }
 {
@@ -2849,70 +2767,19 @@ begin
   end;
 end;
 
-{ TTravelBandStyleHook }
-
-constructor TTravelBandStyleHook.Create(AHandle: THandle);
-begin
-  inherited;
-  {$IF CompilerVersion > 23}
-  StyleElements := [ seBorder, seClient];
-  {$ELSE}
-  OverridePaint := True;
-  OverrideEraseBkgnd := True;
-  OverridePaintNC := True;
-  {$IFEND}
-  UpdateColors;
-end;
-
-destructor TTravelBandStyleHook.Destroy;
-begin
-
-  inherited;
-end;
-
-procedure TTravelBandStyleHook.Paint(Canvas: TCanvas);
-begin
-  inherited;
-//  Canvas.Brush.Color := Color;
-//  Canvas.FillRect(SysControl.ClientRect);
-
-end;
-
-procedure TTravelBandStyleHook.PaintBackground(Canvas: TCanvas);
-begin
-  inherited;
-
-end;
-
-procedure TTravelBandStyleHook.PaintNC(Canvas: TCanvas);
-begin
-  inherited;
-
-end;
-
-procedure TTravelBandStyleHook.UpdateColors;
-begin
-  inherited;
-
-end;
-
-procedure TTravelBandStyleHook.WndProc(var Message: TMessage);
-begin
-  inherited;
-
-end;
-
 initialization
 
 if StyleServices.Available then
 begin
   with TSysStyleManager do
   begin
-    RegisterSysStyleHook('ToolbarWindow32', TSysToolbarStyleHook);
-    RegisterSysStyleHook('SysListView32', TSysListViewStyleHook);
-    RegisterSysStyleHook('SysTabControl32', TSysTabControlStyleHook);
-    RegisterSysStyleHook('SysTreeView32', TSysTreeViewStyleHook);
-    RegisterSysStyleHook('msctls_progress32', TSysProgressBarStyleHook);
+    RegisterSysStyleHook(TOOLBARCLASSNAME, TSysToolbarStyleHook);
+    RegisterSysStyleHook(WC_LISTVIEW, TSysListViewStyleHook);
+    RegisterSysStyleHook(WC_TABCONTROL, TSysTabControlStyleHook);
+    RegisterSysStyleHook(WC_TREEVIEW, TSysTreeViewStyleHook);
+    {$IFNDEF USE_Vcl.Styles.Hooks}
+    RegisterSysStyleHook(PROGRESS_CLASS, TSysProgressBarStyleHook);
+    {$ENDIF}
     RegisterSysStyleHook('RichEdit20A', TSysRichEditStyleHook);
     RegisterSysStyleHook('RichEdit20W', TSysRichEditStyleHook);
     RegisterSysStyleHook('RichEdit30A', TSysRichEditStyleHook);
@@ -2921,16 +2788,10 @@ begin
     RegisterSysStyleHook('RichEdit41W', TSysRichEditStyleHook);
     RegisterSysStyleHook('RichEdit50A', TSysRichEditStyleHook);
     RegisterSysStyleHook('RichEdit50W', TSysRichEditStyleHook);
-    RegisterSysStyleHook('RebarWindow32', TSysReBarStyleHook);
-    RegisterSysStyleHook('msctls_statusbar32', TSysStatusBarStyleHook);
-    RegisterSysStyleHook('msctls_trackbar32', TSysTrackBarStyleHook);
-    RegisterSysStyleHook('msctls_updown32', TSysUpDownStyleHook);
-
-    //RegisterSysStyleHook('SHELLDLL_DefView', TSysListViewStyleHook);
-    //RegisterSysStyleHook('TravelBand', TTravelBandStyleHook);
-//    RegisterSysStyleHook('DirectUIHWND', TDirectUIHWNDStyleHook);
-//    RegisterSysStyleHook('ctrlnotifysink', TCtrlNotifySinkStyleHook);
-//    RegisterSysStyleHook('syslink', TSysLinkStyleHook);
+    RegisterSysStyleHook(REBARCLASSNAME, TSysReBarStyleHook);
+    RegisterSysStyleHook(STATUSCLASSNAME, TSysStatusBarStyleHook);
+    RegisterSysStyleHook(TRACKBAR_CLASS, TSysTrackBarStyleHook);
+    RegisterSysStyleHook(UPDOWN_CLASS, TSysUpDownStyleHook);
   end;
 end;
 
@@ -2938,11 +2799,14 @@ finalization
 
 with TSysStyleManager do
 begin
-  UnRegisterSysStyleHook('ToolbarWindow32', TSysToolbarStyleHook);
-  UnRegisterSysStyleHook('SysListView32', TSysListViewStyleHook);
-  UnRegisterSysStyleHook('SysTabControl32', TSysTabControlStyleHook);
-  UnRegisterSysStyleHook('SysTreeView32', TSysTreeViewStyleHook);
-  UnRegisterSysStyleHook('msctls_progress32', TSysProgressBarStyleHook);
+  UnRegisterSysStyleHook(TOOLBARCLASSNAME, TSysToolbarStyleHook);
+  UnRegisterSysStyleHook(WC_LISTVIEW, TSysListViewStyleHook);
+  UnRegisterSysStyleHook(WC_TABCONTROL, TSysTabControlStyleHook);
+  UnRegisterSysStyleHook(WC_TREEVIEW, TSysTreeViewStyleHook);
+  {$IFNDEF USE_Vcl.Styles.Hooks}
+  UnRegisterSysStyleHook(PROGRESS_CLASS, TSysProgressBarStyleHook);
+  {$ENDIF}
+
   UnRegisterSysStyleHook('RichEdit20A', TSysRichEditStyleHook);
   UnRegisterSysStyleHook('RichEdit20W', TSysRichEditStyleHook);
   UnRegisterSysStyleHook('RichEdit30A', TSysRichEditStyleHook);
@@ -2951,16 +2815,10 @@ begin
   UnRegisterSysStyleHook('RichEdit41W', TSysRichEditStyleHook);
   UnRegisterSysStyleHook('RichEdit50A', TSysRichEditStyleHook);
   UnRegisterSysStyleHook('RichEdit50W', TSysRichEditStyleHook);
-  UnRegisterSysStyleHook('RebarWindow32', TSysReBarStyleHook);
-  UnRegisterSysStyleHook('msctls_statusbar32', TSysStatusBarStyleHook);
-  UnRegisterSysStyleHook('msctls_trackbar32', TSysTrackBarStyleHook);
-  UnRegisterSysStyleHook('msctls_updown32', TSysUpDownStyleHook);
-
-  //UnRegisterSysStyleHook('SHELLDLL_DefView', TSysListViewStyleHook);
-  //UnRegisterSysStyleHook('TravelBand', TTravelBandStyleHook);
-//  UnRegisterSysStyleHook('DirectUIHWND', TDirectUIHWNDStyleHook);
-//  UnRegisterSysStyleHook('ctrlnotifysink', TCtrlNotifySinkStyleHook);
-//  UnRegisterSysStyleHook('syslink', TSysLinkStyleHook);
+  UnRegisterSysStyleHook(REBARCLASSNAME, TSysReBarStyleHook);
+  UnRegisterSysStyleHook(STATUSCLASSNAME, TSysStatusBarStyleHook);
+  UnRegisterSysStyleHook(TRACKBAR_CLASS, TSysTrackBarStyleHook);
+  UnRegisterSysStyleHook(UPDOWN_CLASS, TSysUpDownStyleHook);
 end;
 
 end.

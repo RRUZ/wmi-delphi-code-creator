@@ -2,7 +2,7 @@
 //
 // Unit Vcl.Styles.Utils.Forms
 // unit for the VCL Styles Utils
-// http://code.google.com/p/vcl-styles-utils/
+// https://github.com/RRUZ/vcl-styles-utils/
 //
 // The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
 // you may not use this file except in compliance with the License. You may obtain a copy of the
@@ -14,11 +14,14 @@
 //
 //
 // Portions created by Mahdi Safsafi [SMP3]   e-mail SMP@LIVE.FR
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2014 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2015 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
 unit Vcl.Styles.Utils.Forms;
+
+
+{$I VCL.Styles.Utils.inc}
 
 interface
 
@@ -33,6 +36,9 @@ uses
   Vcl.Dialogs,
   Vcl.Graphics,
   Vcl.Styles.Utils.SysStyleHook,
+  {$IFDEF USE_Vcl.Styles.Hooks}
+  Vcl.Styles.Hooks,
+  {$ENDIF}
   Vcl.Forms,
   Vcl.GraphUtil,
   Vcl.ExtCtrls,
@@ -94,6 +100,8 @@ type
     function IsHorzScrollDisabled: Boolean;
     function IsVertScrollDisabled: Boolean;
   protected
+    property LstPos : Integer read FLstPos write FLstPos;
+    property AllowScrolling : Boolean read FAllowScrolling write FAllowScrolling;
     function NormalizePoint(const P: TPoint): TPoint;
     procedure Scroll(const Kind: TScrollBarKind; const ScrollType: TSysScrollingType; Pos, Delta: Integer); virtual;
     procedure DoScroll(const Kind: TScrollBarKind; const ScrollType: TSysScrollingType; Pos, Delta: Integer);
@@ -158,6 +166,7 @@ type
     procedure WMNCACTIVATE(var Message: TWMNCActivate); message WM_NCACTIVATE;
     procedure WMNCCalcSize(var Message: TWMNCCalcSize); message WM_NCCALCSIZE;
     procedure WMSIZE(var Message: TWMSize); message WM_SIZE;
+    procedure WMSetText(var Message: TMessage); message WM_SETTEXT;
     function GetCaptionRect: TRect;
     function GetBorderStyle: TFormBorderStyle;
     function GetBorderIcons: TBorderIcons;
@@ -716,7 +725,7 @@ begin
     IconDetails := StyleServices.GetElementDetails(twSysButtonNormal);
     if not StyleServices.GetElementContentRect(0, IconDetails, CaptionRect, ButtonRect) then
       ButtonRect := Rect(0, 0, 0, 0);
-    R := ButtonRect;
+    //R := ButtonRect;
     R := Rect(0, 0, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON));
     RectVCenter(R, ButtonRect);
     Result := ButtonRect;
@@ -800,7 +809,7 @@ var
   TextFormat: TTextFormat;
   LText: String;
   nPos: Integer;
-  SysMenu: HMENU;
+  LSysMenu: HMENU;
   ItemDisabled: Boolean;
 begin
   LBorderStyle := BorderStyle;
@@ -856,9 +865,9 @@ begin
     Inc(TextRect.Left, 7);
 
   { Draw buttons }
-  SysMenu := GetSystemMenu(Handle, False);
-  nPos := GetMenuItemPos(SysMenu, SC_CLOSE);
-  ItemDisabled := IsItemDisabled(SysMenu, nPos);
+  LSysMenu := GetSystemMenu(Handle, False);
+  nPos := GetMenuItemPos(LSysMenu, SC_CLOSE);
+  ItemDisabled := IsItemDisabled(LSysMenu, nPos);
   if (biSystemMenu in LBorderIcons) and (not ItemDisabled) then
   begin
     if not UseSmallBorder then
@@ -1218,6 +1227,38 @@ begin
   Handled := True;
 end;
 
+procedure TSysDialogStyleHook.WMSetText(var Message: TMessage);
+var
+  FRedraw: Boolean;
+  LBorderStyle : TFormBorderStyle;
+begin
+  LBorderStyle := BorderStyle;
+  if (LBorderStyle = bsNone) or (WindowState = wsMinimized) or (StyleServices.IsSystemStyle) then
+  begin
+    Handled := False;
+    Exit;
+  end;
+
+  FRedraw := True;
+
+  if  IsWindowVisible(Handle) then
+  begin
+    //Application.ProcessMessages;
+    FRedraw := False;
+    SetRedraw(False);
+  end;
+
+  CallDefaultProc(Message);
+
+  if not FRedraw then
+  begin
+    SetRedraw(True);
+    InvalidateNC;
+  end;
+  Handled := True;
+end;
+
+
 procedure TSysDialogStyleHook.WMSIZE(var Message: TWMSize);
 begin
   Handled := False;
@@ -1235,7 +1276,7 @@ end;
 procedure TSysDialogStyleHook.WndProc(var Message: TMessage);
 var
   DFBW: Integer;
-  BorderSize: TRect;
+  LBorderSize: TRect;
   LParentHandle: HWND;
 begin
   // Addlog(Format('TSysDialogStyleHook $0x%x %s', [SysControl.Handle, WM_To_String(Message.Msg)]));
@@ -1252,8 +1293,8 @@ begin
         { DFBW =Default Frame Border Width }
         DFBW := GetSystemMetrics(SM_CXBORDER);
         Inc(DFBW);
-        BorderSize := GetBorderSize;
-        if (SysControl.Width > BorderSize.Left) and (SysControl.Width > BorderSize.Right) then
+        LBorderSize := GetBorderSize;
+        if (SysControl.Width > LBorderSize.Left) and (SysControl.Width > LBorderSize.Right) then
           SetWindowPos(Handle, 0, 0, 0, SysControl.Width + DFBW, SysControl.Height + DFBW + 1, SWP_NOMOVE or SWP_NOZORDER or SWP_FRAMECHANGED);
         Exit;
       end;
@@ -1481,7 +1522,7 @@ begin
       Detail := FBtnRightDetail;
       if (not SysControl.Enabled) or (HorzScrollDisabled) then
         Detail := tsArrowBtnRightDisabled;
-      R := HorzRightRect;
+      //R := HorzRightRect;
       R := Rect(B.Width - cx, 0, B.Width, cy);
       LDetails := StyleServices.GetElementDetails(Detail);
       StyleServices.DrawElement(BmpDC, LDetails, R);
@@ -1687,14 +1728,10 @@ var
   PosX: Integer;
 begin
   Result := Rect(0, 0, 0, 0);
-  with HorzScrollInfo do
-  begin
-    ThumbSize := GetHorzThumbSize;
-    PosX := MulDiv(nPos, HorzTrackRect.Width, nMax - nMin);
-    with HorzTrackRect do
-      Result := Rect(Left + PosX, Top, Left + PosX + ThumbSize, Bottom);
-  end;
-
+  ThumbSize := GetHorzThumbSize;
+  PosX := MulDiv(HorzScrollInfo.nPos, HorzTrackRect.Width, HorzScrollInfo.nMax - HorzScrollInfo.nMin);
+  with HorzTrackRect do
+    Result := Rect(Left + PosX, Top, Left + PosX + ThumbSize, Bottom);
 end;
 
 function TSysScrollingStyleHook.GetHorzThumbPosFromPos(const Pos: Integer): Integer;
@@ -1850,13 +1887,10 @@ var
   PosY: Integer;
 begin
   Result := Rect(0, 0, 0, 0);
-  with VertScrollInfo do
-  begin
-    ThumbSize := GetVertThumbSize;
-    PosY := MulDiv(nPos, VertTrackRect.Height, nMax - nMin);
-    with VertTrackRect do
-      Result := Rect(Left, Top + PosY, Right, Top + PosY + ThumbSize);
-  end;
+  ThumbSize := GetVertThumbSize;
+  PosY := MulDiv(VertScrollInfo.nPos, VertTrackRect.Height, VertScrollInfo.nMax - VertScrollInfo.nMin);
+  with VertTrackRect do
+    Result := Rect(Left, Top + PosY, Right, Top + PosY + ThumbSize);
 end;
 
 function TSysScrollingStyleHook.GetVertThumbPosFromPos(const Pos: Integer): Integer;
@@ -2636,17 +2670,24 @@ end;
 
 initialization
 
-UseLatestCommonDialogs := False;
+ {$IFNDEF USE_Vcl.Styles.Hooks}
+ //UseLatestCommonDialogs := False;
+ {$ENDIF}
+
+{$IF CompilerVersion >= 30}
+ TStyleManager.SystemHooks := TStyleManager.SystemHooks - [shDialogs];
+{$IFEND}
+
 
   if StyleServices.Available then
   begin
     TSysStyleManager.RegisterSysStyleHook('#32770', TSysDialogStyleHook);
+    //TSysStyleManager.RegisterSysStyleHook('HH Parent', TSysDialogStyleHook);
     TSysStyleManager.RegisterSysStyleHook('ScrollBar', TSysScrollBarStyleHook);
   end;
 
 finalization
-
   TSysStyleManager.UnRegisterSysStyleHook('#32770', TSysDialogStyleHook);
+  //TSysStyleManager.UnRegisterSysStyleHook('HH Parent', TSysDialogStyleHook);
   TSysStyleManager.UnRegisterSysStyleHook('ScrollBar', TSysScrollBarStyleHook);
-
 end.

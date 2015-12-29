@@ -48,7 +48,6 @@ uses
   uWinInet in 'Units\Misc\uWinInet.pas',
   uComboBox in 'Units\Misc\uComboBox.pas',
   uCustomImageDrawHook in 'Units\Misc\uCustomImageDrawHook.pas',
-  uCheckUpdate in 'Units\Misc\uCheckUpdate.pas' {FrmCheckUpdate},
   uWmiCSharpCode in 'Units\uWmiCSharpCode.pas',
   uDotNetFrameWork in 'Units\uDotNetFrameWork.pas',
   uWmiPropertyValue in 'Units\uWmiPropertyValue.pas' {FrmWMIPropValue},
@@ -84,25 +83,13 @@ uses
 
 procedure UpdateApp;
 var
-  Frm: TFrmCheckUpdate;
   Settings : TSettings;
 begin
   Settings:=TSettings.Create;
   try
     ReadSettings(Settings);
     if Settings.CheckForUpdates then
-    begin
-      Frm := GetUpdaterInstance;
-      try
-        Frm.CheckExternal:=True;
-        if Frm.UpdateAvailable then
-          Frm.ExecuteUpdater;
-
-         // ccccccc
-      finally
-        //Frm.Free;
-      end;
-    end;
+     CheckForUpdates(True);
   finally
     Settings.Free;
   end;

@@ -196,9 +196,6 @@
         <DCCReference Include="Units\Misc\uWinInet.pas"/>
         <DCCReference Include="Units\Misc\uComboBox.pas"/>
         <DCCReference Include="Units\Misc\uCustomImageDrawHook.pas"/>
-        <DCCReference Include="Units\Misc\uCheckUpdate.pas">
-            <Form>FrmCheckUpdate</Form>
-        </DCCReference>
         <DCCReference Include="Units\uWmiCSharpCode.pas"/>
         <DCCReference Include="Units\uDotNetFrameWork.pas"/>
         <DCCReference Include="Units\uWmiPropertyValue.pas">
@@ -287,7 +284,7 @@
                     <VersionInfo Name="MajorVer">1</VersionInfo>
                     <VersionInfo Name="MinorVer">1</VersionInfo>
                     <VersionInfo Name="Release">2</VersionInfo>
-                    <VersionInfo Name="Build">247</VersionInfo>
+                    <VersionInfo Name="Build">248</VersionInfo>
                     <VersionInfo Name="Debug">False</VersionInfo>
                     <VersionInfo Name="PreRelease">False</VersionInfo>
                     <VersionInfo Name="Special">False</VersionInfo>
@@ -299,7 +296,7 @@
                 <VersionInfoKeys>
                     <VersionInfoKeys Name="CompanyName"/>
                     <VersionInfoKeys Name="FileDescription"/>
-                    <VersionInfoKeys Name="FileVersion">1.1.2.247</VersionInfoKeys>
+                    <VersionInfoKeys Name="FileVersion">1.1.2.248</VersionInfoKeys>
                     <VersionInfoKeys Name="InternalName"/>
                     <VersionInfoKeys Name="LegalCopyright"/>
                     <VersionInfoKeys Name="LegalTrademarks"/>

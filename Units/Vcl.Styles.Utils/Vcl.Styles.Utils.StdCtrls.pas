@@ -2,7 +2,7 @@
 //
 // Unit Vcl.Styles.Utils.StdCtrls
 // unit for the VCL Styles Utils
-// http://code.google.com/p/vcl-styles-utils/
+// https://github.com/RRUZ/vcl-styles-utils/
 //
 // The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License");
 // you may not use this file except in compliance with the License. You may obtain a copy of the
@@ -14,7 +14,7 @@
 //
 //
 // Portions created by Mahdi Safsafi [SMP3]   e-mail SMP@LIVE.FR
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2014 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2015 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
@@ -125,6 +125,7 @@ type
     function GetBorderSize: TRect; override;
     procedure WndProc(var Message: TMessage); override;
     procedure UpdateColors; override;
+    procedure PaintBackground(Canvas: TCanvas); override;
   public
     constructor Create(AHandle: THandle); override;
     Destructor Destroy; override;
@@ -380,6 +381,7 @@ begin
   OverridePaintNC := True;
   OverrideFont := False;
 {$IFEND}
+  //OverrideEraseBkgnd:=True;
 end;
 
 destructor TSysListBoxStyleHook.Destroy;
@@ -395,12 +397,17 @@ begin
   begin
     Result := Rect(2, 2, 2, 2);
   end;
-  if SysControl.ControlClassName = 'ComboLBox' then
+  if SameText(SysControl.ControlClassName, 'ComboLBox') then
   begin
     if SysControl.Parent.Style and CBS_SIMPLE = CBS_SIMPLE then
       Exit;
     Result := Rect(0, 0, 0, 0);
   end;
+end;
+
+procedure TSysListBoxStyleHook.PaintBackground(Canvas: TCanvas);
+begin
+  inherited;
 end;
 
 procedure TSysListBoxStyleHook.UpdateColors;
@@ -522,6 +529,9 @@ begin
   with SysControl do
     Result := (Style and BS_RADIOBUTTON = BS_RADIOBUTTON) or
       (Style and BS_AUTORADIOBUTTON = BS_AUTORADIOBUTTON);
+
+ if Result then
+      Result:= not IsSplitButton;
 end;
 
 function TSysButtonStyleHook.IsSplitButton: Boolean;
@@ -1297,6 +1307,15 @@ end;
 
 function TSysComboBoxStyleHook.ListBoxVertScrollRect: TRect;
 begin
+  Result := ListBoxBoundsRect;
+  OffsetRect(Result, -Result.Left, -Result.Top);
+  InflateRect(Result, -1, -1);
+  OffsetRect(Result, 1, 1);
+  if SysControl.BiDiMode <> TBidiModeDirection.bmRightToLeft then
+    Result.Left := Result.Right - GetSystemMetrics(SM_CXVSCROLL)
+  else
+    Result.Right := Result.Left + GetSystemMetrics(SM_CXVSCROLL);
+  if ListBoxBoundsRect.Height > 30 then OffsetRect(Result, -1, -1);
 
 end;
 
@@ -2373,8 +2392,10 @@ end;
 function TSysStaticStyleHook.GetIsFrameOrLine: Boolean;
 begin
   with SysControl do
-    Result := (Style and SS_ETCHEDFRAME = SS_ETCHEDFRAME) or
+    Result :=
+      (Style and SS_ETCHEDFRAME = SS_ETCHEDFRAME) or
       (Style and SS_ETCHEDHORZ = SS_ETCHEDHORZ) or
+      (Style and SS_SUNKEN = SS_SUNKEN) or
       (Style and SS_ETCHEDVERT = SS_ETCHEDVERT);
 end;
 
@@ -2518,7 +2539,7 @@ begin
   end;
 end;
 
-{ TNewCheckBoxStyleHook }
+{ TSysCheckBoxStyleHook }
 function RectVCenter(var R: TRect; Bounds: TRect): TRect;
 begin
   OffsetRect(R, -R.Left, -R.Top);
@@ -2760,7 +2781,7 @@ begin
   inherited;
 end;
 
-{ TNewRadioButtonStyleHook }
+{ TSysRadioButtonStyleHook }
 
 constructor TSysRadioButtonStyleHook.Create(AHandle: THandle);
 begin
@@ -2816,12 +2837,12 @@ if StyleServices.Available then
 begin
   with TSysStyleManager do
   begin
-    RegisterSysStyleHook('Button', TSysButtonStyleHook);
-    RegisterSysStyleHook('Edit', TSysEditStyleHook);
+    RegisterSysStyleHook(WC_BUTTON, TSysButtonStyleHook);
+    RegisterSysStyleHook(WC_EDIT, TSysEditStyleHook);
     RegisterSysStyleHook('ComboLBox', TSysListBoxStyleHook);
-    RegisterSysStyleHook('ComboBox', TSysComboBoxStyleHook);
-    RegisterSysStyleHook('ListBox', TSysListBoxStyleHook);
-    RegisterSysStyleHook('Static', TSysStaticStyleHook);
+    RegisterSysStyleHook(WC_COMBOBOX, TSysComboBoxStyleHook);
+    RegisterSysStyleHook( 'ListBox', TSysListBoxStyleHook);
+    RegisterSysStyleHook( 'Static', TSysStaticStyleHook);
   end;
 end;
 
@@ -2829,10 +2850,10 @@ finalization
 
 with TSysStyleManager do
 begin
-  UnRegisterSysStyleHook('Button', TSysButtonStyleHook);
-  UnRegisterSysStyleHook('Edit', TSysEditStyleHook);
+  UnRegisterSysStyleHook(WC_BUTTON, TSysButtonStyleHook);
+  UnRegisterSysStyleHook(WC_EDIT, TSysEditStyleHook);
   UnRegisterSysStyleHook('ComboLBox', TSysListBoxStyleHook);
-  UnRegisterSysStyleHook('ComboBox', TSysComboBoxStyleHook);
+  UnRegisterSysStyleHook(WC_COMBOBOX, TSysComboBoxStyleHook);
   UnRegisterSysStyleHook('ListBox', TSysListBoxStyleHook);
   UnRegisterSysStyleHook('Static', TSysStaticStyleHook);
 end;

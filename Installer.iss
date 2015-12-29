@@ -58,65 +58,64 @@ Source: Themes\Vibrant Ink.theme.xml; DestDir: {app}\Themes\
 Source: Themes\wekeroad-ink.theme.xml; DestDir: {app}\Themes\
 Source: Themes\zenburn-2010.theme.xml; DestDir: {app}\Themes\
 Source: Themes\Zenburn.theme.xml; DestDir: {app}\Themes\
-Source: "WDCC.exe"; DestDir: {app}
-Source: "Extras\MonoDevelop.ico"; DestDir: {app}\Extras\
-Source: "Lazarus\TemplateConsole.lpi"; DestDir: {app}\Lazarus\
+Source: WDCC.exe; DestDir: {app}
+Source: Extras\MonoDevelop.ico; DestDir: {app}\Extras\
+Source: Lazarus\TemplateConsole.lpi; DestDir: {app}\Lazarus\
 
 
-Source: "Oxygene\MonoDevelop\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\MonoDevelop\Properties"
-Source: "Oxygene\MonoDevelop\Properties\Resources.Designer.pas"; DestDir: "{app}\Oxygene\MonoDevelop\Properties"
-Source: "Oxygene\MonoDevelop\Properties\Resources.resx"; DestDir: "{app}\Oxygene\MonoDevelop\Properties"
-Source: "Oxygene\MonoDevelop\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxygene\MonoDevelop\Properties"
-Source: "Oxygene\MonoDevelop\Properties\Settings.settings"; DestDir: "{app}\Oxygene\MonoDevelop\Properties"
-Source: "Oxygene\MonoDevelop\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\MonoDevelop"
-Source: "Oxygene\MonoDevelop\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\MonoDevelop"
-Source: "Oxygene\MonoDevelop\GetWMI_Info.userprefs"; DestDir: "{app}\Oxygene\MonoDevelop"
+Source: Oxygene\MonoDevelop\Properties\AssemblyInfo.pas; DestDir: {app}\Oxygene\MonoDevelop\Properties
+Source: Oxygene\MonoDevelop\Properties\Resources.Designer.pas; DestDir: {app}\Oxygene\MonoDevelop\Properties
+Source: Oxygene\MonoDevelop\Properties\Resources.resx; DestDir: {app}\Oxygene\MonoDevelop\Properties
+Source: Oxygene\MonoDevelop\Properties\Settings.Designer.pas; DestDir: {app}\Oxygene\MonoDevelop\Properties
+Source: Oxygene\MonoDevelop\Properties\Settings.settings; DestDir: {app}\Oxygene\MonoDevelop\Properties
+Source: Oxygene\MonoDevelop\GetWMI_Info.oxygene; DestDir: {app}\Oxygene\MonoDevelop
+Source: Oxygene\MonoDevelop\GetWMI_Info.sln; DestDir: {app}\Oxygene\MonoDevelop
+Source: Oxygene\MonoDevelop\GetWMI_Info.userprefs; DestDir: {app}\Oxygene\MonoDevelop
 
-Source: "Oxygene\VS2008\Properties\App.ico"; DestDir: "{app}\Oxygene\VS2008\Properties"
-Source: "Oxygene\VS2008\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\VS2008\Properties"
-Source: "Oxygene\VS2008\Properties\Resources.Designer.pas"; DestDir: "{app}\Oxygene\VS2008\Properties"
-Source: "Oxygene\VS2008\Properties\Resources.resx"; DestDir: "{app}\Oxygene\VS2008\Properties"
-Source: "Oxygene\VS2008\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxygene\VS2008\Properties"
-Source: "Oxygene\VS2008\Properties\Settings.settings"; DestDir: "{app}\Oxygene\VS2008\Properties"
-Source: "Oxygene\VS2008\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\VS2008"
-Source: "Oxygene\VS2008\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\VS2008"
+Source: Oxygene\VS2008\Properties\App.ico; DestDir: {app}\Oxygene\VS2008\Properties
+Source: Oxygene\VS2008\Properties\AssemblyInfo.pas; DestDir: {app}\Oxygene\VS2008\Properties
+Source: Oxygene\VS2008\Properties\Resources.Designer.pas; DestDir: {app}\Oxygene\VS2008\Properties
+Source: Oxygene\VS2008\Properties\Resources.resx; DestDir: {app}\Oxygene\VS2008\Properties
+Source: Oxygene\VS2008\Properties\Settings.Designer.pas; DestDir: {app}\Oxygene\VS2008\Properties
+Source: Oxygene\VS2008\Properties\Settings.settings; DestDir: {app}\Oxygene\VS2008\Properties
+Source: Oxygene\VS2008\GetWMI_Info.oxygene; DestDir: {app}\Oxygene\VS2008
+Source: Oxygene\VS2008\GetWMI_Info.sln; DestDir: {app}\Oxygene\VS2008
 
-Source: "Oxygene\VS2010\Properties\App.ico"; DestDir: "{app}\Oxygene\VS2010\Properties"
-Source: "Oxygene\VS2010\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\VS2010\Properties"
-Source: "Oxygene\VS2010\Properties\Resources.Designer.pas"; DestDir: "{app}\Oxygene\VS2010\Properties"
-Source: "Oxygene\VS2010\Properties\Resources.resx"; DestDir: "{app}\Oxygene\VS2010\Properties"
-Source: "Oxygene\VS2010\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxygene\VS2010\Properties"
-Source: "Oxygene\VS2010\Properties\Settings.settings"; DestDir: "{app}\Oxygene\VS2010\Properties"
-Source: "Oxygene\VS2010\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\VS2010"
-Source: "Oxygene\VS2010\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\VS2010"
+Source: Oxygene\VS2010\Properties\App.ico; DestDir: {app}\Oxygene\VS2010\Properties
+Source: Oxygene\VS2010\Properties\AssemblyInfo.pas; DestDir: {app}\Oxygene\VS2010\Properties
+Source: Oxygene\VS2010\Properties\Resources.Designer.pas; DestDir: {app}\Oxygene\VS2010\Properties
+Source: Oxygene\VS2010\Properties\Resources.resx; DestDir: {app}\Oxygene\VS2010\Properties
+Source: Oxygene\VS2010\Properties\Settings.Designer.pas; DestDir: {app}\Oxygene\VS2010\Properties
+Source: Oxygene\VS2010\Properties\Settings.settings; DestDir: {app}\Oxygene\VS2010\Properties
+Source: Oxygene\VS2010\GetWMI_Info.oxygene; DestDir: {app}\Oxygene\VS2010
+Source: Oxygene\VS2010\GetWMI_Info.sln; DestDir: {app}\Oxygene\VS2010
 
-Source: "Oxygene\VS2012\Properties\App.ico"; DestDir: "{app}\Oxygene\VS2012\Properties"
-Source: "Oxygene\VS2012\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\VS2012\Properties"
-Source: "Oxygene\VS2012\Properties\Resources.Designer.pas"; DestDir: "{app}\Oxygene\VS2012\Properties"
-Source: "Oxygene\VS2012\Properties\Resources.resx"; DestDir: "{app}\Oxygene\VS2012\Properties"
-Source: "Oxygene\VS2012\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxygene\VS2012\Properties"
-Source: "Oxygene\VS2012\Properties\Settings.settings"; DestDir: "{app}\Oxygene\VS2012\Properties"
-Source: "Oxygene\VS2012\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\VS2012"
-Source: "Oxygene\VS2012\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\VS2012"
+Source: Oxygene\VS2012\Properties\App.ico; DestDir: {app}\Oxygene\VS2012\Properties
+Source: Oxygene\VS2012\Properties\AssemblyInfo.pas; DestDir: {app}\Oxygene\VS2012\Properties
+Source: Oxygene\VS2012\Properties\Resources.Designer.pas; DestDir: {app}\Oxygene\VS2012\Properties
+Source: Oxygene\VS2012\Properties\Resources.resx; DestDir: {app}\Oxygene\VS2012\Properties
+Source: Oxygene\VS2012\Properties\Settings.Designer.pas; DestDir: {app}\Oxygene\VS2012\Properties
+Source: Oxygene\VS2012\Properties\Settings.settings; DestDir: {app}\Oxygene\VS2012\Properties
+Source: Oxygene\VS2012\GetWMI_Info.oxygene; DestDir: {app}\Oxygene\VS2012
+Source: Oxygene\VS2012\GetWMI_Info.sln; DestDir: {app}\Oxygene\VS2012
 
-Source: "Oxygene\VS2013\Properties\App.ico"; DestDir: "{app}\Oxygene\VS2013\Properties"
-Source: "Oxygene\VS2013\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\VS2013\Properties"
-Source: "Oxygene\VS2013\Properties\Resources.Designer.pas"; DestDir: "{app}\Oxygene\VS2013\Properties"
-Source: "Oxygene\VS2013\Properties\Resources.resx"; DestDir: "{app}\Oxygene\VS2013\Properties"
-Source: "Oxygene\VS2013\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxygene\VS2013\Properties"
-Source: "Oxygene\VS2013\Properties\Settings.settings"; DestDir: "{app}\Oxygene\VS2013\Properties"
-Source: "Oxygene\VS2013\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\VS2013"
-Source: "Oxygene\VS2013\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\VS2013"
+Source: Oxygene\VS2013\Properties\App.ico; DestDir: {app}\Oxygene\VS2013\Properties
+Source: Oxygene\VS2013\Properties\AssemblyInfo.pas; DestDir: {app}\Oxygene\VS2013\Properties
+Source: Oxygene\VS2013\Properties\Resources.Designer.pas; DestDir: {app}\Oxygene\VS2013\Properties
+Source: Oxygene\VS2013\Properties\Resources.resx; DestDir: {app}\Oxygene\VS2013\Properties
+Source: Oxygene\VS2013\Properties\Settings.Designer.pas; DestDir: {app}\Oxygene\VS2013\Properties
+Source: Oxygene\VS2013\Properties\Settings.settings; DestDir: {app}\Oxygene\VS2013\Properties
+Source: Oxygene\VS2013\GetWMI_Info.oxygene; DestDir: {app}\Oxygene\VS2013
+Source: Oxygene\VS2013\GetWMI_Info.sln; DestDir: {app}\Oxygene\VS2013
 
-Source: "Oxygene\VS2015\Properties\App.ico"; DestDir: "{app}\Oxygene\VS2015\Properties"
-Source: "Oxygene\VS2015\Properties\AssemblyInfo.pas"; DestDir: "{app}\Oxygene\VS2015\Properties"
-Source: "Oxygene\VS2015\Properties\Resources.Designer.pas"; DestDir: "{app}\Oxygene\VS2015\Properties"
-Source: "Oxygene\VS2015\Properties\Resources.resx"; DestDir: "{app}\Oxygene\VS2015\Properties"
-Source: "Oxygene\VS2015\Properties\Settings.Designer.pas"; DestDir: "{app}\Oxygene\VS2015\Properties"
-Source: "Oxygene\VS2015\Properties\Settings.settings"; DestDir: "{app}\Oxygene\VS2015\Properties"
-Source: "Oxygene\VS2015\GetWMI_Info.oxygene"; DestDir: "{app}\Oxygene\VS2015"
-Source: "Oxygene\VS2015\GetWMI_Info.sln"; DestDir: "{app}\Oxygene\VS2015"
-
+Source: Oxygene\VS2015\Properties\App.ico; DestDir: {app}\Oxygene\VS2015\Properties
+Source: Oxygene\VS2015\Properties\AssemblyInfo.pas; DestDir: {app}\Oxygene\VS2015\Properties
+Source: Oxygene\VS2015\Properties\Resources.Designer.pas; DestDir: {app}\Oxygene\VS2015\Properties
+Source: Oxygene\VS2015\Properties\Resources.resx; DestDir: {app}\Oxygene\VS2015\Properties
+Source: Oxygene\VS2015\Properties\Settings.Designer.pas; DestDir: {app}\Oxygene\VS2015\Properties
+Source: Oxygene\VS2015\Properties\Settings.settings; DestDir: {app}\Oxygene\VS2015\Properties
+Source: Oxygene\VS2015\GetWMI_Info.oxygene; DestDir: {app}\Oxygene\VS2015
+Source: Oxygene\VS2015\GetWMI_Info.sln; DestDir: {app}\Oxygene\VS2015
 Source: Delphi\Jedi.inc; DestDir: {app}\Delphi\
 Source: Delphi\JediAPILib.inc; DestDir: {app}\Delphi\
 Source: Delphi\JwaActiveX.pas; DestDir: {app}\Delphi\
@@ -125,163 +124,155 @@ Source: Delphi\JwaWinDLLNames.pas; DestDir: {app}\Delphi\
 Source: Delphi\JwaWinNT.pas; DestDir: {app}\Delphi\
 Source: Delphi\JwaWinType.pas; DestDir: {app}\Delphi\
 Source: Delphi\WbemScripting_TLB.pas; DestDir: {app}\Delphi\
-
-Source: "Microsoft_C++\VS2005\GetWMI_Info.sln"; DestDir: "{app}\Microsoft_C++\VS2005"
-Source: "Microsoft_C++\VS2005\GetWMI_Info.vcproj"; DestDir: "{app}\Microsoft_C++\VS2005"
-Source: "Microsoft_C++\VS2005\stdafx.cpp"; DestDir: "{app}\Microsoft_C++\VS2005"
-Source: "Microsoft_C++\VS2005\stdafx.h"; DestDir: "{app}\Microsoft_C++\VS2005"
-Source: "Microsoft_C++\VS2005\targetver.h"; DestDir: "{app}\Microsoft_C++\VS2005"
-
-Source: "Microsoft_C++\VS2008\GetWMI_Info.sln"; DestDir: "{app}\Microsoft_C++\VS2008"
-Source: "Microsoft_C++\VS2008\GetWMI_Info.vcproj"; DestDir: "{app}\Microsoft_C++\VS2008"
-Source: "Microsoft_C++\VS2008\stdafx.cpp"; DestDir: "{app}\Microsoft_C++\VS2008"
-Source: "Microsoft_C++\VS2008\stdafx.h"; DestDir: "{app}\Microsoft_C++\VS2008"
-Source: "Microsoft_C++\VS2008\targetver.h"; DestDir: "{app}\Microsoft_C++\VS2008"
-
-Source: "Microsoft_C++\VS2010\GetWMI_Info.sln"; DestDir: "{app}\Microsoft_C++\VS2010"
-Source: "Microsoft_C++\VS2010\GetWMI_Info.vcxproj"; DestDir: "{app}\Microsoft_C++\VS2010"
-Source: "Microsoft_C++\VS2010\stdafx.cpp"; DestDir: "{app}\Microsoft_C++\VS2010"
-Source: "Microsoft_C++\VS2010\stdafx.h"; DestDir: "{app}\Microsoft_C++\VS2010"
-Source: "Microsoft_C++\VS2010\targetver.h"; DestDir: "{app}\Microsoft_C++\VS2010"
-
-Source: "Microsoft_C++\VS11\GetWMI_Info.sln"; DestDir: "{app}\Microsoft_C++\VS11"
-Source: "Microsoft_C++\VS11\GetWMI_Info.vcxproj"; DestDir: "{app}\Microsoft_C++\VS11"
-Source: "Microsoft_C++\VS11\stdafx.cpp"; DestDir: "{app}\Microsoft_C++\VS11"
-Source: "Microsoft_C++\VS11\stdafx.h"; DestDir: "{app}\Microsoft_C++\VS11"
-Source: "Microsoft_C++\VS11\targetver.h"; DestDir: "{app}\Microsoft_C++\VS11"
-
-Source: "Microsoft_C++\VS13\GetWMI_Info.sln"; DestDir: "{app}\Microsoft_C++\VS13"
-Source: "Microsoft_C++\VS13\GetWMI_Info.vcxproj"; DestDir: "{app}\Microsoft_C++\VS13"
-Source: "Microsoft_C++\VS13\stdafx.cpp"; DestDir: "{app}\Microsoft_C++\VS13"
-Source: "Microsoft_C++\VS13\stdafx.h"; DestDir: "{app}\Microsoft_C++\VS13"
-Source: "Microsoft_C++\VS13\targetver.h"; DestDir: "{app}\Microsoft_C++\VS13"
-
-Source: "Microsoft_C++\VS14\GetWMI_Info.sln"; DestDir: "{app}\Microsoft_C++\VS14"
-Source: "Microsoft_C++\VS14\GetWMI_Info.vcxproj"; DestDir: "{app}\Microsoft_C++\VS14"
-Source: "Microsoft_C++\VS14\stdafx.cpp"; DestDir: "{app}\Microsoft_C++\VS14"
-Source: "Microsoft_C++\VS14\stdafx.h"; DestDir: "{app}\Microsoft_C++\VS14"
-Source: "Microsoft_C++\VS14\targetver.h"; DestDir: "{app}\Microsoft_C++\VS14"
-
-Source: "Styles\Amakrits.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\AmethystKamri.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\AquaGraphite.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\AquaLightSlate.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Auric.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\BlueGraphite.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Carbon.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\CharcoalDarkSlate.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\CobaltXEMedia.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\EmeraldLightSlate.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Glossy.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Glow.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\GoldenGraphite.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\GreenGraphite.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\IcebergClassico.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\khaki.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\LavenderClassico.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Light.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\LightGreen.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\lilac.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Luna.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Metro Grey.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\MetroBlack.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\MetroBlue.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\MetroGreen.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\OnyxBlue.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\RubyGraphite.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\SapphireKamri.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Sky.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\SlateClassico.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\SmokeyQuartzKamri.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\TabletDark.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\TurquoiseGray.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Windows10.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Windows10Blue.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\Windows10Dark.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
-Source: "Styles\YellowGraphite.vsf"; DestDir: "{app}\Styles\"; Flags: ignoreversion
+Source: Microsoft_C++\VS2005\GetWMI_Info.sln; DestDir: {app}\Microsoft_C++\VS2005
+Source: Microsoft_C++\VS2005\GetWMI_Info.vcproj; DestDir: {app}\Microsoft_C++\VS2005
+Source: Microsoft_C++\VS2005\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS2005
+Source: Microsoft_C++\VS2005\stdafx.h; DestDir: {app}\Microsoft_C++\VS2005
+Source: Microsoft_C++\VS2005\targetver.h; DestDir: {app}\Microsoft_C++\VS2005
+Source: Microsoft_C++\VS2008\GetWMI_Info.sln; DestDir: {app}\Microsoft_C++\VS2008
+Source: Microsoft_C++\VS2008\GetWMI_Info.vcproj; DestDir: {app}\Microsoft_C++\VS2008
+Source: Microsoft_C++\VS2008\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS2008
+Source: Microsoft_C++\VS2008\stdafx.h; DestDir: {app}\Microsoft_C++\VS2008
+Source: Microsoft_C++\VS2008\targetver.h; DestDir: {app}\Microsoft_C++\VS2008
+Source: Microsoft_C++\VS2010\GetWMI_Info.sln; DestDir: {app}\Microsoft_C++\VS2010
+Source: Microsoft_C++\VS2010\GetWMI_Info.vcxproj; DestDir: {app}\Microsoft_C++\VS2010
+Source: Microsoft_C++\VS2010\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS2010
+Source: Microsoft_C++\VS2010\stdafx.h; DestDir: {app}\Microsoft_C++\VS2010
+Source: Microsoft_C++\VS2010\targetver.h; DestDir: {app}\Microsoft_C++\VS2010
+Source: Microsoft_C++\VS11\GetWMI_Info.sln; DestDir: {app}\Microsoft_C++\VS11
+Source: Microsoft_C++\VS11\GetWMI_Info.vcxproj; DestDir: {app}\Microsoft_C++\VS11
+Source: Microsoft_C++\VS11\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS11
+Source: Microsoft_C++\VS11\stdafx.h; DestDir: {app}\Microsoft_C++\VS11
+Source: Microsoft_C++\VS11\targetver.h; DestDir: {app}\Microsoft_C++\VS11
+Source: Microsoft_C++\VS13\GetWMI_Info.sln; DestDir: {app}\Microsoft_C++\VS13
+Source: Microsoft_C++\VS13\GetWMI_Info.vcxproj; DestDir: {app}\Microsoft_C++\VS13
+Source: Microsoft_C++\VS13\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS13
+Source: Microsoft_C++\VS13\stdafx.h; DestDir: {app}\Microsoft_C++\VS13
+Source: Microsoft_C++\VS13\targetver.h; DestDir: {app}\Microsoft_C++\VS13
+Source: Microsoft_C++\VS14\GetWMI_Info.sln; DestDir: {app}\Microsoft_C++\VS14
+Source: Microsoft_C++\VS14\GetWMI_Info.vcxproj; DestDir: {app}\Microsoft_C++\VS14
+Source: Microsoft_C++\VS14\stdafx.cpp; DestDir: {app}\Microsoft_C++\VS14
+Source: Microsoft_C++\VS14\stdafx.h; DestDir: {app}\Microsoft_C++\VS14
+Source: Microsoft_C++\VS14\targetver.h; DestDir: {app}\Microsoft_C++\VS14
+Source: Styles\Amakrits.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\AmethystKamri.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\AquaGraphite.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\AquaLightSlate.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Auric.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\BlueGraphite.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Carbon.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\CharcoalDarkSlate.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\CobaltXEMedia.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\EmeraldLightSlate.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Glossy.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Glow.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\GoldenGraphite.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\GreenGraphite.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\IcebergClassico.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\khaki.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\LavenderClassico.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Light.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\LightGreen.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\lilac.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Luna.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Metro Grey.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\MetroBlack.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\MetroBlue.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\MetroGreen.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\OnyxBlue.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\RubyGraphite.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\SapphireKamri.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Sky.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\SlateClassico.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\SmokeyQuartzKamri.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\TabletDark.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\TurquoiseGray.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Windows10.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Windows10Blue.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\Windows10Dark.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
+Source: Styles\YellowGraphite.vsf; DestDir: {app}\Styles\; Flags: ignoreversion
 
 
-Source: "CSharp\VS11\Properties\AssemblyInfo.cs"; DestDir: "{app}\CSharp\VS11\Properties"
-Source: "CSharp\VS11\GetWMI_Info.csproj"; DestDir: "{app}\CSharp\VS11"
-Source: "CSharp\VS11\GetWMI_Info.sln"; DestDir: "{app}\CSharp\VS11"
+Source: CSharp\VS11\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS11\Properties
+Source: CSharp\VS11\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS11
+Source: CSharp\VS11\GetWMI_Info.sln; DestDir: {app}\CSharp\VS11
+Source: CSharp\VS13\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS13\Properties
+Source: CSharp\VS13\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS13
+Source: CSharp\VS13\GetWMI_Info.sln; DestDir: {app}\CSharp\VS13
+Source: CSharp\VS14\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS14\Properties
+Source: CSharp\VS14\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS14
+Source: CSharp\VS14\GetWMI_Info.sln; DestDir: {app}\CSharp\VS14
+Source: CSharp\VS2005\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS2005\Properties
+Source: CSharp\VS2005\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS2005
+Source: CSharp\VS2005\GetWMI_Info.sln; DestDir: {app}\CSharp\VS2005
+Source: CSharp\VS2008\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS2008\Properties
+Source: CSharp\VS2008\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS2008
+Source: CSharp\VS2008\GetWMI_Info.sln; DestDir: {app}\CSharp\VS2008
+Source: CSharp\VS2010\Properties\AssemblyInfo.cs; DestDir: {app}\CSharp\VS2010\Properties
+Source: CSharp\VS2010\GetWMI_Info.csproj; DestDir: {app}\CSharp\VS2010
+Source: CSharp\VS2010\GetWMI_Info.sln; DestDir: {app}\CSharp\VS2010
 
-Source: "CSharp\VS13\Properties\AssemblyInfo.cs"; DestDir: "{app}\CSharp\VS13\Properties"
-Source: "CSharp\VS13\GetWMI_Info.csproj"; DestDir: "{app}\CSharp\VS13"
-Source: "CSharp\VS13\GetWMI_Info.sln"; DestDir: "{app}\CSharp\VS13"
+Source: AStyle\bin\AStyle.exe; DestDir: {app}\AStyle\bin
+Source: AStyle\doc\astyle.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\index.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\install.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\license.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\links.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\news.html; DestDir: {app}\AStyle\doc
+Source: Templates\Template_Oxygen.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\Template_MicrosoftCpp.cpp; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\Template_FPC.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\Template_Delphi.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\Template_Csharp.cs; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\Template_BorlandCpp.cpp; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateStaticMethodInvokerMicrosoftCPP.cpp; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateStaticMethodInvokerDelphi_COM.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateStaticMethodInvokerCSharp.cs; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\Templates.xml; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateNonStaticMethodInvokerOxygen.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateNonStaticMethodInvokerFPC.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateNonStaticMethodInvokerDelphi_TLB.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateNonStaticMethodInvokerDelphi_COM.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateNonStaticMethodInvokerDelphi.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateNonStaticMethodInvokerCSharp.cs; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateNonStaticMethodInvokerBorlandCPP.cpp; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateEventsOxygen.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateEventsMicrosoft.cpp; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateEventsFPC.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateEventsDelphi_COM.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateEventsDelphiLate.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateEventsDelphi.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateEventsCSharp.cs; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateEventsBorlandCpp.cpp; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppOxygen.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppMicrosoftCPP.cpp; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppFPCSingleton.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppFPC.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppDelphi_TLB.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppDelphi_COM.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppDelphiSingleton_TLB.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppDelphiSingleton.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppDelphi.pas; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppCSharp.cs; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: Templates\TemplateConsoleAppBorlandCPP.cpp; DestDir: {app}\Templates\; Flags: ignoreversion
+Source: AStyle\doc\notes.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\scripts.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\styles.css; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\subversion.html; DestDir: {app}\AStyle\doc
+Source: AStyle\doc\vsinstall.html; DestDir: {app}\AStyle\doc
+Source: Templates\TemplateConsoleAppBorlandCPP.cpp; DestDir: {app}; Flags: dontcopy
 
-Source: "CSharp\VS14\Properties\AssemblyInfo.cs"; DestDir: "{app}\CSharp\VS14\Properties"
-Source: "CSharp\VS14\GetWMI_Info.csproj"; DestDir: "{app}\CSharp\VS14"
-Source: "CSharp\VS14\GetWMI_Info.sln"; DestDir: "{app}\CSharp\VS14"
-
-Source: "CSharp\VS2005\Properties\AssemblyInfo.cs"; DestDir: "{app}\CSharp\VS2005\Properties"
-Source: "CSharp\VS2005\GetWMI_Info.csproj"; DestDir: "{app}\CSharp\VS2005"
-Source: "CSharp\VS2005\GetWMI_Info.sln"; DestDir: "{app}\CSharp\VS2005"
-
-Source: "CSharp\VS2008\Properties\AssemblyInfo.cs"; DestDir: "{app}\CSharp\VS2008\Properties"
-Source: "CSharp\VS2008\GetWMI_Info.csproj"; DestDir: "{app}\CSharp\VS2008"
-Source: "CSharp\VS2008\GetWMI_Info.sln"; DestDir: "{app}\CSharp\VS2008"
-
-Source: "CSharp\VS2010\Properties\AssemblyInfo.cs"; DestDir: "{app}\CSharp\VS2010\Properties"
-Source: "CSharp\VS2010\GetWMI_Info.csproj"; DestDir: "{app}\CSharp\VS2010"
-Source: "CSharp\VS2010\GetWMI_Info.sln"; DestDir: "{app}\CSharp\VS2010"
-
-Source: "AStyle\bin\AStyle.exe"; DestDir: "{app}\AStyle\bin"
-Source: "AStyle\doc\astyle.html"; DestDir: "{app}\AStyle\doc"
-Source: "AStyle\doc\index.html"; DestDir: "{app}\AStyle\doc"
-Source: "AStyle\doc\install.html"; DestDir: "{app}\AStyle\doc"
-Source: "AStyle\doc\license.html"; DestDir: "{app}\AStyle\doc"
-Source: "AStyle\doc\links.html"; DestDir: "{app}\AStyle\doc"
-Source: "AStyle\doc\news.html"; DestDir: "{app}\AStyle\doc"
-Source: "Templates\Template_Oxygen.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\Template_MicrosoftCpp.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\Template_FPC.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\Template_Delphi.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\Template_Csharp.cs"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\Template_BorlandCpp.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateStaticMethodInvokerOxygen.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateStaticMethodInvokerMicrosoftCPP.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateStaticMethodInvokerFPC.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateStaticMethodInvokerDelphi_TLB.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateStaticMethodInvokerDelphi_COM.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateStaticMethodInvokerDelphi.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateStaticMethodInvokerCSharp.cs"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateStaticMethodInvokerBorlandCPP.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\Templates.xml"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateNonStaticMethodInvokerOxygen.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateNonStaticMethodInvokerFPC.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateNonStaticMethodInvokerDelphi_TLB.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateNonStaticMethodInvokerDelphi_COM.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateNonStaticMethodInvokerDelphi.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateNonStaticMethodInvokerCSharp.cs"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateNonStaticMethodInvokerBorlandCPP.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateEventsOxygen.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateEventsMicrosoft.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateEventsFPC.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateEventsDelphi_COM.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateEventsDelphiLate.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateEventsDelphi.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateEventsCSharp.cs"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateEventsBorlandCpp.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppOxygen.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppMicrosoftCPP.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppFPCSingleton.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppFPC.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppDelphi_TLB.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppDelphi_COM.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppDelphiSingleton_TLB.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppDelphiSingleton.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppDelphi.pas"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppCSharp.cs"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "Templates\TemplateConsoleAppBorlandCPP.cpp"; DestDir: "{app}\Templates\"; Flags: ignoreversion
-Source: "AStyle\doc\notes.html"; DestDir: "{app}\AStyle\doc"
-Source: "AStyle\doc\scripts.html"; DestDir: "{app}\AStyle\doc"
-Source: "AStyle\doc\styles.css"; DestDir: "{app}\AStyle\doc"
-Source: "AStyle\doc\subversion.html"; DestDir: "{app}\AStyle\doc"
-Source: "AStyle\doc\vsinstall.html"; DestDir: "{app}\AStyle\doc"
-Source: "Templates\TemplateConsoleAppBorlandCPP.cpp"; DestDir: "{app}"; Flags: dontcopy
-
-Source: "Installer\background.bmp"; Flags: dontcopy
-Source: "Installer\VclStylesInno.dll"; DestDir: "{app}"; Flags: dontcopy
+Source: Installer\background.bmp; Flags: dontcopy
+Source: Installer\VclStylesInno.dll; DestDir: {app}; Flags: dontcopy
+Source: Updater\DownloadInfo.xml; DestDir: {app}\Updater
+Source: Updater\libeay32.dll; DestDir: {app}\Updater
+Source: Updater\ssleay32.dll; DestDir: {app}\Updater
+Source: Updater\Updater.exe; DestDir: {app}\Updater
 
 [Setup]
 UsePreviousLanguage=no
@@ -308,7 +299,7 @@ AppContact=theroadtodelphi@gmail.com
 DisableProgramGroupPage=false
 AppID=WmiDelphiCodeCreator
 SetupIconFile=Images\Icon.ico
-DefaultGroupName=WmiDelphiCodeCreator
+DefaultGroupName=WMI Delphi Code Creator
 ;MinVersion=
 [Run]
 Filename: {app}\WDCC.exe; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent
@@ -437,38 +428,37 @@ begin
 end;
 
 [Dirs]
-Name: "{app}\Themes"
-Name: "{app}\Cache"
-Name: "{app}\Extras"
-Name: "{app}\Lazarus"
-Name: "{app}\Oxygene"
-Name: "{app}\Oxygene\MonoDevelop"
-Name: "{app}\Oxygene\MonoDevelop\Properties"
-Name: "{app}\Oxygene\VS2008"
-Name: "{app}\Oxygene\VS2008\Properties"
-Name: "{app}\Oxygene\VS2010"
-Name: "{app}\Oxygene\VS2010\Properties"
-Name: "{app}\Delphi"
-Name: "{app}\Microsoft_C++"
-Name: "{app}\Microsoft_C++\VS2008"
-Name: "{app}\Microsoft_C++\VS2010"
-Name: "{app}\Styles"
-Name: "{app}\Microsoft_C++\VS11"
-Name: "{app}\Microsoft_C++\VS14"
-Name: "{app}\CSharp"
-Name: "{app}\CSharp\VS14"
-Name: "{app}\CSharp\VS14\Properties"
-Name: "{app}\CSharp\VS11"
-Name: "{app}\CSharp\VS11\Properties"
-Name: "{app}\CSharp\VS2008"
-Name: "{app}\CSharp\VS2010"
-Name: "{app}\AStyle"
-Name: "{app}\AStyle\bin"
-Name: "{app}\AStyle\doc"
-Name: "{app}\Templates"
-Name: "{app}\Textures"
-Name: "{app}\Templates\"
-
+Name: {app}\Themes
+Name: {app}\Cache
+Name: {app}\Extras
+Name: {app}\Lazarus
+Name: {app}\Oxygene
+Name: {app}\Oxygene\MonoDevelop
+Name: {app}\Oxygene\MonoDevelop\Properties
+Name: {app}\Oxygene\VS2008
+Name: {app}\Oxygene\VS2008\Properties
+Name: {app}\Oxygene\VS2010
+Name: {app}\Oxygene\VS2010\Properties
+Name: {app}\Delphi
+Name: {app}\Microsoft_C++
+Name: {app}\Microsoft_C++\VS2008
+Name: {app}\Microsoft_C++\VS2010
+Name: {app}\Styles
+Name: {app}\Microsoft_C++\VS11
+Name: {app}\Microsoft_C++\VS14
+Name: {app}\CSharp
+Name: {app}\CSharp\VS14
+Name: {app}\CSharp\VS14\Properties
+Name: {app}\CSharp\VS11
+Name: {app}\CSharp\VS11\Properties
+Name: {app}\CSharp\VS2008
+Name: {app}\CSharp\VS2010
+Name: {app}\AStyle
+Name: {app}\AStyle\bin
+Name: {app}\AStyle\doc
+Name: {app}\Templates
+Name: {app}\Templates\
+Name: {app}\Updater
 [Icons]
 Name: {group}\Wmi Delphi Code Creator; Filename: {app}\WDCC.exe; WorkingDir: {app}
 Name: {userdesktop}\Wmi Delphi Code Creator; Filename: {app}\WDCC.exe; WorkingDir: {app}
