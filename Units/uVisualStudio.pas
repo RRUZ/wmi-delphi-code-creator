@@ -33,17 +33,17 @@ uses
   type
   TVSVersion =
     (
-    vs2005,  //8.0
-    vs2008,  //9.0
-    vs2010,  //10.0
-    vs2012,  //11.0
-    vs2013,  //12.0
-    vs2015   //14.0
+    vs2005,  //8.0     'Visual Studio 2005',
+    vs2008,  //9.0     'Visual Studio 2008',
+    vs2010,  //10.0    'Visual Studio 2010',
+    vs2012,  //11.0    'Visual Studio 2012',
+    vs2013,  //12.0    'Visual Studio 2013',
+    vs2015   //14.0    'Visual Studio 2015'
     );
 
 
-    TVisualStudioInfo = class
-  private
+   TVisualStudioInfo = class
+    private
      FIDEFileName: string;
      FCompilerFileName: string;
      FCppCompiler: string;
@@ -57,7 +57,10 @@ uses
      property CppCompiler : string   read FCppCompiler write FCppCompiler;
      property Version : TVSVersion read FVSVersion  write FVSVersion;
      property BaseRegistryKey : string  read FBaseRegistryKey write FBaseRegistryKey;
-    end;
+     function CSharpInstalled : Boolean;
+     function CPPInstalled : Boolean;
+   end;
+
 
     function GetVSIDEList : TObjectList<TVisualStudioInfo>;
     function CreateVsProject(const FileName, Path, ProjectTemplate: string; var NewFileName: string): boolean;
@@ -79,14 +82,14 @@ uses
 
 const
 
- VSVersionsNames: array[TVSVersion] of string = (
-    'Visual Studio 2005',
-    'Visual Studio 2008',
-    'Visual Studio 2010',
-    'Visual Studio 2012',
-    'Visual Studio 2013',
-    'Visual Studio 2015'
-    );
+// VSVersionsNames: array[TVSVersion] of string = (
+//    'Visual Studio 2005',
+//    'Visual Studio 2008',
+//    'Visual Studio 2010',
+//    'Visual Studio 2012',
+//    'Visual Studio 2013',
+//    'Visual Studio 2015'
+//    );
 
   VSRegBasePathsx86: array[TVSVersion] of string = (
     '\SOFTWARE\Microsoft\VisualStudio\8.0\',
@@ -107,35 +110,10 @@ const
     );
 
 
+  VSKeyInstalled       = 'Setup\VS';
+  VSKeyCSharpInstalled = 'Languages\Language Services\CSharp';
+  VSKeyCPPInstalled    = 'InstalledProducts\Microsoft Visual C++';
 
-  VSRegPathsx86: array[TVSVersion] of string = (
-    '\SOFTWARE\Microsoft\VisualStudio\8.0\Setup\VS',
-    '\SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS',
-    '\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS',
-    '\SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS',
-    '\SOFTWARE\Microsoft\VisualStudio\12.0\Setup\VS',
-    '\SOFTWARE\Microsoft\VisualStudio\14.0\Setup\VS'
-    );
-
-  VSRegPathsx64: array[TVSVersion] of string = (
-    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\8.0\Setup\VS',
-    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0\Setup\VS',
-    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VS',
-    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\Setup\VS',
-    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\Setup\VS',
-    '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\Setup\VS'
-    );
-
-
-const
-  VS14x64RegEntry        = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\Setup\VS';
-  VS14x86RegEntry        = '\SOFTWARE\Microsoft\VisualStudio\14.0\Setup\VS';
-  VS11x64RegEntry        = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\Setup\VS';
-  VS11x86RegEntry        = '\SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS';
-  VS2010x64RegEntry      = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VS';
-  VS2010x86RegEntry      = '\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS';
-  VS2008x64RegEntry      = '\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0\Setup\VS';
-  VS2008x86RegEntry      = '\SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS';
 
 var
   VSIDEList : TObjectList<TVisualStudioInfo>;
@@ -237,22 +215,23 @@ begin
   for LVSVersion := Low(TVSVersion) to High(TVSVersion) do
   begin
    FileName := '';
+
    if LWow64 then
-    Found := RegKeyExists(VSRegPathsx64[LVSVersion], HKEY_LOCAL_MACHINE)
+    Found := RegKeyExists(VSRegBasePathsx64[LVSVersion] + VSKeyInstalled, HKEY_LOCAL_MACHINE)
    else
-    Found := RegKeyExists(VSRegPathsx86[LVSVersion], HKEY_LOCAL_MACHINE);
+    Found := RegKeyExists(VSRegBasePathsx86[LVSVersion] + VSKeyInstalled, HKEY_LOCAL_MACHINE);
 
     if Found and LWow64 then
-      Found := RegReadStr(VSRegPathsx64[LVSVersion], 'EnvironmentPath', FileName, HKEY_LOCAL_MACHINE) and FileExists(FileName)
+      Found := RegReadStr(VSRegBasePathsx64[LVSVersion]+ VSKeyInstalled, 'EnvironmentPath', FileName, HKEY_LOCAL_MACHINE) and FileExists(FileName)
     else
-      Found := RegReadStr(VSRegPathsx86[LVSVersion], 'EnvironmentPath', FileName, HKEY_LOCAL_MACHINE) and FileExists(FileName);
+      Found := RegReadStr(VSRegBasePathsx86[LVSVersion]+ VSKeyInstalled, 'EnvironmentPath', FileName, HKEY_LOCAL_MACHINE) and FileExists(FileName);
 
     if Found then
     begin
       LVisualStudioInfo:=TVisualStudioInfo.Create;
       LVisualStudioInfo.IDEFileName:=Filename;
       LVisualStudioInfo.Version := LVSVersion;
-      LVisualStudioInfo.IDEDescription:=VSVersionsNames[LVSVersion];
+      LVisualStudioInfo.IDEDescription:= GetFileDescription(FileName); //VSVersionsNames[LVSVersion];
       if LWow64 then
        LVisualStudioInfo.BaseRegistryKey:= VSRegBasePathsx64[LVSVersion]
       else
@@ -264,6 +243,24 @@ begin
     end;
   end;
 
+end;
+
+{ TVisualStudioInfo }
+
+function TVisualStudioInfo.CPPInstalled: Boolean;
+begin
+ if IsWow64 then
+  Result := RegKeyExists(VSRegBasePathsx64[Version] + VSKeyCPPInstalled, HKEY_LOCAL_MACHINE)
+ else
+  Result := RegKeyExists(VSRegBasePathsx86[Version] + VSKeyCPPInstalled, HKEY_LOCAL_MACHINE);
+end;
+
+function TVisualStudioInfo.CSharpInstalled: Boolean;
+begin
+ if IsWow64 then
+  Result := RegKeyExists(VSRegBasePathsx64[Version] + VSKeyCSharpInstalled, HKEY_LOCAL_MACHINE)
+ else
+  Result := RegKeyExists(VSRegBasePathsx86[Version] + VSKeyCSharpInstalled, HKEY_LOCAL_MACHINE);
 end;
 
 initialization

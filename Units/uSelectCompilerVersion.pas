@@ -115,7 +115,7 @@ end;
 
 procedure TFrmSelCompilerVer.LoadInstalledVersions;
 var
-  item:     TListItem;
+  LItem:     TListItem;
   DelphiComp: TDelphiVersions;
   BorlandCppComp: TBorlandCppVersions;
   CSharpComp : TDotNetVersions;
@@ -129,24 +129,6 @@ var
   LVSIDEList  : TObjectList<TVisualStudioInfo>;
   i : Integer;
 
-  procedure  RegisterVSIDE;
-  var
-   i : Integer;
-  begin
-    LVSIDEList := GetVSIDEList;
-    for i:=0 to LVSIDEList.Count-1 do
-    begin
-      item     := ListViewIDEs.Items.Add;
-      Filename := LVSIDEList[i].IDEFileName;
-      item.Caption := LVSIDEList[i].IDEDescription;
-      item.SubItems.Add(FileName);
-      item.SubItems.Add(LVSIDEList[i].CompilerFileName);
-      ExtractIconFileToImageList(ImageList1, Filename);
-      ImageIndex := ImageList1.Count - 1;
-      item.ImageIndex := ImageIndex;
-      item.Data := Pointer(LVSIDEList[i]);
-    end;
-  end;
 
 begin
   case FLanguageSource of
@@ -160,25 +142,25 @@ begin
           if RegReadStr(DelphiRegPaths[DelphiComp],
             'App', FileName, HKEY_CURRENT_USER) and FileExists(FileName) then
           begin
-            item := ListViewIDEs.Items.Add;
-            item.Caption := DelphiVersionsNames[DelphiComp];
-            item.SubItems.Add(FileName);
-            item.SubItems.Add(ExtractFilePath(FileName) + 'Dcc32.exe');
+            LItem := ListViewIDEs.Items.Add;
+            LItem.Caption := DelphiVersionsNames[DelphiComp];
+            LItem.SubItems.Add(FileName);
+            LItem.SubItems.Add(ExtractFilePath(FileName) + 'Dcc32.exe');
             ExtractIconFileToImageList(ImageList1, Filename);
             ImageIndex := ImageList1.Count - 1;
-            item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Lng_Delphi));
+            LItem.ImageIndex := ImageIndex;
+            LItem.Data := Pointer(Ord(Lng_Delphi));
 
             if (DelphiComp>=DelphiXE2) and FShow64BitsCompiler then
             begin
-              item := ListViewIDEs.Items.Add;
-              item.Caption := DelphiVersionsNames[DelphiComp] +' 64 Bits Compiler';
-              item.SubItems.Add(FileName);
-              item.SubItems.Add(ExtractFilePath(FileName) + 'Dcc64.exe');
+              LItem := ListViewIDEs.Items.Add;
+              LItem.Caption := DelphiVersionsNames[DelphiComp] +' 64 Bits Compiler';
+              LItem.SubItems.Add(FileName);
+              LItem.SubItems.Add(ExtractFilePath(FileName) + 'Dcc64.exe');
               ExtractIconFileToImageList(ImageList1, Filename);
               ImageIndex := ImageList1.Count - 1;
-              item.ImageIndex := ImageIndex;
-              item.Data := Pointer(Ord(Lng_Delphi));
+              LItem.ImageIndex := ImageIndex;
+              LItem.Data := Pointer(Ord(Lng_Delphi));
             end;
 
           end;
@@ -195,14 +177,14 @@ begin
           if RegReadStr(BorlandCppRegPaths[BorlandCppComp],
             'App', FileName, RootKey) and FileExists(FileName) then
           begin
-            item := ListViewIDEs.Items.Add;
-            item.Caption := BorlandCppVersionsNames[BorlandCppComp];
-            item.SubItems.Add(FileName);
-            item.SubItems.Add(ExtractFilePath(FileName) + 'bcc32.exe');
+            LItem := ListViewIDEs.Items.Add;
+            LItem.Caption := BorlandCppVersionsNames[BorlandCppComp];
+            LItem.SubItems.Add(FileName);
+            LItem.SubItems.Add(ExtractFilePath(FileName) + 'bcc32.exe');
             ExtractIconFileToImageList(ImageList1, Filename);
             ImageIndex := ImageList1.Count - 1;
-            item.ImageIndex := ImageIndex;
-            item.Data := Pointer(Ord(Lng_BorlandCpp));
+            LItem.ImageIndex := ImageIndex;
+            LItem.Data := Pointer(Ord(Lng_BorlandCpp));
           end;
       end;
 
@@ -210,8 +192,21 @@ begin
 
     Lng_CSharp:
     begin
+      LVSIDEList:=GetVSIDEList;
 
-      RegisterVSIDE;
+      for i:=0 to LVSIDEList.Count-1 do
+      if LVSIDEList[i].CSharpInstalled then
+      begin
+        LItem     := ListViewIDEs.Items.Add;
+        Filename := LVSIDEList[i].IDEFileName;
+        LItem.Caption := LVSIDEList[i].IDEDescription;
+        LItem.SubItems.Add(FileName);
+        LItem.SubItems.Add(LVSIDEList[i].CompilerFileName);
+        ExtractIconFileToImageList(ImageList1, Filename);
+        ImageIndex := ImageList1.Count - 1;
+        LItem.ImageIndex := ImageIndex;
+        LItem.Data := Pointer(LVSIDEList[i]);
+      end;
 
       if ShowCompiler then
       for CSharpComp :=Low(TDotNetVersions) to High(TDotNetVersions) do
@@ -219,14 +214,14 @@ begin
         FileName:=IncludeTrailingPathDelimiter(NetFrameworkPath(CSharpComp))+'csc.exe';
         if FileExists(FileName) then
         begin
-          item := ListViewIDEs.Items.Add;
-          item.Caption := DotNetNames[CSharpComp];
-          item.SubItems.Add(ExtractFilePath(FileName) );
-          item.SubItems.Add(FileName);
+          LItem := ListViewIDEs.Items.Add;
+          LItem.Caption := DotNetNames[CSharpComp];
+          LItem.SubItems.Add(ExtractFilePath(FileName) );
+          LItem.SubItems.Add(FileName);
           ExtractIconFileToImageList(ImageList1, Filename);
           ImageIndex := ImageList1.Count - 1;
-          item.ImageIndex := ImageIndex;
-          item.Data := Pointer(Ord(CSharpComp));
+          LItem.ImageIndex := ImageIndex;
+          LItem.Data := Pointer(Ord(CSharpComp));
         end;
       end;
 
@@ -238,20 +233,33 @@ begin
       if IsLazarusInstalled then
       begin
         FileName := GetLazarusIDEFileName;
-        item     := ListViewIDEs.Items.Add;
-        item.Caption := 'Lazarus';
-        item.SubItems.Add(FileName);
-        item.SubItems.Add(GetLazarusCompilerFileName);
+        LItem     := ListViewIDEs.Items.Add;
+        LItem.Caption := 'Lazarus';
+        LItem.SubItems.Add(FileName);
+        LItem.SubItems.Add(GetLazarusCompilerFileName);
         ExtractIconFileToImageList(ImageList1, Filename);
         ImageIndex := ImageList1.Count - 1;
-        item.ImageIndex := ImageIndex;
-        item.Data := Pointer(Ord(Lng_FPC));
+        LItem.ImageIndex := ImageIndex;
+        LItem.Data := Pointer(Ord(Lng_FPC));
       end;
     end;
 
     Lng_VSCpp  :
     begin
-      RegisterVSIDE;
+      LVSIDEList:=GetVSIDEList;
+      for i:=0 to LVSIDEList.Count-1 do
+      if LVSIDEList[i].CPPInstalled then
+      begin
+        LItem     := ListViewIDEs.Items.Add;
+        Filename := LVSIDEList[i].IDEFileName;
+        LItem.Caption := LVSIDEList[i].IDEDescription;
+        LItem.SubItems.Add(FileName);
+        LItem.SubItems.Add(LVSIDEList[i].CompilerFileName);
+        ExtractIconFileToImageList(ImageList1, Filename);
+        ImageIndex := ImageList1.Count - 1;
+        LItem.ImageIndex := ImageIndex;
+        LItem.Data := Pointer(LVSIDEList[i]);
+      end;
 
       if ShowCompiler then
       begin
@@ -261,14 +269,14 @@ begin
           FileName :=LVSIDEList[i].CppCompiler;
           if FileExists(FileName) then
           begin
-            item     := ListViewIDEs.Items.Add;
-            item.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
-            item.SubItems.Add(FileName);
-            item.SubItems.Add(FileName);
+            LItem     := ListViewIDEs.Items.Add;
+            LItem.Caption := 'Microsoft C++ Compiler '+uMisc.GetFileVersion(FileName);
+            LItem.SubItems.Add(FileName);
+            LItem.SubItems.Add(FileName);
             ExtractIconFileToImageList(ImageList1, Filename);
             ImageIndex := ImageList1.Count - 1;
-            item.ImageIndex := ImageIndex;
-            item.Data := Pointer(LVSIDEList[i]);
+            LItem.ImageIndex := ImageIndex;
+            LItem.Data := Pointer(LVSIDEList[i]);
           end;
         end;
       end;
@@ -283,15 +291,15 @@ begin
         if FShowCompiler then
         begin
           FileName := GetDelphiPrismCompilerFileName;
-          item     := ListViewIDEs.Items.Add;
-          item.Caption := 'Oxygene';
-          item.SubItems.Add(FileName);
-          item.SubItems.Add(FileName);
+          LItem     := ListViewIDEs.Items.Add;
+          LItem.Caption := 'Oxygene';
+          LItem.SubItems.Add(FileName);
+          LItem.SubItems.Add(FileName);
           ExtractIconFileToImageList(ImageList1, Filename);
           //ExtractIconFileToImageList(ImageList1,ExtractFilePath(ParamStr(0))+'Extras\MonoDevelop.ico');
           ImageIndex := ImageList1.Count - 1;
-          item.ImageIndex := ImageIndex;
-          item.Data := Pointer(Ord(Lng_Oxygen));
+          LItem.ImageIndex := ImageIndex;
+          LItem.Data := Pointer(Ord(Lng_Oxygen));
         end
         else
         begin
@@ -317,14 +325,14 @@ begin
           if RegKeyExists(LVSIDEList[i].BaseRegistryKey + 'InstalledProducts\RemObjects Oxygene', HKEY_LOCAL_MACHINE) then
           begin
             FileName := LVSIDEList[i].IDEFileName;
-            item     := ListViewIDEs.Items.Add;
-            item.Caption := LVSIDEList[i].IDEDescription;
-            item.SubItems.Add(FileName);
-            item.SubItems.Add(GetDelphiPrismCompilerFileName);
+            LItem     := ListViewIDEs.Items.Add;
+            LItem.Caption := LVSIDEList[i].IDEDescription;
+            LItem.SubItems.Add(FileName);
+            LItem.SubItems.Add(GetDelphiPrismCompilerFileName);
             ExtractIconFileToImageList(ImageList1, Filename);
             ImageIndex := ImageList1.Count - 1;
-            item.ImageIndex := ImageIndex;
-            item.Data := Pointer(LVSIDEList[i]);
+            LItem.ImageIndex := ImageIndex;
+            LItem.Data := Pointer(LVSIDEList[i]);
           end;
         end;
 

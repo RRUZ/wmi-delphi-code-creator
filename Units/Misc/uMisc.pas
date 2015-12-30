@@ -42,6 +42,7 @@ type
   procedure MsgInformation(const Msg: string);
   function  MsgQuestion(const Msg: string):Boolean;
   function  GetFileVersion(const FileName: string): string;
+  function  GetFileDescription(const FileName: string): string;
   function  GetTempDirectory: string;
   function  GetWindowsDirectory : string;
   function  GetSpecialFolder(const CSIDL: integer) : string;
@@ -69,6 +70,81 @@ Uses
  Winapi.ShellAPi,
  Vcl.Controls,
  Vcl.Dialogs;
+
+type
+  TEXEVersionData = record
+    CompanyName,
+    FileDescription,
+    FileVersion,
+    InternalName,
+    LegalCopyright,
+    LegalTrademarks,
+    OriginalFileName,
+    ProductName,
+    ProductVersion,
+    Comments,
+    PrivateBuild,
+    SpecialBuild: string;
+  end;
+
+function GetFileVersionData(const FileName: string): TEXEVersionData;
+type
+  PLandCodepage = ^TLandCodepage;
+  TLandCodepage = record
+    wLanguage,
+    wCodePage: word;
+  end;
+var
+  langCode : string;
+  lpdwHandle,  lBlock: Cardinal;
+  pBlock, lplpBuffer: Pointer;
+begin
+  lBlock := GetFileVersionInfoSize(PChar(FileName), lpdwHandle);
+  if lBlock = 0 then
+    RaiseLastOSError;
+  GetMem(pBlock, lBlock);
+  try
+    if not GetFileVersionInfo(PChar(FileName), 0, lBlock, pBlock) then
+      RaiseLastOSError;
+
+    if not VerQueryValue(pBlock, '\VarFileInfo\Translation\', lplpBuffer, lBlock) then
+      RaiseLastOSError;
+
+    langCode := Format('%.4x%.4x', [PLandCodepage(lplpBuffer)^.wLanguage, PLandCodepage(lplpBuffer)^.wCodePage]);
+
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\CompanyName'), lplpBuffer, lBlock) then
+      result.CompanyName := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\FileDescription'), lplpBuffer, lBlock) then
+      result.FileDescription := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\FileVersion'), lplpBuffer, lBlock) then
+      result.FileVersion := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\InternalName'), lplpBuffer, lBlock) then
+      result.InternalName := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\LegalCopyright'), lplpBuffer, lBlock) then
+      result.LegalCopyright := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\LegalTrademarks'), lplpBuffer, lBlock) then
+      result.LegalTrademarks := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\OriginalFileName'), lplpBuffer, lBlock) then
+      result.OriginalFileName := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\ProductName'), lplpBuffer, lBlock) then
+      result.ProductName := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\ProductVersion'), lplpBuffer, lBlock) then
+      result.ProductVersion := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\Comments'), lplpBuffer, lBlock) then
+      result.Comments := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\PrivateBuild'), lplpBuffer, lBlock) then
+      result.PrivateBuild := PChar(lplpBuffer);
+    if VerQueryValue(pBlock, PChar('\StringFileInfo\' + langCode + '\SpecialBuild'), lplpBuffer, lBlock) then
+      result.SpecialBuild := PChar(lplpBuffer);
+  finally
+    FreeMem(pBlock);
+  end;
+end;
+
+function  GetFileDescription(const FileName: string): string;
+begin
+ Result:= GetFileVersionData(FileName).FileDescription;
+end;
 
 procedure CheckForUpdates(Silent : Boolean);
 var
