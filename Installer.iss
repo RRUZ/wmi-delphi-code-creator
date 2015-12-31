@@ -277,12 +277,13 @@ Source: Updater\Updater.exe; DestDir: {app}\Updater
 [Setup]
 UsePreviousLanguage=no
 AppName={#MyAppName}
-AppPublisher=The Road To Delphi
 AppVerName={#MyAppName} {#MyAppVersion}
 VersionInfoVersion={#MyAppVersion}
-AppPublisherURL=http://theroadtodelphi.wordpress.com/
-AppSupportURL=http://theroadtodelphi.wordpress.com/
-AppUpdatesURL=http://theroadtodelphi.wordpress.com/
+AppPublisher=Octopus Software
+AppPublisherURL=http://octopus.software/
+AppSupportURL=https://github.com/RRUZ/wmi-delphi-code-creator/issues
+AppUpdatesURL=https://github.com/RRUZ/wmi-delphi-code-creator
+;DefaultDialogFontName=Calibri
 DefaultDirName={pf}\The Road To Delphi\Wmi Delphi Code Creator
 OutputBaseFileName=Setup_WmiDelphiCodeCreator
 DisableDirPage=true
