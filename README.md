@@ -51,7 +51,6 @@
 <ul>
  <li><a href='http://goo.gl/t20CHt'>Installer</a> Mirror 1</li>
  <li><a href='https://docs.google.com/uc?export=download&id=0B7KzPH8HQCZNbWIwbWZPZDFYa0k'>Installer</a> Mirror 2</li>
- <li><a href='http://goo.gl/800XwT'>Binaries (Portable edition)</a></li>
 </ul>
 
 
