@@ -48,10 +48,8 @@
 
 
 ## Download Links ##
-<ul>
- <li><a href='http://goo.gl/t20CHt'>Installer</a> Mirror 1</li>
- <li><a href='https://docs.google.com/uc?export=download&id=0B7KzPH8HQCZNbWIwbWZPZDFYa0k'>Installer</a> Mirror 2</li>
-</ul>
+
+Looking for the installer? Check the [Release Area](https://github.com/RRUZ/wmi-delphi-code-creator/releases/latest) 
 
 
 Microsoft, Visual Studio, and the Visual Studio logo are trademarks or registered trademarks of Microsoft Corporation in the United States and/or other countries.
