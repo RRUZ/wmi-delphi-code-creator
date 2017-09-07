@@ -1,6 +1,6 @@
 ![](https://dl.dropboxusercontent.com/u/12733424/github/wmi-delphi-code-creator/logo.png)The <strong>WMI Delphi Code Creator </strong> (WDCC), allows you to generate <strong>Object Pascal</strong>,  <strong>[Oxygene](http://www.elementscompiler.com/elements/oxygene/default.aspx)</strong>, <strong>C++</strong> and <strong>C#</strong> code to access the WMI (Windows Management Instrumentation) classes, events and methods. Also includes a set of tools to explorer and Query the content of the WMI.
 
-[![](https://dl.dropboxusercontent.com/u/12733424/Images/followrruz.png)](https://twitter.com/RUZ)
+[![](https://theroadtodelphi.files.wordpress.com/2014/07/followrruz.png)](https://twitter.com/RUZ)
 
 ## Code Generation Features ##
 <ul>
@@ -12,39 +12,39 @@
  <li><a href='https://github.com/RRUZ/wmi-delphi-code-creator/wiki/MSCPPDevelopers'>Microsoft C++ Developers </a>wiki page - detailed list of features about Microsoft C++ and the WDCC</li>
 </ul>
 
-![https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/AllSmall.png](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/AllSmall.png)
+![https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/AllSmall.png](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/AllSmall.png)
 
 ## General Features ##
 
 **WMI Explorer** : Allow you to navigate over all the WMI namespaces and classes, and display WMI metadata like MOF, Qualifiers and Properties.
 
-![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/Explorer1.png)
+![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/Explorer1.png)
 
 **WMI Class Tree** : shows the hierarchy and dependencies of the WMI classes in a namespace
 
-![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/Tree.png)
+![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WMITree.png)
 
 **WMI Finder**: Display all the WMI classes and properties related to a search term.
 
-![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WMIFinder.png)
+![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WMIFinder.png)
 
 **WMI SQL** : Allow you to execute WQL sentences in a local or remote machine, also include a option to auto generate of WQL code
 
-![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WQL.png)
+![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WQL.png)
 
 **WMI Properties Links** : Display the location and sources from where each wmi property get the information.
 
-![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WMILinks.png)
+![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WMILinks.png)
 
-![](https://dl.dropboxusercontent.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/New/WMIOnline.png)
+![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WMIOnline.png)
 
 **Support for VCL Styles (Skins)**
 
-![](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_SettingsGUI.png)
+![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WMDCC_SettingsGUI.png)
 
 **Customizable Syntax Highlight Colors**
 
-![](http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Images%20Wiki/WMDCC_SettingsSyntaxHigh.png)
+![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WMDCC_SettingsSyntaxHigh.png)
 
 
 ## Download Links ##
