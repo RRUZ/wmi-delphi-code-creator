@@ -34,15 +34,16 @@ var
   FSWbemLocator : OLEVariant;
   FWMIService   : OLEVariant;
   FWbemObjectSet: OLEVariant;
-  FWbemObject   : Variant;
+  FWbemObject   : OLEVariant;
   oEnum         : IEnumvariant;
-  sValue        : string;   
+  sValue        : string;  
+  NilDump       : Cardinal;
 begin;
   FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   FWMIService   := FSWbemLocator.ConnectServer(WbemComputer, '[WMINAMESPACE]', WbemUser, WbemPassword);
   FWbemObjectSet:= FWMIService.ExecQuery('SELECT * FROM [WMICLASSNAME]','WQL',wbemFlagForwardOnly);
   oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, FWbemObject, nil) = 0 do
+  while oEnum.Next(1, FWbemObject, NilDump) = 0 do
   begin
 [DELPHICODE]	    
     Writeln('');
