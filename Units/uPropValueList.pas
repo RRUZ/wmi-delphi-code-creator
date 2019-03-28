@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uPropValueList
 // unit for the WMI Delphi Code Creator
@@ -15,12 +15,10 @@
 // The Original Code is uPropValueList.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
-
+// **************************************************************************************************
 
 unit uPropValueList;
 
@@ -38,40 +36,39 @@ type
   private
     FWMIProperties: TStrings;
   public
-     property WMIProperties: TStrings Read FWMIProperties Write FWMIProperties;
+    property WMIProperties: TStrings Read FWMIProperties Write FWMIProperties;
   end;
-
 
 implementation
 
 {$R *.dfm}
 
 uses
- uWmi_Metadata,
- uWmiPropertyValue;
+  uWmi_Metadata,
+  uWmiPropertyValue;
 
 procedure TFrmValueList.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
- Action:=caFree;
+  Action := caFree;
 end;
 
 procedure TFrmValueList.ValueListDblClick(Sender: TObject);
 Var
- Key : string;
- Index : Integer;
- CimType : Integer;
- Frm : TFrmWMIPropValue;
+  Key: string;
+  Index: Integer;
+  CimType: Integer;
+  Frm: TFrmWMIPropValue;
 begin
- if FWMIProperties<>nil then
- begin
-   Key :=ValueList.Keys[ValueList.Row];
-   Index:=FWMIProperties.IndexOf(Key);
-   CimType:=Integer(FWMIProperties.Objects[Index]);
-   Frm:=TFrmWMIPropValue.Create(nil);
-   Frm.Caption:=Format('%s Type %s',[Key, CIMTypeStr(CimType)]);
-   Frm.MemoValue.Text:= ValueList.Values[Key];
-   Frm.Show;
- end;
+  if FWMIProperties <> nil then
+  begin
+    Key := ValueList.Keys[ValueList.Row];
+    Index := FWMIProperties.IndexOf(Key);
+    CimType := Integer(FWMIProperties.Objects[Index]);
+    Frm := TFrmWMIPropValue.Create(nil);
+    Frm.Caption := Format('%s Type %s', [Key, CIMTypeStr(CimType)]);
+    Frm.MemoValue.Text := ValueList.Values[Key];
+    Frm.Show;
+  end;
 end;
 
 end.

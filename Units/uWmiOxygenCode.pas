@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uWmiOxygenCode
 // unit for the WMI Delphi Code Creator
@@ -15,45 +15,43 @@
 // The Original Code is uWmiOxygenCode.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
-
+// **************************************************************************************************
 
 unit uWmiOxygenCode;
 
 interface
 
 uses
- uWmiGenCode,
- Classes;
+  uWmiGenCode,
+  Classes;
 
 const
-  sTagOxygenCode      = '[OXYGENECODE]';
+  sTagOxygenCode = '[OXYGENECODE]';
   sTagOxygenEventsWql = '[OXYGENEVENTSWQL]';
   sTagOxygenEventsOut = '[OXYGENEVENTSOUT]';
 
-  sTagOxygenCodeParamsIn  = '[DELPHICODEINPARAMS]';
+  sTagOxygenCodeParamsIn = '[DELPHICODEINPARAMS]';
   sTagOxygenCodeParamsOut = '[DELPHICODEOUTPARAMS]';
 
 type
-  TOxygenWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
+  TOxygenWmiClassCodeGenerator = class(TWmiClassCodeGenerator)
   public
-    procedure GenerateCode(Props: TStrings);override;
+    procedure GenerateCode(Props: TStrings); override;
   end;
 
-  TOxygenWmiEventCodeGenerator=class(TWmiEventCodeGenerator)
+  TOxygenWmiEventCodeGenerator = class(TWmiEventCodeGenerator)
   public
-    procedure GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings);override;
+    procedure GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings); override;
   end;
 
-  TOxygenWmiMethodCodeGenerator=class(TWmiMethodCodeGenerator)
+  TOxygenWmiMethodCodeGenerator = class(TWmiMethodCodeGenerator)
   private
     function GetWmiClassDescription: string;
   public
-    procedure GenerateCode(ParamsIn, Values: TStrings);override;
+    procedure GenerateCode(ParamsIn, Values: TStrings); override;
   end;
 
 implementation
@@ -74,21 +72,21 @@ var
   Descr: string;
   DynCode: TStrings;
   i: integer;
-  TemplateCode : string;
-  CimType:Integer;
+  TemplateCode: string;
+  CimType: integer;
 begin
   Descr := GetWmiClassDescription;
 
   OutPutCode.BeginUpdate;
-  DynCode    := TStringList.Create;
+  DynCode := TStringList.Create;
   try
     OutPutCode.Clear;
-               {
-    if UseHelperFunctions then
+    {
+      if UseHelperFunctions then
       TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
-    else
+      else
       TemplateCode:='';
-                }
+    }
     StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiClasses));
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
@@ -99,17 +97,16 @@ begin
     if Props.Count > 0 then
       for i := 0 to Props.Count - 1 do
       begin
-          CimType:=Integer(Props.Objects[i]);
-          case CimType of
-            wbemCimtypeDatetime :
-              DynCode.Add(Format(
-                '     Console.WriteLine(''{0,-35} {1,-40}'',%s,ManagementDateTimeConverter.ToDateTime(string(WmiObject[%s])));// %s',
-                [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]))
-            else
-              DynCode.Add(Format(
-                '     Console.WriteLine(''{0,-35} {1,-40}'',%s,WmiObject[%s]);// %s',
-                [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
-          end;
+        CimType := integer(Props.Objects[i]);
+        case CimType of
+          wbemCimtypeDatetime:
+            DynCode.Add
+              (Format('     Console.WriteLine(''{0,-35} {1,-40}'',%s,ManagementDateTimeConverter.ToDateTime(string(WmiObject[%s])));// %s',
+              [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]))
+        else
+          DynCode.Add(Format('     Console.WriteLine(''{0,-35} {1,-40}'',%s,WmiObject[%s]);// %s',
+            [QuotedStr(Props.Names[i]), QuotedStr(Props.Names[i]), Props.ValueFromIndex[i]]));
+        end;
       end;
 
     StrCode := StringReplace(StrCode, sTagOxygenCode, DynCode.Text, [rfReplaceAll]);
@@ -121,29 +118,26 @@ begin
   end;
 end;
 
-
 { TOxygenWmiEventCodeGenerator }
 
-procedure TOxygenWmiEventCodeGenerator.GenerateCode(ParamsIn, Values, Conds,
-  PropsOut: TStrings);
+procedure TOxygenWmiEventCodeGenerator.GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings);
 var
   StrCode: string;
-  sValue:  string;
-  Wql:     string;
-  i, Len:  integer;
-  Props:   TStrings;
-  CimType:Integer;
+  sValue: string;
+  Wql: string;
+  i, Len: integer;
+  Props: TStrings;
+  CimType: integer;
 begin
   StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiEvents));
 
-  WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds,
-    WmiTargetInstance]);
-  WQL := Format('  WmiQuery:=%s+%s', [QuotedStr(WQL), sLineBreak]);
+  Wql := Format('Select * From %s Within %d ', [WmiClass, PollSeconds, WmiTargetInstance]);
+  Wql := Format('  WmiQuery:=%s+%s', [QuotedStr(Wql), sLineBreak]);
 
   if WmiTargetInstance <> '' then
   begin
     sValue := Format('Where TargetInstance ISA "%s" ', [WmiTargetInstance]);
-    WQL    := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
+    Wql := Wql + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
   end;
 
   for i := 0 to Conds.Count - 1 do
@@ -152,55 +146,60 @@ begin
     if (i > 0) or ((i = 0) and (WmiTargetInstance <> '')) then
       sValue := 'AND ';
     sValue := sValue + ' ' + ParamsIn.Names[i] + Conds[i] + Values[i] + ' ';
-    WQL := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
+    Wql := Wql + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
   end;
 
   i := LastDelimiter('+', Wql);
   if i > 0 then
     Wql[i] := ';';
 
-
-  Len   := GetMaxLengthItem(PropsOut) + 6;
+  Len := GetMaxLengthItem(PropsOut) + 6;
   Props := TStringList.Create;
   try
     for i := 0 to PropsOut.Count - 1 do
     begin
-          CimType:=Integer(PropsOut.Objects[i]);
-          case CimType of
-            wbemCimtypeDatetime :
-            begin
-               if StartsText(wbemTargetInstance,PropsOut[i]) then
-                Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + ManagementDateTimeConverter.ToDateTime(string(ManagementBaseObject(e.NewEvent[%s])[%s])));',
-                [QuotedStr(PropsOut[i]+' : '),QuotedStr(wbemTargetInstance), QuotedStr(StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]))]))
-               else
-                Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + ManagementDateTimeConverter.ToDateTime(e.NewEvent.Properties[%s].Value.ToString()));', [QuotedStr(PropsOut[i]+' : '), QuotedStr(PropsOut[i])]));
-            end
+      CimType := integer(PropsOut.Objects[i]);
+      case CimType of
+        wbemCimtypeDatetime:
+          begin
+            if StartsText(wbemTargetInstance, PropsOut[i]) then
+              Props.Add(Format('  Console.WriteLine(%-' + IntToStr(Len) +
+                's + ManagementDateTimeConverter.ToDateTime(string(ManagementBaseObject(e.NewEvent[%s])[%s])));',
+                [QuotedStr(PropsOut[i] + ' : '), QuotedStr(wbemTargetInstance),
+                QuotedStr(StringReplace(PropsOut[i], wbemTargetInstance + '.', '', [rfReplaceAll]))]))
             else
-            begin
-               if StartsText(wbemTargetInstance,PropsOut[i]) then
-                Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + ManagementBaseObject(e.NewEvent[%s])[%s]);',
-                [QuotedStr(PropsOut[i]+' : '),QuotedStr(wbemTargetInstance), QuotedStr(StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll]))]))
-               else
-                Props.Add(Format('  Console.WriteLine(%-'+IntToStr(Len)+'s + e.NewEvent.Properties[%s].Value.ToString());', [QuotedStr(PropsOut[i]+' : '), QuotedStr(PropsOut[i])]));
-            end;
-          end;
+              Props.Add(Format('  Console.WriteLine(%-' + IntToStr(Len) +
+                's + ManagementDateTimeConverter.ToDateTime(e.NewEvent.Properties[%s].Value.ToString()));',
+                [QuotedStr(PropsOut[i] + ' : '), QuotedStr(PropsOut[i])]));
+          end
+      else
+        begin
+          if StartsText(wbemTargetInstance, PropsOut[i]) then
+            Props.Add(Format('  Console.WriteLine(%-' + IntToStr(Len) +
+              's + ManagementBaseObject(e.NewEvent[%s])[%s]);', [QuotedStr(PropsOut[i] + ' : '),
+              QuotedStr(wbemTargetInstance), QuotedStr(StringReplace(PropsOut[i], wbemTargetInstance + '.', '',
+              [rfReplaceAll]))]))
+          else
+            Props.Add(Format('  Console.WriteLine(%-' + IntToStr(Len) +
+              's + e.NewEvent.Properties[%s].Value.ToString());', [QuotedStr(PropsOut[i] + ' : '),
+              QuotedStr(PropsOut[i])]));
+        end;
+      end;
     end;
 
     StrCode := StringReplace(StrCode, sTagOxygenEventsOut, Props.Text, [rfReplaceAll]);
   finally
-    props.Free;
+    Props.Free;
   end;
 
-  StrCode := StringReplace(StrCode, sTagOxygenEventsWql, WQL, [rfReplaceAll]);
+  StrCode := StringReplace(StrCode, sTagOxygenEventsWql, Wql, [rfReplaceAll]);
   StrCode := StringReplace(StrCode, sTagWmiNameSpace, WmiNamespace, [rfReplaceAll]);
   OutPutCode.Text := StrCode;
 end;
 
-
 { TOxygenWmiMethodCodeGenerator }
 
-procedure TOxygenWmiMethodCodeGenerator.GenerateCode(ParamsIn,
-  Values: TStrings);
+procedure TOxygenWmiMethodCodeGenerator.GenerateCode(ParamsIn, Values: TStrings);
 var
   StrCode: string;
   Descr: string;
@@ -209,7 +208,7 @@ var
   i: integer;
 
   IsStatic: boolean;
-  TemplateCode : string;
+  TemplateCode: string;
 begin
   Descr := GetWmiClassDescription;
   OutPutCode.BeginUpdate;
@@ -222,22 +221,22 @@ begin
     if IsStatic then
     begin
       {
-      if UseHelperFunctions then
+        if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
-      else
+        else
         TemplateCode:='';
       }
-        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiMethodStatic));
+      StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiMethodStatic));
     end
     else
     begin
-       {
-      if UseHelperFunctions then
+      {
+        if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
-      else
+        else
         TemplateCode:='';
-        }
-        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiMethodNonStatic));
+      }
+      StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_Oxygen, ModeCodeGeneration, TWmiGenCode.WmiMethodNonStatic));
     end;
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
@@ -247,37 +246,31 @@ begin
     StrCode := StringReplace(StrCode, sTagWmiPath, WmiPath, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
 
-
-    //In Params
+    // In Params
     if ParamsIn.Count > 0 then
       for i := 0 to ParamsIn.Count - 1 do
         if Values[i] <> WbemEmptyParam then
           if ParamsIn.ValueFromIndex[i] = wbemtypeString then
-            DynCodeInParams.Add(
-              Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), QuotedStr(Values[i])]))
+            DynCodeInParams.Add(Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), QuotedStr(Values[i])]))
           else
-            DynCodeInParams.Add(
-              Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), Values[i]]));
+            DynCodeInParams.Add(Format('  inParams[%s]:=%s;', [QuotedStr(ParamsIn.Names[i]), Values[i]]));
     StrCode := StringReplace(StrCode, sTagOxygenCodeParamsIn, DynCodeInParams.Text, [rfReplaceAll]);
 
-    //Out Params
+    // Out Params
     if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count > 1 then
     begin
       for i := 0 to WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count - 1 do
-        DynCodeOutParams.Add(
-          Format('  Console.WriteLine(''{0,-35} {1,-40}'',%s,outParams[%s]);',
-          [QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name), QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name)]));
+        DynCodeOutParams.Add(Format('  Console.WriteLine(''{0,-35} {1,-40}'',%s,outParams[%s]);',
+          [QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name),
+          QuotedStr(WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name)]));
     end
-    else
-    if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count = 1 then
+    else if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count = 1 then
     begin
-      DynCodeOutParams.Add(
-        Format('  Console.WriteLine(''{0,-35} {1,-40}'',''Return Value'',%s);',
+      DynCodeOutParams.Add(Format('  Console.WriteLine(''{0,-35} {1,-40}'',''Return Value'',%s);',
         ['outParams[''ReturnValue'']']));
     end;
 
-    StrCode := StringReplace(StrCode, sTagOxygenCodeParamsOut,
-      DynCodeOutParams.Text, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagOxygenCodeParamsOut, DynCodeOutParams.Text, [rfReplaceAll]);
 
     StrCode := StringReplace(StrCode, sTagWmiMethodDescr, Descr, [rfReplaceAll]);
     OutPutCode.Text := StrCode;
@@ -288,27 +281,26 @@ begin
   end;
 end;
 
-
 function TOxygenWmiMethodCodeGenerator.GetWmiClassDescription: string;
 var
-  ClassDescr : TStringList;
-  Index      : Integer;
+  ClassDescr: TStringList;
+  Index: integer;
 begin
-  ClassDescr:=TStringList.Create;
+  ClassDescr := TStringList.Create;
   try
     Result := WMiClassMetaData.MethodByName[WmiMethod].Description;
 
-    if Pos(#10, Result) = 0 then //check if the description has format
+    if Pos(#10, Result) = 0 then // check if the description has format
       ClassDescr.Text := WrapText(Result, 80)
     else
-      ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
+      ClassDescr.Text := Result; // WrapText(Summary,sLineBreak,[#10],80);
 
     for Index := 0 to ClassDescr.Count - 1 do
       ClassDescr[Index] := Format('// %s', [ClassDescr[Index]]);
 
-    Result:=ClassDescr.Text;
+    Result := ClassDescr.Text;
   finally
-     ClassDescr.Free;
+    ClassDescr.Free;
   end;
 end;
 

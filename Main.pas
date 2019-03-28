@@ -15,7 +15,7 @@
 // The Original Code is Main.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
@@ -29,7 +29,7 @@ uses
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, Rtti, Generics.Collections, uHostsAdmin,
   SynEdit, ImgList, ToolWin, uSettings, Menus, Buttons, Vcl.Styles.ColorTabs,
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, Vcl.ActnList, Vcl.ActnMan,
-  System.Actions;
+  System.Actions, System.ImageList;
 
 type
   TFrmMain = class(TForm)
@@ -82,7 +82,8 @@ type
     procedure ActionDisconnectUpdate(Sender: TObject);
     procedure ToolButton1Click(Sender: TObject);
     procedure ToolButtonExitClick(Sender: TObject);
-    procedure TreeViewTasksCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure TreeViewTasksCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
+      var DefaultDraw: Boolean);
   private
     FSettings: TSettings;
     FCtx: TRttiContext;
@@ -546,7 +547,8 @@ begin
 
 end;
 
-procedure TFrmMain.TreeViewTasksCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
+procedure TFrmMain.TreeViewTasksCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
+  var DefaultDraw: Boolean);
 begin
   if not StyleServices.IsSystemStyle then
     if cdsSelected in State then

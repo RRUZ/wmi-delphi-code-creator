@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uBorlandCppVersions
 // unit for the WMI Delphi Code Creator
@@ -15,10 +15,10 @@
 // The Original Code is uBorlandCppVersions.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
+// **************************************************************************************************
 
 unit uBorlandCppVersions;
 
@@ -82,7 +82,6 @@ const
 
 procedure FillListViewBorlandCppVersions(ListView: TListView);
 
-
 implementation
 
 uses
@@ -100,8 +99,7 @@ begin
   if FileExists(Filename) then
   begin
     FillChar(FileInfo, SizeOf(FileInfo), 0);
-    SHGetFileInfo(PChar(Filename), 0, FileInfo, SizeOf(FileInfo),
-      SHGFI_ICON or SHGFI_SMALLICON);
+    SHGetFileInfo(PChar(Filename), 0, FileInfo, SizeOf(FileInfo), SHGFI_ICON or SHGFI_SMALLICON);
     if FileInfo.hIcon <> 0 then
     begin
       ImageList_AddIcon(ImageList.Handle, FileInfo.hIcon);
@@ -113,7 +111,7 @@ end;
 procedure FillListViewBorlandCppVersions(ListView: TListView);
 var
   BorlandCppComp: TBorlandCppVersions;
-  FileName: string;
+  Filename: string;
   Found: boolean;
   Item: TListItem;
 begin
@@ -121,16 +119,15 @@ begin
   begin
     Found := RegKeyExists(BorlandCppRegPaths[BorlandCppComp], HKEY_CURRENT_USER);
     if Found then
-      Found := RegReadStr(BorlandCppRegPaths[BorlandCppComp], 'App', FileName,
-        HKEY_CURRENT_USER) and
-        FileExists(FileName);
+      Found := RegReadStr(BorlandCppRegPaths[BorlandCppComp], 'App', Filename, HKEY_CURRENT_USER) and
+        FileExists(Filename);
 
     if not Found then
     begin
       Found := RegKeyExists(BorlandCppRegPaths[BorlandCppComp], HKEY_LOCAL_MACHINE);
       if Found then
-        Found := RegReadStr(BorlandCppRegPaths[BorlandCppComp], 'App', FileName,
-          HKEY_LOCAL_MACHINE) and FileExists(FileName);
+        Found := RegReadStr(BorlandCppRegPaths[BorlandCppComp], 'App', Filename, HKEY_LOCAL_MACHINE) and
+          FileExists(Filename);
     end;
 
     if Found then
@@ -139,11 +136,10 @@ begin
       Item := ListView.Items.Add;
       Item.ImageIndex := ListView.SmallImages.Count - 1;
       Item.Caption := BorlandCppVersionsNames[BorlandCppComp];
-      item.SubItems.Add(FileName);
+      Item.SubItems.Add(Filename);
       Item.Data := Pointer(Ord(BorlandCppComp));
     end;
   end;
 end;
-
 
 end.

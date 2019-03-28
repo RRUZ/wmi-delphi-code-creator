@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uGlobals
 // unit for the WMI Delphi Code Creator
@@ -15,62 +15,62 @@
 // The Original Code is uGlobals.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
+// **************************************************************************************************
 unit uGlobals;
 
 interface
 
 uses
- uWmi_Metadata,
- Classes,
- Generics.Collections;
+  uWmi_Metadata,
+  Classes,
+  Generics.Collections;
 
 type
- TWmiClassesList = TObjectList<TWMiClassMetaData>;
+  TWmiClassesList = TObjectList<TWMiClassMetaData>;
 
- TWmiClassesDictionary = TDictionary<string, TWmiClassesList>;
- TWmiNameSpacesDictionary = TDictionary<string, TStrings>;
+  TWmiClassesDictionary = TDictionary<string, TWmiClassesList>;
+  TWmiNameSpacesDictionary = TDictionary<string, TStrings>;
 
- TCachedWMIClasses=class
+  TCachedWMIClasses = class
   strict private
-    class var FNameSpaces : TStrings;
-    class var FHostNameSpaces : TWmiNameSpacesDictionary;
+    class var FNameSpaces: TStrings;
+    class var FHostNameSpaces: TWmiNameSpacesDictionary;
     class var FRegisteredNameSpaces: TWmiClassesDictionary;
     class constructor Create;
     class destructor Destroy;
-    class function RegisterWmiClass(const Host, User, Password, NameSpace, WmiClass: string): TWMiClassMetaData;overload;
-    class function RegisterWmiClass(const NameSpace, WmiClass: string): TWMiClassMetaData;overload;
+    class function RegisterWmiClass(const Host, User, Password, NameSpace, WmiClass: string)
+      : TWMiClassMetaData; overload;
+    class function RegisterWmiClass(const NameSpace, WmiClass: string): TWMiClassMetaData; overload;
 
   private
     class function GetNameSpaces: TStrings; static;
   public
     class property RegisteredNameSpaces: TWmiClassesDictionary read FRegisteredNameSpaces;
-    class function GetWmiClass(const NameSpace, WmiClass: string) : TWMiClassMetaData;overload;
-    class function GetWmiClass(const Host, User, Password, NameSpace, WmiClass: string) : TWMiClassMetaData;overload;
+    class function GetWmiClass(const NameSpace, WmiClass: string): TWMiClassMetaData; overload;
+    class function GetWmiClass(const Host, User, Password, NameSpace, WmiClass: string): TWMiClassMetaData; overload;
 
-    class property NameSpaces : TStrings read GetNameSpaces;
-    class function GetNameSpacesHost(const Host, User, Password : string): TStrings; static;
- end;
+    class property NameSpaces: TStrings read GetNameSpaces;
+    class function GetNameSpacesHost(const Host, User, Password: string): TStrings; static;
+  end;
 
 var
-  CachedWMIClasses : TCachedWMIClasses;
+  CachedWMIClasses: TCachedWMIClasses;
 
 implementation
 
 uses
- uSettings,
- SysUtils;
-
+  uSettings,
+  SysUtils;
 
 { TCachedWMIWmiNameSpaces }
 class constructor TCachedWMIClasses.Create;
 begin
- FNameSpaces:=TStringList.Create;
- FHostNameSpaces:=TWmiNameSpacesDictionary.Create;
- FRegisteredNameSpaces:=nil;
+  FNameSpaces := TStringList.Create;
+  FHostNameSpaces := TWmiNameSpacesDictionary.Create;
+  FRegisteredNameSpaces := nil;
 end;
 
 class destructor TCachedWMIClasses.Destroy;
@@ -80,14 +80,14 @@ var
 begin
   FNameSpaces.Free;
 
-  if FRegisteredNameSpaces<>nil then
-  for LItem in FRegisteredNameSpaces do
-    LItem.Value.Free;
+  if FRegisteredNameSpaces <> nil then
+    for LItem in FRegisteredNameSpaces do
+      LItem.Value.Free;
   FreeAndNil(FRegisteredNameSpaces);
 
-  if FHostNameSpaces<>nil then
-  for LPair in FHostNameSpaces do
-    LPair.Value.Free;
+  if FHostNameSpaces <> nil then
+    for LPair in FHostNameSpaces do
+      LPair.Value.Free;
   FreeAndNil(FHostNameSpaces);
 end;
 
@@ -101,21 +101,20 @@ begin
   else
     LoadWMINameSpacesFromCache(FNameSpaces);
 
-   Result:=FNameSpaces;
+  Result := FNameSpaces;
 end;
 
-class function TCachedWMIClasses.GetNameSpacesHost(
-  const Host, User, Password: string): TStrings;
+class function TCachedWMIClasses.GetNameSpacesHost(const Host, User, Password: string): TStrings;
 Var
-  LNameSpaces : TStrings;
+  LNameSpaces: TStrings;
 begin
 
   if FHostNameSpaces.ContainsKey(Host) then
-    LNameSpaces:=FHostNameSpaces.Items[Host]
+    LNameSpaces := FHostNameSpaces.Items[Host]
   else
   begin
-    LNameSpaces:=TStringList.Create;
-    TStringList(LNameSpaces).Sorted:=True;
+    LNameSpaces := TStringList.Create;
+    TStringList(LNameSpaces).Sorted := True;
     FHostNameSpaces.Add(Host, LNameSpaces);
   end;
 
@@ -127,115 +126,116 @@ begin
   else
     LoadWMINameSpacesFromCache(Host, LNameSpaces);
 
-   Result:=LNameSpaces;
+  Result := LNameSpaces;
 end;
 
-
-class function TCachedWMIClasses.GetWmiClass(const Host, User, Password,
-  NameSpace, WmiClass: string): TWMiClassMetaData;
+class function TCachedWMIClasses.GetWmiClass(const Host, User, Password, NameSpace, WmiClass: string)
+  : TWMiClassMetaData;
 begin
-  Result:=RegisterWmiClass(Host, User, Password, NameSpace, WmiClass);
+  Result := RegisterWmiClass(Host, User, Password, NameSpace, WmiClass);
 end;
 
-class function TCachedWMIClasses.GetWmiClass(
-  const NameSpace, WmiClass: string): TWMiClassMetaData;
+class function TCachedWMIClasses.GetWmiClass(const NameSpace, WmiClass: string): TWMiClassMetaData;
 begin
-  Result:=RegisterWmiClass(NameSpace, WmiClass);
+  Result := RegisterWmiClass(NameSpace, WmiClass);
 end;
 
-class function TCachedWMIClasses.RegisterWmiClass(const Host, User, Password, NameSpace, WmiClass: string): TWMiClassMetaData;
+class function TCachedWMIClasses.RegisterWmiClass(const Host, User, Password, NameSpace, WmiClass: string)
+  : TWMiClassMetaData;
 var
-  List : TWmiClassesList;
+  List: TWmiClassesList;
   Found: Boolean;
-  WmiC : TWMiClassMetaData;
+  WmiC: TWMiClassMetaData;
 begin
-  Result:=nil;
+  Result := nil;
   if FRegisteredNameSpaces = nil then
     FRegisteredNameSpaces := TWmiClassesDictionary.Create;
 
-  if not FRegisteredNameSpaces.ContainsKey(Host+NameSpace) then
+  if not FRegisteredNameSpaces.ContainsKey(Host + NameSpace) then
   begin
     List := TWmiClassesList.Create;
-    Result:=TWMiClassMetaData.Create(NameSpace, WmiClass, Host, User, Password);
+    Result := TWMiClassMetaData.Create(NameSpace, WmiClass, Host, User, Password);
     List.Add(Result);
-    FRegisteredNameSpaces.Add(Host+NameSpace, List);
+    FRegisteredNameSpaces.Add(Host + NameSpace, List);
   end
   else
   begin
-    Found:= False;
-    List := FRegisteredNameSpaces[Host+NameSpace];
+    Found := False;
+    List := FRegisteredNameSpaces[Host + NameSpace];
     for WmiC in List do
-     if Assigned(WmiC) and SameText(WmiC.WmiClass,WmiClass) then
-     begin
-       Result:=WmiC;
-       Found:=True;
-       break;
-     end;
+      if Assigned(WmiC) and SameText(WmiC.WmiClass, WmiClass) then
+      begin
+        Result := WmiC;
+        Found := True;
+        break;
+      end;
 
     if not Found then
     begin
-      Result:=TWMiClassMetaData.Create(NameSpace, WmiClass, Host, User, Password);
-      if Result<>nil then
-       List.Add(Result);
+      Result := TWMiClassMetaData.Create(NameSpace, WmiClass, Host, User, Password);
+      if Result <> nil then
+        List.Add(Result);
     end;
   end;
 
 end;
 
-class function TCachedWMIClasses.RegisterWmiClass(const NameSpace,
-  WmiClass: string) : TWMiClassMetaData;
+class function TCachedWMIClasses.RegisterWmiClass(const NameSpace, WmiClass: string): TWMiClassMetaData;
 var
-  List : TWmiClassesList;
+  List: TWmiClassesList;
   Found: Boolean;
-  WmiC : TWMiClassMetaData;
+  WmiC: TWMiClassMetaData;
 begin
-  Result:=nil;
+  Result := nil;
   if FRegisteredNameSpaces = nil then
     FRegisteredNameSpaces := TWmiClassesDictionary.Create;
 
   if not FRegisteredNameSpaces.ContainsKey(NameSpace) then
   begin
     List := TWmiClassesList.Create;
-    Result:=TWMiClassMetaData.Create(NameSpace, WmiClass);
+    Result := TWMiClassMetaData.Create(NameSpace, WmiClass);
     List.Add(Result);
     FRegisteredNameSpaces.Add(NameSpace, List);
   end
   else
   begin
-    Found:= False;
+    Found := False;
     List := FRegisteredNameSpaces[NameSpace];
     for WmiC in List do
-     if Assigned(WmiC) and SameText(WmiC.WmiClass,WmiClass) then
-     begin
-       Result:=WmiC;
-       Found:=True;
-       break;
-     end;
+      if Assigned(WmiC) and SameText(WmiC.WmiClass, WmiClass) then
+      begin
+        Result := WmiC;
+        Found := True;
+        break;
+      end;
 
     if not Found then
     begin
-      Result:=TWMiClassMetaData.Create(NameSpace, WmiClass);
-      if Result<>nil then
-       List.Add(Result);
+      Result := TWMiClassMetaData.Create(NameSpace, WmiClass);
+      if Result <> nil then
+        List.Add(Result);
     end;
   end;
 
 end;
 
 {
-        if not ExistWmiNameSpaceCache then
-        begin
-          GetListWMINameSpaces('root', FNameSpaces);
-          SaveWMINameSpacesToCache(FNameSpaces);
-        end
-        else
-          LoadWMINameSpacesFromCache(FNameSpaces);
+  if not ExistWmiNameSpaceCache then
+  begin
+  GetListWMINameSpaces('root', FNameSpaces);
+  SaveWMINameSpacesToCache(FNameSpaces);
+  end
+  else
+  LoadWMINameSpacesFromCache(FNameSpaces);
 
 }
 
 initialization
-  CachedWMIClasses:=TCachedWMIClasses.Create;
+
+CachedWMIClasses := TCachedWMIClasses.Create;
+
 finalization
-  CachedWMIClasses.Free;
+
+CachedWMIClasses.Free;
 
 end.

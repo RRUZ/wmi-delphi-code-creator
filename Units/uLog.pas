@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uLog
 // unit for the WMI Delphi Code Creator
@@ -15,11 +15,10 @@
 // The Original Code is uLog.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
+// **************************************************************************************************
 
 unit uLog;
 
@@ -37,7 +36,6 @@ type
   public
     { Public declarations }
   end;
-
 
 implementation
 

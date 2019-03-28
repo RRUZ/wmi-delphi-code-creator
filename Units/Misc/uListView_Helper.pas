@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uListView_Helper
 // unit for the WMI Delphi Code Creator
@@ -15,10 +15,10 @@
 // The Original Code is uListView_Helper.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
+// **************************************************************************************************
 
 unit uListView_Helper;
 
@@ -31,10 +31,9 @@ uses
 const
   LVSCW_AUTOSIZE_BESTFIT = -3;
 
-procedure AutoResizeColumn(const Column: TListColumn;  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
-procedure AutoResizeColumns(const Columns: array of TListColumn;  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
-procedure AutoResizeListView(const ListView: TListView;  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
-
+procedure AutoResizeColumn(const Column: TListColumn; const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
+procedure AutoResizeColumns(const Columns: array of TListColumn; const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
+procedure AutoResizeListView(const ListView: TListView; const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
 
 implementation
 
@@ -42,29 +41,28 @@ uses
   System.Classes,
   Winapi.Windows;
 
-
-procedure AutoResizeColumn(const Column: TListColumn;
-  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
+procedure AutoResizeColumn(const Column: TListColumn; const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
 var
   LWidth: integer;
 begin
   case Mode of
     LVSCW_AUTOSIZE_BESTFIT:
-    begin
-      Column.Width := LVSCW_AUTOSIZE;
-      LWidth := Column.Width;
-      Column.Width := LVSCW_AUTOSIZE_USEHEADER;
-      if LWidth > Column.Width then
+      begin
         Column.Width := LVSCW_AUTOSIZE;
-    end;
+        LWidth := Column.Width;
+        Column.Width := LVSCW_AUTOSIZE_USEHEADER;
+        if LWidth > Column.Width then
+          Column.Width := LVSCW_AUTOSIZE;
+      end;
 
-    LVSCW_AUTOSIZE: Column.Width := LVSCW_AUTOSIZE;
-    LVSCW_AUTOSIZE_USEHEADER: Column.Width := LVSCW_AUTOSIZE_USEHEADER;
+    LVSCW_AUTOSIZE:
+      Column.Width := LVSCW_AUTOSIZE;
+    LVSCW_AUTOSIZE_USEHEADER:
+      Column.Width := LVSCW_AUTOSIZE_USEHEADER;
   end;
 end;
 
-procedure AutoResizeColumns(const Columns: array of TListColumn;
-  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
+procedure AutoResizeColumns(const Columns: array of TListColumn; const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
 var
   LIndex: integer;
 begin
@@ -72,14 +70,12 @@ begin
     AutoResizeColumn(Columns[LIndex], Mode);
 end;
 
-procedure AutoResizeListView(const ListView: TListView;
-  const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
+procedure AutoResizeListView(const ListView: TListView; const Mode: integer = LVSCW_AUTOSIZE_BESTFIT);
 var
   LIndex: integer;
 begin
   for LIndex := 0 to ListView.Columns.Count - 1 do
     AutoResizeColumn(ListView.Columns[LIndex], Mode);
 end;
-
 
 end.

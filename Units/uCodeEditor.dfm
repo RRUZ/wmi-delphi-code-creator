@@ -79,6 +79,14 @@ object FrmCodeEditor: TFrmCodeEditor
     Font.Style = []
     PopupMenu = PopupActionBar1
     TabOrder = 2
+    CodeFolding.GutterShapeSize = 11
+    CodeFolding.CollapsedLineColor = clGrayText
+    CodeFolding.FolderBarLinesColor = clGrayText
+    CodeFolding.IndentGuidesColor = clGray
+    CodeFolding.IndentGuides = True
+    CodeFolding.ShowCollapsedLine = False
+    CodeFolding.ShowHintMark = True
+    UseCodeFolding = False
     Gutter.Color = 4598550
     Gutter.BorderColor = clYellow
     Gutter.Font.Charset = DEFAULT_CHARSET
@@ -221,7 +229,7 @@ object FrmCodeEditor: TFrmCodeEditor
     Left = 432
     Top = 152
     Bitmap = {
-      494C01010B000D00040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010B000D00080010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       000000000000000000000000000000000000020202030F0F0F101717171A1717
       171A1717171A1717171A141414170F0F0F110A0A0A0B06060607060606070606

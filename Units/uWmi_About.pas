@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uWmi_About
 // unit for the WMI Delphi Code Creator
@@ -15,10 +15,10 @@
 // The Original Code is uWmi_About.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
+// **************************************************************************************************
 
 unit uWmi_About;
 
@@ -30,13 +30,13 @@ uses
 
 type
   TFrmAbout = class(TForm)
-    Panel1:    TPanel;
-    Button1:   TButton;
-    Image1:    TImage;
-    Label1:    TLabel;
+    Panel1: TPanel;
+    Button1: TButton;
+    Image1: TImage;
+    Label1: TLabel;
     LabelVersion: TLabel;
     LabelWMIVersion: TLabel;
-    Button2:   TButton;
+    Button2: TButton;
     MemoCopyRights: TMemo;
     Button3: TButton;
     Image2: TImage;
@@ -54,8 +54,6 @@ type
     { Public declarations }
   end;
 
-
-
 implementation
 
 uses
@@ -66,8 +64,6 @@ uses
   ShellApi;
 
 {$R *.dfm}
-
-
 
 procedure TFrmAbout.btnCheckUpdatesClick(Sender: TObject);
 begin
@@ -81,34 +77,29 @@ end;
 
 procedure TFrmAbout.Button2Click(Sender: TObject);
 begin
-  ShellExecute(Handle, 'open', PChar('https://github.com/RRUZ/wmi-delphi-code-creator'), nil,
-    nil, SW_SHOW);
+  ShellExecute(Handle, 'open', PChar('https://github.com/RRUZ/wmi-delphi-code-creator'), nil, nil, SW_SHOW);
 end;
 
 procedure TFrmAbout.Button3Click(Sender: TObject);
 begin
-   ShellExecute(Handle, 'open', PChar('http://theroadtodelphi.wordpress.com/contributions/'), nil, nil, SW_SHOW);
+  ShellExecute(Handle, 'open', PChar('http://theroadtodelphi.wordpress.com/contributions/'), nil, nil, SW_SHOW);
 end;
 
 procedure TFrmAbout.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
- Action:=caFree;
+  Action := caFree;
 end;
 
 procedure TFrmAbout.FormCreate(Sender: TObject);
 begin
-  LabelVersion.Caption    := Format('Version %s', [FileVersionStr]);
-  LabelWmiVersion.Caption := Format('WMI installed version %s', [GetWmiVersion]);
-  MemoCopyRights.Lines.Add(
-    'Author Rodrigo Ruz rodrigo.ruz.v@gmail.com - © 2010-2015 all rights reserved.');
+  LabelVersion.Caption := Format('Version %s', [FileVersionStr]);
+  LabelWMIVersion.Caption := Format('WMI installed version %s', [GetWmiVersion]);
+  MemoCopyRights.Lines.Add('Author Rodrigo Ruz rodrigo.ruz.v@gmail.com - © 2010-2019 all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Third Party libraries and tools used');
-  MemoCopyRights.Lines.Add(
-    'SynEdit http://synedit.svn.sourceforge.net/viewvc/synedit/ all rights reserved.');
+  MemoCopyRights.Lines.Add('SynEdit https://github.com/SynEdit/SynEdit all rights reserved.');
   MemoCopyRights.Lines.Add('');
-  MemoCopyRights.Lines.Add(
-    'AsyncCalls 2.98 Copyright © 2008-2011 Andreas Hausladen all rights reserved.');
-  MemoCopyRights.Lines.Add('http://andy.jgknet.de/blog/?page_id=100');
+  MemoCopyRights.Lines.Add('AsyncCalls https://github.com/ahausladen/AsyncCalls');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Artistic Style 2.02 - http://sourceforge.net/projects/astyle/');
   MemoCopyRights.Lines.Add('A Free, Fast and Small Automatic Formatter C, C++, C#, and Java Source Code');
@@ -118,10 +109,10 @@ begin
   MemoCopyRights.Lines.Add('Go Delphi Go');
 end;
 
-
 procedure TFrmAbout.Image3Click(Sender: TObject);
 begin
-  ShellExecute(Handle, 'open', 'http://tp.embarcadero.com/ctprefer?partner_id=1445&product_id=0',nil,nil, SW_SHOWNORMAL) ;
+  ShellExecute(Handle, 'open', 'http://tp.embarcadero.com/ctprefer?partner_id=1445&product_id=0', nil, nil,
+    SW_SHOWNORMAL);
 end;
 
 end.

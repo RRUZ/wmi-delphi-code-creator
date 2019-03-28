@@ -184,6 +184,14 @@ object FrmWMISQL: TFrmWMISQL
         Font.Style = []
         PopupMenu = PopupActionBar1
         TabOrder = 1
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
+        CodeFolding.ShowCollapsedLine = False
+        CodeFolding.ShowHintMark = True
+        UseCodeFolding = False
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
         Gutter.Font.Height = -11
@@ -310,10 +318,6 @@ object FrmWMISQL: TFrmWMISQL
         TabOrder = 0
         object TabSheet1: TTabSheet
           Caption = 'Grid'
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object DBGridWMI: TDBGrid
             Left = 0
             Top = 0
@@ -402,7 +406,7 @@ object FrmWMISQL: TFrmWMISQL
     Left = 128
     Top = 296
     Bitmap = {
-      494C010101000500040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101010005000C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000010D0434052D0DD9042F
       0FFD041909B70005012600000000000000000000000000000000000000000000

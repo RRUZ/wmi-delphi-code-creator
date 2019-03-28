@@ -36,6 +36,8 @@ object FrmWMIInfo: TFrmWMIInfo
         ColWidths = (
           426
           849)
+        RowHeights = (
+          18)
       end
     end
     object TabSheet2: TTabSheet
@@ -58,6 +60,8 @@ object FrmWMIInfo: TFrmWMIInfo
         ColWidths = (
           426
           849)
+        RowHeights = (
+          18)
       end
     end
   end

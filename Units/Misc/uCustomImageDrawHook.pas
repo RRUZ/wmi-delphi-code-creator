@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uCustomImageDrawHook
 // unit for the WMI Delphi Code Creator
@@ -15,12 +15,10 @@
 // The Original Code is uCustomImageDrawHook.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
-
+// **************************************************************************************************
 
 unit uCustomImageDrawHook;
 
@@ -43,7 +41,7 @@ type
   PXRedirCode = ^TXRedirCode;
 
   TXRedirCode = packed record
-    Jump:   byte;
+    Jump: byte;
     Offset: TJumpOfs;
   end;
 
@@ -51,7 +49,7 @@ type
 
   TAbsoluteIndirectJmp = packed record
     OpCode: word;
-    Addr:   PPointer;
+    Addr: PPointer;
   end;
 
   TCustomImageListClass = class(TCustomImageList);
@@ -63,8 +61,7 @@ function GetActualAddr(Proc: Pointer): Pointer;
 begin
   if Proc <> nil then
   begin
-    if (Win32Platform = VER_PLATFORM_WIN32_NT) and
-      (PAbsoluteIndirectJmp(Proc).OpCode = $25FF) then
+    if (Win32Platform = VER_PLATFORM_WIN32_NT) and (PAbsoluteIndirectJmp(Proc).OpCode = $25FF) then
       Result := PAbsoluteIndirectJmp(Proc).Addr^
     else
       Result := Proc;
@@ -75,14 +72,14 @@ end;
 
 procedure HookProc(Proc, Dest: Pointer; var BackupCode: TXRedirCode);
 var
-  lpNumberOfBytesRead:    SIZE_T;
+  lpNumberOfBytesRead: SIZE_T;
   Code: TXRedirCode;
 begin
   Proc := GetActualAddr(Proc);
   Assert(Proc <> nil);
   if ReadProcessMemory(GetCurrentProcess, Proc, @BackupCode, SizeOf(BackupCode), lpNumberOfBytesRead) then
   begin
-    Code.Jump   := $E9;
+    Code.Jump := $E9;
     Code.Offset := PAnsiChar(Dest) - PAnsiChar(Proc) - SizeOf(Code);
     WriteProcessMemory(GetCurrentProcess, Proc, @Code, SizeOf(Code), lpNumberOfBytesRead);
   end;
@@ -101,7 +98,7 @@ begin
   end;
 end;
 
-procedure DoDrawGrayImage(hdcDst: HDC; himl: HIMAGELIST; ImageIndex, X, Y: Integer);
+procedure DoDrawGrayImage(hdcDst: HDC; himl: HIMAGELIST; ImageIndex, X, Y: integer);
 var
   pimldp: TImageListDrawParams;
 begin
@@ -111,12 +108,10 @@ begin
   pimldp.hdcDst := hdcDst;
   pimldp.himl := himl;
   pimldp.i := ImageIndex;
-  pimldp.x := X;
-  pimldp.y := Y;
+  pimldp.X := X;
+  pimldp.Y := Y;
   ImageList_DrawIndirect(@pimldp);
 end;
-
-
 
 function GetRGBColor(Value: TColor): DWORD;
 begin
@@ -129,19 +124,17 @@ begin
   end;
 end;
 
-procedure New_Draw(Self: TObject; Index: integer; Canvas: TCanvas;
-  X, Y: integer; Style: cardinal; Enabled: boolean);
+procedure New_Draw(Self: TObject; Index: integer; Canvas: TCanvas; X, Y: integer; Style: cardinal; Enabled: boolean);
 var
-  LImageList : TCustomImageList;
+  LImageList: TCustomImageList;
 begin
-  LImageList:=TCustomImageListClass(Self);
+  LImageList := TCustomImageListClass(Self);
   with TCustomImageListClass(Self) do
   begin
     if not HandleAllocated then
       Exit;
     if Enabled then
-      ImageList_DrawEx(Handle, Index, Canvas.Handle, X, Y, 0, 0,
-        GetRGBColor(BkColor), GetRGBColor(BlendColor), Style)
+      ImageList_DrawEx(Handle, Index, Canvas.Handle, X, Y, 0, 0, GetRGBColor(BkColor), GetRGBColor(BlendColor), Style)
     else
       DoDrawGrayImage(Canvas.Handle, LImageList.Handle, Index, X, Y);
   end;
@@ -157,10 +150,12 @@ begin
   UnhookProc(@TCustomImageListClass.DoDraw, DoDrawBackup);
 end;
 
-
 initialization
-  HookDraw;
+
+HookDraw;
 
 finalization
-  UnHookDraw;
+
+UnHookDraw;
+
 end.

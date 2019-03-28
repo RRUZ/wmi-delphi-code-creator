@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uOnlineResources
 // unit for the WMI Delphi Code Creator
@@ -15,11 +15,10 @@
 // The Original Code is uOnlineResources.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
+// **************************************************************************************************
 
 unit uOnlineResources;
 
@@ -43,12 +42,11 @@ type
     FSearchKey: string;
     procedure SetSearchKey(const Value: string);
   public
-    property SearchKey : string read FSearchKey write SetSearchKey;
+    property SearchKey: string read FSearchKey write SetSearchKey;
     procedure GetResults;
   end;
 
-
-  function GetURLBySearchTerm(const SearchKey : string) : string;
+function GetURLBySearchTerm(const SearchKey: string): string;
 
 var
   FrmOnlineResources: TFrmOnlineResources;
@@ -56,49 +54,50 @@ var
 implementation
 
 uses
- IdURI,
- uListView_Helper,
- ShellApi,
- ComObj,
- MSXML;
+  IdURI,
+  uListView_Helper,
+  ShellApi,
+  ComObj,
+  MSXML;
 
 {$R *.dfm}
 
-function GetURLBySearchTerm(const SearchKey : string) : string;
+function GetURLBySearchTerm(const SearchKey: string): string;
 const
- ApplicationID= 'TnirCFpM4B8F8mCECpFxNtF0i0qts/xVKkVJT/iWRig=';
- URI='https://api.datamarket.azure.com/Bing/Search/Web?Query=%s&$format=ATOM&$top=%d&$skip=%d';
- COMPLETED=4;
- OK       =200;
+  ApplicationID = 'TnirCFpM4B8F8mCECpFxNtF0i0qts/xVKkVJT/iWRig=';
+  URI = 'https://api.datamarket.azure.com/Bing/Search/Web?Query=%s&$format=ATOM&$top=%d&$skip=%d';
+  COMPLETED = 4;
+  OK = 200;
 var
-  XMLHTTPRequest  : IXMLHTTPRequest;
-  XMLDOMDocument  : IXMLDOMDocument;
-  XMLDOMNode      : IXMLDOMNode;
-  cXMLDOMNode     : IXMLDOMNode;
-  XMLDOMNodeList  : IXMLDOMNodeList;
-  LIndex          : Integer;
+  XMLHTTPRequest: IXMLHTTPRequest;
+  XMLDOMDocument: IXMLDOMDocument;
+  XMLDOMNode: IXMLDOMNode;
+  cXMLDOMNode: IXMLDOMNode;
+  XMLDOMNodeList: IXMLDOMNodeList;
+  LIndex: Integer;
 begin
-    Result:='';
-    XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As IXMLHTTPRequest;
+  Result := '';
+  XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As IXMLHTTPRequest;
   try
-    XMLHTTPRequest.open('GET',Format(URI,[TIdURI.PathEncode(QuotedStr(SearchKey)), 10, 0]), False, ApplicationID, ApplicationID);
+    XMLHTTPRequest.open('GET', Format(URI, [TIdURI.PathEncode(QuotedStr(SearchKey)), 10, 0]), False, ApplicationID,
+      ApplicationID);
     XMLHTTPRequest.send('');
     if (XMLHTTPRequest.readyState = COMPLETED) and (XMLHTTPRequest.status = OK) then
     begin
-      XMLDOMDocument:=CoDOMDocument.Create;
+      XMLDOMDocument := CoDOMDocument.Create;
       try
         XMLDOMDocument.loadXML(XMLHTTPRequest.responseText);
         XMLDOMNode := XMLDOMDocument.selectSingleNode('/feed');
         XMLDOMNodeList := XMLDOMNode.selectNodes('//entry');
-        for LIndex:=0 to  XMLDOMNodeList.length-1 do
+        for LIndex := 0 to XMLDOMNodeList.length - 1 do
         begin
-          XMLDOMNode:=XMLDOMNodeList.item[LIndex];
-           cXMLDOMNode:=XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Url',[LIndex]));
-           Result:= String(cXMLDOMNode.Text);
-           Break;
+          XMLDOMNode := XMLDOMNodeList.item[LIndex];
+          cXMLDOMNode := XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Url', [LIndex]));
+          Result := String(cXMLDOMNode.Text);
+          Break;
         end;
       finally
-        XMLDOMDocument:=nil;
+        XMLDOMDocument := nil;
       end;
     end;
   finally
@@ -108,61 +107,62 @@ end;
 
 procedure TFrmOnlineResources.btnSearchClick(Sender: TObject);
 begin
- GetResults;
+  GetResults;
 end;
 
 procedure TFrmOnlineResources.EditSearchExit(Sender: TObject);
 begin
-  FSearchKey:=EditSearch.Text;
+  FSearchKey := EditSearch.Text;
 end;
 
-procedure TFrmOnlineResources.FormClose(Sender: TObject;
-  var Action: TCloseAction);
+procedure TFrmOnlineResources.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  Action:=caFree;
+  Action := caFree;
 end;
 
 procedure TFrmOnlineResources.GetResults;
 const
- ApplicationID= 'TnirCFpM4B8F8mCECpFxNtF0i0qts/xVKkVJT/iWRig=';
- URI='https://api.datamarket.azure.com/Bing/Search/Web?Query=%s&$format=ATOM&$top=%d&$skip=%d';
- COMPLETED=4;
- OK       =200;
+  ApplicationID = 'TnirCFpM4B8F8mCECpFxNtF0i0qts/xVKkVJT/iWRig=';
+  URI = 'https://api.datamarket.azure.com/Bing/Search/Web?Query=%s&$format=ATOM&$top=%d&$skip=%d';
+  COMPLETED = 4;
+  OK = 200;
 var
-  XMLHTTPRequest  : IXMLHTTPRequest;
-  XMLDOMDocument  : IXMLDOMDocument;
-  XMLDOMNode      : IXMLDOMNode;
-  cXMLDOMNode     : IXMLDOMNode;
-  XMLDOMNodeList  : IXMLDOMNodeList;
-  LIndex          : Integer;
-  Item            : TListItem;
+  XMLHTTPRequest: IXMLHTTPRequest;
+  XMLDOMDocument: IXMLDOMDocument;
+  XMLDOMNode: IXMLDOMNode;
+  cXMLDOMNode: IXMLDOMNode;
+  XMLDOMNodeList: IXMLDOMNodeList;
+  LIndex: Integer;
+  item: TListItem;
 
 begin
-    ListViewURL.Items.Clear;
-    XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As IXMLHTTPRequest;
+  ListViewURL.Items.Clear;
+  XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As IXMLHTTPRequest;
   try
-    XMLHTTPRequest.open('GET',Format(URI,[TIdURI.PathEncode(QuotedStr(SearchKey)), 10, 0]), False, ApplicationID, ApplicationID);
+    XMLHTTPRequest.open('GET', Format(URI, [TIdURI.PathEncode(QuotedStr(SearchKey)), 10, 0]), False, ApplicationID,
+      ApplicationID);
     XMLHTTPRequest.send('');
     if (XMLHTTPRequest.readyState = COMPLETED) and (XMLHTTPRequest.status = OK) then
     begin
-      XMLDOMDocument:=CoDOMDocument.Create;
+      XMLDOMDocument := CoDOMDocument.Create;
       try
         XMLDOMDocument.loadXML(XMLHTTPRequest.responseText);
         XMLDOMNode := XMLDOMDocument.selectSingleNode('/feed');
         XMLDOMNodeList := XMLDOMNode.selectNodes('//entry');
-        for LIndex:=0 to  XMLDOMNodeList.length-1 do
+        for LIndex := 0 to XMLDOMNodeList.length - 1 do
         begin
-          Item:=ListViewURL.Items.Add;
-          XMLDOMNode:=XMLDOMNodeList.item[LIndex];
-           cXMLDOMNode:=XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Title',[LIndex]));
-           Item.Caption:=String(cXMLDOMNode.Text);
-           cXMLDOMNode:=XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Url',[LIndex]));
-           Item.SubItems.Add(String(cXMLDOMNode.Text));
-           cXMLDOMNode:=XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Description',[LIndex]));
-           Item.SubItems.Add(String(cXMLDOMNode.Text));
+          item := ListViewURL.Items.Add;
+          XMLDOMNode := XMLDOMNodeList.item[LIndex];
+          cXMLDOMNode := XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Title', [LIndex]));
+          item.Caption := String(cXMLDOMNode.Text);
+          cXMLDOMNode := XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Url', [LIndex]));
+          item.SubItems.Add(String(cXMLDOMNode.Text));
+          cXMLDOMNode := XMLDOMNode.selectSingleNode(Format('//entry[%d]/content/m:properties/d:Description',
+            [LIndex]));
+          item.SubItems.Add(String(cXMLDOMNode.Text));
         end;
       finally
-        XMLDOMDocument:=nil;
+        XMLDOMDocument := nil;
       end;
     end;
   finally
@@ -171,12 +171,12 @@ begin
   AutoResizeListView(ListViewURL);
 end;
 {
-const
- ApplicationID= '73C8F474CA4D1202AD60747126813B731199ECEA';
- URI='http://api.bing.net/xml.aspx?AppId=%s&Version=2.2&Market=en-US&Query=%s&Sources=web&web.count=%d&xmltype=AttributeBased';
- COMPLETED=4;
- OK       =200;
-var
+  const
+  ApplicationID= '73C8F474CA4D1202AD60747126813B731199ECEA';
+  URI='http://api.bing.net/xml.aspx?AppId=%s&Version=2.2&Market=en-US&Query=%s&Sources=web&web.count=%d&xmltype=AttributeBased';
+  COMPLETED=4;
+  OK       =200;
+  var
   XMLHTTPRequest  : IXMLHTTPRequest;
   XMLDOMDocument  : IXMLDOMDocument;
   XMLDOMNode      : IXMLDOMNode;
@@ -184,44 +184,43 @@ var
   LIndex          : Integer;
   Item            : TListItem;
 
-begin
-    ListViewURL.Items.Clear;
-    XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As XMLHTTP;
+  begin
+  ListViewURL.Items.Clear;
+  XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As XMLHTTP;
   try
-    XMLHTTPRequest.open('GET', Format(URI,[ApplicationID, SearchKey, 10]), False, EmptyParam, EmptyParam);
-    XMLHTTPRequest.send('');
-    if (XMLHTTPRequest.readyState = COMPLETED) and (XMLHTTPRequest.status = OK) then
-    begin
-      XMLDOMDocument := XMLHTTPRequest.responseXML  As IXMLDOMDocument2;
-      XMLDOMNode := XMLDOMDocument.selectSingleNode('//web:Web');
-      XMLDOMNodeList := XMLDOMNode.selectNodes('//web:WebResult');
-      for LIndex:=0 to  XMLDOMNodeList.length-1 do
-      begin
-        Item:=ListViewURL.Items.Add;
-        XMLDOMNode:=XMLDOMNodeList.item[LIndex];
-         Item.Caption:=String(XMLDOMNode.attributes.getNamedItem('Title').Text);
-         Item.SubItems.Add(String(XMLDOMNode.attributes.getNamedItem('Url').Text));
-         Item.SubItems.Add(String(XMLDOMNode.attributes.getNamedItem('Description').Text));
-      end;
-    end;
+  XMLHTTPRequest.open('GET', Format(URI,[ApplicationID, SearchKey, 10]), False, EmptyParam, EmptyParam);
+  XMLHTTPRequest.send('');
+  if (XMLHTTPRequest.readyState = COMPLETED) and (XMLHTTPRequest.status = OK) then
+  begin
+  XMLDOMDocument := XMLHTTPRequest.responseXML  As IXMLDOMDocument2;
+  XMLDOMNode := XMLDOMDocument.selectSingleNode('//web:Web');
+  XMLDOMNodeList := XMLDOMNode.selectNodes('//web:WebResult');
+  for LIndex:=0 to  XMLDOMNodeList.length-1 do
+  begin
+  Item:=ListViewURL.Items.Add;
+  XMLDOMNode:=XMLDOMNodeList.item[LIndex];
+  Item.Caption:=String(XMLDOMNode.attributes.getNamedItem('Title').Text);
+  Item.SubItems.Add(String(XMLDOMNode.attributes.getNamedItem('Url').Text));
+  Item.SubItems.Add(String(XMLDOMNode.attributes.getNamedItem('Description').Text));
+  end;
+  end;
   finally
-    XMLHTTPRequest := nil;
+  XMLHTTPRequest := nil;
   end;
   AutoResizeListView(ListViewURL);
-end;
+  end;
 }
-
 
 procedure TFrmOnlineResources.ListViewURLDblClick(Sender: TObject);
 begin
-  if ListViewURL.Selected<>nil then
-   ShellExecute(Handle, 'open', PChar(ListViewURL.Selected.SubItems[0]), nil, nil, SW_SHOW);
+  if ListViewURL.Selected <> nil then
+    ShellExecute(Handle, 'open', PChar(ListViewURL.Selected.SubItems[0]), nil, nil, SW_SHOW);
 end;
 
 procedure TFrmOnlineResources.SetSearchKey(const Value: string);
 begin
   FSearchKey := Value;
-  EditSearch.Text:=FSearchKey;
+  EditSearch.Text := FSearchKey;
 end;
 
 end.

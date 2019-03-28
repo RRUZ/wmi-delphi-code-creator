@@ -15,7 +15,7 @@
 // The Original Code is uSettings.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
@@ -28,7 +28,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, StdCtrls, uDelphiIDEHighlight, SynEdit, uComboBox,
   SynEditHighlighter, SynHighlighterPas, SynHighlighterCpp, Vcl.Styles.Ext, Vcl.Styles.ColorTabs,
-  SynHighlighterCS, Vcl.ExtDlgs, SynHighlighterSQL, Vcl.Themes, Vcl.Styles.Fixes;
+  SynHighlighterCS, Vcl.ExtDlgs, SynHighlighterSQL, Vcl.Themes, Vcl.Styles.Fixes,
+  SynEditCodeFolding;
 
 type
   TSettings = class
@@ -278,7 +279,7 @@ procedure SaveWMIClassesMethodsToCache(const namespace: string; List: TStrings);
 
 function GetWMICFolderCache: string;
 
-//function GetUpdaterInstance: TFrmCheckUpdate;
+// function GetUpdaterInstance: TFrmCheckUpdate;
 
 implementation
 
@@ -313,16 +314,16 @@ Var
 type
   TVclStylesPreviewClass = class(TVclStylesPreview);
 
-//function GetUpdaterInstance: TFrmCheckUpdate;
-//begin
-//  Result := TFrmCheckUpdate.Create(nil);
-//  Result.RemoteVersionFile := 'http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Version.xml';
-//  Result.ApplicationName := 'WMI Delphi Code Creator';
-//  Result.XPathVersionNumber := '/versioninfo/@versionapp';
-//  Result.XPathUrlInstaller := '/versioninfo/@url';
-//  Result.XPathInstallerFileName := '/versioninfo/@installerfilename';
-//end;
-//
+  // function GetUpdaterInstance: TFrmCheckUpdate;
+  // begin
+  // Result := TFrmCheckUpdate.Create(nil);
+  // Result.RemoteVersionFile := 'http://dl.dropbox.com/u/12733424/Blog/Delphi%20Wmi%20Code%20Creator/Version.xml';
+  // Result.ApplicationName := 'WMI Delphi Code Creator';
+  // Result.XPathVersionNumber := '/versioninfo/@versionapp';
+  // Result.XPathUrlInstaller := '/versioninfo/@url';
+  // Result.XPathInstallerFileName := '/versioninfo/@installerfilename';
+  // end;
+  //
 function GetWMICFolderCache: string;
 begin
   Result := IncludeTrailingPathDelimiter(GetSpecialFolder(CSIDL_APPDATA)) + 'WDCC\Cache\';
@@ -495,7 +496,8 @@ begin
     Result := FOutputFolder;
 end;
 
-function EnumFontsProc(var LogFont: TLogFont; var TextMetric: TTextMetric; FontType: Integer; Data: Pointer): Integer; stdcall;
+function EnumFontsProc(var LogFont: TLogFont; var TextMetric: TTextMetric; FontType: Integer; Data: Pointer)
+  : Integer; stdcall;
 begin
   // if ((FontType and TrueType_FontType) <> 0) and  ((LogFont.lfPitchAndFamily and VARIABLE_PITCH) = 0) then
   if ((LogFont.lfPitchAndFamily and FIXED_PITCH) <> 0) then
@@ -508,8 +510,10 @@ end;
 procedure SetSynAttr(FCurrentTheme: TIDETheme; Element: TIDEHighlightElements; SynAttr: TSynHighlighterAttributes;
   DelphiVersion: TDelphiVersions);
 begin
-  SynAttr.Background := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].BackgroundColorNew), DelphiVersion);
-  SynAttr.Foreground := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].ForegroundColorNew), DelphiVersion);
+  SynAttr.Background := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].BackgroundColorNew),
+    DelphiVersion);
+  SynAttr.Foreground := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].ForegroundColorNew),
+    DelphiVersion);
   SynAttr.Style := [];
   if FCurrentTheme[Element].Bold then
     SynAttr.Style := SynAttr.Style + [fsBold];
@@ -527,18 +531,23 @@ begin
   DelphiVer := DelphiXE;
 
   Element := TIDEHighlightElements.RightMargin;
-  SynEdit.RightEdgeColor := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].ForegroundColorNew), DelphiVer);
+  SynEdit.RightEdgeColor := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].ForegroundColorNew),
+    DelphiVer);
 
   Element := TIDEHighlightElements.MarkedBlock;
-  SynEdit.SelectedColor.Foreground := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].ForegroundColorNew), DelphiVer);
-  SynEdit.SelectedColor.Background := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].BackgroundColorNew), DelphiVer);
+  SynEdit.SelectedColor.Foreground := GetDelphiVersionMappedColor
+    (StringToColor(FCurrentTheme[Element].ForegroundColorNew), DelphiVer);
+  SynEdit.SelectedColor.Background := GetDelphiVersionMappedColor
+    (StringToColor(FCurrentTheme[Element].BackgroundColorNew), DelphiVer);
 
   Element := TIDEHighlightElements.LineNumber;
   SynEdit.Gutter.Color := StringToColor(FCurrentTheme[Element].BackgroundColorNew);
-  SynEdit.Gutter.Font.Color := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].ForegroundColorNew), DelphiVer);
+  SynEdit.Gutter.Font.Color := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].ForegroundColorNew),
+    DelphiVer);
 
   Element := TIDEHighlightElements.LineHighlight;
-  SynEdit.ActiveLineColor := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].BackgroundColorNew), DelphiVer);
+  SynEdit.ActiveLineColor := GetDelphiVersionMappedColor(StringToColor(FCurrentTheme[Element].BackgroundColorNew),
+    DelphiVer);
 
   Element := TIDEHighlightElements.PlainText;
   SynEdit.Gutter.BorderColor := GetHighLightColor(StringToColor(FCurrentTheme[Element].BackgroundColorNew));
@@ -667,14 +676,17 @@ begin
     Settings.CurrentTheme := iniFile.ReadString('Global', 'CurrentTheme', 'deep-blue');
     Settings.FontName := iniFile.ReadString('Global', 'FontName', 'Consolas');
     Settings.FontSize := iniFile.ReadInteger('Global', 'FontSize', 10);
-    Settings.DelphiWmiClassCodeGenMode := iniFile.ReadInteger('Global', 'DelphiWmiClassCodeGenMode', Integer(WmiCode_LateBinding));
+    Settings.DelphiWmiClassCodeGenMode := iniFile.ReadInteger('Global', 'DelphiWmiClassCodeGenMode',
+      Integer(WmiCode_LateBinding));
     Settings.DelphiWmiClassHelperFuncts := iniFile.ReadBool('Global', 'DelphiWmiClassHelperFuncts', False);
     Settings.FPCWmiClassHelperFuncts := iniFile.ReadBool('Global', 'FPCWmiClassHelperFuncts', False);
 
     Settings.ShowImplementedMethods := iniFile.ReadBool('Global', 'ShowImplementedMethods', True);
-    Settings.DelphiWmiEventCodeGenMode := iniFile.ReadInteger('Global', 'DelphiWmiEventCodeGenMode', Integer(WmiCode_Scripting));
+    Settings.DelphiWmiEventCodeGenMode := iniFile.ReadInteger('Global', 'DelphiWmiEventCodeGenMode',
+      Integer(WmiCode_Scripting));
     Settings.OutputFolder := iniFile.ReadString('Global', 'OutputFolder', GetTempDirectory);
-    Settings.DelphiWmiMethodCodeGenMode := iniFile.ReadInteger('Global', 'DelphiWmiMethodCodeGenMode', Integer(WmiCode_Scripting));
+    Settings.DelphiWmiMethodCodeGenMode := iniFile.ReadInteger('Global', 'DelphiWmiMethodCodeGenMode',
+      Integer(WmiCode_Scripting));
     Settings.LastWmiNameSpace := iniFile.ReadString('Global', 'LastWmiNameSpace', 'root\CIMV2');
     Settings.LastWmiClass := iniFile.ReadString('Global', 'LastWmiClass', 'Win32_OperatingSystem');
 
@@ -777,7 +789,8 @@ begin
   try
     for i := 0 to DelphiMaxTypesClassCodeGen - 1 do
       // CbDelphiCodewmiClass.Items.Add(ListWmiCodeName[DelphiWmiClassCodeSupported[i]])
-      CbDelphiCodeWmiClass.Items.AddObject(ListWmiCodeName[DelphiWmiClassCodeSupported[i]], TObject(DelphiWmiClassCodeSupported[i]));
+      CbDelphiCodeWmiClass.Items.AddObject(ListWmiCodeName[DelphiWmiClassCodeSupported[i]],
+        TObject(DelphiWmiClassCodeSupported[i]));
   finally
     CbDelphiCodeWmiClass.Items.EndUpdate;
   end;
@@ -786,7 +799,8 @@ begin
   CbDelphiCodeWmiEvent.Items.BeginUpdate;
   try
     for i := 0 to DelphiMaxTypesEventsCodeGen - 1 do
-      CbDelphiCodeWmiEvent.Items.AddObject(ListWmiCodeName[DelphiWmiEventCodeSupported[i]], TObject(DelphiWmiEventCodeSupported[i]));
+      CbDelphiCodeWmiEvent.Items.AddObject(ListWmiCodeName[DelphiWmiEventCodeSupported[i]],
+        TObject(DelphiWmiEventCodeSupported[i]));
   finally
     CbDelphiCodeWmiEvent.Items.EndUpdate;
   end;
@@ -795,7 +809,8 @@ begin
   CbDelphiCodeWmiMethod.Items.BeginUpdate;
   try
     for i := 0 to DelphiMaxTypesMethodCodeGen - 1 do
-      CbDelphiCodeWmiMethod.Items.AddObject(ListWmiCodeName[DelphiWmiMethodCodeSupported[i]], TObject(DelphiWmiMethodCodeSupported[i]));
+      CbDelphiCodeWmiMethod.Items.AddObject(ListWmiCodeName[DelphiWmiMethodCodeSupported[i]],
+        TObject(DelphiWmiMethodCodeSupported[i]));
   finally
     CbDelphiCodeWmiMethod.Items.EndUpdate;
   end;
@@ -832,7 +847,8 @@ end;
 
 procedure TFrmSettings.ButtonGetMoreClick(Sender: TObject);
 begin
-  ShellExecute(Self.WindowHandle, 'open', 'http://theroadtodelphi.wordpress.com/delphi-ide-theme-editor/', nil, nil, SW_SHOWNORMAL);
+  ShellExecute(Self.WindowHandle, 'open', 'http://theroadtodelphi.wordpress.com/delphi-ide-theme-editor/', nil, nil,
+    SW_SHOWNORMAL);
 end;
 
 procedure TFrmSettings.BtnDeleteCacheClick(Sender: TObject);
@@ -854,7 +870,8 @@ begin
     Directory := EditOutputFolder.Text;
 
   // sdNewFolder, sdShowEdit, sdShowShares, sdNewUI, sdShowFiles,    sdValidateDir
-  if SelectDirectory('Select directory', Directory, Directory, [sdNewFolder, sdNewUI, sdShowEdit, sdValidateDir, sdShowShares], nil) then
+  if SelectDirectory('Select directory', Directory, Directory, [sdNewFolder, sdNewUI, sdShowEdit, sdValidateDir,
+    sdShowShares], nil) then
     EditOutputFolder.Text := Directory;
 end;
 
@@ -889,7 +906,8 @@ begin
     FSettings.FPCWmiClassHelperFuncts := CheckBoxFPCHelperFunc.Checked;
     FSettings.ShowImplementedMethods := CheckBoxShowImplMethods.Checked;
     FSettings.DelphiWmiEventCodeGenMode := Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]);
-    FSettings.DelphiWmiMethodCodeGenMode := Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]);
+    FSettings.DelphiWmiMethodCodeGenMode :=
+      Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]);
     FSettings.OutputFolder := EditOutputFolder.Text;
     FSettings.VCLStyle := ComboBoxVCLStyle.Text;
     FSettings.Formatter := CbFormatter.Text;
@@ -966,18 +984,21 @@ end;
 
 procedure TFrmSettings.CbDelphiCodeWmiClassChange(Sender: TObject);
 begin
-  LabelDescr.Caption := ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiClass.Items.Objects[CbDelphiCodeWmiClass.ItemIndex]))];
+  LabelDescr.Caption := ListWmiCodeDescr
+    [TWmiCode(Integer(CbDelphiCodeWmiClass.Items.Objects[CbDelphiCodeWmiClass.ItemIndex]))];
   // ListWmiCodeDescr[TWmiCode(CbDelphiCodewmiClass.ItemIndex)];
 end;
 
 procedure TFrmSettings.CbDelphiCodeWmiEventChange(Sender: TObject);
 begin
-  LabelDescrEvent.Caption := ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]))];
+  LabelDescrEvent.Caption := ListWmiCodeDescr
+    [TWmiCode(Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]))];
 end;
 
 procedure TFrmSettings.CbDelphiCodeWmiMethodChange(Sender: TObject);
 begin
-  LabelDescrMethod.Caption := ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]))];
+  LabelDescrMethod.Caption := ListWmiCodeDescr
+    [TWmiCode(Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]))];
 end;
 
 procedure TFrmSettings.CheckBoxDisableVClStylesNCClick(Sender: TObject);
@@ -1184,9 +1205,12 @@ begin
       break;
     end;
 
-  LabelDescr.Caption := ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiClass.Items.Objects[CbDelphiCodeWmiClass.ItemIndex]))];
-  LabelDescrEvent.Caption := ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]))];
-  LabelDescrMethod.Caption := ListWmiCodeDescr[TWmiCode(Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]))];
+  LabelDescr.Caption := ListWmiCodeDescr
+    [TWmiCode(Integer(CbDelphiCodeWmiClass.Items.Objects[CbDelphiCodeWmiClass.ItemIndex]))];
+  LabelDescrEvent.Caption := ListWmiCodeDescr
+    [TWmiCode(Integer(CbDelphiCodeWmiEvent.Items.Objects[CbDelphiCodeWmiEvent.ItemIndex]))];
+  LabelDescrMethod.Caption := ListWmiCodeDescr
+    [TWmiCode(Integer(CbDelphiCodeWmiMethod.Items.Objects[CbDelphiCodeWmiMethod.ItemIndex]))];
 
   CheckBoxDelphiHelperFunc.Checked := FSettings.FDelphiWmiClassHelperFuncts;
   CheckBoxFPCHelperFunc.Checked := FSettings.FDelphiWmiClassHelperFuncts;

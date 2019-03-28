@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uDelphiIDE
 // unit for the WMI Delphi Code Creator
@@ -15,10 +15,10 @@
 // The Original Code is uDelphiIDE.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
+// **************************************************************************************************
 
 unit uDelphiIDE;
 
@@ -27,11 +27,9 @@ interface
 Uses
   System.Classes;
 
-
-function  CreateDelphiProject(const DestPath, SourcePath: string): boolean;
-procedure CompileAndRunDelphiCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
-procedure FormatDelphiCode(Console, DelphiCode:TStrings; const FormatterPath:string);
-
+function CreateDelphiProject(const DestPath, SourcePath: string): boolean;
+procedure CompileAndRunDelphiCode(Console: TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
+procedure FormatDelphiCode(Console, DelphiCode: TStrings; const FormatterPath: string);
 
 implementation
 
@@ -41,38 +39,37 @@ uses
   WinApi.ShellApi,
   uMisc;
 
-
-procedure CompileAndRunDelphiCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
+procedure CompileAndRunDelphiCode(Console: TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
 var
   ExeFile: string;
 begin
   Console.Add('');
-  CaptureConsoleOutput(Format('"%s" -B -CC -NSsystem;vcl;Winapi;System.Win "%s"', [CompilerName,ProjectFile]), Console);
-  //CaptureConsoleOutput(Format('"%s" -B -CC "%s"', [CompilerName,ProjectFile]), Console);
+  CaptureConsoleOutput(Format('"%s" -B -CC -NSsystem;vcl;Winapi;System.Win "%s"', [CompilerName, ProjectFile]),
+    Console);
+  // CaptureConsoleOutput(Format('"%s" -B -CC "%s"', [CompilerName,ProjectFile]), Console);
   if Run then
   begin
     ExeFile := ChangeFileExt(ProjectFile, '.exe');
     if FileExists(ExeFile) then
-      ShellExecute(0, nil, PChar(Format('"%s"',[ExeFile])), nil, nil, SW_SHOWNORMAL)
+      ShellExecute(0, nil, PChar(Format('"%s"', [ExeFile])), nil, nil, SW_SHOWNORMAL)
     else
       MsgWarning(Format('Could not find %s', [ExeFile]));
   end;
 end;
 
-procedure FormatDelphiCode(Console, DelphiCode:TStrings; const FormatterPath:string);
+procedure FormatDelphiCode(Console, DelphiCode: TStrings; const FormatterPath: string);
 var
-  TempFile : string;
+  TempFile: string;
 begin
   Console.Add('');
   if FileExists(FormatterPath) then
   begin
-   TempFile:=IncludeTrailingPathDelimiter(GetTempDirectory)+FormatDateTime('hhnnss.zzz',Now)+'.pas';
-   DelphiCode.SaveToFile(TempFile);
-   CaptureConsoleOutput(Format('"%s" -delphi "%s"', [FormatterPath,TempFile]), Console);
-   DelphiCode.LoadFromFile(TempFile);
+    TempFile := IncludeTrailingPathDelimiter(GetTempDirectory) + FormatDateTime('hhnnss.zzz', Now) + '.pas';
+    DelphiCode.SaveToFile(TempFile);
+    CaptureConsoleOutput(Format('"%s" -delphi "%s"', [FormatterPath, TempFile]), Console);
+    DelphiCode.LoadFromFile(TempFile);
   end;
 end;
-
 
 function CreateDelphiProject(const DestPath, SourcePath: string): boolean;
 begin

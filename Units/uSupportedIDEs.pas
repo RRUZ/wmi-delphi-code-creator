@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uSupportedIDEs
 // unit for the Delphi Dev Shell Tools
@@ -15,10 +15,10 @@
 // The Original Code is uSupportedIDEs.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
+// **************************************************************************************************
 
 unit uSupportedIDEs;
 
@@ -26,8 +26,9 @@ interface
 
 type
   TSupportedIDEs = (DelphiIDE, LazarusIDE);
+
 const
-  ListSupportedIDEs : array[TSupportedIDEs] of string = ('Delphi IDE','Lazarus IDE');
+  ListSupportedIDEs: array [TSupportedIDEs] of string = ('Delphi IDE', 'Lazarus IDE');
 
 implementation
 

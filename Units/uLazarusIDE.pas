@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uLazarusIDE
 // unit for the WMI Delphi Code Creator
@@ -15,10 +15,10 @@
 // The Original Code is uLazarusIDE.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
+// **************************************************************************************************
 
 unit uLazarusIDE;
 
@@ -39,8 +39,8 @@ function GetLazarusIDEFileName: string;
 function GetLazarusCompilerFileName: string;
 function IsLazarusInstalled: boolean;
 
-function  CreateLazarusProject(const FileName, Path, ProjectTemplate: string): boolean;
-procedure CompileAndRunFPCCode(Console:TStrings;const CompilerName, ProjectFile: string; Run: boolean);
+function CreateLazarusProject(const FileName, Path, ProjectTemplate: string): boolean;
+procedure CompileAndRunFPCCode(Console: TStrings; const CompilerName, ProjectFile: string; Run: boolean);
 
 implementation
 
@@ -50,29 +50,28 @@ uses
 
 const
   LazarusConfigFile = 'environmentoptions.xml';
-  LazarusIDEName    = 'lazarus.exe';
+  LazarusIDEName = 'lazarus.exe';
 
-procedure CompileAndRunFPCCode(Console:TStrings;const CompilerName, ProjectFile: string; Run: boolean);
+procedure CompileAndRunFPCCode(Console: TStrings; const CompilerName, ProjectFile: string; Run: boolean);
 var
   ExeFile: string;
 begin
   Console.Add('');
-  CaptureConsoleOutput(Format('"%s" "%s"', [CompilerName,ProjectFile]), Console);
+  CaptureConsoleOutput(Format('"%s" "%s"', [CompilerName, ProjectFile]), Console);
   if Run then
   begin
     ExeFile := ChangeFileExt(ProjectFile, '.exe');
     if FileExists(ExeFile) then
-      ShellExecute(0, nil, PChar(Format('"%s"',[ExeFile])), nil, nil, SW_SHOWNORMAL)
+      ShellExecute(0, nil, PChar(Format('"%s"', [ExeFile])), nil, nil, SW_SHOWNORMAL)
     else
       MsgWarning(Format('Could not find %s', [ExeFile]));
   end;
 end;
 
-
 function CreateLazarusProject(const FileName, Path, ProjectTemplate: string): boolean;
 var
   XmlDoc: olevariant;
-  Node:   olevariant;
+  Node: olevariant;
 
   LpiFileName: string;
 begin
@@ -90,20 +89,18 @@ begin
     if (XmlDoc.parseError.errorCode <> 0) then
       raise Exception.CreateFmt('Error in Xml Data %s', [XmlDoc.parseError]);
 
-    Node := XmlDoc.selectSingleNode(
-      '//CONFIG/ProjectOptions/Units/Unit0/Filename/@Value');
+    Node := XmlDoc.selectSingleNode('//CONFIG/ProjectOptions/Units/Unit0/Filename/@Value');
     if not VarIsClear(Node) then
       Node.Text := FileName;
 
-    Node := XmlDoc.selectSingleNode(
-      '//CONFIG/ProjectOptions/JumpHistory/Position1/Filename/@Value');
+    Node := XmlDoc.selectSingleNode('//CONFIG/ProjectOptions/JumpHistory/Position1/Filename/@Value');
     if not VarIsClear(Node) then
       Node.Text := FileName;
-       {
-       Node  :=XmlDoc.selectSingleNode('//CONFIG/CompilerOptions/Target/Filename/@Value');
-       if not VarIsClear(Node) then
-       Node.Text:=ChangeFileExt(FileName,'');
-       }
+    {
+      Node  :=XmlDoc.selectSingleNode('//CONFIG/CompilerOptions/Target/Filename/@Value');
+      if not VarIsClear(Node) then
+      Node.Text:=ChangeFileExt(FileName,'');
+    }
     XmlDoc.Save(LpiFileName);
     Result := True;
   finally
@@ -125,12 +122,11 @@ var
   XmlDoc: olevariant;
   Node: olevariant;
 begin
-  Result      := '';
+  Result := '';
   LocalFolder := GetLazarusLocalFolder;
   if LocalFolder <> '' then
   begin
-    FileName := Format('%s%s', [IncludeTrailingPathDelimiter(LocalFolder),
-      LazarusConfigFile]);
+    FileName := Format('%s%s', [IncludeTrailingPathDelimiter(LocalFolder), LazarusConfigFile]);
     if FileExists(FileName) then
     begin
       XmlDoc := CreateOleObject('Msxml2.DOMDocument.6.0');
@@ -152,7 +148,6 @@ begin
   end;
 end;
 
-
 function GetLazarusIDEFolder: string;
 begin
   Result := GetConfigLazarusValue('//CONFIG/EnvironmentOptions/LazarusDirectory/@Value');
@@ -160,8 +155,7 @@ end;
 
 function GetLazarusIDEFileName: string;
 begin
-  Result := Format('%s%s', [IncludeTrailingPathDelimiter(GetLazarusIDEFolder),
-    LazarusIDEName]);
+  Result := Format('%s%s', [IncludeTrailingPathDelimiter(GetLazarusIDEFolder), LazarusIDEName]);
 end;
 
 function GetLazarusCompilerFileName: string;
@@ -173,6 +167,5 @@ function IsLazarusInstalled: boolean;
 begin
   Result := FileExists(GetLazarusIDEFileName);
 end;
-
 
 end.

@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uUpdatesChanges
 // unit for the WMI Delphi Code Creator
@@ -15,10 +15,10 @@
 // The Original Code is uUpdatesChanges.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
+// **************************************************************************************************
 unit uUpdatesChanges;
 
 interface
@@ -29,7 +29,8 @@ uses
   Vcl.ExtCtrls, Vcl.OleCtrls, SHDocVw, Vcl.Styles.WebBrowser;
 
 type
-  TWebBrowser=class(TVclStylesWebBrowser);
+  TWebBrowser = class(TVclStylesWebBrowser);
+
   TFrmUpdateChanges = class(TForm)
     ImageUpdate: TImage;
     LabelMsg: TLabel;
@@ -44,7 +45,7 @@ type
     procedure btnDetailsClick(Sender: TObject);
   private
     { Private declarations }
-    FExecute : Boolean;
+    FExecute: Boolean;
     FURLFeed: string;
     procedure Load;
   public
@@ -53,190 +54,171 @@ type
     function Execute: Boolean;
   end;
 
-  function CheckChangesUpdates(const msg : string): Boolean;
-
+function CheckChangesUpdates(const msg: string): Boolean;
 
 implementation
 
 uses
- Vcl.Styles,
- Vcl.Themes,
- Vcl.GraphUtil,
- MsHtml,
- System.Win.ComObj,
- Winapi.ActiveX,
- Winapi.msxml;
+  Vcl.Styles,
+  Vcl.Themes,
+  Vcl.GraphUtil,
+  MsHtml,
+  System.Win.ComObj,
+  Winapi.ActiveX,
+  Winapi.msxml;
 
 {$R *.dfm}
 
-
-function CheckChangesUpdates(const msg : string): Boolean;
+function CheckChangesUpdates(const msg: string): Boolean;
 var
-  Frm : TFrmUpdateChanges;
+  Frm: TFrmUpdateChanges;
 begin
-  Frm:=TFrmUpdateChanges.Create(nil);
+  Frm := TFrmUpdateChanges.Create(nil);
   try
-    Frm.LabelMsg.Caption:=msg;
-    Frm.URLFeed:= 'http://code.google.com/feeds/p/wmi-delphi-code-creator/svnchanges/basic';
+    Frm.LabelMsg.Caption := msg;
+    Frm.URLFeed := 'http://code.google.com/feeds/p/wmi-delphi-code-creator/svnchanges/basic';
     Frm.ShowModal;
-    Result:=Frm.FExecute;
+    Result := Frm.FExecute;
   finally
     Frm.Free;
   end;
 end;
 
-
 procedure TFrmUpdateChanges.BtnCancelClick(Sender: TObject);
 begin
-  FExecute:=False;
+  FExecute := False;
   Close;
 end;
 
 procedure TFrmUpdateChanges.BtnOkClick(Sender: TObject);
 begin
-  FExecute:=True;
+  FExecute := True;
   Close;
 end;
 
 procedure TFrmUpdateChanges.btnDetailsClick(Sender: TObject);
 begin
- if ClientHeight<200 then
- begin
-  Height:=Height+210;
-  Load;
- end
- else
-  Height:=Height-210;
+  if ClientHeight < 200 then
+  begin
+    Height := Height + 210;
+    Load;
+  end
+  else
+    Height := Height - 210;
 end;
 
 function TFrmUpdateChanges.Execute: Boolean;
 begin
   ShowModal;
-  Result:=Execute;
+  Result := Execute;
 end;
 
 procedure TFrmUpdateChanges.FormCreate(Sender: TObject);
 begin
-  FExecute:=False;
+  FExecute := False;
 end;
 
 procedure TFrmUpdateChanges.Load;
 const
- COMPLETED= 4;
- OK       = 200;
- XslRss   =
-'<xsl:stylesheet version="1.0"'+
+  COMPLETED = 4;
+  OK = 200;
+  XslRss = '<xsl:stylesheet version="1.0"' +
 
-'  xmlns:atom="http://www.w3.org/2005/Atom"'+
-'  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"'+
-'  xmlns:dc="http://purl.org/dc/elements/1.1/">'+
+    '  xmlns:atom="http://www.w3.org/2005/Atom"' + '  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"' +
+    '  xmlns:dc="http://purl.org/dc/elements/1.1/">' +
 
-'    <xsl:output method="html"/>'+
-'    <xsl:template match="/">'+
+    '    <xsl:output method="html"/>' + '    <xsl:template match="/">' +
 
-'    <xsl:apply-templates select="/atom:feed/atom:head"/>'+
-'        <xsl:apply-templates select="/atom:feed"/>'+
-'    </xsl:template>'+
+    '    <xsl:apply-templates select="/atom:feed/atom:head"/>' + '        <xsl:apply-templates select="/atom:feed"/>' +
+    '    </xsl:template>' +
 
-'    <xsl:template match="atom:feed/atom:head">'+
-'        <h3><xsl:value-of select="atom:title"/></h3>'+
-'        <xsl:if test="atom:tagline"><p><xsl:value-of select="atom:tagline"/></p></xsl:if>'+
-'        <xsl:if test="atom:subtitle"><p><xsl:value-of select="atom:subtitle"/></p></xsl:if>'+
-'    </xsl:template>'+
+    '    <xsl:template match="atom:feed/atom:head">' + '        <h3><xsl:value-of select="atom:title"/></h3>' +
+    '        <xsl:if test="atom:tagline"><p><xsl:value-of select="atom:tagline"/></p></xsl:if>' +
+    '        <xsl:if test="atom:subtitle"><p><xsl:value-of select="atom:subtitle"/></p></xsl:if>' +
+    '    </xsl:template>' +
 
-'    <xsl:template match="/atom:feed">'+
-'    <html xmlns="http://www.w3.org/1999/xhtml">'+
-'      <body style="font-family:Arial;font-size:12pt;background-color:%s">'+
-'       <div style="background-color:%s;color:%s;font-family: Tahoma;font-size:12px">'+
-'          <h3><xsl:value-of select="atom:title"/></h3>'+
-'       </div>'+
-'        <xsl:if test="atom:tagline"><p><xsl:value-of select="atom:tagline"/></p></xsl:if>'+
-'        <xsl:if test="atom:subtitle"><p><xsl:value-of select="atom:subtitle"/></p></xsl:if>'+
-'        <ul>'+
-'            <xsl:apply-templates select="atom:entry"/>'+
-'        </ul>'+
-'      </body>'+
-'    </html>'+
-'    </xsl:template>'+
+    '    <xsl:template match="/atom:feed">' + '    <html xmlns="http://www.w3.org/1999/xhtml">' +
+    '      <body style="font-family:Arial;font-size:12pt;background-color:%s">' +
+    '       <div style="background-color:%s;color:%s;font-family: Tahoma;font-size:12px">' +
+    '          <h3><xsl:value-of select="atom:title"/></h3>' + '       </div>' +
+    '        <xsl:if test="atom:tagline"><p><xsl:value-of select="atom:tagline"/></p></xsl:if>' +
+    '        <xsl:if test="atom:subtitle"><p><xsl:value-of select="atom:subtitle"/></p></xsl:if>' + '        <ul>' +
+    '            <xsl:apply-templates select="atom:entry"/>' + '        </ul>' + '      </body>' + '    </html>' +
+    '    </xsl:template>' +
 
-'    <xsl:template match="atom:entry">'+
-'    <div style="background-color:%s;color:%s;font-family: monospace;font-size:12px">'+
-'            <a href="{atom:link[@rel=''related'']/@href}" title="{substring(atom:published, 0, 11)}"><xsl:value-of select="atom:title"/></a>'+
-'            <xsl:choose>'+
-'                <xsl:when test="atom:content != ''''">'+
-'                    <p><xsl:value-of select="atom:content" disable-output-escaping="yes" /></p>'+
-'                </xsl:when>'+
-'                <xsl:otherwise>'+
-'                    <p><xsl:value-of select="atom:summary" disable-output-escaping="yes" /></p>'+
-'                </xsl:otherwise>'+
-'            </xsl:choose>'+
-'    </div>'+
-'    </xsl:template>'+
-'</xsl:stylesheet>';
+    '    <xsl:template match="atom:entry">' +
+    '    <div style="background-color:%s;color:%s;font-family: monospace;font-size:12px">' +
+    '            <a href="{atom:link[@rel=''related'']/@href}" title="{substring(atom:published, 0, 11)}"><xsl:value-of select="atom:title"/></a>'
+    + '            <xsl:choose>' + '                <xsl:when test="atom:content != ''''">' +
+    '                    <p><xsl:value-of select="atom:content" disable-output-escaping="yes" /></p>' +
+    '                </xsl:when>' + '                <xsl:otherwise>' +
+    '                    <p><xsl:value-of select="atom:summary" disable-output-escaping="yes" /></p>' +
+    '                </xsl:otherwise>' + '            </xsl:choose>' + '    </div>' + '    </xsl:template>' +
+    '</xsl:stylesheet>';
 
 var
-  XMLHTTPRequest  : IXMLHTTPRequest;
-  StringStream    : TStringStream;
-  StreamAdapter   : IStream;
+  XMLHTTPRequest: IXMLHTTPRequest;
+  StringStream: TStringStream;
+  StreamAdapter: IStream;
   PersistStreamInit: IPersistStreamInit;
-  XmlStr          : string;
-  XMLDOMDocument  : IXMLDOMDocument;
-  Xsl             : IXMLDOMDocument;
-  FontColor       : string;
-  BackColor       : string;
-  LColor          : TColor;
+  XmlStr: string;
+  XMLDOMDocument: IXMLDOMDocument;
+  Xsl: IXMLDOMDocument;
+  FontColor: string;
+  BackColor: string;
+  LColor: TColor;
 begin
 
   if not TStyleManager.IsCustomStyleActive then
-    LColor:=clWhite
+    LColor := clWhite
   else
-    LColor:=StyleServices.GetSystemColor(clWindow);
-  BackColor:= ColorToWebColorStr(LColor);
+    LColor := StyleServices.GetSystemColor(clWindow);
+  BackColor := ColorToWebColorStr(LColor);
 
   if not TStyleManager.IsCustomStyleActive then
-    LColor:=clBlack
+    LColor := clBlack
   else
-    LColor:=StyleServices.GetSystemColor(clWindowText);
-  FontColor:= ColorToWebColorStr(LColor);
+    LColor := StyleServices.GetSystemColor(clWindowText);
+  FontColor := ColorToWebColorStr(LColor);
 
-   WebBrowser1.HandleNeeded;
-   WebBrowser1.Navigate('about:blank');
-   while WebBrowser1.ReadyState < READYSTATE_INTERACTIVE do
+  WebBrowser1.HandleNeeded;
+  WebBrowser1.Navigate('about:blank');
+  while WebBrowser1.ReadyState < READYSTATE_INTERACTIVE do
     Application.ProcessMessages;
 
-   if Assigned(WebBrowser1.Document) then
-   begin
+  if Assigned(WebBrowser1.Document) then
+  begin
     XMLHTTPRequest := CreateOleObject('MSXML2.XMLHTTP') As IXMLHTTPRequest;
     try
       XMLHTTPRequest.open('GET', FURLFeed, False, EmptyParam, EmptyParam);
       XMLHTTPRequest.send('');
-      if (XMLHTTPRequest.readyState = COMPLETED) and (XMLHTTPRequest.status = OK) then
+      if (XMLHTTPRequest.ReadyState = COMPLETED) and (XMLHTTPRequest.status = OK) then
       begin
-        XmlStr:=XMLHTTPRequest.responseText;
+        XmlStr := XMLHTTPRequest.responseText;
         XMLDOMDocument := CoDOMDocument.Create();
-        XMLDOMDocument.async:=false;
+        XMLDOMDocument.async := False;
         XMLDOMDocument.loadXML(XmlStr);
-        Xsl:=CoDomDocument.Create();
-        Xsl.async:=false;
-        Xsl.loadXML(Format(XslRss,[BackColor , BackColor, FontColor, BackColor , FontColor]));
-        XmlStr:=XMLDOMDocument.transformNode(Xsl);
+        Xsl := CoDOMDocument.Create();
+        Xsl.async := False;
+        Xsl.loadXML(Format(XslRss, [BackColor, BackColor, FontColor, BackColor, FontColor]));
+        XmlStr := XMLDOMDocument.transformNode(Xsl);
 
-        StringStream:=TStringStream.Create(XmlStr);
-         try
-           if WebBrowser1.Document.QueryInterface( IPersistStreamInit, PersistStreamInit) = S_OK then
-           begin
-             StringStream.Seek(0, 0) ;
-             StreamAdapter:= TStreamAdapter.Create(StringStream);
-             PersistStreamInit.Load(StreamAdapter);
-           end;
-         finally
-           StringStream.Free;
-         end;
+        StringStream := TStringStream.Create(XmlStr);
+        try
+          if WebBrowser1.Document.QueryInterface(IPersistStreamInit, PersistStreamInit) = S_OK then
+          begin
+            StringStream.Seek(0, 0);
+            StreamAdapter := TStreamAdapter.Create(StringStream);
+            PersistStreamInit.Load(StreamAdapter);
+          end;
+        finally
+          StringStream.Free;
+        end;
       end;
     finally
-      XMLHTTPRequest:=nil;
+      XMLHTTPRequest := nil;
     end;
-   end;
+  end;
 end;
 
 end.

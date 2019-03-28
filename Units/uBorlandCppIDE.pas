@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uBorlandCppIDE
 // unit for the WMI Delphi Code Creator
@@ -15,11 +15,10 @@
 // The Original Code is uBorlandCppIDE.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
+// **************************************************************************************************
 
 unit uBorlandCppIDE;
 
@@ -28,10 +27,9 @@ interface
 Uses
   Classes;
 
-
-function  CreateBorlandCppiProject(const DestPath, SourcePath: string): boolean;
-procedure CompileAndRunBorlandCppCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
-procedure FormatBorlandCppCode(Console, DelphiCode:TStrings; const FormatterPath:string);
+function CreateBorlandCppiProject(const DestPath, SourcePath: string): boolean;
+procedure CompileAndRunBorlandCppCode(Console: TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
+procedure FormatBorlandCppCode(Console, DelphiCode: TStrings; const FormatterPath: string);
 
 implementation
 
@@ -41,33 +39,33 @@ uses
   ShellApi,
   uMisc;
 
-procedure FormatBorlandCppCode(Console, DelphiCode:TStrings; const FormatterPath:string);
+procedure FormatBorlandCppCode(Console, DelphiCode: TStrings; const FormatterPath: string);
 var
-  TempFile : string;
+  TempFile: string;
 begin
   Console.Add('');
   if FileExists(FormatterPath) then
   begin
-   TempFile:=IncludeTrailingPathDelimiter(GetTempDirectory)+FormatDateTime('hhnnss.zzz',Now)+'.cpp';
-   DelphiCode.SaveToFile(TempFile);
-   CaptureConsoleOutput(Format('"%s" -cpp "%s"', [FormatterPath,TempFile]), Console);
-   DelphiCode.LoadFromFile(TempFile);
+    TempFile := IncludeTrailingPathDelimiter(GetTempDirectory) + FormatDateTime('hhnnss.zzz', Now) + '.cpp';
+    DelphiCode.SaveToFile(TempFile);
+    CaptureConsoleOutput(Format('"%s" -cpp "%s"', [FormatterPath, TempFile]), Console);
+    DelphiCode.LoadFromFile(TempFile);
   end;
 end;
 
-
-procedure CompileAndRunBorlandCppCode(Console:TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
+procedure CompileAndRunBorlandCppCode(Console: TStrings; const CompilerName, ProjectFile: string; Run: boolean = True);
 var
   ExeFile: string;
 begin
   Console.Add('');
-  //CaptureConsoleOutput(Format('"%s" -B -CC -NSsystem;vcl;Winapi;System.Win "%s"', [CompilerName,ProjectFile]), Console);
-  CaptureConsoleOutput(Format('"%s" -n"%s" "%s"', [CompilerName,ExcludeTrailingPathDelimiter(ExtractFilePath(ProjectFile)),ProjectFile]), Console);
+  // CaptureConsoleOutput(Format('"%s" -B -CC -NSsystem;vcl;Winapi;System.Win "%s"', [CompilerName,ProjectFile]), Console);
+  CaptureConsoleOutput(Format('"%s" -n"%s" "%s"',
+    [CompilerName, ExcludeTrailingPathDelimiter(ExtractFilePath(ProjectFile)), ProjectFile]), Console);
   if Run then
   begin
     ExeFile := ChangeFileExt(ProjectFile, '.exe');
     if FileExists(ExeFile) then
-      ShellExecute(0, nil, PChar(Format('"%s"',[ExeFile])), nil, nil, SW_SHOWNORMAL)
+      ShellExecute(0, nil, PChar(Format('"%s"', [ExeFile])), nil, nil, SW_SHOWNORMAL)
     else
       MsgWarning(Format('Could not find %s', [ExeFile]));
   end;

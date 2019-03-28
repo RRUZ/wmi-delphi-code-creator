@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uOleVariantEnum
 // unit for the WMI Delphi Code Creator
@@ -15,10 +15,10 @@
 // The Original Code is uOleVariantEnum.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
+// **************************************************************************************************
 
 unit uOleVariantEnum;
 
@@ -28,10 +28,10 @@ Uses
   Winapi.ActiveX;
 
 type
-  IOleVariantEnum  = interface
-    function  GetCurrent: OLEVariant;
-    function  MoveNext: Boolean;
-    property  Current: OLEVariant read GetCurrent;
+  IOleVariantEnum = interface
+    function GetCurrent: OLEVariant;
+    function MoveNext: Boolean;
+    property Current: OLEVariant read GetCurrent;
   end;
 
   IGetOleVariantEnum = interface
@@ -40,49 +40,47 @@ type
 
   TOleVariantEnum = class(TInterfacedObject, IOleVariantEnum, IGetOleVariantEnum)
   private
-    FCurrent : OLEVariant;
-    FEnum    : IEnumVARIANT;
+    FCurrent: OLEVariant;
+    FEnum: IEnumVARIANT;
   public
     function GetEnumerator: IOleVariantEnum;
     constructor Create(Collection: OLEVariant);
-    function  GetCurrent: OLEVariant;
-    function  MoveNext: Boolean;
-    property  Current: OLEVariant read GetCurrent;
+    function GetCurrent: OLEVariant;
+    function MoveNext: Boolean;
+    property Current: OLEVariant read GetCurrent;
   end;
 
   TOleVariantArrayEnum = class(TInterfacedObject, IOleVariantEnum, IGetOleVariantEnum)
   private
-    FCollection : OLEVariant;
-    FIndex      : Integer;
-    FLowBound   : Integer;
-    FHighBound  : Integer;
+    FCollection: OLEVariant;
+    FIndex: Integer;
+    FLowBound: Integer;
+    FHighBound: Integer;
   public
     function GetEnumerator: IOleVariantEnum;
     constructor Create(Collection: OLEVariant);
-    function  GetCurrent: OLEVariant;
-    function  MoveNext: Boolean;
-    property  Current: OLEVariant read GetCurrent;
+    function GetCurrent: OLEVariant;
+    function MoveNext: Boolean;
+    property Current: OLEVariant read GetCurrent;
   end;
 
-function GetOleVariantEnum(Collection:OleVariant):IGetOleVariantEnum;
-function GetOleVariantArrEnum(Collection:OleVariant):IGetOleVariantEnum;
-
+function GetOleVariantEnum(Collection: OLEVariant): IGetOleVariantEnum;
+function GetOleVariantArrEnum(Collection: OLEVariant): IGetOleVariantEnum;
 
 implementation
 
 Uses
   System.Variants;
 
-function GetOleVariantEnum(Collection:OleVariant):IGetOleVariantEnum;
+function GetOleVariantEnum(Collection: OLEVariant): IGetOleVariantEnum;
 begin
- Result := TOleVariantEnum.Create(Collection);
+  Result := TOleVariantEnum.Create(Collection);
 end;
 
-function GetOleVariantArrEnum(Collection:OleVariant):IGetOleVariantEnum;
+function GetOleVariantArrEnum(Collection: OLEVariant): IGetOleVariantEnum;
 begin
- Result := TOleVariantArrayEnum.Create(Collection);
+  Result := TOleVariantArrayEnum.Create(Collection);
 end;
-
 
 { TOleVariantEnum }
 
@@ -94,20 +92,20 @@ end;
 
 function TOleVariantEnum.GetCurrent: OLEVariant;
 begin
-  Result:=FCurrent;
+  Result := FCurrent;
 end;
 
 function TOleVariantEnum.GetEnumerator: IOleVariantEnum;
 begin
-  Result:=Self;
+  Result := Self;
 end;
 
 function TOleVariantEnum.MoveNext: Boolean;
 var
-  iValue        : LongWord;
+  iValue: LongWord;
 begin
-  FCurrent:=Unassigned;//avoid memory leaks
-  Result:= FEnum.Next(1, FCurrent, iValue) = S_OK;
+  FCurrent := Unassigned; // avoid memory leaks
+  Result := FEnum.Next(1, FCurrent, iValue) = S_OK;
 end;
 
 { TOleVariantArrayEnum }
@@ -115,20 +113,20 @@ end;
 constructor TOleVariantArrayEnum.Create(Collection: OLEVariant);
 begin
   inherited Create;
-  FCollection:=Collection;
-  FLowBound :=VarArrayLowBound(FCollection, 1);
-  FHighBound:=VarArrayHighBound(FCollection, 1);
-  FIndex:=FLowBound-1;
+  FCollection := Collection;
+  FLowBound := VarArrayLowBound(FCollection, 1);
+  FHighBound := VarArrayHighBound(FCollection, 1);
+  FIndex := FLowBound - 1;
 end;
 
 function TOleVariantArrayEnum.GetCurrent: OLEVariant;
 begin
-  Result:=FCollection[FIndex];
+  Result := FCollection[FIndex];
 end;
 
 function TOleVariantArrayEnum.GetEnumerator: IOleVariantEnum;
 begin
-  Result:=Self;
+  Result := Self;
 end;
 
 function TOleVariantArrayEnum.MoveNext: Boolean;

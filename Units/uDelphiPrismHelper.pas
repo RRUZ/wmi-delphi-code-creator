@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uDelphiPrismHelper
 // unit for the WMI Delphi Code Creator
@@ -15,19 +15,16 @@
 // The Original Code is uDelphiPrismHelper.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
+// **************************************************************************************************
 
 unit uDelphiPrismHelper;
 
 interface
 
-function CreateOxygeneProject(const FileName, Path, ProjectTemplate: string;
-  var NewFileName: string): boolean;
-
+function CreateOxygeneProject(const FileName, Path, ProjectTemplate: string; var NewFileName: string): boolean;
 
 implementation
 
@@ -36,25 +33,22 @@ uses
   SysUtils,
   Windows;
 
-function CreateOxygeneProject(const FileName, Path, ProjectTemplate: string;
-  var NewFileName: string): boolean;
+function CreateOxygeneProject(const FileName, Path, ProjectTemplate: string; var NewFileName: string): boolean;
 var
   PathTemplate: string;
-  DestFolder:   string;
+  DestFolder: string;
 begin
-  NewFileName  := '';
+  NewFileName := '';
   PathTemplate := ExtractFilePath(ProjectTemplate);
-  DestFolder   := IncludeTrailingPathDelimiter(Path) + FormatDateTime('YYYYMMDDHHNNSS', Now);
+  DestFolder := IncludeTrailingPathDelimiter(Path) + FormatDateTime('YYYYMMDDHHNNSS', Now);
   ForceDirectories(DestFolder);
   Result := CopyDir(IncludeTrailingPathDelimiter(PathTemplate) + '*.*', DestFolder);
   if Result then
   begin
     NewFileName := IncludeTrailingPathDelimiter(DestFolder) + FileName;
-    Result      := CopyFile(PChar(IncludeTrailingPathDelimiter(Path) + FileName),
-      PChar(NewFileName), False);
+    Result := CopyFile(PChar(IncludeTrailingPathDelimiter(Path) + FileName), PChar(NewFileName), False);
     NewFileName := ExtractFilePath(NewFileName) + 'GetWMI_Info.oxygene';
   end;
 end;
-
 
 end.

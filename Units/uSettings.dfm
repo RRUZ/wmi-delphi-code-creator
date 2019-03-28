@@ -36,10 +36,6 @@ object FrmSettings: TFrmSettings
       object TabSheet4: TTabSheet
         Caption = 'General'
         ImageIndex = 3
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Label6: TLabel
           Left = 16
           Top = 13
@@ -507,6 +503,14 @@ object FrmSettings: TFrmSettings
               Font.Pitch = fpFixed
               Font.Style = []
               TabOrder = 6
+              CodeFolding.GutterShapeSize = 11
+              CodeFolding.CollapsedLineColor = clGrayText
+              CodeFolding.FolderBarLinesColor = clGrayText
+              CodeFolding.IndentGuidesColor = clGray
+              CodeFolding.IndentGuides = True
+              CodeFolding.ShowCollapsedLine = False
+              CodeFolding.ShowHintMark = True
+              UseCodeFolding = False
               Gutter.Color = 4598550
               Gutter.BorderColor = clYellow
               Gutter.Font.Charset = DEFAULT_CHARSET

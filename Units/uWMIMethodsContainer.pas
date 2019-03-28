@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uWMIMethodsContainer
 // unit for the WMI Delphi Code Creator
@@ -15,11 +15,10 @@
 // The Original Code is uWMIMethodsContainer.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
+// **************************************************************************************************
 
 unit uWMIMethodsContainer;
 
@@ -30,7 +29,7 @@ uses
   Vcl.StdCtrls, uMisc, uSettings,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ImgList, Vcl.ActnList,
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ComCtrls, Vcl.ToolWin,
-  Vcl.ActnCtrls, System.Actions;
+  Vcl.ActnCtrls, System.Actions, System.ImageList;
 
 type
   TPageControl = class(Vcl.ComCtrls.TPageControl);
@@ -50,16 +49,16 @@ type
   private
     { Private declarations }
     FSetLog: TProcLog;
-    DataLoaded : Boolean;
+    DataLoaded: Boolean;
     FSetMsg: TProcLog;
     FConsole: TMemo;
     FSettings: TSettings;
     procedure CreateNewInstance;
   public
-    property SetMsg : TProcLog read FSetMsg Write FSetMsg;
-    property SetLog : TProcLog read FSetLog Write FSetLog;
-    property Console : TMemo read FConsole write FConsole;
-    property Settings : TSettings read FSettings Write  FSettings;
+    property SetMsg: TProcLog read FSetMsg Write FSetMsg;
+    property SetLog: TProcLog read FSetLog Write FSetLog;
+    property Console: TMemo read FConsole write FConsole;
+    property Settings: TSettings read FSettings Write FSettings;
   end;
 
 var
@@ -74,69 +73,69 @@ uses
   Vcl.Themes;
 
 {$R *.dfm}
-
 { TForm1 }
 
 procedure TFrmWmiMethodsContainer.ActionDeleteExecute(Sender: TObject);
 Var
- LTabSheet : TTabSheet;
+  LTabSheet: TTabSheet;
 begin
- if MsgQuestion(Format('Do you want delete the %s page?',[Trim(PageControl1.ActivePage.Caption)])) then
- begin
-  LTabSheet := TTabSheet(PageControl1.ActivePage);
-  PageControl1.SelectNextPage(False);
-  if LTabSheet <> nil then
+  if MsgQuestion(Format('Do you want delete the %s page?', [Trim(PageControl1.ActivePage.Caption)])) then
   begin
-   LTabSheet.Parent := nil;
-   LTabSheet.Free;
+    LTabSheet := TTabSheet(PageControl1.ActivePage);
+    PageControl1.SelectNextPage(False);
+    if LTabSheet <> nil then
+    begin
+      LTabSheet.Parent := nil;
+      LTabSheet.Free;
+    end;
   end;
- end;
 end;
 
 procedure TFrmWmiMethodsContainer.ActionDeleteUpdate(Sender: TObject);
 begin
- TAction(Sender).Enabled:=PageControl1.PageCount>0;
+  TAction(Sender).Enabled := PageControl1.PageCount > 0;
 end;
 
 procedure TFrmWmiMethodsContainer.ActionNewExecute(Sender: TObject);
 begin
- CreateNewInstance;
+  CreateNewInstance;
 end;
 
 procedure TFrmWmiMethodsContainer.CreateNewInstance;
 Var
- LTabSheet : TTabSheet;
- LForm     : TFrmWmiMethods;
+  LTabSheet: TTabSheet;
+  LForm: TFrmWmiMethods;
 begin
- LTabSheet:=TTabSheet.Create(PageControl1);
- LTabSheet.Caption:=Format('WMI Methods CodeGen %d',[PageControl1.PageCount+1]);
- LTabSheet.PageControl:=PageControl1;
+  LTabSheet := TTabSheet.Create(PageControl1);
+  LTabSheet.Caption := Format('WMI Methods CodeGen %d', [PageControl1.PageCount + 1]);
+  LTabSheet.PageControl := PageControl1;
 
- LForm:=TFrmWmiMethods.Create(LTabSheet);
- LForm.Parent:=LTabSheet;
- LForm.BorderStyle:=bsNone;
- LForm.Align:=alClient;
- LForm.SetLog:=FSetLog;
- LForm.SetMsg:=FSetMsg;
- LForm.Settings:=FSettings;
- LForm.Console:=FConsole;
- LForm.Show;
- PageControl1.ActivePage:=LTabSheet;
- DataLoaded:=True;
+  LForm := TFrmWmiMethods.Create(LTabSheet);
+  LForm.Parent := LTabSheet;
+  LForm.BorderStyle := bsNone;
+  LForm.Align := alClient;
+  LForm.SetLog := FSetLog;
+  LForm.SetMsg := FSetMsg;
+  LForm.Settings := FSettings;
+  LForm.Console := FConsole;
+  LForm.Show;
+  PageControl1.ActivePage := LTabSheet;
+  DataLoaded := True;
 end;
 
 procedure TFrmWmiMethodsContainer.FormCreate(Sender: TObject);
 begin
-  DataLoaded:=False;
+  DataLoaded := False;
 end;
 
 procedure TFrmWmiMethodsContainer.FormShow(Sender: TObject);
 begin
- if not DataLoaded then
-  CreateNewInstance;
+  if not DataLoaded then
+    CreateNewInstance;
 end;
 
 initialization
-  TStyleManager.Engine.RegisterStyleHook(uWMIMethodsContainer.TPageControl, TTabControlStyleHookBtnClose);
+
+TStyleManager.Engine.RegisterStyleHook(uWMIMethodsContainer.TPageControl, TTabControlStyleHookBtnClose);
 
 end.

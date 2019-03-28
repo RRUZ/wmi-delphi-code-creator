@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uHostsAdmin
 // unit for the WMI Delphi Code Creator
@@ -15,10 +15,10 @@
 // The Original Code is uHostsAdmin.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
+// **************************************************************************************************
 unit uHostsAdmin;
 
 interface
@@ -44,8 +44,7 @@ type
     Image1: TImage;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure ClientDataSet1PostError(DataSet: TDataSet; E: EDatabaseError;
-      var Action: TDataAction);
+    procedure ClientDataSet1PostError(DataSet: TDataSet; E: EDatabaseError; var Action: TDataAction);
   private
     { Private declarations }
     procedure CreateStructure;
@@ -53,7 +52,7 @@ type
     { Public declarations }
   end;
 
-  TWMIHost=class
+  TWMIHost = class
   private
     FHost: string;
     FPassWord: string;
@@ -61,52 +60,49 @@ type
     FUser: string;
     FForm: TForm;
   public
-    property Host : string read FHost;
-    property PassWord : string read FPassWord;
-    property User : string read FUser;
-    property Description  : string read FDescription;
-    property Form  : TForm read FForm write FForm;
+    property Host: string read FHost;
+    property PassWord: string read FPassWord;
+    property User: string read FUser;
+    property Description: string read FDescription;
+    property Form: TForm read FForm write FForm;
   end;
 
-
- function ExistWMIHostDb : Boolean;
- function GetWMIHostDbName : String;
- function GetWMIRegisteredHosts : TStringDynArray; overload;
- function GetListWMIRegisteredHosts : TObjectList<TWMIHost>; overload;
-
-
+function ExistWMIHostDb: Boolean;
+function GetWMIHostDbName: String;
+function GetWMIRegisteredHosts: TStringDynArray; overload;
+function GetListWMIRegisteredHosts: TObjectList<TWMIHost>; overload;
 
 implementation
 
 uses
-   IOUtils,
-   uMisc,
-   uSettings,
-   MidasLib;
+  IOUtils,
+  uMisc,
+  uSettings,
+  MidasLib;
 
 {$R *.dfm}
 
-function GetWMIRegisteredHosts : TStringDynArray;
+function GetWMIRegisteredHosts: TStringDynArray;
 var
-  LClientDataSet : TClientDataSet;
+  LClientDataSet: TClientDataSet;
   ResultArray: TStringDynArray;
-  LIndex : Integer;
+  LIndex: Integer;
 begin
-  Result:=nil;
-  ResultArray:=nil;
+  Result := nil;
+  ResultArray := nil;
 
   if ExistWMIHostDb then
   begin
-    LClientDataSet:=TClientDataSet.Create(nil);
+    LClientDataSet := TClientDataSet.Create(nil);
     try
       LClientDataSet.LoadFromFile(GetWMIHostDbName);
       LClientDataSet.Open;
       SetLength(ResultArray, LClientDataSet.RecordCount + 1);
-      ResultArray[0]:='localhost';
-      LIndex:=1;
+      ResultArray[0] := 'localhost';
+      LIndex := 1;
       while not LClientDataSet.Eof do
       begin
-        ResultArray[LIndex]:=LClientDataSet.FieldByName('Host').AsString;
+        ResultArray[LIndex] := LClientDataSet.FieldByName('Host').AsString;
         Inc(LIndex);
 
         LClientDataSet.Next;
@@ -118,41 +114,41 @@ begin
   end
   else
   begin
-     SetLength(ResultArray, 1);
-     ResultArray[0]:='localhost';
+    SetLength(ResultArray, 1);
+    ResultArray[0] := 'localhost';
   end;
 
-  Result:=ResultArray;
+  Result := ResultArray;
 end;
 
-function GetListWMIRegisteredHosts : TObjectList<TWMIHost>;
+function GetListWMIRegisteredHosts: TObjectList<TWMIHost>;
 var
-  LClientDataSet : TClientDataSet;
+  LClientDataSet: TClientDataSet;
 begin
- Result:=TObjectList<TWMIHost>.Create;
- {
- Result.Add(TWMIHost.Create);
- Result[Result.Count-1].FHost:='localhost';
- Result[Result.Count-1].FPassWord:='';
- Result[Result.Count-1].FUser:='';
- Result[Result.Count-1].FDescription:='localhost';
- Result[Result.Count-1].FForm:=nil;
- }
+  Result := TObjectList<TWMIHost>.Create;
+  {
+    Result.Add(TWMIHost.Create);
+    Result[Result.Count-1].FHost:='localhost';
+    Result[Result.Count-1].FPassWord:='';
+    Result[Result.Count-1].FUser:='';
+    Result[Result.Count-1].FDescription:='localhost';
+    Result[Result.Count-1].FForm:=nil;
+  }
   if ExistWMIHostDb then
   begin
-    LClientDataSet:=TClientDataSet.Create(nil);
+    LClientDataSet := TClientDataSet.Create(nil);
     try
       LClientDataSet.LoadFromFile(GetWMIHostDbName);
       LClientDataSet.Open;
       while not LClientDataSet.Eof do
       begin
-         Result.Add(TWMIHost.Create);
-         Result[Result.Count-1].FHost:=LClientDataSet.FieldByName('Host').AsString;
-         Result[Result.Count-1].FPassWord:=LClientDataSet.FieldByName('Password').AsString;
-         Result[Result.Count-1].FUser:=LClientDataSet.FieldByName('User').AsString;
-         Result[Result.Count-1].FDescription:=LClientDataSet.FieldByName('Description').AsString;
-         Result[Result.Count-1].FForm:=nil;
-         LClientDataSet.Next;
+        Result.Add(TWMIHost.Create);
+        Result[Result.Count - 1].FHost := LClientDataSet.FieldByName('Host').AsString;
+        Result[Result.Count - 1].FPassWord := LClientDataSet.FieldByName('Password').AsString;
+        Result[Result.Count - 1].FUser := LClientDataSet.FieldByName('User').AsString;
+        Result[Result.Count - 1].FDescription := LClientDataSet.FieldByName('Description').AsString;
+        Result[Result.Count - 1].FForm := nil;
+        LClientDataSet.Next;
       end;
       LClientDataSet.Close;
     finally
@@ -161,44 +157,42 @@ begin
   end;
 end;
 
-
-
-function GetWMIHostDbName : String;
+function GetWMIHostDbName: String;
 begin
-result:=GetWMICFolderCache+'WMIhosts.xml';
+  Result := GetWMICFolderCache + 'WMIhosts.xml';
 end;
 
-
-function ExistWMIHostDb : Boolean;
+function ExistWMIHostDb: Boolean;
 begin
-  result:=TFile.Exists(GetWMIHostDbName);
+  Result := TFile.Exists(GetWMIHostDbName);
 end;
 
 { TFrmHostAdmin }
 
-procedure TFrmHostAdmin.ClientDataSet1PostError(DataSet: TDataSet;
-  E: EDatabaseError; var Action: TDataAction);
+procedure TFrmHostAdmin.ClientDataSet1PostError(DataSet: TDataSet; E: EDatabaseError; var Action: TDataAction);
 begin
-  Action:=daAbort;
-  MsgWarning(Format('The host %s was previously registered [%s]',[ClientDataSet1.FieldByName('Host').AsString, E.Message]));
+  Action := daAbort;
+  MsgWarning(Format('The host %s was previously registered [%s]', [ClientDataSet1.FieldByName('Host').AsString,
+    E.Message]));
 end;
 
 procedure TFrmHostAdmin.CreateStructure;
 begin
-  if ClientDataSet1.Active then ClientDataSet1.Close;
+  if ClientDataSet1.Active then
+    ClientDataSet1.Close;
   ClientDataSet1.FieldDefs.Clear;
   ClientDataSet1.FieldDefs.Add('Host', ftString, 40, True);
   ClientDataSet1.FieldDefs.Add('User', ftString, 40, True);
   ClientDataSet1.FieldDefs.Add('Password', ftString, 40, True);
   ClientDataSet1.FieldDefs.Add('Description', ftString, 255, True);
-  ClientDataSet1.IndexDefs.Add('Host','Host',[ixPrimary, ixUnique, ixCaseInsensitive]);
-  ClientDataSet1.IndexName:='Host';
+  ClientDataSet1.IndexDefs.Add('Host', 'Host', [ixPrimary, ixUnique, ixCaseInsensitive]);
+  ClientDataSet1.IndexName := 'Host';
   ClientDataSet1.CreateDataSet;
 end;
 
 procedure TFrmHostAdmin.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
- ClientDataSet1.SaveToFile(GetWMIHostDbName);
+  ClientDataSet1.SaveToFile(GetWMIHostDbName);
 end;
 
 procedure TFrmHostAdmin.FormCreate(Sender: TObject);
@@ -208,8 +202,8 @@ begin
   else
   begin
     ClientDataSet1.LoadFromFile(GetWMIHostDbName);
-    ClientDataSet1.IndexDefs.Add('Host','Host',[ixPrimary, ixUnique, ixCaseInsensitive]);
-    ClientDataSet1.IndexName:='Host';
+    ClientDataSet1.IndexDefs.Add('Host', 'Host', [ixPrimary, ixUnique, ixCaseInsensitive]);
+    ClientDataSet1.IndexName := 'Host';
   end;
   ClientDataSet1.Open;
 end;

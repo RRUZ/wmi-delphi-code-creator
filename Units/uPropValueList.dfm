@@ -30,5 +30,8 @@ object FrmValueList: TFrmValueList
     ColWidths = (
       150
       204)
+    RowHeights = (
+      18
+      18)
   end
 end

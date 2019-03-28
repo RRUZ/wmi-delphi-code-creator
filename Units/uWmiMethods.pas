@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uWmiMethods
 // unit for the WMI Delphi Code Creator
@@ -15,11 +15,10 @@
 // The Original Code is uWmiMethods.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
+// **************************************************************************************************
 
 unit uWmiMethods;
 
@@ -27,11 +26,11 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, uMisc,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls, uWmi_Metadata, uCodeEditor, uSettings, uComboBox;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls, uWmi_Metadata, uCodeEditor, uSettings,
+  uComboBox;
 
 const
   UM_EDITPARAMVALUE = WM_USER + 111;
-
 
 type
   TFrmWmiMethods = class(TForm)
@@ -69,26 +68,25 @@ type
     FSetLog: TProcLog;
     FSettings: TSettings;
     FConsole: TMemo;
-    FrmCodeEditorMethod   : TFrmCodeEditor;
-    FItem:      TListitem;
-    FDataLoaded : Boolean;
+    FrmCodeEditorMethod: TFrmCodeEditor;
+    FItem: TListitem;
+    FDataLoaded: Boolean;
     procedure UMEditValueParam(var msg: TMessage); message UM_EDITPARAMVALUE;
     procedure SetSettings(const Value: TSettings);
     procedure SetConsole(const Value: TMemo);
-    procedure LoadMethodInfo(FirstTime : Boolean=False);
-    procedure LoadParametersMethodInfo(WmiMetaClassInfo : TWMiClassMetaData);
-    procedure GenerateMethodInvoker(WmiMetaClassInfo : TWMiClassMetaData);
+    procedure LoadMethodInfo(FirstTime: Boolean = False);
+    procedure LoadParametersMethodInfo(WmiMetaClassInfo: TWMiClassMetaData);
+    procedure GenerateMethodInvoker(WmiMetaClassInfo: TWMiClassMetaData);
     procedure GenerateCode;
     procedure LoadNameSpaces;
-    procedure LoadWmiMethods(const Namespace: string; FirstTime : Boolean=False);
+    procedure LoadWmiMethods(const Namespace: string; FirstTime: Boolean = False);
     procedure SaveCurrentSettings;
   public
-    property SetMsg : TProcLog read FSetMsg Write FSetMsg;
-    property SetLog : TProcLog read FSetLog Write FSetLog;
-    property Settings : TSettings read FSettings Write SetSettings;
-    property Console : TMemo read FConsole write SetConsole;
+    property SetMsg: TProcLog read FSetMsg Write FSetMsg;
+    property SetLog: TProcLog read FSetLog Write FSetLog;
+    property Settings: TSettings read FSettings Write SetSettings;
+    property Console: TMemo read FConsole write SetConsole;
   end;
-
 
 implementation
 
@@ -108,10 +106,8 @@ uses
   uWmiCSharpCode,
   uListView_Helper;
 
-
 const
   VALUE_METHODPARAM_COLUMN = 2;
-
 
 procedure TFrmWmiMethods.ButtonGenerateCodeInvokerClick(Sender: TObject);
 begin
@@ -164,12 +160,11 @@ begin
     FItem.SubItems[VALUE_METHODPARAM_COLUMN - 1] := TEdit(Sender).Text;
     FItem := nil;
   end;
-  PostMessage(handle, WM_NEXTDLGCTL, ListViewMethodsParams.Handle, 1);
+  PostMessage(handle, WM_NEXTDLGCTL, ListViewMethodsParams.handle, 1);
   TEdit(Sender).Visible := True;
 
   GenerateMethodInvoker(CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text));
 end;
-
 
 procedure TFrmWmiMethods.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -178,50 +173,49 @@ end;
 
 procedure TFrmWmiMethods.FormCreate(Sender: TObject);
 begin
-  FrmCodeEditorMethod  := TFrmCodeEditor.Create(Self);
-  FrmCodeEditorMethod.CodeGenerator:=GenerateCode;
+  FrmCodeEditorMethod := TFrmCodeEditor.Create(Self);
+  FrmCodeEditorMethod.CodeGenerator := GenerateCode;
   FrmCodeEditorMethod.Parent := PanelMethodCode;
-  FrmCodeEditorMethod.OldParent:= PanelMethodCode;
+  FrmCodeEditorMethod.OldParent := PanelMethodCode;
   FrmCodeEditorMethod.Show;
-  //FrmCodeEditorMethod.Settings:=Settings;
-  //FrmCodeEditorMethod.Console:=MemoConsole;
-  FrmCodeEditorMethod.SourceLanguage:=Lng_Delphi;
+  // FrmCodeEditorMethod.Settings:=Settings;
+  // FrmCodeEditorMethod.Console:=MemoConsole;
+  FrmCodeEditorMethod.SourceLanguage := Lng_Delphi;
 end;
 
 procedure TFrmWmiMethods.FormShow(Sender: TObject);
 begin
- if not FDataLoaded then
-  LoadNameSpaces;
+  if not FDataLoaded then
+    LoadNameSpaces;
 end;
 
 procedure TFrmWmiMethods.GenerateCode;
 begin
-   if (Parent<>nil) and (Parent is TTabSheet) then
-     TTabSheet(Parent).Caption:=Format('WMI Methods %s CodeGen',[FrmCodeEditorMethod.ComboBoxLanguageSel.Text]);;
+  if (Parent <> nil) and (Parent is TTabSheet) then
+    TTabSheet(Parent).Caption := Format('WMI Methods %s CodeGen', [FrmCodeEditorMethod.ComboBoxLanguageSel.Text]);;
 
-    if ComboBoxClassesMethods.ItemIndex>=0 then
-      GenerateMethodInvoker(CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text,ComboBoxClassesMethods.Text));
+  if ComboBoxClassesMethods.ItemIndex >= 0 then
+    GenerateMethodInvoker(CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text));
 end;
 
-procedure TFrmWmiMethods.GenerateMethodInvoker(
-  WmiMetaClassInfo: TWMiClassMetaData);
+procedure TFrmWmiMethods.GenerateMethodInvoker(WmiMetaClassInfo: TWMiClassMetaData);
 var
   Namespace: string;
   WmiClass: string;
   WmiMethod: string;
-  i:      integer;
+  i: integer;
   Params: TStringList;
   Values: TStringList;
-  Str:    string;
-  WmiCodeGenerator : TWmiMethodCodeGenerator;
+  Str: string;
+  WmiCodeGenerator: TWmiMethodCodeGenerator;
 begin
   if (ComboBoxClassesMethods.Text = '') or (ComboBoxMethods.Text = '') then
     exit;
 
-  SetLog(Format('Generating code for %s:%s',[WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
+  SetLog(Format('Generating code for %s:%s', [WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass]));
 
   Namespace := ComboBoxNamespaceMethods.Text;
-  WmiClass  := ComboBoxClassesMethods.Text;
+  WmiClass := ComboBoxClassesMethods.Text;
   WmiMethod := ComboBoxMethods.Text;
 
   Params := TStringList.Create;
@@ -234,7 +228,7 @@ begin
       Str := Str + Format('%s=%s, ', [ListViewMethodsParams.Items[i].Caption,
         ListViewMethodsParams.Items[i].SubItems[0]]);
       if ListViewMethodsParams.Items[i].Checked then
-        Values.AddObject(ListViewMethodsParams.Items[i].SubItems[1],ListViewMethodsParams.Items[i].Data)
+        Values.AddObject(ListViewMethodsParams.Items[i].SubItems[1], ListViewMethodsParams.Items[i].Data)
       else
         Values.Add(WbemEmptyParam);
     end;
@@ -243,98 +237,96 @@ begin
 
     case FrmCodeEditorMethod.SourceLanguage of
       Lng_Delphi:
-                 begin
-                  WmiCodeGenerator :=TDelphiWmiMethodCodeGenerator.Create;
-                  try
-                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                    WmiCodeGenerator.WmiMethod:=WmiMethod;
-                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
-                    WmiCodeGenerator.UseHelperFunctions:=False;
-                    WmiCodeGenerator.ModeCodeGeneration :=TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
-                    WmiCodeGenerator.GenerateCode(Params, Values);
-                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
-                  finally
-                    WmiCodeGenerator.Free;
-                  end;
-                 end;
+        begin
+          WmiCodeGenerator := TDelphiWmiMethodCodeGenerator.Create;
+          try
+            WmiCodeGenerator.WMiClassMetaData := WmiMetaClassInfo;
+            WmiCodeGenerator.WmiMethod := WmiMethod;
+            WmiCodeGenerator.WmiPath := ComboBoxPaths.Text;
+            WmiCodeGenerator.UseHelperFunctions := False;
+            WmiCodeGenerator.ModeCodeGeneration := TWmiCode(Settings.DelphiWmiMethodCodeGenMode);
+            WmiCodeGenerator.GenerateCode(Params, Values);
+            FrmCodeEditorMethod.SourceCode := WmiCodeGenerator.OutPutCode;
+          finally
+            WmiCodeGenerator.Free;
+          end;
+        end;
 
       Lng_BorlandCpp:
-                 begin
-                  WmiCodeGenerator :=TBorlandCppWmiMethodCodeGenerator.Create;
-                  try
-                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                    WmiCodeGenerator.WmiMethod:=WmiMethod;
-                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
-                    WmiCodeGenerator.UseHelperFunctions:=False;
-                    WmiCodeGenerator.GenerateCode(Params, Values);
-                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
-                  finally
-                    WmiCodeGenerator.Free;
-                  end;
-                 end;
+        begin
+          WmiCodeGenerator := TBorlandCppWmiMethodCodeGenerator.Create;
+          try
+            WmiCodeGenerator.WMiClassMetaData := WmiMetaClassInfo;
+            WmiCodeGenerator.WmiMethod := WmiMethod;
+            WmiCodeGenerator.WmiPath := ComboBoxPaths.Text;
+            WmiCodeGenerator.UseHelperFunctions := False;
+            WmiCodeGenerator.GenerateCode(Params, Values);
+            FrmCodeEditorMethod.SourceCode := WmiCodeGenerator.OutPutCode;
+          finally
+            WmiCodeGenerator.Free;
+          end;
+        end;
 
       Lng_VSCpp:
-                 begin
-                  WmiCodeGenerator :=TVsWmiMethodCodeGenerator.Create;
-                  try
-                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                    WmiCodeGenerator.WmiMethod:=WmiMethod;
-                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
-                    WmiCodeGenerator.UseHelperFunctions:=False;
-                    WmiCodeGenerator.GenerateCode(Params, Values);
-                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
-                  finally
-                    WmiCodeGenerator.Free;
-                  end;
-                 end;
-
+        begin
+          WmiCodeGenerator := TVsWmiMethodCodeGenerator.Create;
+          try
+            WmiCodeGenerator.WMiClassMetaData := WmiMetaClassInfo;
+            WmiCodeGenerator.WmiMethod := WmiMethod;
+            WmiCodeGenerator.WmiPath := ComboBoxPaths.Text;
+            WmiCodeGenerator.UseHelperFunctions := False;
+            WmiCodeGenerator.GenerateCode(Params, Values);
+            FrmCodeEditorMethod.SourceCode := WmiCodeGenerator.OutPutCode;
+          finally
+            WmiCodeGenerator.Free;
+          end;
+        end;
 
       Lng_FPC:
-                 begin
-                  WmiCodeGenerator :=TFPCWmiMethodCodeGenerator.Create;
-                  try
-                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                    WmiCodeGenerator.WmiMethod:=WmiMethod;
-                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
-                    WmiCodeGenerator.UseHelperFunctions:=False;
-                    WmiCodeGenerator.GenerateCode(Params, Values);
-                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
-                  finally
-                    WmiCodeGenerator.Free;
-                  end;
-                 end;
+        begin
+          WmiCodeGenerator := TFPCWmiMethodCodeGenerator.Create;
+          try
+            WmiCodeGenerator.WMiClassMetaData := WmiMetaClassInfo;
+            WmiCodeGenerator.WmiMethod := WmiMethod;
+            WmiCodeGenerator.WmiPath := ComboBoxPaths.Text;
+            WmiCodeGenerator.UseHelperFunctions := False;
+            WmiCodeGenerator.GenerateCode(Params, Values);
+            FrmCodeEditorMethod.SourceCode := WmiCodeGenerator.OutPutCode;
+          finally
+            WmiCodeGenerator.Free;
+          end;
+        end;
 
       Lng_Oxygen:
-                 begin
-                  WmiCodeGenerator :=TOxygenWmiMethodCodeGenerator.Create;
-                  try
-                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                    WmiCodeGenerator.WmiMethod:=WmiMethod;
-                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
-                    WmiCodeGenerator.UseHelperFunctions:=False;
-                    WmiCodeGenerator.GenerateCode(Params, Values);
-                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
-                  finally
-                    WmiCodeGenerator.Free;
-                  end;
-                 end;
+        begin
+          WmiCodeGenerator := TOxygenWmiMethodCodeGenerator.Create;
+          try
+            WmiCodeGenerator.WMiClassMetaData := WmiMetaClassInfo;
+            WmiCodeGenerator.WmiMethod := WmiMethod;
+            WmiCodeGenerator.WmiPath := ComboBoxPaths.Text;
+            WmiCodeGenerator.UseHelperFunctions := False;
+            WmiCodeGenerator.GenerateCode(Params, Values);
+            FrmCodeEditorMethod.SourceCode := WmiCodeGenerator.OutPutCode;
+          finally
+            WmiCodeGenerator.Free;
+          end;
+        end;
 
       Lng_CSharp:
-                 begin
-                  WmiCodeGenerator :=TCSharpWmiMethodCodeGenerator.Create;
-                  try
-                    WmiCodeGenerator.WMiClassMetaData:=WmiMetaClassInfo;
-                    WmiCodeGenerator.WmiMethod:=WmiMethod;
-                    WmiCodeGenerator.WmiPath:=ComboBoxPaths.Text;
-                    WmiCodeGenerator.UseHelperFunctions:=False;
-                    WmiCodeGenerator.GenerateCode(Params, Values);
-                    FrmCodeEditorMethod.SourceCode:=WmiCodeGenerator.OutPutCode;
-                  finally
-                    WmiCodeGenerator.Free;
-                  end;
-                 end;
+        begin
+          WmiCodeGenerator := TCSharpWmiMethodCodeGenerator.Create;
+          try
+            WmiCodeGenerator.WMiClassMetaData := WmiMetaClassInfo;
+            WmiCodeGenerator.WmiMethod := WmiMethod;
+            WmiCodeGenerator.WmiPath := ComboBoxPaths.Text;
+            WmiCodeGenerator.UseHelperFunctions := False;
+            WmiCodeGenerator.GenerateCode(Params, Values);
+            FrmCodeEditorMethod.SourceCode := WmiCodeGenerator.OutPutCode;
+          finally
+            WmiCodeGenerator.Free;
+          end;
+        end;
     end;
-
 
   finally
     Params.Free;
@@ -347,43 +339,44 @@ var
   pt: TPoint;
   HitTestInfo: TLVHitTestInfo;
 begin
-  if TListView(Sender).Items.Count=0  then exit;
+  if TListView(Sender).Items.Count = 0 then
+    exit;
 
   EditValueMethodParam.Visible := False;
   pt := TListView(Sender).ScreenToClient(Mouse.CursorPos);
   FillChar(HitTestInfo, sizeof(HitTestInfo), 0);
   HitTestInfo.pt := pt;
-  if (-1 <> TListView(Sender).Perform(LVM_SUBITEMHITTEST, 0,
-    lparam(@HitTestInfo))) and
+  if (-1 <> TListView(Sender).Perform(LVM_SUBITEMHITTEST, 0, lparam(@HitTestInfo))) and
     (HitTestInfo.iSubItem = VALUE_METHODPARAM_COLUMN) then
-    PostMessage(Self.Handle, UM_EDITPARAMVALUE, HitTestInfo.iItem, 0);
+    PostMessage(Self.handle, UM_EDITPARAMVALUE, HitTestInfo.iItem, 0);
 
   GenerateCode;
 end;
 
 procedure TFrmWmiMethods.LoadMethodInfo(FirstTime: Boolean);
 Var
-  WmiMetaClassInfo : TWMiClassMetaData;
-  i                : Integer;
+  WmiMetaClassInfo: TWMiClassMetaData;
+  i: integer;
 begin
-  if ComboBoxClassesMethods.ItemIndex=-1 then exit;
+  if ComboBoxClassesMethods.ItemIndex = -1 then
+    exit;
 
   ComboBoxMethods.Items.BeginUpdate;
   try
     ComboBoxMethods.Items.Clear;
-    WmiMetaClassInfo:=CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text);
+    WmiMetaClassInfo := CachedWMIClasses.GetWmiClass(ComboBoxNamespaceMethods.Text, ComboBoxClassesMethods.Text);
 
     if ComboBoxClassesMethods.Text <> '' then
     begin
 
       if Settings.ShowImplementedMethods then
-        for i:= 0 to WmiMetaClassInfo.MethodsCount-1 do
+        for i := 0 to WmiMetaClassInfo.MethodsCount - 1 do
         begin
-         if WmiMetaClassInfo.Methods[i].Implemented then
-           ComboBoxMethods.Items.Add(WmiMetaClassInfo.Methods[i].Name)
+          if WmiMetaClassInfo.Methods[i].Implemented then
+            ComboBoxMethods.Items.Add(WmiMetaClassInfo.Methods[i].Name)
         end
       else
-        for i:= 0 to WmiMetaClassInfo.MethodsCount-1 do
+        for i := 0 to WmiMetaClassInfo.MethodsCount - 1 do
           ComboBoxMethods.Items.Add(WmiMetaClassInfo.Methods[i].Name);
 
       ComboBoxPaths.Items.Clear;
@@ -397,13 +390,13 @@ begin
   if ComboBoxMethods.Items.Count > 0 then
     if FirstTime then
     begin
-      if Settings.LastWmiMethod<>'' then
+      if Settings.LastWmiMethod <> '' then
         ComboBoxMethods.ItemIndex := ComboBoxMethods.Items.IndexOf(Settings.LastWmiMethod)
       else
         ComboBoxMethods.ItemIndex := 0;
     end
     else
-    ComboBoxMethods.ItemIndex := 0
+      ComboBoxMethods.ItemIndex := 0
   else
     ComboBoxMethods.ItemIndex := -1;
 
@@ -413,33 +406,33 @@ end;
 
 procedure TFrmWmiMethods.LoadNameSpaces;
 begin
-    ComboBoxNamespaceMethods.Items.AddStrings(CachedWMIClasses.NameSpaces);
+  ComboBoxNamespaceMethods.Items.AddStrings(CachedWMIClasses.NameSpaces);
 
-    if FSettings.LastWmiNameSpaceMethods<>'' then
-      ComboBoxNamespaceMethods.ItemIndex := ComboBoxNamespaceMethods.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
-    else
-      ComboBoxNamespaceMethods.ItemIndex := 0;
-    LoadWmiMethods(ComboBoxNamespaceMethods.Text, True);
+  if FSettings.LastWmiNameSpaceMethods <> '' then
+    ComboBoxNamespaceMethods.ItemIndex := ComboBoxNamespaceMethods.Items.IndexOf(Settings.LastWmiNameSpaceEvents)
+  else
+    ComboBoxNamespaceMethods.ItemIndex := 0;
+  LoadWmiMethods(ComboBoxNamespaceMethods.Text, True);
 
-    FDataLoaded:=True;
+  FDataLoaded := True;
 end;
 
-procedure TFrmWmiMethods.LoadParametersMethodInfo(
-  WmiMetaClassInfo: TWMiClassMetaData);
+procedure TFrmWmiMethods.LoadParametersMethodInfo(WmiMetaClassInfo: TWMiClassMetaData);
 var
-  i:    integer;
-  Item: TListItem;
-  s   : string;
-  LWMiMethodMetaData : TWMiMethodMetaData;
+  i: integer;
+  Item: TListitem;
+  s: string;
+  LWMiMethodMetaData: TWMiMethodMetaData;
 begin
-  if not Assigned(WmiMetaClassInfo) then exit;
+  if not Assigned(WmiMetaClassInfo) then
+    exit;
   ListViewMethodsParams.Items.BeginUpdate;
   try
     ListViewMethodsParams.Items.Clear;
     if (ComboBoxClassesMethods.Text <> '') and (ComboBoxMethods.Text <> '') then
     begin
 
-      LWMiMethodMetaData:=WmiMetaClassInfo.MethodByName[ComboBoxMethods.Text];
+      LWMiMethodMetaData := WmiMetaClassInfo.MethodByName[ComboBoxMethods.Text];
       if not LWMiMethodMetaData.IsStatic and CheckBoxPath.Checked then
       begin
         GetWmiClassPath(WmiMetaClassInfo.WmiNameSpace, WmiMetaClassInfo.WmiClass, ComboBoxPaths.Items);
@@ -458,12 +451,12 @@ begin
       begin
         Item := ListViewMethodsParams.Items.Add;
         Item.Caption := LWMiMethodMetaData.InParameters[i].Name;
-        Item.Data    := Pointer(LWMiMethodMetaData.InParameters[i].CimType);
+        Item.Data := Pointer(LWMiMethodMetaData.InParameters[i].CimType);
 
         Item.Checked := CheckBoxSelAllProps.Checked;
 
         Item.SubItems.Add(LWMiMethodMetaData.InParameters[i].&Type);
-        s:=GetDefaultValueWmiType(LWMiMethodMetaData.InParameters[i].&Type);
+        s := GetDefaultValueWmiType(LWMiMethodMetaData.InParameters[i].&Type);
         Item.SubItems.Add(s);
         Item.SubItems.Add(LWMiMethodMetaData.InParameters[i].Description);
       end;
@@ -478,8 +471,7 @@ begin
   AutoResizeColumn(ListViewMethodsParams.Column[1]);
 end;
 
-procedure TFrmWmiMethods.LoadWmiMethods(const Namespace: string;
-  FirstTime: Boolean);
+procedure TFrmWmiMethods.LoadWmiMethods(const Namespace: string; FirstTime: Boolean);
 begin
   SetMsg(Format('Loading classes with methods in %s', [Namespace]));
   try
@@ -488,8 +480,7 @@ begin
       ComboBoxClassesMethods.Items.BeginUpdate;
       try
         GetListWmiClassesWithMethods(Namespace, ComboBoxClassesMethods.Items);
-        LabelClassesMethods.Caption :=
-          Format('Classes (%d)', [ComboBoxClassesMethods.Items.Count]);
+        LabelClassesMethods.Caption := Format('Classes (%d)', [ComboBoxClassesMethods.Items.Count]);
         SaveWMIClassesMethodsToCache(Namespace, ComboBoxClassesMethods.Items);
       finally
         ComboBoxClassesMethods.Items.EndUpdate;
@@ -502,13 +493,13 @@ begin
     begin
       if FirstTime then
       begin
-        if Settings.LastWmiClassesMethods<>'' then
+        if Settings.LastWmiClassesMethods <> '' then
           ComboBoxClassesMethods.ItemIndex := ComboBoxClassesMethods.Items.IndexOf(Settings.LastWmiClassesMethods)
         else
           ComboBoxClassesMethods.ItemIndex := 0;
       end
       else
-      ComboBoxClassesMethods.ItemIndex := 0
+        ComboBoxClassesMethods.ItemIndex := 0
     end
     else
       ComboBoxClassesMethods.ItemIndex := -1;
@@ -521,25 +512,25 @@ end;
 
 procedure TFrmWmiMethods.SaveCurrentSettings;
 begin
-  Settings.LastWmiNameSpaceMethods:=ComboBoxNamespaceMethods.Text;
-  Settings.LastWmiClassesMethods  :=ComboBoxClassesMethods.Text;
-  Settings.LastWmiMethod          :=ComboBoxMethods.Text;
+  Settings.LastWmiNameSpaceMethods := ComboBoxNamespaceMethods.Text;
+  Settings.LastWmiClassesMethods := ComboBoxClassesMethods.Text;
+  Settings.LastWmiMethod := ComboBoxMethods.Text;
 end;
 
 procedure TFrmWmiMethods.SetConsole(const Value: TMemo);
 begin
   FConsole := Value;
-  FrmCodeEditorMethod.Console:=Value;
+  FrmCodeEditorMethod.Console := Value;
 end;
 
 procedure TFrmWmiMethods.SetSettings(const Value: TSettings);
 begin
   FSettings := Value;
-  FrmCodeEditorMethod.Settings:=Value;
-  FrmCodeEditorMethod.SourceLanguage:=TSourceLanguages(Value.DefaultLanguage);
+  FrmCodeEditorMethod.Settings := Value;
+  FrmCodeEditorMethod.SourceLanguage := TSourceLanguages(Value.DefaultLanguage);
 
   LoadCurrentTheme(FrmCodeEditorMethod, Settings.CurrentTheme);
-  LoadCurrentThemeFont(FrmCodeEditorMethod ,Settings.FontName,Settings.FontSize);
+  LoadCurrentThemeFont(FrmCodeEditorMethod, Settings.FontName, Settings.FontSize);
 end;
 
 procedure TFrmWmiMethods.UMEditValueParam(var msg: TMessage);
@@ -548,17 +539,14 @@ var
 begin
   EditValueMethodParam.Visible := True;
   EditValueMethodParam.BringToFront;
-  SubItemRect.Top  := VALUE_METHODPARAM_COLUMN;
+  SubItemRect.Top := VALUE_METHODPARAM_COLUMN;
   SubItemRect.Left := LVIR_BOUNDS;
-  ListViewMethodsParams.Perform(LVM_GETSUBITEMRECT, msg.wparam,
-    lparam(@SubItemRect));
-  MapWindowPoints(ListViewMethodsParams.Handle, EditValueMethodParam.Parent.Handle,
-    SubItemRect, 2);
+  ListViewMethodsParams.Perform(LVM_GETSUBITEMRECT, msg.wparam, lparam(@SubItemRect));
+  MapWindowPoints(ListViewMethodsParams.handle, EditValueMethodParam.Parent.handle, SubItemRect, 2);
   FItem := ListViewMethodsParams.Items[msg.wparam];
-  EditValueMethodParam.Text := Fitem.Subitems[VALUE_METHODPARAM_COLUMN - 1];
+  EditValueMethodParam.Text := FItem.SubItems[VALUE_METHODPARAM_COLUMN - 1];
   EditValueMethodParam.BoundsRect := SubItemRect;
   EditValueMethodParam.SetFocus;
 end;
-
 
 end.

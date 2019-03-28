@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uWinInet
 // unit for the WMI Delphi Code Creator
@@ -15,11 +15,10 @@
 // The Original Code is uWinInet.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
+// **************************************************************************************************
 
 unit uWinInet;
 
@@ -32,72 +31,68 @@ uses
   System.Classes;
 
 const
-   WM_UWININET_THREAD_FINISHED = WM_USER + 669;
-   WM_UWININET_THREAD_CANCELLED= WM_USER + 670;
+  WM_UWININET_THREAD_FINISHED = WM_USER + 669;
+  WM_UWININET_THREAD_CANCELLED = WM_USER + 670;
 
 type
-  TuWinInetProcCallBack= procedure(BytesRead:Integer) of object;
+  TuWinInetProcCallBack = procedure(BytesRead: Integer) of object;
 
   TWinINetGetThread = class(TThread)
   private
     FBytesRead: DWORD;
-    FUrl : string;
-    FStream : TStream;
-    FCallBack : TuWinInetProcCallBack;
+    FUrl: string;
+    FStream: TStream;
+    FCallBack: TuWinInetProcCallBack;
     FhWnd: HWND;
     procedure SyncCallBack;
   public
-    constructor Create(const Url: string;Stream:TStream;CallBack:TuWinInetProcCallBack;hWnd: HWND); overload;
+    constructor Create(const Url: string; Stream: TStream; CallBack: TuWinInetProcCallBack; HWND: HWND); overload;
     destructor Destroy; override;
     procedure Execute; override;
   end;
 
-
-
-function  GetRemoteFileSize(const Url : string): Integer;
-procedure WinInet_HttpGet(const Url: string;Stream:TStream;CallBack:TuWinInetProcCallBack);overload;
-function  WinInet_HttpGet(const Url: string;CallBack:TuWinInetProcCallBack): string;overload;
-function  GetWinInetError(ErrorCode:Cardinal): string;
-
+function GetRemoteFileSize(const Url: string): Integer;
+procedure WinInet_HttpGet(const Url: string; Stream: TStream; CallBack: TuWinInetProcCallBack); overload;
+function WinInet_HttpGet(const Url: string; CallBack: TuWinInetProcCallBack): string; overload;
+function GetWinInetError(ErrorCode: Cardinal): string;
 
 implementation
 
 uses
- Winapi.WinInet;
+  Winapi.WinInet;
 
 const
   sUserAgent = 'Mozilla/5.001 (windows; U; NT4.0; en-US; rv:1.0) Gecko/25250101';
 
-function GetWinInetError(ErrorCode:Cardinal): string;
+function GetWinInetError(ErrorCode: Cardinal): string;
 const
-   winetdll = 'wininet.dll';
+  winetdll = 'wininet.dll';
 var
   Len: Integer;
   Buffer: PChar;
 begin
-  Len := FormatMessage(
-  FORMAT_MESSAGE_FROM_HMODULE or FORMAT_MESSAGE_FROM_SYSTEM or
-  FORMAT_MESSAGE_ALLOCATE_BUFFER or FORMAT_MESSAGE_IGNORE_INSERTS or  FORMAT_MESSAGE_ARGUMENT_ARRAY,
-  Pointer(GetModuleHandle(winetdll)), ErrorCode, 0, @Buffer, SizeOf(Buffer), nil);
+  Len := FormatMessage(FORMAT_MESSAGE_FROM_HMODULE or FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_ALLOCATE_BUFFER or
+    FORMAT_MESSAGE_IGNORE_INSERTS or FORMAT_MESSAGE_ARGUMENT_ARRAY, Pointer(GetModuleHandle(winetdll)), ErrorCode, 0,
+    @Buffer, SizeOf(Buffer), nil);
   try
-    while (Len > 0) and {$IFDEF UNICODE}(CharInSet(Buffer[Len - 1], [#0..#32, '.'])) {$ELSE}(Buffer[Len - 1] in [#0..#32, '.']) {$ENDIF} do Dec(Len);
+    while (Len > 0) and {$IFDEF UNICODE}(CharInSet(Buffer[Len - 1], [#0 .. #32, '.']))
+    {$ELSE}(Buffer[Len - 1] in [#0 .. #32, '.']) {$ENDIF} do
+      Dec(Len);
     SetString(Result, Buffer, Len);
   finally
     LocalFree(HLOCAL(Buffer));
   end;
 end;
 
-
-
 procedure ParseURL(const lpszUrl: string; var Host, Resource: string);
 var
-  lpszScheme      : array[0..INTERNET_MAX_SCHEME_LENGTH - 1] of Char;
-  lpszHostName    : array[0..INTERNET_MAX_HOST_NAME_LENGTH - 1] of Char;
-  lpszUserName    : array[0..INTERNET_MAX_USER_NAME_LENGTH - 1] of Char;
-  lpszPassword    : array[0..INTERNET_MAX_PASSWORD_LENGTH - 1] of Char;
-  lpszUrlPath     : array[0..INTERNET_MAX_PATH_LENGTH - 1] of Char;
-  lpszExtraInfo   : array[0..1024 - 1] of Char;
-  lpUrlComponents : TURLComponents;
+  lpszScheme: array [0 .. INTERNET_MAX_SCHEME_LENGTH - 1] of Char;
+  lpszHostName: array [0 .. INTERNET_MAX_HOST_NAME_LENGTH - 1] of Char;
+  lpszUserName: array [0 .. INTERNET_MAX_USER_NAME_LENGTH - 1] of Char;
+  lpszPassword: array [0 .. INTERNET_MAX_PASSWORD_LENGTH - 1] of Char;
+  lpszUrlPath: array [0 .. INTERNET_MAX_PATH_LENGTH - 1] of Char;
+  lpszExtraInfo: array [0 .. 1024 - 1] of Char;
+  lpUrlComponents: TURLComponents;
 begin
   ZeroMemory(@lpszScheme, SizeOf(lpszScheme));
   ZeroMemory(@lpszHostName, SizeOf(lpszHostName));
@@ -107,18 +102,18 @@ begin
   ZeroMemory(@lpszExtraInfo, SizeOf(lpszExtraInfo));
   ZeroMemory(@lpUrlComponents, SizeOf(TURLComponents));
 
-  lpUrlComponents.dwStructSize      := SizeOf(TURLComponents);
-  lpUrlComponents.lpszScheme        := lpszScheme;
-  lpUrlComponents.dwSchemeLength    := SizeOf(lpszScheme);
-  lpUrlComponents.lpszHostName      := lpszHostName;
-  lpUrlComponents.dwHostNameLength  := SizeOf(lpszHostName);
-  lpUrlComponents.lpszUserName      := lpszUserName;
-  lpUrlComponents.dwUserNameLength  := SizeOf(lpszUserName);
-  lpUrlComponents.lpszPassword      := lpszPassword;
-  lpUrlComponents.dwPasswordLength  := SizeOf(lpszPassword);
-  lpUrlComponents.lpszUrlPath       := lpszUrlPath;
-  lpUrlComponents.dwUrlPathLength   := SizeOf(lpszUrlPath);
-  lpUrlComponents.lpszExtraInfo     := lpszExtraInfo;
+  lpUrlComponents.dwStructSize := SizeOf(TURLComponents);
+  lpUrlComponents.lpszScheme := lpszScheme;
+  lpUrlComponents.dwSchemeLength := SizeOf(lpszScheme);
+  lpUrlComponents.lpszHostName := lpszHostName;
+  lpUrlComponents.dwHostNameLength := SizeOf(lpszHostName);
+  lpUrlComponents.lpszUserName := lpszUserName;
+  lpUrlComponents.dwUserNameLength := SizeOf(lpszUserName);
+  lpUrlComponents.lpszPassword := lpszPassword;
+  lpUrlComponents.dwPasswordLength := SizeOf(lpszPassword);
+  lpUrlComponents.lpszUrlPath := lpszUrlPath;
+  lpUrlComponents.dwUrlPathLength := SizeOf(lpszUrlPath);
+  lpUrlComponents.lpszExtraInfo := lpszExtraInfo;
   lpUrlComponents.dwExtraInfoLength := SizeOf(lpszExtraInfo);
 
   InternetCrackUrl(PChar(lpszUrl), Length(lpszUrl), ICU_DECODE or ICU_ESCAPE, lpUrlComponents);
@@ -127,63 +122,69 @@ begin
   Resource := lpszUrlPath;
 end;
 
-function GetRemoteFileSize(const Url : string): Integer;
+function GetRemoteFileSize(const Url: string): Integer;
 var
-  hInet    : HINTERNET;
-  hConnect : HINTERNET;
-  hRequest : HINTERNET;
+  hInet: HINTERNET;
+  hConnect: HINTERNET;
+  hRequest: HINTERNET;
   lpdwBufferLength: DWORD;
-  lpdwReserved    : DWORD;
+  lpdwReserved: DWORD;
   ServerName: string;
   Resource: string;
-  ErrorCode : Cardinal;
+  ErrorCode: Cardinal;
 begin
-  ParseURL(Url,ServerName,Resource);
-  Result:=0;
+  ParseURL(Url, ServerName, Resource);
+  Result := 0;
 
   hInet := InternetOpen(PChar(sUserAgent), INTERNET_OPEN_TYPE_PRECONFIG, nil, nil, 0);
-  if hInet=nil then
+  if hInet = nil then
   begin
-    ErrorCode:=GetLastError;
-    raise Exception.Create(Format('InternetOpen Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
+    ErrorCode := GetLastError;
+    raise Exception.Create(Format('InternetOpen Error %d Description %s', [ErrorCode, GetWinInetError(ErrorCode)]));
   end;
 
   try
-    hConnect := InternetConnect(hInet, PChar(ServerName), INTERNET_DEFAULT_HTTP_PORT, nil, nil, INTERNET_SERVICE_HTTP, 0, 0);
-    if hConnect=nil then
+    hConnect := InternetConnect(hInet, PChar(ServerName), INTERNET_DEFAULT_HTTP_PORT, nil, nil,
+      INTERNET_SERVICE_HTTP, 0, 0);
+    if hConnect = nil then
     begin
-      ErrorCode:=GetLastError;
-      raise Exception.Create(Format('InternetConnect Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
+      ErrorCode := GetLastError;
+      raise Exception.Create(Format('InternetConnect Error %d Description %s',
+        [ErrorCode, GetWinInetError(ErrorCode)]));
     end;
 
     try
       hRequest := HttpOpenRequest(hConnect, PChar('HEAD'), PChar(Resource), nil, nil, nil, 0, 0);
-        if hRequest<>nil then
-        begin
-          try
-            lpdwBufferLength:=SizeOf(Result);
-            lpdwReserved    :=0;
-            if not HttpSendRequest(hRequest, nil, 0, nil, 0) then
-            begin
-              ErrorCode:=GetLastError;
-              raise Exception.Create(Format('HttpOpenRequest Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
-            end;
-
-             if not HttpQueryInfo(hRequest, HTTP_QUERY_CONTENT_LENGTH or HTTP_QUERY_FLAG_NUMBER, @Result, lpdwBufferLength, lpdwReserved) then
-             begin
-              Result:=0;
-              ErrorCode:=GetLastError;
-              raise Exception.Create(Format('HttpQueryInfo Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
-             end;
-          finally
-            InternetCloseHandle(hRequest);
+      if hRequest <> nil then
+      begin
+        try
+          lpdwBufferLength := SizeOf(Result);
+          lpdwReserved := 0;
+          if not HttpSendRequest(hRequest, nil, 0, nil, 0) then
+          begin
+            ErrorCode := GetLastError;
+            raise Exception.Create(Format('HttpOpenRequest Error %d Description %s',
+              [ErrorCode, GetWinInetError(ErrorCode)]));
           end;
-        end
-        else
-        begin
-          ErrorCode:=GetLastError;
-          raise Exception.Create(Format('HttpOpenRequest Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
+
+          if not HttpQueryInfo(hRequest, HTTP_QUERY_CONTENT_LENGTH or HTTP_QUERY_FLAG_NUMBER, @Result, lpdwBufferLength,
+            lpdwReserved) then
+          begin
+            Result := 0;
+            ErrorCode := GetLastError;
+            raise Exception.Create(Format('HttpQueryInfo Error %d Description %s',
+              [ErrorCode, GetWinInetError(ErrorCode)]));
+          end;
+        finally
+          InternetCloseHandle(hRequest);
         end;
+      end
+      else
+      begin
+        ErrorCode := GetLastError;
+        raise Exception.Create(Format('HttpOpenRequest Error %d Description %s',
+          [ErrorCode, GetWinInetError(ErrorCode)]));
+      end;
     finally
       InternetCloseHandle(hConnect);
     end;
@@ -193,85 +194,84 @@ begin
 
 end;
 
-
-procedure WinInet_HttpGet(const Url: string;Stream:TStream;CallBack:TuWinInetProcCallBack);overload;
+procedure WinInet_HttpGet(const Url: string; Stream: TStream; CallBack: TuWinInetProcCallBack); overload;
 const
-  BuffSize = 1024*64;
+  BuffSize = 1024 * 64;
 var
-  hInter   : HINTERNET;
-  hFile    : HINTERNET;
+  hInter: HINTERNET;
+  hFile: HINTERNET;
   BytesRead: DWORD;
-  Buffer   : Pointer;
+  Buffer: Pointer;
   ErrorCode: Cardinal;
 begin
   hInter := InternetOpen('', INTERNET_OPEN_TYPE_PRECONFIG, nil, nil, 0);
-  if hInter=nil then
+  if hInter = nil then
   begin
-    ErrorCode:=GetLastError;
-    raise Exception.Create(Format('InternetOpen Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
+    ErrorCode := GetLastError;
+    raise Exception.Create(Format('InternetOpen Error %d Description %s', [ErrorCode, GetWinInetError(ErrorCode)]));
   end;
 
+  try
+    Stream.Seek(0, 0);
+    GetMem(Buffer, BuffSize);
     try
-      Stream.Seek(0,0);
-      GetMem(Buffer,BuffSize);
-      try
-          hFile := InternetOpenUrl(hInter, PChar(Url), nil, 0, INTERNET_FLAG_RELOAD, 0);
-          if hFile=nil then
-          begin
-            ErrorCode:=GetLastError;
-            raise Exception.Create(Format('InternetOpenUrl Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
-          end;
+      hFile := InternetOpenUrl(hInter, PChar(Url), nil, 0, INTERNET_FLAG_RELOAD, 0);
+      if hFile = nil then
+      begin
+        ErrorCode := GetLastError;
+        raise Exception.Create(Format('InternetOpenUrl Error %d Description %s',
+          [ErrorCode, GetWinInetError(ErrorCode)]));
+      end;
 
-            try
-              repeat
-                InternetReadFile(hFile, Buffer, BuffSize, BytesRead);
-                if BytesRead>0 then
-                begin
-                 Stream.WriteBuffer(Buffer^,BytesRead);
-                 if @CallBack<>nil then
-                  CallBack(BytesRead);
-                end;
-              until BytesRead = 0;
-            finally
-             InternetCloseHandle(hFile);
-            end;
+      try
+        repeat
+          InternetReadFile(hFile, Buffer, BuffSize, BytesRead);
+          if BytesRead > 0 then
+          begin
+            Stream.WriteBuffer(Buffer^, BytesRead);
+            if @CallBack <> nil then
+              CallBack(BytesRead);
+          end;
+        until BytesRead = 0;
       finally
-        FreeMem(Buffer);
+        InternetCloseHandle(hFile);
       end;
     finally
-     InternetCloseHandle(hInter);
+      FreeMem(Buffer);
     end;
+  finally
+    InternetCloseHandle(hInter);
+  end;
 end;
 
-function WinInet_HttpGet(const Url: string;CallBack:TuWinInetProcCallBack): string;overload;
+function WinInet_HttpGet(const Url: string; CallBack: TuWinInetProcCallBack): string; overload;
 Var
-  StringStream : TStringStream;
+  StringStream: TStringStream;
 begin
-  Result:='';
-    StringStream:=TStringStream.Create('',TEncoding.UTF8);
-    try
-        WinInet_HttpGet(Url,StringStream,CallBack);
-        if StringStream.Size>0 then
-        begin
-          StringStream.Seek(0,0);
-          Result:=StringStream.ReadString(StringStream.Size);
-        end;
-    finally
-      StringStream.Free;
+  Result := '';
+  StringStream := TStringStream.Create('', TEncoding.UTF8);
+  try
+    WinInet_HttpGet(Url, StringStream, CallBack);
+    if StringStream.Size > 0 then
+    begin
+      StringStream.Seek(0, 0);
+      Result := StringStream.ReadString(StringStream.Size);
     end;
+  finally
+    StringStream.Free;
+  end;
 end;
-
 
 { TWinINetGetThread }
 
-constructor TWinINetGetThread.Create(const Url: string; Stream: TStream; CallBack: TuWinInetProcCallBack;hWnd: HWND);
+constructor TWinINetGetThread.Create(const Url: string; Stream: TStream; CallBack: TuWinInetProcCallBack; HWND: HWND);
 begin
   inherited Create(False);
   FreeOnTerminate := True;
-  FUrl:=Url;
-  FStream:=Stream;
-  FCallBack:=CallBack;
-  FhWnd:=hWnd;
+  FUrl := Url;
+  FStream := Stream;
+  FCallBack := CallBack;
+  FhWnd := HWND;
 end;
 
 destructor TWinINetGetThread.Destroy;
@@ -279,65 +279,63 @@ begin
   inherited;
 end;
 
-
 procedure TWinINetGetThread.Execute;
 const
-  BuffSize = 1024*64;
+  BuffSize = 1024 * 64;
 var
-  hInter   : HINTERNET;
-  hFile    : HINTERNET;
-  Buffer   : Pointer;
+  hInter: HINTERNET;
+  hFile: HINTERNET;
+  Buffer: Pointer;
   ErrorCode: Cardinal;
 begin
   hInter := InternetOpen('', INTERNET_OPEN_TYPE_PRECONFIG, nil, nil, 0);
-  if hInter=nil then
+  if hInter = nil then
   begin
-    ErrorCode:=GetLastError;
-    raise Exception.Create(Format('InternetOpen Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
+    ErrorCode := GetLastError;
+    raise Exception.Create(Format('InternetOpen Error %d Description %s', [ErrorCode, GetWinInetError(ErrorCode)]));
   end;
 
   try
-    FStream.Seek(0,0);
-    GetMem(Buffer,BuffSize);
+    FStream.Seek(0, 0);
+    GetMem(Buffer, BuffSize);
     try
-        hFile := InternetOpenUrl(hInter, PChar(FUrl), nil, 0, INTERNET_FLAG_RELOAD, 0);
-        if hFile=nil then
-        begin
-          ErrorCode:=GetLastError;
-          raise Exception.Create(Format('InternetOpenUrl Error %d Description %s',[ErrorCode,GetWinInetError(ErrorCode)]));
-        end;
+      hFile := InternetOpenUrl(hInter, PChar(FUrl), nil, 0, INTERNET_FLAG_RELOAD, 0);
+      if hFile = nil then
+      begin
+        ErrorCode := GetLastError;
+        raise Exception.Create(Format('InternetOpenUrl Error %d Description %s',
+          [ErrorCode, GetWinInetError(ErrorCode)]));
+      end;
 
-          try
-            repeat
-              InternetReadFile(hFile, Buffer, BuffSize, FBytesRead);
-              if FBytesRead>0 then
-              begin
-                FStream.WriteBuffer(Buffer^, FBytesRead);
-                Synchronize(SyncCallBack);
-              end;
-            until (FBytesRead = 0) or Terminated;
-          finally
-           InternetCloseHandle(hFile);
+      try
+        repeat
+          InternetReadFile(hFile, Buffer, BuffSize, FBytesRead);
+          if FBytesRead > 0 then
+          begin
+            FStream.WriteBuffer(Buffer^, FBytesRead);
+            Synchronize(SyncCallBack);
           end;
+        until (FBytesRead = 0) or Terminated;
+      finally
+        InternetCloseHandle(hFile);
+      end;
     finally
       FreeMem(Buffer);
     end;
   finally
-   InternetCloseHandle(hInter);
+    InternetCloseHandle(hInter);
   end;
 
   if not Terminated then
-   SendMessage(FhWnd, WM_UWININET_THREAD_FINISHED,0,0)
+    SendMessage(FhWnd, WM_UWININET_THREAD_FINISHED, 0, 0)
   else
-   SendMessage(FhWnd, WM_UWININET_THREAD_CANCELLED,0,0);
+    SendMessage(FhWnd, WM_UWININET_THREAD_CANCELLED, 0, 0);
 end;
-
 
 procedure TWinINetGetThread.SyncCallBack;
 begin
-  if @FCallBack<>nil then
-   FCallBack(FBytesRead);
+  if @FCallBack <> nil then
+    FCallBack(FBytesRead);
 end;
-
 
 end.

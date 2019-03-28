@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uWmiCSharpCode
 // unit for the WMI Delphi Code Creator
@@ -15,38 +15,35 @@
 // The Original Code is uWmiCSharpCode.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
-
+// **************************************************************************************************
 
 unit uWmiCSharpCode;
 
 interface
 
 uses
- uWmiGenCode,
- Classes;
-
+  uWmiGenCode,
+  Classes;
 
 type
-  TCSharpWmiClassCodeGenerator=class(TWmiClassCodeGenerator)
+  TCSharpWmiClassCodeGenerator = class(TWmiClassCodeGenerator)
   public
-    procedure GenerateCode(Props: TStrings);override;
+    procedure GenerateCode(Props: TStrings); override;
   end;
 
-  TCSharpWmiEventCodeGenerator=class(TWmiEventCodeGenerator)
+  TCSharpWmiEventCodeGenerator = class(TWmiEventCodeGenerator)
   public
-    procedure GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings);override;
+    procedure GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings); override;
   end;
 
-  TCSharpWmiMethodCodeGenerator=class(TWmiMethodCodeGenerator)
+  TCSharpWmiMethodCodeGenerator = class(TWmiMethodCodeGenerator)
   private
     function GetWmiClassDescription: string;
   public
-    procedure GenerateCode(ParamsIn, Values: TStrings);override;
+    procedure GenerateCode(ParamsIn, Values: TStrings); override;
   end;
 
 implementation
@@ -59,26 +56,24 @@ uses
   uWmi_Metadata,
   SysUtils;
 
-
 const
-  sTagCSharpCode          = '[CSHARPCODE]';
-  sTagCSharpEventsWql     = '[CSHARPEVENTSWQL]';
-  sTagCSharpEventsOut     = '[CSHARPEVENTSOUT]';
-  sTagCSharpCodeParamsIn  = '[CSHARPCODEINPARAMS]';
+  sTagCSharpCode = '[CSHARPCODE]';
+  sTagCSharpEventsWql = '[CSHARPEVENTSWQL]';
+  sTagCSharpEventsOut = '[CSHARPEVENTSOUT]';
+  sTagCSharpCodeParamsIn = '[CSHARPCODEINPARAMS]';
   sTagCSharpCodeParamsOut = '[CSHARPCODEOUTPARAMS]';
 
-function EscapeCSharpStr(const Value:string) : string;
+function EscapeCSharpStr(const Value: string): string;
 const
- ArrChr       : Array [0..1] of Char = ('\','"');
- ArrChrEscape : Array [0..1] of Char = ('\','\');
+  ArrChr: Array [0 .. 1] of Char = ('\', '"');
+  ArrChrEscape: Array [0 .. 1] of Char = ('\', '\');
 Var
- i : integer;
+  i: integer;
 begin
-  Result:=Value;
-  for i:= Low(ArrChr) to High(ArrChr) do
-   Result:=StringReplace(Result,ArrChr[i],ArrChrEscape[i]+ArrChr[i], [rfReplaceAll]);
+  Result := Value;
+  for i := Low(ArrChr) to High(ArrChr) do
+    Result := StringReplace(Result, ArrChr[i], ArrChrEscape[i] + ArrChr[i], [rfReplaceAll]);
 end;
-
 
 { TCSharpWmiClassCodeGenerator }
 
@@ -88,38 +83,38 @@ var
   Descr: string;
   DynCode: TStrings;
   i: integer;
-  TemplateCode : string;
-  Padding    : string;
-  CimType:Integer;
+  TemplateCode: string;
+  Padding: string;
+  CimType: integer;
 
 begin
   Descr := GetWmiClassDescription;
 
   OutPutCode.BeginUpdate;
-  DynCode    := TStringList.Create;
+  DynCode := TStringList.Create;
   try
     OutPutCode.Clear;
     StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiClasses));
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
-    StrCode := StringReplace(StrCode, sTagWmiNameSpace,  EscapeCSharpStr(WmiNamespace), [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagWmiNameSpace, EscapeCSharpStr(WmiNamespace), [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
-    Padding:=StringOfChar(' ',20);
+    Padding := StringOfChar(' ', 20);
     if Props.Count > 0 then
       for i := 0 to Props.Count - 1 do
       begin
-          CimType:=Integer(Props.Objects[i]);
-          case CimType of
-            wbemCimtypeDatetime :
-              DynCode.Add(Format(
-                Padding+'Console.WriteLine("{0,-35} {1,-40}","%s",ManagementDateTimeConverter.ToDateTime((string)WmiObject["%s"]));// %s',
-                [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]))
-          else
-              DynCode.Add(Format(
-                Padding+'Console.WriteLine("{0,-35} {1,-40}","%s",WmiObject["%s"]);// %s',
-                [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]));
-          end;
+        CimType := integer(Props.Objects[i]);
+        case CimType of
+          wbemCimtypeDatetime:
+            DynCode.Add
+              (Format(Padding +
+              'Console.WriteLine("{0,-35} {1,-40}","%s",ManagementDateTimeConverter.ToDateTime((string)WmiObject["%s"]));// %s',
+              [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]))
+        else
+          DynCode.Add(Format(Padding + 'Console.WriteLine("{0,-35} {1,-40}","%s",WmiObject["%s"]);// %s',
+            [Props.Names[i], Props.Names[i], Props.ValueFromIndex[i]]));
+        end;
       end;
 
     StrCode := StringReplace(StrCode, sTagCSharpCode, DynCode.Text, [rfReplaceAll]);
@@ -131,30 +126,28 @@ begin
   end;
 end;
 
-
 { TCSharpWmiEventCodeGenerator }
 
-procedure TCSharpWmiEventCodeGenerator.GenerateCode(ParamsIn, Values, Conds,
-  PropsOut: TStrings);
+procedure TCSharpWmiEventCodeGenerator.GenerateCode(ParamsIn, Values, Conds, PropsOut: TStrings);
 var
   StrCode: string;
-  sValue:  string;
-  Wql:     string;
-  i, Len:  integer;
-  Props:   TStrings;
-  Padding : string;
-  CimType:Integer;
+  sValue: string;
+  Wql: string;
+  i, Len: integer;
+  Props: TStrings;
+  Padding: string;
+  CimType: integer;
 begin
-  Padding := StringOfChar(' ',10);
+  Padding := StringOfChar(' ', 10);
   StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiEvents));
 
-  WQL := Format('Select * From %s Within %d ', [WmiClass, PollSeconds]);
-  WQL := Format(Padding+StringOfChar(' ',6)+'WmiQuery ="%s"+%s', [WQL, sLineBreak]);
+  Wql := Format('Select * From %s Within %d ', [WmiClass, PollSeconds]);
+  Wql := Format(Padding + StringOfChar(' ', 6) + 'WmiQuery ="%s"+%s', [Wql, sLineBreak]);
 
   if WmiTargetInstance <> '' then
   begin
     sValue := Format('"Where TargetInstance ISA %s "', [QuotedStr(WmiTargetInstance)]);
-    WQL    := WQL + Padding+StringOfChar(' ',6) + sValue + '+' + sLineBreak;
+    Wql := Wql + Padding + StringOfChar(' ', 6) + sValue + '+' + sLineBreak;
   end;
 
   for i := 0 to Conds.Count - 1 do
@@ -163,56 +156,60 @@ begin
     if (i > 0) or ((i = 0) and (WmiTargetInstance <> '')) then
       sValue := 'AND ';
     sValue := sValue + ' ' + ParamsIn.Names[i] + Conds[i] + Values[i] + ' ';
-    WQL := WQL + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
+    Wql := Wql + StringOfChar(' ', 8) + QuotedStr(sValue) + '+' + sLineBreak;
   end;
 
   i := LastDelimiter('+', Wql);
   if i > 0 then
     Wql[i] := ';';
 
-
-  Len   := GetMaxLengthItem(PropsOut) + 6;
+  Len := GetMaxLengthItem(PropsOut) + 6;
   Props := TStringList.Create;
   try
     for i := 0 to PropsOut.Count - 1 do
     begin
-          CimType:=Integer(PropsOut.Objects[i]);
-          case CimType of
-            wbemCimtypeDatetime :
-               if StartsText(wbemTargetInstance,PropsOut[i]) then
-                Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + ManagementDateTimeConverter.ToDateTime((string)((ManagementBaseObject)e.NewEvent.Properties["%s"].Value)["%s"]));',
-                [PropsOut[i]+' : ',wbemTargetInstance, StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll])]))
-               else
-                Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + ManagementDateTimeConverter.ToDateTime(e.NewEvent.Properties["%s"].Value.ToString()));', [PropsOut[i]+' : ', PropsOut[i]]));
+      CimType := integer(PropsOut.Objects[i]);
+      case CimType of
+        wbemCimtypeDatetime:
+          if StartsText(wbemTargetInstance, PropsOut[i]) then
+            Props.Add(Format(Padding + '  Console.WriteLine("%-' + IntToStr(Len) +
+              's" + ManagementDateTimeConverter.ToDateTime((string)((ManagementBaseObject)e.NewEvent.Properties["%s"].Value)["%s"]));',
+              [PropsOut[i] + ' : ', wbemTargetInstance, StringReplace(PropsOut[i], wbemTargetInstance + '.', '',
+              [rfReplaceAll])]))
           else
-            begin
-               if StartsText(wbemTargetInstance,PropsOut[i]) then
-                Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + ((ManagementBaseObject)e.NewEvent.Properties["%s"].Value)["%s"]);',
-                [PropsOut[i]+' : ',wbemTargetInstance, StringReplace(PropsOut[i],wbemTargetInstance+'.','',[rfReplaceAll])]))
-               else
-                Props.Add(Format(Padding+'  Console.WriteLine("%-'+IntToStr(Len)+'s" + e.NewEvent.Properties["%s"].Value.ToString());', [PropsOut[i]+' : ', PropsOut[i]]));
-            end;
+            Props.Add(Format(Padding + '  Console.WriteLine("%-' + IntToStr(Len) +
+              's" + ManagementDateTimeConverter.ToDateTime(e.NewEvent.Properties["%s"].Value.ToString()));',
+              [PropsOut[i] + ' : ', PropsOut[i]]));
+      else
+        begin
+          if StartsText(wbemTargetInstance, PropsOut[i]) then
+            Props.Add(Format(Padding + '  Console.WriteLine("%-' + IntToStr(Len) +
+              's" + ((ManagementBaseObject)e.NewEvent.Properties["%s"].Value)["%s"]);',
+              [PropsOut[i] + ' : ', wbemTargetInstance, StringReplace(PropsOut[i], wbemTargetInstance + '.', '',
+              [rfReplaceAll])]))
+          else
+            Props.Add(Format(Padding + '  Console.WriteLine("%-' + IntToStr(Len) +
+              's" + e.NewEvent.Properties["%s"].Value.ToString());', [PropsOut[i] + ' : ', PropsOut[i]]));
+        end;
 
-          end;
+      end;
     end;
 
     StrCode := StringReplace(StrCode, sTagCSharpEventsOut, Props.Text, [rfReplaceAll]);
   finally
-    props.Free;
+    Props.Free;
   end;
 
   StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
-  StrCode := StringReplace(StrCode, sTagCSharpEventsWql, WQL, [rfReplaceAll]);
+  StrCode := StringReplace(StrCode, sTagCSharpEventsWql, Wql, [rfReplaceAll]);
   StrCode := StringReplace(StrCode, sTagWmiClassName, WmiClass, [rfReplaceAll]);
   StrCode := StringReplace(StrCode, sTagWmiNameSpace, EscapeCSharpStr(WmiNamespace), [rfReplaceAll]);
   OutPutCode.Text := StrCode;
 end;
 
-
 { TCSharpWmiMethodCodeGenerator }
 
-procedure TCSharpWmiMethodCodeGenerator.GenerateCode(ParamsIn,
-  Values: TStrings);
+procedure TCSharpWmiMethodCodeGenerator.GenerateCode(ParamsIn, Values: TStrings);
 var
   StrCode: string;
   Descr: string;
@@ -221,10 +218,10 @@ var
   i: integer;
 
   IsStatic: boolean;
-  TemplateCode : string;
-  Padding : string;
+  TemplateCode: string;
+  Padding: string;
 begin
-  Padding := stringofchar(' ', 14);
+  Padding := StringOfChar(' ', 14);
   Descr := GetWmiClassDescription;
   OutPutCode.BeginUpdate;
   DynCodeInParams := TStringList.Create;
@@ -235,23 +232,23 @@ begin
     OutPutCode.Clear;
     if IsStatic then
     begin
-     {
-      if UseHelperFunctions then
+      {
+        if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
-      else
+        else
         TemplateCode:='';
-     }
-        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiMethodStatic));
+      }
+      StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiMethodStatic));
     end
     else
     begin
-            {
-      if UseHelperFunctions then
+      {
+        if UseHelperFunctions then
         TemplateCode := TFile.ReadAllText(GetTemplateLocation(sTemplateTemplateFuncts))
-      else
+        else
         TemplateCode:='';
-         }
-        StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiMethodNonStatic));
+      }
+      StrCode := TFile.ReadAllText(GetTemplateLocation(Lng_CSharp, ModeCodeGeneration, TWmiGenCode.WmiMethodNonStatic));
     end;
 
     StrCode := StringReplace(StrCode, sTagVersionApp, FileVersionStr, [rfReplaceAll]);
@@ -261,36 +258,31 @@ begin
     StrCode := StringReplace(StrCode, sTagWmiPath, EscapeCSharpStr(WmiPath), [rfReplaceAll]);
     StrCode := StringReplace(StrCode, sTagHelperTemplate, TemplateCode, [rfReplaceAll]);
 
-
-    //In Params
+    // In Params
     if ParamsIn.Count > 0 then
       for i := 0 to ParamsIn.Count - 1 do
         if Values[i] <> WbemEmptyParam then
           if ParamsIn.ValueFromIndex[i] = wbemtypeString then
-            DynCodeInParams.Add(
-              Format(Padding+'  inParams["%s"]="%s";', [ParamsIn.Names[i], Values[i]]))
+            DynCodeInParams.Add(Format(Padding + '  inParams["%s"]="%s";', [ParamsIn.Names[i], Values[i]]))
           else
-            DynCodeInParams.Add(
-              Format(Padding+'  inParams["%s"]=%s;', [ParamsIn.Names[i], Values[i]]));
+            DynCodeInParams.Add(Format(Padding + '  inParams["%s"]=%s;', [ParamsIn.Names[i], Values[i]]));
     StrCode := StringReplace(StrCode, sTagCSharpCodeParamsIn, DynCodeInParams.Text, [rfReplaceAll]);
 
-    //Out Params
+    // Out Params
     if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count > 1 then
     begin
       for i := 0 to WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count - 1 do
-        DynCodeOutParams.Add(
-          Format(Padding+'  Console.WriteLine("{0,-35} {1,-40}","%s",outParams["%s"]);',
-          [WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name, WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name]));
+        DynCodeOutParams.Add(Format(Padding + '  Console.WriteLine("{0,-35} {1,-40}","%s",outParams["%s"]);',
+          [WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name,
+          WMiClassMetaData.MethodByName[WmiMethod].OutParameters[i].Name]));
     end
-    else
-    if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count = 1 then
+    else if WMiClassMetaData.MethodByName[WmiMethod].OutParameters.Count = 1 then
     begin
-      DynCodeOutParams.Add(
-        Format(Padding+'  Console.WriteLine("{0,-35} {1,-40}","Return Value",%s);',['outParams["ReturnValue"]']));
+      DynCodeOutParams.Add(Format(Padding + '  Console.WriteLine("{0,-35} {1,-40}","Return Value",%s);',
+        ['outParams["ReturnValue"]']));
     end;
 
-    StrCode := StringReplace(StrCode, sTagCSharpCodeParamsOut,
-      DynCodeOutParams.Text, [rfReplaceAll]);
+    StrCode := StringReplace(StrCode, sTagCSharpCodeParamsOut, DynCodeOutParams.Text, [rfReplaceAll]);
 
     StrCode := StringReplace(StrCode, sTagWmiMethodDescr, Descr, [rfReplaceAll]);
     OutPutCode.Text := StrCode;
@@ -301,27 +293,26 @@ begin
   end;
 end;
 
-
 function TCSharpWmiMethodCodeGenerator.GetWmiClassDescription: string;
 var
-  ClassDescr : TStringList;
-  Index      : Integer;
+  ClassDescr: TStringList;
+  Index: integer;
 begin
-  ClassDescr:=TStringList.Create;
+  ClassDescr := TStringList.Create;
   try
     Result := WMiClassMetaData.MethodByName[WmiMethod].Description;
 
-    if Pos(#10, Result) = 0 then //check if the description has format
+    if Pos(#10, Result) = 0 then // check if the description has format
       ClassDescr.Text := WrapText(Result, 80)
     else
-      ClassDescr.Text := Result;//WrapText(Summary,sLineBreak,[#10],80);
+      ClassDescr.Text := Result; // WrapText(Summary,sLineBreak,[#10],80);
 
     for Index := 0 to ClassDescr.Count - 1 do
       ClassDescr[Index] := Format('// %s', [ClassDescr[Index]]);
 
-    Result:=ClassDescr.Text;
+    Result := ClassDescr.Text;
   finally
-     ClassDescr.Free;
+    ClassDescr.Free;
   end;
 end;
 

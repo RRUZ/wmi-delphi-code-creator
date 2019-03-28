@@ -1,4 +1,4 @@
-//**************************************************************************************************
+// **************************************************************************************************
 //
 // Unit uDelphiPrismIDE
 // unit for the WMI Delphi Code Creator
@@ -15,11 +15,10 @@
 // The Original Code is uDelphiPrismIDE.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2015 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2019 Rodrigo Ruz V.
 // All Rights Reserved.
 //
-//**************************************************************************************************
-
+// **************************************************************************************************
 
 unit uDelphiPrismIDE;
 
@@ -37,8 +36,7 @@ function IsDelphiPrismAttachedtoMonoDevelop: boolean;
 
 function GetMonoDevelopIDEFileName: string;
 
-procedure CompileAndRunOxygenCode(Console:TStrings;const CompilerName, ProjectFile: string;
-  Run: boolean);
+procedure CompileAndRunOxygenCode(Console: TStrings; const CompilerName, ProjectFile: string; Run: boolean);
 
 implementation
 
@@ -51,27 +49,25 @@ uses
   uMisc;
 
 const
-  //HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\RemObjects\Oxygene
+  // HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\RemObjects\Oxygene
   DelphiPrismx86RegEntry = '\Software\RemObjects\Oxygene';
   DelphiPrismx64RegEntry = '\Software\Wow6432Node\RemObjects\Oxygene';
 
-  //HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Novell\MonoDevelop
+  // HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Novell\MonoDevelop
   MonoDevelopx64RegEntry = '\SOFTWARE\Novell\MonoDevelop';
   MonoDevelopx86RegEntry = '\SOFTWARE\Wow6432Node\Novell\MonoDevelop';
 
-
-procedure CompileAndRunOxygenCode(Console:TStrings;const CompilerName, ProjectFile: string;
-  Run: boolean);
+procedure CompileAndRunOxygenCode(Console: TStrings; const CompilerName, ProjectFile: string; Run: boolean);
 var
   ExeFile: string;
 begin
   Console.Add('');
-  CaptureConsoleOutput(Format('"%s" "%s"', [CompilerName,ProjectFile]), Console);
+  CaptureConsoleOutput(Format('"%s" "%s"', [CompilerName, ProjectFile]), Console);
   if Run then
   begin
     ExeFile := ExtractFilePath(ProjectFile) + 'bin\release\' + ChangeFileExt(ExtractFileName(ProjectFile), '.exe');
     if FileExists(ExeFile) then
-      ShellExecute(0, nil, PChar(Format('"%s"',[ExeFile])), nil, nil, SW_SHOWNORMAL)
+      ShellExecute(0, nil, PChar(Format('"%s"', [ExeFile])), nil, nil, SW_SHOWNORMAL)
     else
       MsgWarning(Format('Could not find %s', [ExeFile]));
   end;
@@ -87,7 +83,7 @@ begin
     if RegKeyExists(MonoDevelopx64RegEntry, HKEY_LOCAL_MACHINE) then
     begin
       RegReadStr(MonoDevelopx64RegEntry, 'Path', Value, HKEY_LOCAL_MACHINE);
-      Value  := IncludeTrailingPathDelimiter(Value) + 'bin\Monodevelop.exe';
+      Value := IncludeTrailingPathDelimiter(Value) + 'bin\Monodevelop.exe';
       Result := FileExists(Value);
     end;
   end
@@ -96,12 +92,11 @@ begin
     if RegKeyExists(MonoDevelopx86RegEntry, HKEY_LOCAL_MACHINE) then
     begin
       RegReadStr(MonoDevelopx86RegEntry, 'Path', Value, HKEY_LOCAL_MACHINE);
-      Value  := IncludeTrailingPathDelimiter(Value) + 'bin\Monodevelop.exe';
+      Value := IncludeTrailingPathDelimiter(Value) + 'bin\Monodevelop.exe';
       Result := FileExists(Value);
     end;
   end;
 end;
-
 
 function GetMonoDevelopIDEFileName: string;
 begin
@@ -134,8 +129,7 @@ begin
     if RegKeyExists(MonoDevelopx64RegEntry, HKEY_LOCAL_MACHINE) then
     begin
       RegReadStr(MonoDevelopx64RegEntry, 'Path', Value, HKEY_LOCAL_MACHINE);
-      Value  := IncludeTrailingPathDelimiter(Value) +
-        'AddIns\Oxygene\RemObjects.Oxygene.Compiler.dll';
+      Value := IncludeTrailingPathDelimiter(Value) + 'AddIns\Oxygene\RemObjects.Oxygene.Compiler.dll';
       Result := FileExists(Value);
     end;
   end
@@ -144,13 +138,11 @@ begin
     if RegKeyExists(MonoDevelopx86RegEntry, HKEY_LOCAL_MACHINE) then
     begin
       RegReadStr(MonoDevelopx86RegEntry, 'Path', Value, HKEY_LOCAL_MACHINE);
-      Value  := IncludeTrailingPathDelimiter(Value) +
-        'AddIns\Oxygene\RemObjects.Oxygene.Compiler.dll';
+      Value := IncludeTrailingPathDelimiter(Value) + 'AddIns\Oxygene\RemObjects.Oxygene.Compiler.dll';
       Result := FileExists(Value);
     end;
   end;
 end;
-
 
 function GetDelphiPrismRegValue(const Value: string): string;
 begin
@@ -178,8 +170,7 @@ end;
 
 function IsDelphiPrismInstalled: boolean;
 begin
-  Result := FileExists(GetDelphiPrismCompilerFileName) and
-    (GetDelphiPrismRegValue('Installed') = '1');
+  Result := FileExists(GetDelphiPrismCompilerFileName) and (GetDelphiPrismRegValue('Installed') = '1');
 end;
 
 end.
