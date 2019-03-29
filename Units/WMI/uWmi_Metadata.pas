@@ -443,7 +443,7 @@ public
 implementation
 
 uses
-  XmlDoc, uDelphiSyntax, StrUtils, uOleVariantEnum;
+  XmlDoc, WDCC.Delphi.Syntax, StrUtils, WDCC.OleVariant.Enum;
 
 function VarArrayToStr(const vArray: variant): string;
 

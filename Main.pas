@@ -26,8 +26,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, Rtti, Generics.Collections, uHostsAdmin,
-  SynEdit, ImgList, ToolWin, uSettings, Menus, Buttons, Vcl.Styles.ColorTabs,
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, Rtti, Generics.Collections, WDCC.HostsAdmin,
+  SynEdit, ImgList, ToolWin, WDCC.Settings, Menus, Buttons, Vcl.Styles.ColorTabs,
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, Vcl.ActnList, Vcl.ActnMan,
   System.Actions, System.ImageList;
 
@@ -103,23 +103,23 @@ var
 implementation
 
 uses
-  uStdActionsPopMenu,
-  uMisc,
+  WDCC.StdActions.PopMenu,
+  WDCC.Misc,
   uWmi_Metadata,
-  uLog,
-  uGlobals,
-  uSqlWMIContainer,
-  uWMIClassesContainer,
-  uWmiDatabase,
-  uWmiClassTree,
-  uWMIEventsContainer,
-  uWMIMethodsContainer,
-  uWmiTree,
-  uWmiInfo,
+  WDCC.Log,
+  WDCC.Globals,
+  WDCC.Sql.WMI.Container,
+  WDCC.WMI.Classes.Container,
+  WDCC.WMI.Database,
+  WDCC.WMI.Classes.Tree,
+  WDCC.WMI.Events.Container,
+  WDCC.WMI.Methods.Container,
+  WDCC.WMI.Tree,
+  WDCC.WMI.Info,
   Vcl.Styles.FormStyleHooks,
   Vcl.Styles.Ext,
   Vcl.Themes,
-  uWmi_About;
+  WDCC.About;
 
 Const
   HostCIMStr = 'CIM Repository (%s)';
