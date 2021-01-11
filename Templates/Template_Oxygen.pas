@@ -7,13 +7,13 @@ GenericMethodTest = static class
 public
   class method Main;
 private
-  class method Swap<T>(var left, right : T);
-  class method DoSwap<T>(left, right : T);
+  class method Swap<T>(var left, right: T);
+  class method DoSwap<T>(left, right: T);
 end;
  
 implementation
  
-class method GenericMethodTest.DoSwap<T>(left, right : T);
+class method GenericMethodTest.DoSwap<T>(left, right: T);
 begin
   var a := left;
   var b := right;
@@ -37,7 +37,7 @@ begin
   Console.ReadLine();
 end;
  
-class method GenericMethodTest.Swap<T>(var left, right : T);
+class method GenericMethodTest.Swap<T>(var left, right: T);
 begin
   var temp := left;
   left:= right;

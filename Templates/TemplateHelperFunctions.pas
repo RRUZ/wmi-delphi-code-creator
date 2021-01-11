@@ -8,22 +8,22 @@ function VarArrayToStr(const vArray: variant): string;
     Vt := VarType(V);
         case Vt of
           varSmallint,
-          varInteger  : Result := IntToStr(integer(V));
+          varInteger: Result := IntToStr(integer(V));
           varSingle,
           varDouble,
-          varCurrency : Result := FloatToStr(Double(V));
-          varDate     : Result := VarToStr(V);
-          varOleStr   : Result := WideString(V);
-          varBoolean  : Result := VarToStr(V);
-          varVariant  : Result := VarToStr(Variant(V));
-          varByte     : Result := char(byte(V));
-          varString   : Result := String(V);
-          varArray    : Result := VarArrayToStr(Variant(V));
+          varCurrency: Result := FloatToStr(Double(V));
+          varDate: Result := VarToStr(V);
+          varOleStr: Result := WideString(V);
+          varBoolean: Result := VarToStr(V);
+          varVariant: Result := VarToStr(Variant(V));
+          varByte: Result := char(byte(V));
+          varString: Result := String(V);
+          varArray: Result := VarArrayToStr(Variant(V));
         end;
     end;
 
 var
-i : integer;
+i: integer;
 begin
     Result := '[';
      if (VarType(vArray) and VarArray)=0 then
