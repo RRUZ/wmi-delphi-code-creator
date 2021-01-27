@@ -28,11 +28,11 @@
 
 ![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WMIFinder.png)
 
-**WMI SQL** : Allow you to execute WQL sentences in a local or remote machine, also include a option to auto generate of WQL code
+**WMI SQL** : Allow you to execute WQL sentences in a local or remote machine, also include an option to auto-generate of WQL code
 
 ![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WQL.png)
 
-**WMI Properties Links** : Display the location and sources from where each wmi property get the information.
+**WMI Properties Links** : Display the location and sources from where each wmi property gets the information.
 
 ![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WMILinks.png)
 
