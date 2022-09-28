@@ -1,23 +1,23 @@
-{**************************************************************************************************}
-{                                                                                                  }
-{ Unit uXE2Patches                                                                                 }
-{ Unit for the WMI Delphi Code Creator                                                             }
-{                                                                                                  }
+{ ************************************************************************************************** }
+{ }
+{ Unit uXE2Patches }
+{ Unit for the WMI Delphi Code Creator }
+{ }
 { The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
-{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
-{ License at http://www.mozilla.org/MPL/                                                           }
-{                                                                                                  }
-{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
-{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
-{ and limitations under the License.                                                               }
-{                                                                                                  }
-{ The Original Code is uXE2Patches.pas.                                                            }
-{                                                                                                  }
-{ The Initial Developer of the Original Code is Rodrigo Ruz V.                                     }
-{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V.                    }
-{ All Rights Reserved.                                                                             }
-{                                                                                                  }
-{**************************************************************************************************}
+{ you may not use this file except in compliance with the License. You may obtain a copy of the }
+{ License at http://www.mozilla.org/MPL/ }
+{ }
+{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF }
+{ ANY KIND, either express or implied. See the License for the specific language governing rights }
+{ and limitations under the License. }
+{ }
+{ The Original Code is uXE2Patches.pas. }
+{ }
+{ The Initial Developer of the Original Code is Rodrigo Ruz V. }
+{ Portions created by Rodrigo Ruz V. are Copyright (C) 2011-2012 Rodrigo Ruz V. }
+{ All Rights Reserved. }
+{ }
+{ ************************************************************************************************** }
 unit uXE2Patches;
 
 interface
@@ -29,7 +29,7 @@ uses
   Winapi.Windows,
   Vcl.ComCtrls;
 
-{.$DEFINE USE_TabControlFix}
+{ .$DEFINE USE_TabControlFix }
 
 {$IFDEF USE_TabControlFix}
 
@@ -43,7 +43,6 @@ type
   end;
 {$ENDIF}
 
-
 implementation
 
 Uses
@@ -52,11 +51,10 @@ Uses
 {$IFDEF USE_TabControlFix}
 
 type
-  THackCustomTabControl  =class (TCustomTabControl);
-{ TMyTabControlStyleHook }
+  THackCustomTabControl = class(TCustomTabControl);
+  { TMyTabControlStyleHook }
 
-procedure TMyTabControlStyleHook.AngleTextOut(Canvas: TCanvas; Angle, X,
-  Y: Integer; const Text: string);
+procedure TMyTabControlStyleHook.AngleTextOut(Canvas: TCanvas; Angle, X, Y: Integer; const Text: string);
 var
   NewFontHandle, OldFontHandle: hFont;
   LogRec: TLogFont;
@@ -74,9 +72,9 @@ end;
 
 function TMyTabControlStyleHook.GetImageIndex(TabIndex: Integer): Integer;
 begin
-  Result:=-1;
+  Result := -1;
   if (Control <> nil) and (Control is TCustomTabControl) then
-   Result:=THackCustomTabControl(Control).GetImageIndex(TabIndex);
+    Result := THackCustomTabControl(Control).GetImageIndex(TabIndex);
 end;
 
 procedure TMyTabControlStyleHook.DrawTab(Canvas: TCanvas; Index: Integer);
@@ -86,9 +84,9 @@ var
   DrawState: TThemedTab;
   Details: TThemedElementDetails;
   ThemeTextColor: TColor;
-  ImageIndex:Integer;
+  ImageIndex: Integer;
 begin
-  ImageIndex:=GetImageIndex(Index);
+  ImageIndex := GetImageIndex(Index);
 
   if (Images <> nil) and (ImageIndex < Images.Count) then
   begin
@@ -104,7 +102,8 @@ begin
   end;
 
   R := TabRect[Index];
-  if R.Left < 0 then Exit;
+  if R.Left < 0 then
+    Exit;
 
   if TabPosition in [tpTop, tpBottom] then
   begin
@@ -112,7 +111,9 @@ begin
       InflateRect(R, 0, 2);
   end
   else if Index = TabIndex then
-    Dec(R.Left, 2) else Dec(R.Right, 2);
+    Dec(R.Left, 2)
+  else
+    Dec(R.Right, 2);
 
   Canvas.Font.Assign(THackCustomTabControl(Control).Font);
   LayoutR := R;
@@ -205,31 +206,24 @@ begin
 
     if TabPosition = tpLeft then
     begin
-      TX := LayoutR.Left + (LayoutR.Right - LayoutR.Left) div 2 -
-        Canvas.TextHeight(Tabs[Index]) div 2;
-      TY := LayoutR.Top + (LayoutR.Bottom - LayoutR.Top) div 2 +
-        Canvas.TextWidth(Tabs[Index]) div 2;
-     if StyleServices.GetElementColor(Details, ecTextColor, ThemeTextColor) then
-       Canvas.Font.Color := ThemeTextColor;
+      TX := LayoutR.Left + (LayoutR.Right - LayoutR.Left) div 2 - Canvas.TextHeight(Tabs[Index]) div 2;
+      TY := LayoutR.Top + (LayoutR.Bottom - LayoutR.Top) div 2 + Canvas.TextWidth(Tabs[Index]) div 2;
+      if StyleServices.GetElementColor(Details, ecTextColor, ThemeTextColor) then
+        Canvas.Font.Color := ThemeTextColor;
       AngleTextOut(Canvas, 90, TX, TY, Tabs[Index]);
     end
     else if TabPosition = tpRight then
     begin
-      TX := LayoutR.Left + (LayoutR.Right - LayoutR.Left) div 2 +
-        Canvas.TextHeight(Tabs[Index]) div 2;
-      TY := LayoutR.Top + (LayoutR.Bottom - LayoutR.Top) div 2 -
-        Canvas.TextWidth(Tabs[Index]) div 2;
-      if StyleServices.GetElementColor(Details, ecTextColor, ThemeTextColor)
-      then
+      TX := LayoutR.Left + (LayoutR.Right - LayoutR.Left) div 2 + Canvas.TextHeight(Tabs[Index]) div 2;
+      TY := LayoutR.Top + (LayoutR.Bottom - LayoutR.Top) div 2 - Canvas.TextWidth(Tabs[Index]) div 2;
+      if StyleServices.GetElementColor(Details, ecTextColor, ThemeTextColor) then
         Canvas.Font.Color := ThemeTextColor;
       AngleTextOut(Canvas, -90, TX, TY, Tabs[Index]);
     end
     else
-      DrawControlText(Canvas, Details, Tabs[Index], LayoutR, DT_VCENTER or DT_CENTER or DT_SINGLELINE  or DT_NOCLIP);
+      DrawControlText(Canvas, Details, Tabs[Index], LayoutR, DT_VCENTER or DT_CENTER or DT_SINGLELINE or DT_NOCLIP);
   end;
 end;
 {$ENDIF}
-
-
 
 end.

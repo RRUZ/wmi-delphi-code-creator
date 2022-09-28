@@ -13,74 +13,13 @@
 { The Original Code is AsyncCalls.pas.                                                             }
 {                                                                                                  }
 { The Initial Developer of the Original Code is Andreas Hausladen.                                 }
-{ Portions created by Andreas Hausladen are Copyright (C) 2006-2011 Andreas Hausladen.             }
+{ Portions created by Andreas Hausladen are Copyright (C) 2006-2016 Andreas Hausladen.             }
 { All Rights Reserved.                                                                             }
 {                                                                                                  }
 { Contributor(s):                                                                                  }
 {                                                                                                  }
 {**************************************************************************************************}
-{                                                                                                  }
-{ Version: 2.98 (2011-10-22)                                                                       }
-{   Added: Support for Delphi XE2 64bit                                                            }
-{                                                                                                  }
-{ Version: 2.97 (2011-05-21)                                                                       }
-{   Fixed: The thread priority wasn't reset to Normal for new AsyncCall tasks.                     }
-{   Fixed: Replaced Suspend/Resume code to prevent a race condition where all threads are          }
-{          suspended but their FSuspended flag is false.                                           }
-{   Fixed: Exception handling in TAsyncCall.InternExecuteSyncCall. Quit() wasn't called after an   }
-{          exception was raised.                                                                   }
-{                                                                                                  }
-{ Version: 2.96 (2010-09-12)                                                                       }
-{   Fixed: CoInitialize call was missing                                                           }
-{                                                                                                  }
-{ Version: 2.95 (2010-09-12)                                                                       }
-{   Added: Support for RAD Studio XE                                                               }
-{   Added: Support for UnicodeString                                                               }
-{                                                                                                  }
-{ Version: 2.92 (2009-08-30)                                                                       }
-{   Added: Support for RAD Studio 2010                                                             }
-{   Restored: Delphi 2009 Update 1 fixed the compiler bug. All generic methods are now available.  }
-{                                                                                                  }
-{ Version: 2.91 (2008-09-29)                                                                       }
-{   Fixed: All generic methods are now disabled due to an internal compiler error in Delphi 2009   }
-{                                                                                                  }
-{ Version: 2.9 (2008-09-27)                                                                        }
-{   Fixed: Window message handling                                                                 }
-{   Added: Delphi 2009 support with generics and anonymous methods                                 }
-{   Added: AsyncCall(Runnable: IAsyncRunnable)                                                     }
-{                                                                                                  }
-{ Version: 2.21 (2008-05-14)                                                                       }
-{   Fixed: Fixed bug in AsyncMultiSync                                                             }
-{                                                                                                  }
-{ Version: 2.2 (2008-05-12)                                                                        }
-{   Fixed: Bugs in main thread AsyncMultiSync implementation                                       }
-{   Added: Delphi 5 support                                                                        }
-{                                                                                                  }
-{ Version: 2.1 (2008-05-06)                                                                        }
-{   Added: Delphi 6 support                                                                        }
-{   Added: Support for "Exit;" in the MainThread block                                             }
-{   Fixed: Exception handling for Delphi 6, 7 and 2005                                             }
-{   Fixed: EBX, ESI and EDI weren't copied into the synchronized block (e.g. used for Self-Pointer)}
-{                                                                                                  }
-{ Version: 2.0 (2008-05-04)                                                                        }
-{   Added: EnterMainThread/LeaveMainThread                                                         }
-{   Added: LocalVclCall, LocalAsyncVclCall, MsgAsyncMultiSync                                      }
-{   Added: LocalAsyncExec, AsyncExec                                                               }
-{   Added: IAsyncCall.ForceDifferentThread                                                         }
-{   Fixed: Exception handling                                                                      }
-{   Removed: Delphi 5 and 6 support                                                                }
-{                                                                                                  }
-{ Version: 1.2 (2008-02-10)                                                                        }
-{   Added: CoInitialize                                                                            }
-{   Added: LocalAsynCall() function                                                                }
-{                                                                                                  }
-{ Version: 1.1 (2007-08-14)                                                                        }
-{   Fixed: Workaround for TThread.Resume bug                                                       }
-{                                                                                                  }
-{ Version: 1.0 (2006-12-23)                                                                        }
-{   Initial release                                                                                }
-{**************************************************************************************************}
-{$A+,B-,C-,D-,E-,F-,G+,H+,I+,J-,K-,L+,M-,N+,O+,P+,Q-,R-,S-,T-,U-,V+,W+,X+,Y+,Z1}
+{$A+,B-,C+,D-,E-,F-,G+,H+,I+,J-,K-,L+,M-,N+,O+,P+,Q-,R-,S-,T-,U-,V+,W+,X+,Y+,Z1}
 
 unit AsyncCalls;
 
@@ -198,12 +137,29 @@ type
     function Finished: Boolean;
 
     { ReturnValue() returns the result of the asynchronous call. It raises an
-      exception if called before the function has finished. }
+      exception if called before the function has finished. It returns 0 if the
+      AsyncCall invocation was canceled. }
     function ReturnValue: Integer;
+
+    { Canceled() returns True if the AsyncCall was canceled by CancelInvocation(). }
+    function Canceled: Boolean;
 
     { ForceDifferentThread() tells AsyncCalls that the assigned function must
       not be executed in the current thread. }
     procedure ForceDifferentThread;
+
+    { CancelInvocation() stopps the AsyncCall from being invoked. If the AsyncCall is already
+      processed, a call to CancelInvocation() has no effect and the Canceled() function will
+      return False as the AsyncCall wasn't canceled. }
+    procedure CancelInvocation;
+
+    { Forget() unlinks the IAsyncCall interface from the internal AsyncCall. This means that
+      if the last reference to the IAsyncCall interface is gone, the asynchronous call will
+      be still executed. The interface's methods will throw an exception if called after calling
+      Forget(). The async function must not call into the main thread because it could be executed
+      after the TThread.Synchronize/Queue mechanism was shut down by the RTL what can cause a
+      dead lock. }
+    procedure Forget;
   end;
 
   { *** Internal interface. Do not use it *** }
@@ -487,13 +443,13 @@ function MsgAsyncMultiSync(const List: array of IAsyncCall; WaitAll: Boolean;
 function MsgAsyncMultiSyncEx(const List: array of IAsyncCall; const Handles: array of THandle;
   WaitAll: Boolean; Milliseconds: Cardinal; dwWakeMask: DWORD): Cardinal;
 
-{$IFDEF SUPPORT_LOCAL_FUNCTIONS}  
+{$IFDEF SUPPORT_LOCAL_FUNCTIONS}
 {
    EnterMainThread/LeaveMainThread can be used to temporary switch to the
    main thread. The code that should be synchonized (blocking) has to be put
    into a try/finally block and the LeaveMainThread() function must be called
    from the finally block. A missing try/finally will lead to an access violation.
-   
+
    * All local variables can be used. (EBP points to the thread's stack while
      ESP points the the main thread's stack)
    * Unhandled exceptions are passed to the surrounding thread.
@@ -528,38 +484,75 @@ procedure LeaveMainThread;
 
 
 type
+  TAsyncCall = class;
+
   { *** Internal class. Do not use it *** }
-  { TAsyncCall is the base class for all parameter based async call types }
-  TAsyncCall = class(TInterfacedObject, IAsyncCall, IAsyncCallEx)
+  { TInternalAsyncCall is the base class for all parameter based async call types }
+  TInternalAsyncCall = class(TObject)
   private
-    FNext: TAsyncCall;
+    FNext: TInternalAsyncCall;
 
     FEvent: THandle;
-    FReturnValue: Integer;
-    FFinished: Boolean;
     FFatalException: Exception;
     FFatalErrorAddr: Pointer;
+
+    FRefCount: Integer;
+    FReturnValue: Integer;
     FForceDifferentThread: Boolean;
+    FCancelInvocation: Boolean;
+    FCanceled: Boolean;
+    FExecuted: Boolean;
+    FFinished: Boolean;
+
     procedure InternExecuteAsyncCall;
     procedure InternExecuteSyncCall;
     procedure Quit(AReturnValue: Integer);
   protected
-    { Decendants must implement this method. It is called  when the async call
+    { Decendants must implement this method. It is called when the async call
       should be executed. }
     function ExecuteAsyncCall: Integer; virtual; abstract;
-  public
+  private
     constructor Create;
-    destructor Destroy; override;
-    function _Release: Integer; stdcall;
+    procedure AddRef;
+    procedure Release;
+
     function ExecuteAsync: TAsyncCall;
-    function SyncInThisThreadIfPossible: Boolean;
 
     function GetEvent: THandle;
+    function SyncInThisThreadIfPossible: Boolean;
 
     function Sync: Integer;
     function Finished: Boolean;
     function ReturnValue: Integer;
+    function Canceled: Boolean;
     procedure ForceDifferentThread;
+    procedure CancelInvocation;
+    procedure Forget;
+  public
+    destructor Destroy; override;
+  end;
+
+  { *** Internal class. Do not use it *** }
+  TAsyncCall = class(TInterfacedObject, IAsyncCall, IAsyncCallEx)
+  private
+    FCall: TInternalAsyncCall;
+    procedure CheckForget;
+
+    { IAsyncCallEx }
+    function GetEvent: THandle;
+    function SyncInThisThreadIfPossible: Boolean;
+  private
+    constructor Create(ACall: TInternalAsyncCall);
+    { IAsyncCall }
+    function Sync: Integer;
+    function Finished: Boolean;
+    function ReturnValue: Integer;
+    function Canceled: Boolean;
+    procedure ForceDifferentThread;
+    procedure CancelInvocation;
+    procedure Forget;
+  public
+    destructor Destroy; override;
   end;
 
   { *** Internal class. Do not use it *** }
@@ -568,18 +561,22 @@ type
   TSyncCall = class(TInterfacedObject, IAsyncCall)
   private
     FReturnValue: Integer;
-  public
+  private
     constructor Create(AReturnValue: Integer);
+    { IAsyncCall }
     function Sync: Integer;
     function Finished: Boolean;
     function ReturnValue: Integer;
+    function Canceled: Boolean;
     procedure ForceDifferentThread;
+    procedure CancelInvocation;
+    procedure Forget;
   end;
 
 {$IFDEF DELPHI2009_UP}
 type
-  { *** Helpher class *** }
-  TMultiArgProcCall<TProc, T1> = class(TAsyncCall)
+  { *** Helper class *** }
+  TMultiArgProcCall<TProc, T1> = class(TInternalAsyncCall)
   private
     FProc: TProc;
     FArg1: T1;
@@ -661,7 +658,7 @@ type
         function ExecuteAsyncCall: Integer; override;
       end;
 
-      TAsyncCallAnonymProc = class(TAsyncCall)
+      TAsyncCallAnonymProc = class(TInternalAsyncCall)
       private
         FProc: TProc;
       protected
@@ -670,7 +667,7 @@ type
         constructor Create(AProc: TProc);
       end;
 
-      TAsyncCallAnonymFunc = class(TAsyncCall)
+      TAsyncCallAnonymFunc = class(TInternalAsyncCall)
       private
         FProc: TIntFunc;
       protected
@@ -679,7 +676,7 @@ type
         constructor Create(AProc: TIntFunc);
       end;
 
-      TAsyncVclCallAnonymProc = class(TAsyncCall)
+      TAsyncVclCallAnonymProc = class(TInternalAsyncCall)
       private
         FProc: TProc;
       protected
@@ -731,9 +728,12 @@ resourcestring
   RsAsyncCallUnknownVarRecType = 'Unknown TVarRec type %d';
   RsLeaveMainThreadNestedError = 'Unpaired call to AsyncCalls.LeaveMainThread()';
   RsLeaveMainThreadThreadError = 'AsyncCalls.LeaveMainThread() was called outside of the main thread';
+  RsForgetWasCalled = 'IAsyncCall.Forget was called. The interface isn''t connected to the asynchronous call anymore';
+  RsNoVclSyncPossible = 'Cannot synchronize with the main thread anymore. Don''t call IAsyncCall.Forget for functions that access the VCL';
 
 const
   WM_VCLSYNC = WM_USER + 12;
+  WM_RAISEEXCEPTION = WM_USER + 13;
 
 {$IFNDEF DELPHI7_UP}
 var
@@ -829,6 +829,15 @@ begin
 end;
 {$ENDIF DELPHI6}
 
+{$IFNDEF DELPHI2009_UP}
+// Needed for older Delphi versions
+function InterlockedCompareExchange(var Destination: Integer; Exchange: Integer; Comparand: Integer): Integer;
+asm
+       XCHG    EAX, ECX
+  LOCK CMPXCHG [ECX], EDX
+end;
+{$ENDIF ~DELPHI2009_UP}
+
 type
   { TAsyncCallThread is a pooled thread. It looks itself for work. }
   TAsyncCallThread = class(TThread)
@@ -849,13 +858,15 @@ type
     FWakeUpEvent: THandle;
     FThreadTerminateEvent: THandle;
     FSleepingThreadCount: Integer;
+    FEnqueuedCallCount: Integer;
     FMaxThreads: Integer;
+    FDestroying: Boolean;
 
     FThreadCount: Integer;
     FThreads: array[0..255] of TAsyncCallThread;
 
     FAsyncCallsCritSect: TRTLCriticalSection;
-    FAsyncCallHead, FAsyncCallTail: TAsyncCall;
+    FAsyncCallHead, FAsyncCallTail: TInternalAsyncCall;
 
     FNumberOfProcessors: Cardinal;
     {$IFDEF DEBUG_THREADSTATS}
@@ -868,7 +879,7 @@ type
     procedure ProcessMainThreadSync;
 
     procedure AllocThread;
-    function GetNextAsyncCall: TAsyncCall; // called from the threads
+    function GetNextAsyncCall: TInternalAsyncCall; // called from the threads
 
     procedure WakeUpThread;
     procedure Sleep;
@@ -876,10 +887,11 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure SendVclSync(Call: TAsyncCall);
+    procedure CheckDestroying;
+    procedure SendVclSync(Call: TInternalAsyncCall);
 
-    procedure AddAsyncCall(Call: TAsyncCall);
-    function RemoveAsyncCall(Call: TAsyncCall): Boolean;
+    procedure AddAsyncCall(Call: TInternalAsyncCall);
+    function RemoveAsyncCall(Call: TInternalAsyncCall): Boolean;
 
     property MaxThreads: Integer read FMaxThreads;
     property NumberOfProcessors: Cardinal read FNumberOfProcessors;
@@ -888,7 +900,7 @@ type
 
 { ---------------------------------------------------------------------------- }
 
-  TAsyncCallArgObject = class(TAsyncCall)
+  TAsyncCallArgObject = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgObjectProc;
     FArg: TObject;
@@ -898,7 +910,7 @@ type
     constructor Create(AProc: TAsyncCallArgObjectProc; AArg: TObject);
   end;
 
-  TAsyncCallArgString = class(TAsyncCall)
+  TAsyncCallArgString = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgStringProc;
     FArg: string;
@@ -908,7 +920,7 @@ type
     constructor Create(AProc: TAsyncCallArgStringProc; const AArg: string);
   end;
 
-  TAsyncCallArgWideString = class(TAsyncCall)
+  TAsyncCallArgWideString = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgWideStringProc;
     FArg: WideString;
@@ -918,7 +930,7 @@ type
     constructor Create(AProc: TAsyncCallArgWideStringProc; const AArg: WideString);
   end;
 
-  TAsyncCallArgInterface = class(TAsyncCall)
+  TAsyncCallArgInterface = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgInterfaceProc;
     FArg: IInterface;
@@ -928,7 +940,7 @@ type
     constructor Create(AProc: TAsyncCallArgInterfaceProc; const AArg: IInterface);
   end;
 
-  TAsyncCallArgExtended = class(TAsyncCall)
+  TAsyncCallArgExtended = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgExtendedProc;
     FArg: Extended;
@@ -938,7 +950,7 @@ type
     constructor Create(AProc: TAsyncCallArgExtendedProc; const AArg: Extended);
   end;
 
-  TAsyncCallArgVariant = class(TAsyncCall)
+  TAsyncCallArgVariant = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgVariantProc;
     FArg: Variant;
@@ -951,7 +963,7 @@ type
 { ---------------------------------------------------------------------------- }
 
   {$IFDEF SUPPORT_LOCAL_FUNCTIONS}
-  TAsyncCallLocalProc = class(TAsyncCall)
+  TAsyncCallLocalProc = class(TInternalAsyncCall)
   private
     FProc: TLocalAsyncProc;
     FBasePointer: Pointer;
@@ -961,7 +973,7 @@ type
     constructor Create(AProc: TLocalAsyncProc; ABasePointer: Pointer);
   end;
 
-  TAsyncCallLocalProcEx = class(TAsyncCall)
+  TAsyncCallLocalProcEx = class(TInternalAsyncCall)
   private
     FProc: TLocalAsyncProc;
     FBasePointer: Pointer;
@@ -972,7 +984,7 @@ type
     constructor Create(AProc: TLocalAsyncProc; AParam: INT_PTR; ABasePointer: Pointer);
   end;
 
-  TAsyncVclCallLocalProc = class(TAsyncCall)
+  TAsyncVclCallLocalProc = class(TInternalAsyncCall)
   private
     FProc: TLocalVclProc;
     FBasePointer: Pointer;
@@ -986,7 +998,7 @@ type
 
 { ---------------------------------------------------------------------------- }
 
-  TAsyncCallMethodArgObject = class(TAsyncCall)
+  TAsyncCallMethodArgObject = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgObjectMethod;
     FArg: TObject;
@@ -996,7 +1008,7 @@ type
     constructor Create(AProc: TAsyncCallArgObjectMethod; AArg: TObject);
   end;
 
-  TAsyncCallMethodArgString = class(TAsyncCall)
+  TAsyncCallMethodArgString = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgStringMethod;
     FArg: string;
@@ -1006,7 +1018,7 @@ type
     constructor Create(AProc: TAsyncCallArgStringMethod; const AArg: string);
   end;
 
-  TAsyncCallMethodArgWideString = class(TAsyncCall)
+  TAsyncCallMethodArgWideString = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgWideStringMethod;
     FArg: WideString;
@@ -1016,7 +1028,7 @@ type
     constructor Create(AProc: TAsyncCallArgWideStringMethod; const AArg: WideString);
   end;
 
-  TAsyncCallMethodArgInterface = class(TAsyncCall)
+  TAsyncCallMethodArgInterface = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgInterfaceMethod;
     FArg: IInterface;
@@ -1026,7 +1038,7 @@ type
     constructor Create(AProc: TAsyncCallArgInterfaceMethod; const AArg: IInterface);
   end;
 
-  TAsyncCallMethodArgExtended = class(TAsyncCall)
+  TAsyncCallMethodArgExtended = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgExtendedMethod;
     FArg: Extended;
@@ -1036,7 +1048,7 @@ type
     constructor Create(AProc: TAsyncCallArgExtendedMethod; const AArg: Extended);
   end;
 
-  TAsyncCallMethodArgVariant = class(TAsyncCall)
+  TAsyncCallMethodArgVariant = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgVariantMethod;
     FArg: Variant;
@@ -1048,7 +1060,7 @@ type
 
 { ---------------------------------------------------------------------------- }
 
-  TAsyncCallArgRecord = class(TAsyncCall)
+  TAsyncCallArgRecord = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgRecordProc;
     FArg: Pointer;
@@ -1058,7 +1070,7 @@ type
     constructor Create(AProc: TAsyncCallArgRecordProc; AArg: Pointer);
   end;
 
-  TAsyncCallMethodArgRecord = class(TAsyncCall)
+  TAsyncCallMethodArgRecord = class(TInternalAsyncCall)
   private
     FProc: TAsyncCallArgRecordMethod;
     FArg: Pointer;
@@ -1069,7 +1081,7 @@ type
   end;
 
   {$IFDEF SUPPORT_LOCAL_FUNCTIONS}
-  TAsyncCallArrayOfConst = class(TAsyncCall)
+  TAsyncCallArrayOfConst = class(TInternalAsyncCall)
   private
     FProc: function: Integer register;
     FArgs: array of TVarRec;
@@ -1367,26 +1379,30 @@ end;
 {$IFDEF SUPPORT_LOCAL_FUNCTIONS}
 function AsyncCall(Proc: TCdeclFunc; const Args: array of const): IAsyncCall; overload;
 var
-  Call: TAsyncCall;
+  Call: TInternalAsyncCall;
 begin
   Call := TAsyncCallArrayOfConst.Create(Proc, Args);
   if ThreadPool.MaxThreads = 0 then
-    Call.InternExecuteSyncCall
+  begin
+    Call.InternExecuteSyncCall;
+    Result := TAsyncCall.Create(Call);
+  end
   else
-    Call.ExecuteAsync;
-  Result := Call;
+    Result := Call.ExecuteAsync;
 end;
 
 function AsyncCall(Proc: TCdeclMethod; const Args: array of const): IAsyncCall; overload;
 var
-  Call: TAsyncCall;
+  Call: TInternalAsyncCall;
 begin
   Call := TAsyncCallArrayOfConst.Create(Proc.Code, TObject(Proc.Data), Args);
   if ThreadPool.MaxThreads = 0 then
-    Call.InternExecuteSyncCall
+  begin
+    Call.InternExecuteSyncCall;
+    Result := TAsyncCall.Create(Call);
+  end
   else
-    Call.ExecuteAsync;
-  Result := Call;
+    Result := Call.ExecuteAsync;
 end;
 {$ENDIF SUPPORT_LOCAL_FUNCTIONS}
 
@@ -1521,7 +1537,7 @@ function InternalAsyncMultiSync(const List: array of IAsyncCall; const Handles: 
     SetLength(WaitHandles, Length(List) + Length(Handles));
     SetLength(Mapping, Length(WaitHandles));
     Count := 0;
-    { Get the TAsyncCall events }
+    { Get the TInternalAsyncCall events }
     for I := 0 to High(List) do
     begin
       if (List[I] <> nil) and Supports(List[I], IAsyncCallEx, EventIntf) then
@@ -1677,7 +1693,7 @@ end;
 
 procedure TAsyncCallThread.Execute;
 var
-  FAsyncCall: TAsyncCall;
+  FAsyncCall: TInternalAsyncCall;
   CoInitialized: Boolean;
   {$IFDEF DEBUG_THREADSTATS}
   Start, Stop: Int64;
@@ -1719,6 +1735,9 @@ begin
         if FAsyncCall = nil then
           Break;
       end;
+
+      if FAsyncCall <> nil then
+        FAsyncCall.Release;
     end;
   finally
     if CoInitialized then
@@ -1750,8 +1769,11 @@ end;
 destructor TThreadPool.Destroy;
 var
   I: Integer;
+  Call: TInternalAsyncCall;
+  Msg: TMsg;
 begin
-  FMaxThreads := FThreadCount; // Prevent the allocation of new thread
+  FMaxThreads := FThreadCount; // Do not allocation new threads
+  FDestroying := True; // => Sync in this thread because there is no other thread (required for FAsnycCallHead.Free)
 
   // Allow the threads to terminate if there is no task
   for I := FThreadCount - 1 downto 0 do
@@ -1762,22 +1784,44 @@ begin
   for I := FThreadCount - 1 downto 0 do
     FThreads[I].Free;
 
+  // Clean up not yet released TInternalAsyncCalls objects
+  while FAsyncCallHead <> nil do
+  begin
+    Call := FAsyncCallHead.FNext;
+    FAsyncCallHead.Release;
+    FAsyncCallHead := Call;
+  end;
+
+  // Handle pending FatalExceptions from "forgotten" async calls
+  while PeekMessage(Msg, FMainThreadVclHandle, WM_RAISEEXCEPTION, WM_RAISEEXCEPTION, PM_REMOVE or PM_NOYIELD) do
+    DispatchMessage(Msg);
+
   CloseHandle(FThreadTerminateEvent);
   CloseHandle(FWakeUpEvent);
   CloseHandle(FMainThreadSyncEvent);
   DeallocateHWnd(FMainThreadVclHandle);
+  FMainThreadVclHandle := 0;
   DeleteCriticalSection(FAsyncCallsCritSect);
 
   inherited Destroy;
 end;
 
-function TThreadPool.GetNextAsyncCall: TAsyncCall;
+procedure TThreadPool.CheckDestroying;
+begin
+  if FDestroying then
+    raise EAsyncCallError.CreateRes(@RsNoVclSyncPossible);
+end;
+
+function TThreadPool.GetNextAsyncCall: TInternalAsyncCall;
 begin
   { Dequeue }
   EnterCriticalSection(FAsyncCallsCritSect); // spinning
   try
+    // Skip reference count handling, because we would increment (Result) and decrement (ListRemove) it.
     { Get the "oldest" async call }
     Result := FAsyncCallHead;
+    if Result <> nil then
+      Dec(FEnqueuedCallCount);
     if FAsyncCallHead <> nil then
       FAsyncCallHead := FAsyncCallHead.FNext;
     if Result = FAsyncCallTail then
@@ -1795,9 +1839,9 @@ begin
     Sleep;
 end;
 
-function TThreadPool.RemoveAsyncCall(Call: TAsyncCall): Boolean;
+function TThreadPool.RemoveAsyncCall(Call: TInternalAsyncCall): Boolean;
 var
-  Item: TAsyncCall;
+  Item: TInternalAsyncCall;
 begin
   Result := False;
   EnterCriticalSection(FAsyncCallsCritSect); // spinning, but we may take too much time
@@ -1808,6 +1852,7 @@ begin
       FAsyncCallHead := Call.FNext;
       if FAsyncCallHead = nil then
         FAsyncCallTail := nil;
+      Dec(FEnqueuedCallCount);
       Result := True;
     end
     else
@@ -1819,17 +1864,24 @@ begin
         Item.FNext := Call.FNext;
         if Call = FAsyncCallTail then
           FAsyncCallTail := Item;
+        Dec(FEnqueuedCallCount);
         Result := True;
       end;
     end;
   finally
     LeaveCriticalSection(FAsyncCallsCritSect);
   end;
+  if Result then
+    Call.Release; // removed from list
 end;
 
-procedure TThreadPool.AddAsyncCall(Call: TAsyncCall);
+procedure TThreadPool.AddAsyncCall(Call: TInternalAsyncCall);
+var
+  AvailableThreadCount: Integer;
 begin
   { Enqueue }
+  Call.AddRef; // added to list
+
   EnterCriticalSection(FAsyncCallsCritSect); // spinning
   if FAsyncCallTail = nil then
   begin
@@ -1841,10 +1893,13 @@ begin
     FAsyncCallTail.FNext := Call;
     FAsyncCallTail := Call;
   end;
+  AvailableThreadCount := FSleepingThreadCount - FEnqueuedCallCount;
+  Inc(FEnqueuedCallCount);
   LeaveCriticalSection(FAsyncCallsCritSect);
 
-  { All threads are busy, we need to allocate another thread if possible. }
-  if FSleepingThreadCount = 0 then
+  { We need to start another thread, if all threads are busy (not sleeping) or we have already
+    enqueued tasks for all sleeping thread. }
+  if AvailableThreadCount <= 0 then
   begin
     { Do an unsafe ThreadCount check. AllocThread will do a safe check if we were wrong here. }
     if FThreadCount < MaxThreads then
@@ -1856,16 +1911,6 @@ begin
 end;
 
 procedure TThreadPool.AllocThread;
-
-{$IFNDEF DELPHI2009_UP}
-  // Needed for older Delphi versions
-  function InterlockedCompareExchange(var Destination: Integer; Exchange: Integer; Comparand: Integer): Integer;
-  asm
-         XCHG    EAX, ECX
-    LOCK CMPXCHG [ECX], EDX
-  end;
-{$ENDIF ~DELPHI2009_UP}
-
 var
   Index: Integer;
 begin
@@ -1878,8 +1923,10 @@ begin
     FThreads[Index] := TAsyncCallThread.Create(False);
 end;
 
-procedure TThreadPool.SendVclSync(Call: TAsyncCall);
+procedure TThreadPool.SendVclSync(Call: TInternalAsyncCall);
 begin
+  CheckDestroying;
+
   if not PostMessage(FMainThreadVclHandle, WM_VCLSYNC, 0, LPARAM(Call)) then
     Call.Quit(0)
   else
@@ -1911,11 +1958,18 @@ end;
 
 procedure TThreadPool.MainThreadWndProc(var Msg: TMessage);
 begin
-  case Msg.Msg of
-    WM_VCLSYNC:
-      TAsyncCall(Msg.LParam).InternExecuteSyncCall;
-  else
-    Msg.Result := DefWindowProc(FMainThreadVclHandle, Msg.Msg, Msg.WParam, Msg.LParam);
+  try
+    case Msg.Msg of
+      WM_VCLSYNC:
+        TInternalAsyncCall(Msg.LParam).InternExecuteSyncCall;
+      WM_RAISEEXCEPTION:
+        raise Exception(Msg.LParam) at Pointer(Msg.WParam);
+    else
+      Msg.Result := DefWindowProc(FMainThreadVclHandle, Msg.Msg, Msg.WParam, Msg.LParam);
+    end;
+  except
+    if Assigned(ApplicationHandleException) then
+      ApplicationHandleException(Self);
   end;
 end;
 
@@ -1934,6 +1988,15 @@ end;
 { ---------------------------------------------------------------------------- }
 { TSyncCall }
 
+function TSyncCall.Canceled: Boolean;
+begin
+  Result := False;
+end;
+
+procedure TSyncCall.CancelInvocation;
+begin
+end;
+
 constructor TSyncCall.Create(AReturnValue: Integer);
 begin
   inherited Create;
@@ -1949,6 +2012,10 @@ procedure TSyncCall.ForceDifferentThread;
 begin
 end;
 
+procedure TSyncCall.Forget;
+begin
+end;
+
 function TSyncCall.ReturnValue: Integer;
 begin
   Result := FReturnValue;
@@ -1960,58 +2027,80 @@ begin
 end;
 
 { ---------------------------------------------------------------------------- }
-{ TAsyncCall }
+{ TInternalAsyncCall }
 
-constructor TAsyncCall.Create;
+constructor TInternalAsyncCall.Create;
 begin
   inherited Create;
   FEvent := CreateEvent(nil, True, False, nil);
 end;
 
-destructor TAsyncCall.Destroy; 
+destructor TInternalAsyncCall.Destroy;
 begin
   if FEvent <> 0 then
   begin
-    try
-      Sync;
-    finally
-      CloseHandle(FEvent);
-      FEvent := 0;
-    end;
+    CloseHandle(FEvent);
+    FEvent := 0;
+  end;
+  // TAsyncCall.Destroy either already called Sync() or we are a "forgotten" async call
+  // and we need to handle the exception ourself by trying to throw it in the main thread
+  // or just ignoring it.
+  if FFatalException <> nil then
+  begin
+    if Assigned(ApplicationHandleException) and
+       (ThreadPool.FMainThreadVclHandle <> 0) and IsWindow(ThreadPool.FMainThreadVclHandle) then
+      PostMessage(ThreadPool.FMainThreadVclHandle, WM_RAISEEXCEPTION, WPARAM(FFatalErrorAddr), LPARAM(FFatalException))
+    else
+      FFatalException.Free;
   end;
   inherited Destroy;
 end;
 
-function TAsyncCall._Release: Integer;
+procedure TInternalAsyncCall.AddRef;
 begin
-  Result := InterlockedDecrement(FRefCount);
-  if Result = 0 then
-  begin
-    try
-      if FEvent <> 0 then
-        Sync;
-    finally
-      Destroy;
-    end;
-  end;
+  InterlockedIncrement(FRefCount);
 end;
 
-function TAsyncCall.Finished: Boolean;
+procedure TInternalAsyncCall.Release;
 begin
-  Result := (FEvent = 0) or FFinished or (WaitForSingleObject(FEvent, 0) = WAIT_OBJECT_0);
+  if InterlockedDecrement(FRefCount) = 0 then
+    Destroy;
 end;
 
-procedure TAsyncCall.ForceDifferentThread;
+function TInternalAsyncCall.Finished: Boolean;
+begin
+  if FCanceled or (FCancelInvocation and not FExecuted) then
+    Result := True
+  else
+    Result := (FEvent = 0) or FFinished or (WaitForSingleObject(FEvent, 0) = WAIT_OBJECT_0);
+end;
+
+procedure TInternalAsyncCall.ForceDifferentThread;
 begin
   FForceDifferentThread := True;
 end;
 
-function TAsyncCall.GetEvent: THandle;
+procedure TInternalAsyncCall.Forget;
+begin
+  ForceDifferentThread;
+end;
+
+function TInternalAsyncCall.Canceled: Boolean;
+begin
+  Result := FCanceled;
+end;
+
+procedure TInternalAsyncCall.CancelInvocation;
+begin
+  FCancelInvocation := True;
+end;
+
+function TInternalAsyncCall.GetEvent: THandle;
 begin
   Result := FEvent;
 end;
 
-procedure TAsyncCall.InternExecuteAsyncCall;
+procedure TInternalAsyncCall.InternExecuteAsyncCall;
 var
   Value: Integer;
 begin
@@ -2020,15 +2109,21 @@ begin
   {$ENDIF DEBUG_THREADSTATS}
   Value := 0;
   try
-    Value := ExecuteAsyncCall;
+    if not FCancelInvocation then
+    begin
+      FExecuted := True;
+      Value := ExecuteAsyncCall;
+    end
+    else
+      FCanceled := True;
   except
     FFatalErrorAddr := ExceptAddr;
-    FFatalException := AcquireExceptionObject;
+    FFatalException := Exception(AcquireExceptionObject);
   end;
   Quit(Value);
 end;
 
-procedure TAsyncCall.InternExecuteSyncCall;
+procedure TInternalAsyncCall.InternExecuteSyncCall;
 var
   Value: Integer;
 begin
@@ -2037,21 +2132,27 @@ begin
   {$ENDIF DEBUG_THREADSTATS}
   Value := 0;
   try
-    Value := ExecuteAsyncCall();
+    if not FCancelInvocation then
+    begin
+      FExecuted := True;
+      Value := ExecuteAsyncCall();
+    end
+    else
+      FCanceled := True;
   finally
     // Let the exception be handled by the caller because we are in sync with it
     Quit(Value);
   end;
 end;
 
-procedure TAsyncCall.Quit(AReturnValue: Integer);
+procedure TInternalAsyncCall.Quit(AReturnValue: Integer);
 begin
   FReturnValue := AReturnValue;
   FFinished := True;
   SetEvent(FEvent);
 end;
 
-function TAsyncCall.ReturnValue: Integer;
+function TInternalAsyncCall.ReturnValue: Integer;
 var
   E: Exception;
 begin
@@ -2067,7 +2168,7 @@ begin
   end;
 end;
 
-function TAsyncCall.Sync: Integer;
+function TInternalAsyncCall.Sync: Integer;
 var
   E: Exception;
 begin
@@ -2095,12 +2196,14 @@ begin
   end;
 end;
 
-function TAsyncCall.SyncInThisThreadIfPossible: Boolean;
+function TInternalAsyncCall.SyncInThisThreadIfPossible: Boolean;
 begin
+  // AddRef/Release protection isn't needed here because SyncInThisThreadIfPossible
+  // is only called from an TAsynCall instance that holds a reference.
   if not Finished then
   begin
     Result := False;
-    if not FForceDifferentThread then
+    if not FForceDifferentThread or ThreadPool.FDestroying then
     begin
       { If no thread was assigned to this async call, remove it form the waiting
         queue and execute it in the current thread. }
@@ -2115,10 +2218,10 @@ begin
     Result := True;
 end;
 
-function TAsyncCall.ExecuteAsync: TAsyncCall;
+function TInternalAsyncCall.ExecuteAsync: TAsyncCall;
 begin
+  Result := TAsyncCall.Create(Self);
   ThreadPool.AddAsyncCall(Self);
-  Result := Self;
 end;
 
 { ---------------------------------------------------------------------------- }
@@ -2598,7 +2701,7 @@ asm
   mov eax, [eax].TLocalVclCallRec.Param
   push edx
   call ecx
-  pop ecx 
+  pop ecx
 end;
 
 procedure InternLocalVclCall(LocalProc: TLocalVclProc; Param: INT_PTR; BasePointer: Pointer);
@@ -2606,6 +2709,7 @@ var
   M: TMethod;
   Data: TLocalVclCallRec;
 begin
+  ThreadPool.CheckDestroying;
   Data.BasePointer := BasePointer;
   Data.Proc := LocalProc;
   Data.Param := Param;
@@ -2639,9 +2743,10 @@ begin
   end
   else
   begin
+    ThreadPool.CheckDestroying;
     Call := TAsyncVclCallLocalProc.Create(LocalProc, Param, BasePointer);
     ThreadPool.SendVclSync(Call);
-    Result := Call;
+    Result := TAsyncCall.Create(Call);
   end;
 end;
 
@@ -2722,8 +2827,8 @@ end;
 procedure LeaveMainThreadError(ErrorMode: Integer);
 begin
   case ErrorMode of
-    0: raise Exception.Create(RsLeaveMainThreadNestedError);
-    1: raise Exception.Create(RsLeaveMainThreadThreadError);
+    0: raise Exception.CreateRes(@RsLeaveMainThreadNestedError);
+    1: raise Exception.CreateRes(@RsLeaveMainThreadThreadError);
   end;
 end;
 
@@ -2775,7 +2880,7 @@ asm
   { Detect if the finally block is called by System._HandleFinally.
     In that case an exception was raised in the MainThread-Block. The
     Classes.CheckSynchronize function will handle the exception and the
-    thread switch for us. This will also restore the EBP regíster. }
+    thread switch for us. This will also restore the EBP register. }
   mov eax, [esp + $04] // finally return address
   mov edx, OFFSET System.@HandleFinally
   cmp eax, edx
@@ -2844,6 +2949,9 @@ asm
   cmp eax, ecx
   je @@InMainThread
 
+  mov eax, ThreadPool
+  call TThreadPool.CheckDestroying;
+
   { Enter critical section => implicit waiting queue }
   mov eax, OFFSET MainThreadContextCritSect
   push eax
@@ -2911,7 +3019,7 @@ asm
 
   { End try/finally }
 @@Finally:
-  { Restore thread registers } 
+  { Restore thread registers }
   mov eax, OFFSET MainThreadContext
   mov ebx, [eax].TMainThreadContext.ThreadRegEBX
   mov edi, [eax].TMainThreadContext.ThreadRegEDI
@@ -3174,6 +3282,7 @@ begin
     Proc()
   else
   begin
+    ThreadPool.CheckDestroying;
     M.Code := @Exec;
     M.Data := @Proc;
     StaticSynchronize(TThreadMethod(M));
@@ -3191,9 +3300,10 @@ begin
   end
   else
   begin
+    ThreadPool.CheckDestroying;
     Call := TAsyncVclCallAnonymProc.Create(Proc);
     ThreadPool.SendVclSync(Call);
-    Result := Call;
+    Result := TAsyncCall.Create(Call);
   end;
 end;
 
@@ -3217,6 +3327,93 @@ end;
 
 {----------------------------------------------------------------------------}
 
+{ TAsyncCall }
+
+constructor TAsyncCall.Create(ACall: TInternalAsyncCall);
+begin
+  inherited Create;
+  ACall.AddRef;
+  FCall := ACall;
+end;
+
+destructor TAsyncCall.Destroy;
+begin
+  if FCall <> nil then
+  begin
+    try
+      FCall.Sync; // throws raised exception
+    finally
+      FCall.Release;
+    end;
+  end;
+  inherited Destroy;
+end;
+
+function TAsyncCall.Finished: Boolean;
+begin
+  CheckForget;
+  Result := FCall.Finished;
+end;
+
+procedure TAsyncCall.ForceDifferentThread;
+begin
+  CheckForget;
+  FCall.ForceDifferentThread;
+end;
+
+procedure TAsyncCall.Forget;
+var
+  C: TInternalAsyncCall;
+begin
+  CheckForget;
+  C := FCall;
+  FCall := nil;
+  C.Forget;
+  C.Release;
+end;
+
+function TAsyncCall.ReturnValue: Integer;
+begin
+  CheckForget;
+  Result := FCall.ReturnValue;
+end;
+
+function TAsyncCall.Sync: Integer;
+begin
+  CheckForget;
+  Result := FCall.Sync;
+end;
+
+function TAsyncCall.GetEvent: THandle;
+begin
+  CheckForget;
+  Result := FCall.GetEvent;
+end;
+
+function TAsyncCall.SyncInThisThreadIfPossible: Boolean;
+begin
+  CheckForget;
+  Result := FCall.SyncInThisThreadIfPossible;
+end;
+
+function TAsyncCall.Canceled: Boolean;
+begin
+  CheckForget;
+  Result := FCall.Canceled;
+end;
+
+procedure TAsyncCall.CancelInvocation;
+begin
+  CheckForget;
+  FCall.CancelInvocation;
+end;
+
+procedure TAsyncCall.CheckForget;
+begin
+  if FCall = nil then
+    raise EAsyncCallError.CreateRes(@RsForgetWasCalled);
+end;
+
 initialization
   ThreadPool := TThreadPool.Create;
   {$IFDEF SUPPORT_LOCAL_FUNCTIONS}
@@ -3239,3 +3436,4 @@ finalization
   {$ENDIF ~DELPHi7_UP}
 
 end.
+
