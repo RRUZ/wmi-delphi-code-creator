@@ -1,4 +1,4 @@
-![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/logo_s.png)The <strong>WMI Delphi Code Creator </strong> (WDCC), allows you to generate <strong>Object Pascal</strong>,  <strong>[Oxygene](http://www.elementscompiler.com/elements/oxygene/default.aspx)</strong>, <strong>C++</strong> and <strong>C#</strong> code to access the WMI (Windows Management Instrumentation) classes, events and methods. Also includes a set of tools to explorer and Query the content of the WMI.
+![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/logo_s.png)The <strong>WMI Delphi Code Creator </strong> (WDCC), allows you to generate <strong>Object Pascal</strong>,  <strong>[Oxygene](http://www.elementscompiler.com/elements/oxygene/default.aspx)</strong>, <strong>C++</strong> and <strong>C#</strong> code to access the WMI (Windows Management Instrumentation) classes, events and methods. It also includes a set of tools to explore and query the content of the WMI.
 
 [![](https://theroadtodelphi.files.wordpress.com/2014/07/followrruz.png)](https://twitter.com/RUZ)
 
@@ -20,7 +20,7 @@
 
 ![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/Explorer1.png)
 
-**WMI Class Tree** : shows the hierarchy and dependencies of the WMI classes in a namespace
+**WMI Class Tree** : Shows the hierarchy and dependencies of the WMI classes in a namespace
 
 ![](https://github.com/RRUZ/wmi-delphi-code-creator/blob/master/images/WMITree.png)
 
