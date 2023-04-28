@@ -11,6 +11,8 @@
 //     DAMAGES AND LOSS OF PROFITS OR ANY OTHER KIND OF LOSS WHILE USING OR MISUSING THIS CODE.
 //
 //----------------------------------------------------------------------------------------------------
+//     Bug #29 (https://github.com/RRUZ/wmi-delphi-code-creator/issues/29) has been fixed by tnt4brain
+//     via https://github.com/tnt4brain/wmi-delphi-code-creator
 program GetWMI_Info;
 
 {$mode objfpc} {$H+}
@@ -34,15 +36,16 @@ var
   FSWbemLocator: OLEVariant;
   FWMIService: OLEVariant;
   FWbemObjectSet: OLEVariant;
-  FWbemObject: Variant;
-  oEnum: IEnumvariant;
-  sValue: string;   
+  FWbemObject   : OLEVariant;
+  oEnum         : IEnumvariant;
+  sValue        : string;   
+  tmpValue      : longword=0;
 begin;
   FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
   FWMIService   := FSWbemLocator.ConnectServer(WbemComputer, '[WMINAMESPACE]', WbemUser, WbemPassword);
   FWbemObjectSet:= FWMIService.ExecQuery('SELECT * FROM [WMICLASSNAME]','WQL',wbemFlagForwardOnly);
   oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
-  while oEnum.Next(1, FWbemObject, nil) = 0 do
+  while oEnum.Next(1, FWbemObject, tmpValue) = 0 do
   begin
 [DELPHICODE]	    
     Writeln('');
